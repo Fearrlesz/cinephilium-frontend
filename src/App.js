@@ -122,12 +122,23 @@ function HomePage() {
     loadFilms();
   }, []);
 
+  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ФИЛЬМОВ =====
   const loadFilms = async () => {
     setLoading(true);
     setError('');
     try {
       const response = await api.get('/films');
-      setFilms(response.data.films || []);
+      // Проверяем, что пришёл массив
+      if (Array.isArray(response.data.films)) {
+        // Добавляем новые фильмы к старым, убирая дубликаты по _id
+        setFilms(prev => {
+          const existingIds = new Set(prev.map(f => f._id));
+          const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+          return [...prev, ...newFilms];
+        });
+      } else {
+        setFilms([]);
+      }
     } catch (err) {
       console.error('Ошибка загрузки фильмов:', err);
       setError('Не удалось загрузить фильмы. Попробуйте позже.');
@@ -136,11 +147,9 @@ function HomePage() {
     }
   };
 
-  // ===== ИСПРАВЛЕННЫЙ ПОИСК =====
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     try {
-      // ИСПРАВЛЕНИЕ: отправляем query как params, а не в URL
       const response = await api.get('/tmdb/search', {
         params: { query: searchQuery }
       });
