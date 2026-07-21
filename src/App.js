@@ -3,7 +3,29 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } 
 import axios from 'axios';
 import './App.css';
 
-// ------------------ API ------------------
+// ===== КОНСТАНТЫ =====
+const baseNames = [
+  '🎭 Сценарий и драматургия',
+  '🎨 Режиссура и визуал',
+  '🔊 Звук и аудио-атмосфера',
+  '🎬 Актерская игра и монтаж'
+];
+
+const criteriaNames = [
+  ['Оригинальность сюжета', 'Логичность событий', 'Качество диалогов', 'Умение создавать напряжение', 'Сильная концовка'],
+  ['Композиция кадра', 'Цветокоррекция', 'Мастерство освещения', 'Движение камеры', 'Визуальные метафоры'],
+  ['Качество саундтрека', 'Звуковой дизайн', 'Использование тишины', 'Разборчивость речи', 'Естественность звуков'],
+  ['Аутентичность актеров', 'Химия между актёрами', 'Богатство мимики', 'Ритм монтажа', 'Техническая чистота']
+];
+
+const baseDescriptions = [
+  ['Насколько оригинален сюжет?', 'Нет ли сюжетных дыр?', 'Насколько естественно звучат диалоги?', 'Умеет ли фильм держать в напряжении?', 'Удовлетворяет ли концовка?'],
+  ['Насколько гармонична композиция кадра?', 'Соответствует ли цветокоррекция настроению?', 'Насколько профессионально освещение?', 'Уместна ли работа камеры?', 'Есть ли визуальные метафоры?'],
+  ['Насколько хорош саундтрек?', 'Насколько качественно звуковое окружение?', 'Насколько уместна тишина?', 'Четко ли слышна речь?', 'Насколько естественны звуковые эффекты?'],
+  ['Верите ли вы актёрам?', 'Чувствуете ли химию между актёрами?', 'Насколько выразительна мимика?', 'Соответствует ли монтаж динамике?', 'Насколько чисто сделаны склейки?']
+];
+
+// ===== API =====
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
 });
@@ -13,7 +35,6 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      // Редирект будет обработан в компонентах, но для защиты оставляем
       if (!window.location.pathname.startsWith('/login')) {
         window.location.href = '/login';
       }
@@ -30,7 +51,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ------------------ Цвет для оценки ------------------
+// ===== УТИЛИТЫ =====
 function getScoreColor(score) {
   if (score === undefined || score === null || isNaN(score)) return '#666';
   const clampedScore = Math.max(6, Math.min(90, score));
@@ -39,7 +60,54 @@ function getScoreColor(score) {
   return `hsl(${hue}, 85%, ${45 + normalized * 15}%)`;
 }
 
-// ------------------ ГЛАВНАЯ ------------------
+// ===== МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ОЦЕНКИ =====
+function RatingDetailsModal({ rating, onClose }) {
+  if (!rating) return null;
+
+  const bases = [rating.base1, rating.base2, rating.base3, rating.base4];
+  const baseAverages = bases.map(base => 
+    base && base.length === 5 ? (base.reduce((a, b) => a + b, 0) / 5).toFixed(1) : '0.0'
+  );
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        
+        <div className="modal-header">
+          <h2>{rating.filmId?.title || 'Фильм'}</h2>
+          <p>Оценка: <span style={{ color: getScoreColor(rating.finalScore), fontSize: '28px', fontWeight: 'bold' }}>{rating.finalScore}</span></p>
+          <p className="modal-user">👤 {rating.userId?.nickname || 'Пользователь'}</p>
+          <p>Субъективный множитель (M): <strong>{rating.subjectiveM}</strong></p>
+          <p>Технический балл (T): <strong>{rating.technicalScore}</strong></p>
+          {rating.textReview && (
+            <div className="modal-review">
+              <p><strong>Отзыв:</strong> {rating.textReview}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="modal-bases">
+          {[0, 1, 2, 3].map((baseIndex) => (
+            <div key={baseIndex} className="modal-base">
+              <h4>{baseNames[baseIndex]} <span className="modal-base-avg">(среднее: {baseAverages[baseIndex]})</span></h4>
+              <div className="modal-criteria">
+                {criteriaNames[baseIndex].map((name, critIndex) => (
+                  <div key={critIndex} className="modal-criterion">
+                    <span>{name}</span>
+                    <span className="modal-criterion-score">{bases[baseIndex]?.[critIndex] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== ГЛАВНАЯ =====
 function HomePage() {
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +115,7 @@ function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,14 +155,20 @@ function HomePage() {
       navigate('/login');
       return;
     }
+    
+    if (isImporting) return;
+    setIsImporting(true);
+    
     try {
       await api.post('/films/import', { tmdbId });
       alert('Фильм успешно добавлен!');
       setShowSearch(false);
       setSearchQuery('');
-      loadFilms();
+      await loadFilms();
     } catch (err) {
       alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -154,7 +229,9 @@ function HomePage() {
                 />
                 <h4>{film.title}</h4>
                 <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
-                <button onClick={() => importFilm(film.id)}>➕ Добавить</button>
+                <button onClick={() => importFilm(film.id)} disabled={isImporting}>
+                  {isImporting ? 'Добавление...' : '➕ Добавить'}
+                </button>
               </div>
             ))}
           </div>
@@ -186,7 +263,7 @@ function HomePage() {
   );
 }
 
-// ------------------ СТРАНИЦА ФИЛЬМА ------------------
+// ===== СТРАНИЦА ФИЛЬМА =====
 function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -194,6 +271,10 @@ function FilmPage() {
   const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState(null);
   const [isRatingMode, setIsRatingMode] = useState(false);
+  const [filmUsers, setFilmUsers] = useState([]);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const [base1, setBase1] = useState([5, 5, 5, 5, 5]);
   const [base2, setBase2] = useState([5, 5, 5, 5, 5]);
@@ -201,10 +282,10 @@ function FilmPage() {
   const [base4, setBase4] = useState([5, 5, 5, 5, 5]);
   const [subjectiveM, setSubjectiveM] = useState(5);
   const [textReview, setTextReview] = useState('');
-  const [calculatedScore, setCalculatedScore] = useState(null);
 
   useEffect(() => {
     loadFilm();
+    loadFilmUsers();
   }, [id]);
 
   const loadFilm = async () => {
@@ -222,7 +303,6 @@ function FilmPage() {
         setSubjectiveM(ur.subjectiveM || 5);
         setTextReview(ur.textReview || '');
       } else {
-        // Сбрасываем форму при отсутствии оценки
         setBase1([5,5,5,5,5]);
         setBase2([5,5,5,5,5]);
         setBase3([5,5,5,5,5]);
@@ -231,11 +311,22 @@ function FilmPage() {
         setTextReview('');
         setUserRating(null);
       }
-      setCalculatedScore(null); // сбрасываем предпросмотр при загрузке
     } catch (err) {
       console.error('Ошибка загрузки фильма:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadFilmUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const response = await api.get(`/films/${id}/users`);
+      setFilmUsers(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки пользователей:', err);
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -249,7 +340,7 @@ function FilmPage() {
     });
   }, []);
 
-  const calculatePreview = () => {
+  const calculatePreview = useCallback(() => {
     const avg1 = base1.reduce((a, b) => a + b, 0) / 5;
     const avg2 = base2.reduce((a, b) => a + b, 0) / 5;
     const avg3 = base3.reduce((a, b) => a + b, 0) / 5;
@@ -257,7 +348,7 @@ function FilmPage() {
     const T = (avg1 + avg2 + avg3 + avg4) * 1.4;
     const finalRaw = T + 34 * (subjectiveM - 1) / 9;
     return Math.min(90, Math.max(6, Math.round(finalRaw)));
-  };
+  }, [base1, base2, base3, base4, subjectiveM]);
 
   const saveRating = async () => {
     const token = localStorage.getItem('token');
@@ -266,6 +357,9 @@ function FilmPage() {
       navigate('/login');
       return;
     }
+
+    if (isSaving) return;
+    setIsSaving(true);
 
     try {
       const response = await api.post('/ratings', {
@@ -277,56 +371,40 @@ function FilmPage() {
         subjectiveM,
         textReview
       });
-      const finalScore = response.data.finalScore;
-      setCalculatedScore(finalScore);
-      // Обновляем локальный userRating, чтобы не делать повторный запрос
-      const newRating = {
-        ...response.data.rating,
-        filmId: id,
-        finalScore
-      };
-      setUserRating(newRating);
-      // Также обновляем среднюю оценку фильма, если она вернулась
-      if (response.data.film) {
-        setFilm(prev => ({ ...prev, averageRating: response.data.film.averageRating, votesCount: response.data.film.votesCount }));
-      }
+      
+      setUserRating(response.data.rating);
       alert('Оценка сохранена!');
+      await loadFilm();
+      await loadFilmUsers();
     } catch (err) {
       alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Открывая форму, сбрасываем calculatedScore, чтобы не показывать старый предпросмотр
-  const toggleRatingMode = () => {
-    if (!isRatingMode) {
-      setCalculatedScore(null);
+  const openRatingDetails = async (ratingData) => {
+    try {
+      if (ratingData.base1 && ratingData.base1.length === 5) {
+        setSelectedRating(ratingData);
+        return;
+      }
+      const response = await api.get(`/ratings/${ratingData.id}/details`);
+      setSelectedRating(response.data);
+    } catch (err) {
+      console.error('Ошибка загрузки деталей оценки:', err);
+      alert('Не удалось загрузить детали оценки.');
     }
+  };
+
+  const toggleRatingMode = () => {
     setIsRatingMode(!isRatingMode);
   };
 
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!film) return <div className="error">Фильм не найден</div>;
 
-  const baseNames = [
-    '🎭 Сценарий и драматургия',
-    '🎨 Режиссура и визуал',
-    '🔊 Звук и аудио-атмосфера',
-    '🎬 Актерская игра и монтаж'
-  ];
-
-  const criteriaNames = [
-    ['Оригинальность сюжета', 'Логичность событий', 'Качество диалогов', 'Умение создавать напряжение', 'Сильная концовка'],
-    ['Композиция кадра', 'Цветокоррекция', 'Мастерство освещения', 'Движение камеры', 'Визуальные метафоры'],
-    ['Качество саундтрека', 'Звуковой дизайн', 'Использование тишины', 'Разборчивость речи', 'Естественность звуков'],
-    ['Аутентичность актеров', 'Химия между актёрами', 'Богатство мимики', 'Ритм монтажа', 'Техническая чистота']
-  ];
-
-  const baseDescriptions = [
-    ['Насколько оригинален сюжет?', 'Нет ли сюжетных дыр?', 'Насколько естественно звучат диалоги?', 'Умеет ли фильм держать в напряжении?', 'Удовлетворяет ли концовка?'],
-    ['Насколько гармонична композиция кадра?', 'Соответствует ли цветокоррекция настроению?', 'Насколько профессионально освещение?', 'Уместна ли работа камеры?', 'Есть ли визуальные метафоры?'],
-    ['Насколько хорош саундтрек?', 'Насколько качественно звуковое окружение?', 'Насколько уместна тишина?', 'Четко ли слышна речь?', 'Насколько естественны звуковые эффекты?'],
-    ['Верите ли вы актёрам?', 'Чувствуете ли химию между актёрами?', 'Насколько выразительна мимика?', 'Соответствует ли монтаж динамике?', 'Насколько чисто сделаны склейки?']
-  ];
+  const previewScore = calculatePreview();
 
   return (
     <div className="container">
@@ -366,6 +444,33 @@ function FilmPage() {
             </button>
           </div>
         </div>
+
+        {/* Список пользователей */}
+        {usersLoading ? (
+          <div className="loading">Загрузка пользователей...</div>
+        ) : filmUsers.length > 0 ? (
+          <div className="film-users">
+            <h3>Оценили фильм: {filmUsers.length} человек</h3>
+            <div className="users-list">
+              {filmUsers.map((item) => (
+                <div key={`${item.user.id}-${item.rating.id}`} className="user-rating-item">
+                  <Link to={`/user/${item.user.id}`} className="user-link">
+                    👤 {item.user.nickname}
+                  </Link>
+                  <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
+                    {item.rating.finalScore}
+                  </span>
+                  <button 
+                    className="details-btn"
+                    onClick={() => openRatingDetails(item.rating)}
+                  >
+                    🔍 Детали
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {isRatingMode && (
           <div className="rating-form">
@@ -425,27 +530,29 @@ function FilmPage() {
               <h3>Текстовый отзыв (необязательно)</h3>
               <textarea
                 value={textReview}
-                onChange={(e) => setTextReview(e.target.value)}
+                onChange={(e) => setTextReview(e.target.value.slice(0, 1000))}
                 placeholder="Напишите свои впечатления..."
                 rows="4"
+                maxLength={1000}
               />
+              <div className="char-counter">{textReview.length}/1000</div>
             </div>
 
             <div className="rating-preview">
               <h3>Итоговая оценка:</h3>
-              <div className="preview-score" style={{ color: getScoreColor(calculatePreview()) }}>
-                {calculatePreview()}
+              <div className="preview-score" style={{ color: getScoreColor(previewScore) }}>
+                {previewScore}
               </div>
               <div className="score-bar" style={{ 
-                width: `${(calculatePreview() - 6) / 84 * 100}%`,
+                width: `${(previewScore - 6) / 84 * 100}%`,
                 background: `linear-gradient(to right, #ff1744, #ffab00, #00e676)`
               }}></div>
               <div className="score-labels">
                 <span>6 (провал)</span>
                 <span>90 (шедевр)</span>
               </div>
-              <button onClick={saveRating} className="save-rating-btn">
-                💾 Сохранить оценку
+              <button onClick={saveRating} className="save-rating-btn" disabled={isSaving}>
+                {isSaving ? 'Сохранение...' : '💾 Сохранить оценку'}
               </button>
             </div>
           </div>
@@ -458,22 +565,29 @@ function FilmPage() {
           </div>
         )}
       </div>
+
+      <RatingDetailsModal 
+        rating={selectedRating} 
+        onClose={() => setSelectedRating(null)} 
+      />
     </div>
   );
 }
 
-// ------------------ ЛОГИН / РЕГИСТРАЦИЯ ------------------
+// ===== ВХОД / РЕГИСТРАЦИЯ =====
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
@@ -484,6 +598,8 @@ function LoginPage() {
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Произошла ошибка');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -516,7 +632,9 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">{isLogin ? 'Войти' : 'Зарегистрироваться'}</button>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
+          </button>
         </form>
         <p onClick={() => { setIsLogin(!isLogin); setError(''); }} className="toggle-auth">
           {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
@@ -526,11 +644,12 @@ function LoginPage() {
   );
 }
 
-// ------------------ ПРОФИЛЬ ------------------
+// ===== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ =====
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -563,6 +682,16 @@ function ProfilePage() {
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
+  };
+
+  const openRatingDetails = async (rating) => {
+    try {
+      const response = await api.get(`/ratings/${rating._id}/details`);
+      setSelectedRating(response.data);
+    } catch (err) {
+      console.error('Ошибка загрузки деталей оценки:', err);
+      alert('Не удалось загрузить детали оценки.');
+    }
   };
 
   if (loading) return <div className="loading">Загрузка...</div>;
@@ -604,16 +733,120 @@ function ProfilePage() {
                 <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>
                   {rating.finalScore}
                 </div>
+                <button 
+                  className="details-btn"
+                  onClick={() => openRatingDetails(rating)}
+                >
+                  🔍 Детали
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      <RatingDetailsModal 
+        rating={selectedRating} 
+        onClose={() => setSelectedRating(null)} 
+      />
     </div>
   );
 }
 
-// ------------------ APP ------------------
+// ===== ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ =====
+function UserProfilePage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [ratings, setRatings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState(null);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [id]);
+
+  const loadUserProfile = async () => {
+    try {
+      const response = await api.get(`/users/${id}`);
+      setUser(response.data.user);
+      setRatings(response.data.ratings || []);
+    } catch (err) {
+      console.error('Ошибка загрузки профиля:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openRatingDetails = async (rating) => {
+    try {
+      const response = await api.get(`/ratings/${rating.id}/details`);
+      setSelectedRating(response.data);
+    } catch (err) {
+      console.error('Ошибка загрузки деталей оценки:', err);
+      alert('Не удалось загрузить детали оценки.');
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (!user) return <div className="error">Пользователь не найден</div>;
+
+  return (
+    <div className="container profile-page">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+      
+      <div className="profile-header">
+        <div className="profile-avatar">
+          <div className="avatar-placeholder">{user.nickname[0]}</div>
+        </div>
+        <div className="profile-info">
+          <h1>{user.nickname}</h1>
+          <p>📅 Зарегистрирован: {new Date(user.registeredAt).toLocaleDateString()}</p>
+          <p>⭐ Всего оценок: {ratings.length}</p>
+        </div>
+      </div>
+
+      <div className="profile-ratings">
+        <h2>Оценки пользователя</h2>
+        {ratings.length === 0 ? (
+          <p>Пользователь еще не оценил ни одного фильма</p>
+        ) : (
+          <div className="ratings-list">
+            {ratings.map((rating) => (
+              <div key={rating.id} className="rating-item">
+                <Link to={`/film/${rating.film._id}`}>
+                  <div className="rating-film-info">
+                    <img src={rating.film.poster || '/no-poster.jpg'} alt={rating.film.title} className="rating-poster-small" />
+                    <div>
+                      <h4>{rating.film.title}</h4>
+                      <p>{rating.film.year}</p>
+                    </div>
+                  </div>
+                </Link>
+                <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>
+                  {rating.finalScore}
+                </div>
+                <button 
+                  className="details-btn"
+                  onClick={() => openRatingDetails(rating)}
+                >
+                  🔍 Детали
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <RatingDetailsModal 
+        rating={selectedRating} 
+        onClose={() => setSelectedRating(null)} 
+      />
+    </div>
+  );
+}
+
+// ===== ГЛАВНОЕ ПРИЛОЖЕНИЕ =====
 function App() {
   return (
     <Router>
@@ -622,6 +855,7 @@ function App() {
         <Route path="/film/:id" element={<FilmPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/user/:id" element={<UserProfilePage />} />
       </Routes>
     </Router>
   );
