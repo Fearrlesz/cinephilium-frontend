@@ -136,10 +136,14 @@ function HomePage() {
     }
   };
 
+  // ===== ИСПРАВЛЕННЫЙ ПОИСК =====
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     try {
-      const response = await api.get(`/tmdb/search?query=${encodeURIComponent(searchQuery)}`);
+      // ИСПРАВЛЕНИЕ: отправляем query как params, а не в URL
+      const response = await api.get('/tmdb/search', {
+        params: { query: searchQuery }
+      });
       setSearchResults(response.data.results || []);
       setShowSearch(true);
     } catch (err) {
@@ -445,7 +449,6 @@ function FilmPage() {
           </div>
         </div>
 
-        {/* Список пользователей */}
         {usersLoading ? (
           <div className="loading">Загрузка пользователей...</div>
         ) : filmUsers.length > 0 ? (
