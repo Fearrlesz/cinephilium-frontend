@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
@@ -6,23 +6,23 @@ import './App.css';
 // ===== КОНСТАНТЫ =====
 const baseNames = [
   '🎭 Сценарий и драматургия',
-  '🎨 Режиссура и визуал',
-  '🔊 Звук и аудио-атмосфера',
-  '🎬 Актерская игра и монтаж'
+  '🎭 Персонажи и актерская игра',
+  '🎬 Режиссура и визуальный язык',
+  '🔊 Звук и атмосфера'
 ];
 
 const criteriaNames = [
-  ['Оригинальность сюжета', 'Логичность событий', 'Качество диалогов', 'Умение создавать напряжение', 'Сильная концовка'],
-  ['Композиция кадра', 'Цветокоррекция', 'Мастерство освещения', 'Движение камеры', 'Визуальные метафоры'],
-  ['Качество саундтрека', 'Звуковой дизайн', 'Использование тишины', 'Разборчивость речи', 'Естественность звуков'],
-  ['Аутентичность актеров', 'Химия между актёрами', 'Богатство мимики', 'Ритм монтажа', 'Техническая чистота']
+  ['1.1 Логика и Запуск', '1.2 Структура и Нарастание', '1.3 Цели и Мотивация', '1.4 Диалоги и Подтекст', '1.5 Ценность и Итог'],
+  ['2.1 Глубина личности', '2.2 Химия и Ансамбль', '2.3 Органика поведения', '2.4 Эволюция личности', '2.5 Перегруженность'],
+  ['3.1 Композиция и Среда', '3.2 Движение камеры', '3.3 Цветовая партитура', '3.4 Монтажный ритм', '3.5 Визуальный символизм'],
+  ['4.1 Музыкальная драматургия', '4.2 Тембр и Стиль', '4.3 Шумовая партитура', '4.4 Использование Тишины', '4.5 Технический баланс']
 ];
 
 const baseDescriptions = [
-  ['Насколько оригинален сюжет?', 'Нет ли сюжетных дыр?', 'Насколько естественно звучат диалоги?', 'Умеет ли фильм держать в напряжении?', 'Удовлетворяет ли концовка?'],
-  ['Насколько гармонична композиция кадра?', 'Соответствует ли цветокоррекция настроению?', 'Насколько профессионально освещение?', 'Уместна ли работа камеры?', 'Есть ли визуальные метафоры?'],
-  ['Насколько хорош саундтрек?', 'Насколько качественно звуковое окружение?', 'Насколько уместна тишина?', 'Четко ли слышна речь?', 'Насколько естественны звуковые эффекты?'],
-  ['Верите ли вы актёрам?', 'Чувствуете ли химию между актёрами?', 'Насколько выразительна мимика?', 'Соответствует ли монтаж динамике?', 'Насколько чисто сделаны склейки?']
+  ['Насколько органично события вытекают друг из друга?', 'Есть ли внятное развитие: знакомство → кризис → кульминация → развязка?', 'Понятно ли, чего хочет герой и что ему мешает?', 'Есть ли в словах героев скрытый смысл?', 'Меняется ли герой или мир к финалу?'],
+  ['Есть ли у героя слабости, странности, внутренние конфликты?', 'Интересно ли смотреть на общение героев друг с другом?', 'Верим ли мы мимике, паузам, взглядам, пластике?', 'Меняется ли характер героя под давлением обстоятельств?', 'Нет ли в фильме героев, которые не влияют на сюжет?'],
+  ['Продумано ли, что и где стоит в кадре?', 'Обоснована ли камера: почему в одной сцене она дрожит, а в другой — плавно плывет?', 'Есть ли у фильма своя цветная атмосфера?', 'Длится ли кадр ровно столько, сколько нужно глазу?', 'Есть ли повторяющиеся образы, которые несут скрытый смысл?'],
+  ['Помогает ли музыка понять чувства героя?', 'Соответствуют ли инструменты эпохе, месту и жанру?', 'Работают ли бытовые шумы на атмосферу?', 'Умеет ли режиссер вовремя выключить музыку?', 'Все ли слышно? Не перекрывает ли бас или музыка голоса актеров?']
 ];
 
 // ===== API =====
@@ -78,7 +78,7 @@ function RatingDetailsModal({ rating, onClose }) {
           <h2>{rating.filmId?.title || 'Фильм'}</h2>
           <p>Оценка: <span style={{ color: getScoreColor(rating.finalScore), fontSize: '28px', fontWeight: 'bold' }}>{rating.finalScore}</span></p>
           <p className="modal-user">👤 {rating.userId?.nickname || 'Пользователь'}</p>
-          <p>Субъективный множитель (M): <strong>{rating.subjectiveM}</strong></p>
+          <p>Субъективный множитель «Вайб»: <strong>{rating.subjectiveM}</strong></p>
           <p>Технический балл (T): <strong>{rating.technicalScore}</strong></p>
           {rating.textReview && (
             <div className="modal-review">
@@ -107,6 +107,100 @@ function RatingDetailsModal({ rating, onClose }) {
   );
 }
 
+// ===== ЛЕНТА СОБЫТИЙ =====
+function ActivityFeed({ events }) {
+  if (!events || events.length === 0) return null;
+
+  return (
+    <div className="activity-feed">
+      <h3>📰 Последние события</h3>
+      <div className="feed-list">
+        {events.slice(0, 10).map((e, i) => (
+          <div key={i} className="feed-item">
+            <span className="feed-icon">
+              {e.type === 'rating' ? '⭐' : '➕'}
+            </span>
+            <span className="feed-text">
+              {e.type === 'rating' 
+                ? `«${e.user}» оценил «${e.film}» на ${e.score} баллов`
+                : `«${e.user}» добавил «${e.film}» в базу`}
+            </span>
+            <span className="feed-time">{e.time}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ===== СТРАНИЦА "О СИСТЕМЕ" =====
+function AboutPage() {
+  return (
+    <div className="container about-page">
+      <Link to="/" className="back-btn">← На главную</Link>
+      
+      <h1 className="about-title">📖 О системе оценки</h1>
+      
+      <div className="about-intro">
+        <p>
+          Мы оцениваем фильмы по <strong>20 критериям</strong>, разбитым на 4 блока.
+          Каждый критерий оценивается от <strong>1 до 10</strong>.
+        </p>
+        <p>
+          Также немаловажную роль играет ваше личное восприятие фильма в виде 
+          множителя <strong>«Вайб»</strong>! Тем самым мы в одной системе оценивания 
+          соединяем <strong>химию и математику</strong>. Чистый метамодернизм!
+        </p>
+      </div>
+
+      <div className="about-blocks">
+        {[0, 1, 2, 3].map((blockIndex) => (
+          <div key={blockIndex} className="about-block">
+            <h2 className="about-block-title">{baseNames[blockIndex]}</h2>
+            <div className="about-criteria">
+              {criteriaNames[blockIndex].map((name, critIndex) => (
+                <div key={critIndex} className="about-criterion">
+                  <div className="about-criterion-name">{name}</div>
+                  <div className="about-criterion-desc">{baseDescriptions[blockIndex][critIndex]}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="about-formula">
+        <h2>🔢 Формула расчёта</h2>
+        <div className="formula-steps">
+          <div className="formula-step">
+            <span className="step-number">1</span>
+            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">2</span>
+            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">3</span>
+            <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">4</span>
+            <span>Итог = T + 34 × (M − 1) ÷ 9</span>
+          </div>
+        </div>
+        <div className="formula-result">
+          <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
+        </div>
+      </div>
+
+      <div className="about-version">
+        <p>Синефилиум v1.0 — Храм честного кино.</p>
+      </div>
+    </div>
+  );
+}
+
 // ===== ГЛАВНАЯ =====
 function HomePage() {
   const [films, setFilms] = useState([]);
@@ -116,26 +210,30 @@ function HomePage() {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFilms();
-  }, []);
+    loadFilms(page);
+    loadEvents();
+  }, [page]);
 
-  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ФИЛЬМОВ =====
-  const loadFilms = async () => {
+  const loadFilms = async (pageNum = 1) => {
     setLoading(true);
     setError('');
     try {
-      const response = await api.get('/films');
-      // Проверяем, что пришёл массив
+      const response = await api.get(`/films?page=${pageNum}&limit=20`);
       if (Array.isArray(response.data.films)) {
-        // Добавляем новые фильмы к старым, убирая дубликаты по _id
-        setFilms(prev => {
-          const existingIds = new Set(prev.map(f => f._id));
+        if (pageNum === 1) {
+          setFilms(response.data.films);
+        } else {
+          const existingIds = new Set(films.map(f => f._id));
           const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-          return [...prev, ...newFilms];
-        });
+          setFilms(prev => [...prev, ...newFilms]);
+        }
+        setTotalPages(response.data.totalPages || 1);
       } else {
         setFilms([]);
       }
@@ -144,6 +242,21 @@ function HomePage() {
       setError('Не удалось загрузить фильмы. Попробуйте позже.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadEvents = async () => {
+    try {
+      const response = await api.get('/events');
+      setEvents(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки событий:', err);
+    }
+  };
+
+  const loadMore = () => {
+    if (page < totalPages) {
+      setPage(prev => prev + 1);
     }
   };
 
@@ -177,7 +290,9 @@ function HomePage() {
       alert('Фильм успешно добавлен!');
       setShowSearch(false);
       setSearchQuery('');
-      await loadFilms();
+      setPage(1);
+      await loadFilms(1);
+      await loadEvents();
     } catch (err) {
       alert('Ошибка: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -187,13 +302,20 @@ function HomePage() {
 
   const token = localStorage.getItem('token');
 
-  if (loading) return <div className="loading">Загрузка...</div>;
+  if (loading && page === 1) return <div className="loading">Загрузка...</div>;
+
+  // Топ-5 фильмов
+  const topFilms = [...films]
+    .filter(f => f.averageRating > 0)
+    .sort((a, b) => b.averageRating - a.averageRating)
+    .slice(0, 5);
 
   return (
     <div className="container">
       <header className="header">
         <h1>🎬 СИНЕФИЛИУМ</h1>
         <div className="header-actions">
+          <Link to="/about" className="btn-about">📖 О системе</Link>
           {token ? (
             <>
               <Link to="/profile" className="btn-profile">👤 Профиль</Link>
@@ -251,26 +373,57 @@ function HomePage() {
         </div>
       )}
 
+      {/* ТОП-5 ФИЛЬМОВ */}
+      {topFilms.length > 0 && (
+        <div className="top-films">
+          <h3>🏆 Топ-5 сообщества</h3>
+          <div className="top-list">
+            {topFilms.map((film, i) => (
+              <Link to={`/film/${film._id}`} key={film._id} className="top-item">
+                <span className="top-rank">#{i+1}</span>
+                <span className="top-title">{film.title}</span>
+                <span className="top-score" style={{ color: getScoreColor(film.averageRating) }}>
+                  {film.averageRating?.toFixed(1)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ЛЕНТА СОБЫТИЙ */}
+      <ActivityFeed events={events} />
+
       {films.length === 0 ? (
         <div className="no-films">Нет добавленных фильмов. Найдите и добавьте первый!</div>
       ) : (
-        <div className="films-grid">
-          {films.map((film) => (
-            <Link to={`/film/${film._id}`} key={film._id} className="film-card-link">
-              <div className="film-card">
-                <img src={film.poster || '/no-poster.jpg'} alt={film.title} />
-                <div className="film-info">
-                  <h3>{film.title}</h3>
-                  <p>{film.year}</p>
-                  <div className="rating-badge" style={{ color: getScoreColor(film.averageRating) }}>
-                    {film.averageRating ? `${film.averageRating.toFixed(1)}` : 'Нет оценок'}
+        <>
+          <div className="films-grid">
+            {films.map((film) => (
+              <Link to={`/film/${film._id}`} key={film._id} className="film-card-link">
+                <div className="film-card">
+                  <img src={film.poster || '/no-poster.jpg'} alt={film.title} />
+                  <div className="film-info">
+                    <h3>{film.title}</h3>
+                    <p>{film.year}</p>
+                    <div className="rating-badge" style={{ color: getScoreColor(film.averageRating) }}>
+                      {film.averageRating ? `${film.averageRating.toFixed(1)}` : 'Нет оценок'}
+                    </div>
+                    <span className="votes-count">👥 {film.votesCount || 0}</span>
                   </div>
-                  <span className="votes-count">👥 {film.votesCount || 0}</span>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+          {page < totalPages && (
+            <div className="load-more">
+              <button onClick={loadMore} className="load-more-btn">
+                Загрузить ещё
+              </button>
+              <span className="page-info">{page} / {totalPages}</span>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -295,6 +448,18 @@ function FilmPage() {
   const [base4, setBase4] = useState([5, 5, 5, 5, 5]);
   const [subjectiveM, setSubjectiveM] = useState(5);
   const [textReview, setTextReview] = useState('');
+
+  // ===== ЗАЩИТА ОТ СЛУЧАЙНОГО ЗАКРЫТИЯ =====
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isRatingMode && !isSaving) {
+        e.preventDefault();
+        e.returnValue = 'Вы уверены, что хотите закрыть страницу? Ваши изменения не будут сохранены.';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isRatingMode, isSaving]);
 
   useEffect(() => {
     loadFilm();
@@ -521,7 +686,7 @@ function FilmPage() {
             ))}
 
             <div className="subjective-block">
-              <h3>Субъективный множитель (M)</h3>
+              <h3>Субъективный множитель «Вайб»</h3>
               <p>Насколько лично вам понравился фильм, несмотря на технические оценки?</p>
               <div className="slider-container">
                 <span>1</span>
@@ -706,6 +871,11 @@ function ProfilePage() {
     }
   };
 
+  // ===== СТАТИСТИКА =====
+  const avgRating = ratings.length 
+    ? (ratings.reduce((sum, r) => sum + r.finalScore, 0) / ratings.length).toFixed(1) 
+    : 'Нет';
+
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
@@ -720,7 +890,10 @@ function ProfilePage() {
         <div className="profile-info">
           <h1>{user.nickname}</h1>
           <p>📧 {user.email}</p>
-          <p>⭐ Всего оценок: {ratings.length}</p>
+          <div className="profile-stats">
+            <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
+            <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
+          </div>
           <button onClick={logout} className="logout-btn">🚪 Выйти</button>
         </div>
       </div>
@@ -864,6 +1037,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/film/:id" element={<FilmPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
