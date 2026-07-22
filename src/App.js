@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
@@ -50,6 +50,13 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// ===== КОНТЕКСТ ДЛЯ УВЕДОМЛЕНИЙ =====
+const NotificationContext = createContext();
+
+export function useNotification() {
+  return useContext(NotificationContext);
+}
 
 // ===== УТИЛИТЫ =====
 function getScoreColor(score) {
@@ -115,6 +122,43 @@ function RatingDetailsModal({ rating, onClose }) {
   );
 }
 
+// ===== КОМПОНЕНТ: УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ УВЕДОМЛЕНИЙ =====
+function NotificationModal({ isOpen, onClose, title, message, type = 'success' }) {
+  if (!isOpen) return null;
+
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    warning: '⚠️'
+  };
+
+  const typeLabels = {
+    success: 'Успешно',
+    error: 'Ошибка',
+    info: 'Информация',
+    warning: 'Внимание'
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-glass" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-content">
+          <div className={`modal-icon ${type}`}>
+            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ️'}</span>
+          </div>
+          <h3 className="modal-title">{title || typeLabels[type] || 'Уведомление'}</h3>
+          <p className="modal-message">{message}</p>
+          <button className="btn-modal btn-primary" onClick={onClose}>
+            {type === 'success' ? 'Отлично' : type === 'error' ? 'Понятно' : 'Закрыть'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ===== КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ =====
 function ActivityFeed({ events }) {
   if (!events || events.length === 0) return null;
@@ -143,7 +187,7 @@ function ActivityFeed({ events }) {
   );
 }
 
-// ===== СТРАНИЦА: О СИСТЕМЕ (ИСПРАВЛЕННАЯ) =====
+// ===== СТРАНИЦА: О СИСТЕМЕ =====
 function AboutPage() {
   return (
     <div className="container about-page">
@@ -179,30 +223,30 @@ function AboutPage() {
         ))}
       </div>
 
-<div className="about-formula glass-card">
-  <h2>🔢 Формула расчёта</h2>
-  <div className="formula-steps">
-    <div className="formula-step">
-      <span className="step-number">1.</span>
-      <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
-    </div>
-    <div className="formula-step">
-      <span className="step-number">2.</span>
-      <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
-    </div>
-    <div className="formula-step">
-      <span className="step-number">3.</span>
-      <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
-    </div>
-    <div className="formula-step">
-      <span className="step-number">4.</span>
-      <span>Итог = T + 34 × (M − 1) ÷ 9</span>
-    </div>
-  </div>
-  <div className="formula-result">
-    <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
-  </div>
-</div>
+      <div className="about-formula glass-card">
+        <h2>🔢 Формула расчёта</h2>
+        <div className="formula-steps">
+          <div className="formula-step">
+            <span className="step-number">1.</span>
+            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">2.</span>
+            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">3.</span>
+            <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">4.</span>
+            <span>Итог = T + 34 × (M − 1) ÷ 9</span>
+          </div>
+        </div>
+        <div className="formula-result">
+          <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
+        </div>
+      </div>
 
       <div className="about-version">
         <p>Синефилиум v1.0 — Храм честного кино.</p>
@@ -280,6 +324,7 @@ function AdminPanel() {
   const [pendingComments, setPendingComments] = useState([]);
   const [pendingReviews, setPendingReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -319,8 +364,17 @@ function AdminPanel() {
     try {
       await api.put(`/admin/comments/${id}/approve`);
       setPendingComments(prev => prev.filter(c => c._id !== id));
+      showNotification({
+        title: 'Одобрено',
+        message: 'Комментарий опубликован',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось одобрить комментарий',
+        type: 'error'
+      });
     }
   };
 
@@ -328,8 +382,17 @@ function AdminPanel() {
     try {
       await api.put(`/admin/comments/${id}/reject`);
       setPendingComments(prev => prev.filter(c => c._id !== id));
+      showNotification({
+        title: 'Отклонено',
+        message: 'Комментарий отклонён',
+        type: 'info'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось отклонить комментарий',
+        type: 'error'
+      });
     }
   };
 
@@ -337,8 +400,17 @@ function AdminPanel() {
     try {
       await api.put(`/admin/reviews/${id}/approve`);
       setPendingReviews(prev => prev.filter(r => r._id !== id));
+      showNotification({
+        title: 'Одобрено',
+        message: 'Рецензия опубликована',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось одобрить рецензию',
+        type: 'error'
+      });
     }
   };
 
@@ -346,8 +418,17 @@ function AdminPanel() {
     try {
       await api.put(`/admin/reviews/${id}/reject`);
       setPendingReviews(prev => prev.filter(r => r._id !== id));
+      showNotification({
+        title: 'Отклонено',
+        message: 'Рецензия отклонена',
+        type: 'info'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось отклонить рецензию',
+        type: 'error'
+      });
     }
   };
 
@@ -423,6 +504,7 @@ function HomePage() {
   const [events, setEvents] = useState([]);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadFilms(page);
@@ -494,14 +576,22 @@ function HomePage() {
       setShowSearch(true);
     } catch (err) {
       console.error('Ошибка поиска:', err);
-      alert('Ошибка поиска: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка поиска',
+        message: err.response?.data?.error || 'Не удалось найти фильмы',
+        type: 'error'
+      });
     }
   };
 
   const importFilm = async (tmdbId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Чтобы добавить фильм, необходимо войти в систему.');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы добавлять фильмы',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
@@ -511,14 +601,22 @@ function HomePage() {
     
     try {
       await api.post('/films/import', { tmdbId });
-      alert('Фильм успешно добавлен!');
       setShowSearch(false);
       setSearchQuery('');
       setPage(1);
       await loadFilms(1);
       await loadEvents();
+      showNotification({
+        title: 'Фильм добавлен!',
+        message: 'Фильм успешно добавлен в каталог',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось добавить фильм',
+        type: 'error'
+      });
     } finally {
       setIsImporting(false);
     }
@@ -528,6 +626,11 @@ function HomePage() {
     localStorage.removeItem('token');
     setUser(null);
     navigate('/');
+    showNotification({
+      title: 'До свидания!',
+      message: 'Вы вышли из аккаунта',
+      type: 'info'
+    });
   };
 
   const token = localStorage.getItem('token');
@@ -658,7 +761,7 @@ function HomePage() {
   );
 }
 
-// ===== СТРАНИЦА: ФИЛЬМ (ИСПРАВЛЕННАЯ) =====
+// ===== СТРАНИЦА: ФИЛЬМ =====
 function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -676,6 +779,7 @@ function FilmPage() {
   const [newReview, setNewReview] = useState({ title: '', text: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const { showNotification } = useNotification();
 
   const [base1, setBase1] = useState([5, 5, 5, 5, 5]);
   const [base2, setBase2] = useState([5, 5, 5, 5, 5]);
@@ -800,7 +904,11 @@ function FilmPage() {
   const saveRating = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Войдите в систему, чтобы оценивать фильмы');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы оценивать фильмы',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
@@ -820,12 +928,20 @@ function FilmPage() {
       });
       
       setUserRating(response.data.rating);
-      alert('Оценка сохранена!');
       await loadFilm();
       await loadFilmUsers();
       setIsRatingMode(false);
+      showNotification({
+        title: 'Оценка сохранена!',
+        message: 'Ваша оценка успешно добавлена',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось сохранить оценку',
+        type: 'error'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -841,7 +957,11 @@ function FilmPage() {
       setSelectedRating(response.data);
     } catch (err) {
       console.error('Ошибка загрузки деталей оценки:', err);
-      alert('Не удалось загрузить детали оценки.');
+      showNotification({
+        title: 'Ошибка',
+        message: 'Не удалось загрузить детали оценки',
+        type: 'error'
+      });
     }
   };
 
@@ -852,7 +972,11 @@ function FilmPage() {
   const addComment = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Войдите в систему, чтобы комментировать');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы комментировать',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
@@ -861,15 +985,28 @@ function FilmPage() {
       await api.post('/comments', { filmId: id, text: commentText });
       setCommentText('');
       await loadComments();
+      showNotification({
+        title: 'Комментарий добавлен',
+        message: 'Ваш комментарий опубликован',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка добавления комментария: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось добавить комментарий',
+        type: 'error'
+      });
     }
   };
 
   const likeComment = async (commentId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Войдите в систему, чтобы ставить лайки');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы ставить лайки',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
@@ -877,23 +1014,39 @@ function FilmPage() {
       await api.post(`/comments/${commentId}/like`);
       await loadComments();
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось поставить лайк',
+        type: 'error'
+      });
     }
   };
 
   const addReview = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Войдите в систему, чтобы написать рецензию');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы написать рецензию',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
     if (!userRating) {
-      alert('Сначала оцените фильм!');
+      showNotification({
+        title: 'Сначала оцените фильм',
+        message: 'Чтобы написать рецензию, нужно оценить фильм',
+        type: 'warning'
+      });
       return;
     }
     if (!newReview.title.trim() || !newReview.text.trim()) {
-      alert('Заполните заголовок и текст рецензии');
+      showNotification({
+        title: 'Заполните все поля',
+        message: 'Заголовок и текст рецензии обязательны',
+        type: 'warning'
+      });
       return;
     }
     try {
@@ -906,16 +1059,28 @@ function FilmPage() {
       setNewReview({ title: '', text: '' });
       setShowReviewForm(false);
       await loadReviews();
-      alert('Рецензия добавлена!');
+      showNotification({
+        title: 'Рецензия добавлена!',
+        message: 'Ваша рецензия опубликована',
+        type: 'success'
+      });
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось добавить рецензию',
+        type: 'error'
+      });
     }
   };
 
   const likeReview = async (reviewId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Войдите в систему, чтобы ставить лайки');
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы ставить лайки',
+        type: 'warning'
+      });
       navigate('/login');
       return;
     }
@@ -923,7 +1088,11 @@ function FilmPage() {
       await api.post(`/reviews/${reviewId}/like`);
       await loadReviews();
     } catch (err) {
-      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось поставить лайк',
+        type: 'error'
+      });
     }
   };
 
@@ -1192,6 +1361,7 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -1212,6 +1382,11 @@ function LoginPage() {
       const response = await api.post(endpoint, data);
       localStorage.setItem('token', response.data.token);
       navigate('/');
+      showNotification({
+        title: isLogin ? 'Добро пожаловать!' : 'Регистрация прошла успешно!',
+        message: isLogin ? 'Вы вошли в аккаунт' : 'Добро пожаловать в Синефилиум!',
+        type: 'success'
+      });
     } catch (err) {
       setError(err.response?.data?.error || 'Произошла ошибка');
     } finally {
@@ -1271,6 +1446,7 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -1304,6 +1480,11 @@ function ProfilePage() {
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
+    showNotification({
+      title: 'До свидания!',
+      message: 'Вы вышли из аккаунта',
+      type: 'info'
+    });
   };
 
   const openRatingDetails = async (rating) => {
@@ -1312,7 +1493,11 @@ function ProfilePage() {
       setSelectedRating(response.data);
     } catch (err) {
       console.error('Ошибка загрузки деталей оценки:', err);
-      alert('Не удалось загрузить детали оценки.');
+      showNotification({
+        title: 'Ошибка',
+        message: 'Не удалось загрузить детали оценки',
+        type: 'error'
+      });
     }
   };
 
@@ -1329,6 +1514,11 @@ function ProfilePage() {
       setAdminSuccess(response.data.message);
       setUser(prev => ({ ...prev, isAdmin: true, totalPoints: response.data.totalPoints }));
       setAdminSecret('');
+      showNotification({
+        title: 'Поздравляем!',
+        message: 'Вы стали администратором! 👑',
+        type: 'success'
+      });
     } catch (err) {
       setAdminError(err.response?.data?.error || 'Ошибка активации');
     } finally {
@@ -1434,6 +1624,7 @@ function UserProfilePage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     loadUserProfile();
@@ -1458,7 +1649,11 @@ function UserProfilePage() {
       setSelectedRating(response.data);
     } catch (err) {
       console.error('Ошибка загрузки деталей оценки:', err);
-      alert('Не удалось загрузить детали оценки.');
+      showNotification({
+        title: 'Ошибка',
+        message: 'Не удалось загрузить детали оценки',
+        type: 'error'
+      });
     }
   };
 
@@ -1543,19 +1738,43 @@ function UserProfilePage() {
 
 // ===== ГЛАВНОЕ ПРИЛОЖЕНИЕ =====
 function App() {
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'success'
+  });
+
+  const showNotification = ({ title, message, type = 'success' }) => {
+    setNotification({ isOpen: true, title, message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification({ ...notification, isOpen: false });
+  };
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/top" element={<TopUsersPage />} />
-        <Route path="/admin/:nickname" element={<AdminPanel />} />
-        <Route path="/film/:id" element={<FilmPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/user/:id" element={<UserProfilePage />} />
-      </Routes>
-    </Router>
+    <NotificationContext.Provider value={{ showNotification }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/top" element={<TopUsersPage />} />
+          <Route path="/admin/:nickname" element={<AdminPanel />} />
+          <Route path="/film/:id" element={<FilmPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/user/:id" element={<UserProfilePage />} />
+        </Routes>
+      </Router>
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={closeNotification}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+      />
+    </NotificationContext.Provider>
   );
 }
 
