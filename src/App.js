@@ -179,30 +179,30 @@ function AboutPage() {
         ))}
       </div>
 
-      <div className="about-formula glass-card">
-        <h2>🔢 Формула расчёта</h2>
-        <div className="formula-steps">
-          <div className="formula-step">
-            <span className="step-number">1</span>
-            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">2</span>
-            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">3</span>
-            <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">4</span>
-            <span>Итог = T + 34 × (M − 1) ÷ 9</span>
-          </div>
-        </div>
-        <div className="formula-result">
-          <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
-        </div>
-      </div>
+<div className="about-formula glass-card">
+  <h2>🔢 Формула расчёта</h2>
+  <div className="formula-steps">
+    <div className="formula-step">
+      <span className="step-number">1.</span>
+      <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">2.</span>
+      <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">3.</span>
+      <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">4.</span>
+      <span>Итог = T + 34 × (M − 1) ÷ 9</span>
+    </div>
+  </div>
+  <div className="formula-result">
+    <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
+  </div>
+</div>
 
       <div className="about-version">
         <p>Синефилиум v1.0 — Храм честного кино.</p>
