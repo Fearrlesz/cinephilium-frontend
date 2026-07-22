@@ -1940,3 +1940,209 @@ body {
     font-size: 12px;
   }
 }
+
+/* ============================================================
+   СТЕКЛЯННЫЕ КАРТОЧКИ (glass-card)
+   ============================================================ */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--bg-glass-hover);
+}
+
+/* ============================================================
+   НЕОНОВЫЙ ТЕКСТ (neon-text)
+   ============================================================ */
+.neon-text {
+  color: var(--neon-cyan);
+}
+
+.neon-text strong {
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   СТРАНИЦА "О СИСТЕМЕ" (исправленная)
+   ============================================================ */
+.about-page .glass-card {
+  margin-bottom: 24px;
+}
+
+.about-page .about-block {
+  margin-bottom: 16px;
+}
+
+.about-page .about-criterion {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border-left: 3px solid var(--neon-cyan);
+  margin-bottom: 8px;
+}
+
+.about-page .about-criterion-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.about-page .about-criterion-desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.about-page .about-block-title {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   РЕЦЕНЗИИ (исправленные)
+   ============================================================ */
+.reviews-section .glass-card {
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.review-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 3px solid var(--neon-purple);
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--neon-cyan);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-nickname {
+  font-weight: 600;
+  color: var(--neon-cyan);
+}
+
+.review-rating {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.review-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+  margin: 4px 0;
+}
+
+.review-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-actions {
+  margin-top: 8px;
+}
+
+.review-form {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--glass-border);
+}
+
+.review-form input,
+.review-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.review-form input:focus,
+.review-form textarea:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+}
+
+.review-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.review-form button {
+  padding: 10px 28px;
+  border-radius: 40px;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(34, 211, 238, 0.08));
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.review-form button:hover {
+  border-color: rgba(124, 58, 237, 0.3);
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.btn-add-review {
+  padding: 8px 20px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.btn-add-review:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
