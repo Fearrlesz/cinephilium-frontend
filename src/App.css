@@ -2146,3 +2146,165 @@ body {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
 }
+/* ============================================================
+   СТРАНИЦА "О СИСТЕМЕ" (полный дизайн)
+   ============================================================ */
+.about-page .glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.about-page .glass-card:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--bg-glass-hover);
+}
+
+.about-page .about-block {
+  margin-bottom: 16px;
+}
+
+.about-page .about-criterion {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border-left: 3px solid var(--neon-cyan);
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.about-page .about-criterion:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--neon-purple);
+}
+
+.about-page .about-criterion-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.about-page .about-criterion-desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.about-page .about-block-title {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 14px;
+  letter-spacing: -0.02em;
+}
+
+.about-page .about-title {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 32px;
+  text-align: center;
+  margin: 20px 0 30px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-page .about-intro p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.about-page .about-intro .neon-text {
+  color: var(--neon-cyan);
+}
+
+.about-page .about-intro strong {
+  color: var(--text-primary);
+}
+
+.about-page .about-formula {
+  margin-top: 24px;
+}
+
+.about-page .formula-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-page .formula-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.about-page .formula-step:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.about-page .step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+  color: #0a0a12;
+  font-weight: 700;
+  border-radius: 50%;
+  font-size: 14px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.about-page .formula-step span:last-child {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.about-page .formula-step strong {
+  color: var(--neon-cyan);
+}
+
+.about-page .formula-result {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(34, 211, 238, 0.04);
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid rgba(34, 211, 238, 0.08);
+}
+
+.about-page .formula-result p {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.about-page .formula-result strong {
+  color: var(--neon-cyan);
+}
+
+.about-page .about-version {
+  text-align: center;
+  margin-top: 30px;
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  border-top: 1px solid var(--glass-border);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
