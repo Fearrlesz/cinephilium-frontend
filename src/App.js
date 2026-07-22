@@ -25,7 +25,7 @@ const baseDescriptions = [
   ['Помогает ли музыка понять чувства героя?', 'Соответствуют ли инструменты эпохе, месту и жанру?', 'Работают ли бытовые шумы на атмосферу?', 'Умеет ли режиссер вовремя выключить музыку?', 'Все ли слышно? Не перекрывает ли бас или музыка голоса актеров?']
 ];
 
-// ===== API =====
+// ===== API КЛИЕНТ =====
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
 });
@@ -60,7 +60,15 @@ function getScoreColor(score) {
   return `hsl(${hue}, 85%, ${45 + normalized * 15}%)`;
 }
 
-// ===== МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ОЦЕНКИ =====
+function formatDate(date) {
+  return new Date(date).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+// ===== КОМПОНЕНТ: МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ОЦЕНКИ =====
 function RatingDetailsModal({ rating, onClose }) {
   if (!rating) return null;
 
@@ -107,7 +115,7 @@ function RatingDetailsModal({ rating, onClose }) {
   );
 }
 
-// ===== ЛЕНТА СОБЫТИЙ =====
+// ===== КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ =====
 function ActivityFeed({ events }) {
   if (!events || events.length === 0) return null;
 
@@ -135,7 +143,7 @@ function ActivityFeed({ events }) {
   );
 }
 
-// ===== СТРАНИЦА "О СИСТЕМЕ" =====
+// ===== СТРАНИЦА: О СИСТЕМЕ =====
 function AboutPage() {
   return (
     <div className="container about-page">
@@ -203,7 +211,7 @@ function AboutPage() {
   );
 }
 
-// ===== СТРАНИЦА ТОПА =====
+// ===== СТРАНИЦА: ТОП ПОЛЬЗОВАТЕЛЕЙ =====
 function TopUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -264,7 +272,149 @@ function TopUsersPage() {
   );
 }
 
-// ===== ГЛАВНАЯ =====
+// ===== СТРАНИЦА: АДМИН-ПАНЕЛЬ =====
+function AdminPanel() {
+  const { nickname } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [pendingComments, setPendingComments] = useState([]);
+  const [pendingReviews, setPendingReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    loadAdminData();
+  }, [nickname, navigate]);
+
+  const loadAdminData = async () => {
+    try {
+      const userResponse = await api.get('/auth/me');
+      setUser(userResponse.data);
+
+      if (userResponse.data.nickname !== nickname) {
+        navigate('/');
+        return;
+      }
+
+      if (!userResponse.data.isAdmin) {
+        navigate('/');
+        return;
+      }
+
+      const [commentsRes, reviewsRes] = await Promise.all([
+        api.get('/admin/pending/comments'),
+        api.get('/admin/pending/reviews')
+      ]);
+      
+      setPendingComments(commentsRes.data || []);
+      setPendingReviews(reviewsRes.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки админ-панели:', err);
+      navigate('/');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const approveComment = async (id) => {
+    try {
+      await api.put(`/admin/comments/${id}/approve`);
+      setPendingComments(prev => prev.filter(c => c._id !== id));
+    } catch (err) {
+      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const rejectComment = async (id) => {
+    try {
+      await api.put(`/admin/comments/${id}/reject`);
+      setPendingComments(prev => prev.filter(c => c._id !== id));
+    } catch (err) {
+      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const approveReview = async (id) => {
+    try {
+      await api.put(`/admin/reviews/${id}/approve`);
+      setPendingReviews(prev => prev.filter(r => r._id !== id));
+    } catch (err) {
+      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const rejectReview = async (id) => {
+    try {
+      await api.put(`/admin/reviews/${id}/reject`);
+      setPendingReviews(prev => prev.filter(r => r._id !== id));
+    } catch (err) {
+      alert('Ошибка: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+
+  return (
+    <div className="container admin-panel">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+      <h1 className="admin-title">🛡️ Админ-панель</h1>
+      <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
+
+      <div className="admin-section">
+        <h2>💬 Комментарии на модерации ({pendingComments.length})</h2>
+        {pendingComments.length === 0 ? (
+          <p className="admin-empty">Нет комментариев для проверки</p>
+        ) : (
+          <div className="admin-list">
+            {pendingComments.map(c => (
+              <div key={c._id} className="admin-item">
+                <div className="admin-item-header">
+                  <span className="admin-item-author">👤 {c.userId?.nickname}</span>
+                  <span className="admin-item-film">🎬 {c.filmId?.title}</span>
+                </div>
+                <p className="admin-item-text">{c.text}</p>
+                <div className="admin-item-actions">
+                  <button className="btn-approve" onClick={() => approveComment(c._id)}>✅ Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectComment(c._id)}>❌ Отклонить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="admin-section">
+        <h2>📝 Рецензии на модерации ({pendingReviews.length})</h2>
+        {pendingReviews.length === 0 ? (
+          <p className="admin-empty">Нет рецензий для проверки</p>
+        ) : (
+          <div className="admin-list">
+            {pendingReviews.map(r => (
+              <div key={r._id} className="admin-item">
+                <div className="admin-item-header">
+                  <span className="admin-item-author">👤 {r.userId?.nickname}</span>
+                  <span className="admin-item-film">🎬 {r.filmId?.title}</span>
+                </div>
+                <h4 className="admin-item-title">{r.title}</h4>
+                <p className="admin-item-text">{r.text}</p>
+                <div className="admin-item-actions">
+                  <button className="btn-approve" onClick={() => approveReview(r._id)}>✅ Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectReview(r._id)}>❌ Отклонить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ===== СТРАНИЦА: ГЛАВНАЯ =====
 function HomePage() {
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -276,12 +426,28 @@ function HomePage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [events, setEvents] = useState([]);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadFilms(page);
     loadEvents();
+    loadCurrentUser();
   }, [page]);
+
+  const loadCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await api.get('/auth/me');
+        setUser(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    }
+  };
 
   const loadFilms = async (pageNum = 1) => {
     setLoading(true);
@@ -363,6 +529,12 @@ function HomePage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/');
+  };
+
   const token = localStorage.getItem('token');
 
   if (loading && page === 1) return <div className="loading">Загрузка...</div>;
@@ -379,14 +551,14 @@ function HomePage() {
         <div className="header-actions">
           <Link to="/about" className="btn-about">📖 О системе</Link>
           <Link to="/top" className="btn-top">🏆 Топ</Link>
-          {token ? (
+          {token && user ? (
             <>
-              <Link to="/profile" className="btn-profile">👤 Профиль</Link>
+              <Link to="/profile" className="btn-profile">👤 {user.nickname}</Link>
+              {user.isAdmin && (
+                <Link to={`/admin/${user.nickname}`} className="btn-admin">🛡️ Админка</Link>
+              )}
               <button
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  navigate('/');
-                }}
+                onClick={handleLogout}
                 className="btn-logout"
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff' }}
               >
@@ -490,7 +662,7 @@ function HomePage() {
   );
 }
 
-// ===== СТРАНИЦА ФИЛЬМА =====
+// ===== СТРАНИЦА: ФИЛЬМ =====
 function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -505,9 +677,9 @@ function FilmPage() {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [reviews, setReviews] = useState([]);
-  const [showReviews, setShowReviews] = useState(false);
   const [newReview, setNewReview] = useState({ title: '', text: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [base1, setBase1] = useState([5, 5, 5, 5, 5]);
   const [base2, setBase2] = useState([5, 5, 5, 5, 5]);
@@ -521,7 +693,22 @@ function FilmPage() {
     loadFilmUsers();
     loadComments();
     loadReviews();
+    loadCurrentUser();
   }, [id]);
+
+  const loadCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await api.get('/auth/me');
+        setCurrentUser(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -640,6 +827,7 @@ function FilmPage() {
       alert('Оценка сохранена!');
       await loadFilm();
       await loadFilmUsers();
+      setIsRatingMode(false);
     } catch (err) {
       alert('Ошибка: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -647,7 +835,6 @@ function FilmPage() {
     }
   };
 
-  // ===== ИСПРАВЛЕНО: rating._id вместо rating.id =====
   const openRatingDetails = async (ratingData) => {
     try {
       if (ratingData.base1 && ratingData.base1.length === 5) {
@@ -666,7 +853,6 @@ function FilmPage() {
     setIsRatingMode(!isRatingMode);
   };
 
-  // ===== КОММЕНТАРИИ =====
   const addComment = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -685,6 +871,12 @@ function FilmPage() {
   };
 
   const likeComment = async (commentId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Войдите в систему, чтобы ставить лайки');
+      navigate('/login');
+      return;
+    }
     try {
       await api.post(`/comments/${commentId}/like`);
       await loadComments();
@@ -693,7 +885,6 @@ function FilmPage() {
     }
   };
 
-  // ===== РЕЦЕНЗИИ =====
   const addReview = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -726,6 +917,12 @@ function FilmPage() {
   };
 
   const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Войдите в систему, чтобы ставить лайки');
+      navigate('/login');
+      return;
+    }
     try {
       await api.post(`/reviews/${reviewId}/like`);
       await loadReviews();
@@ -778,13 +975,14 @@ function FilmPage() {
           </div>
         </div>
 
-        {/* ===== РЕЦЕНЗИИ ===== */}
         <div className="reviews-section">
           <div className="reviews-header">
             <h3>📝 Рецензии ({reviews.length})</h3>
-            <button className="btn-add-review" onClick={() => setShowReviewForm(!showReviewForm)}>
-              {showReviewForm ? 'Отменить' : '+ Написать рецензию'}
-            </button>
+            {currentUser && (
+              <button className="btn-add-review" onClick={() => setShowReviewForm(!showReviewForm)}>
+                {showReviewForm ? 'Отменить' : '+ Написать рецензию'}
+              </button>
+            )}
           </div>
 
           {showReviewForm && (
@@ -829,7 +1027,6 @@ function FilmPage() {
           </div>
         </div>
 
-        {/* ===== ПОЛЬЗОВАТЕЛИ, ОЦЕНИВШИЕ ФИЛЬМ ===== */}
         {usersLoading ? (
           <div className="loading">Загрузка пользователей...</div>
         ) : filmUsers.length > 0 ? (
@@ -846,7 +1043,6 @@ function FilmPage() {
                   </span>
                   <button 
                     className="details-btn"
-                    // ===== ИСПРАВЛЕНО: передаём полный объект, а не item.rating =====
                     onClick={() => openRatingDetails(item.rating)}
                   >
                     🔍 Детали
@@ -943,7 +1139,6 @@ function FilmPage() {
           </div>
         )}
 
-        {/* ===== КОММЕНТАРИИ ===== */}
         <div className="comments-section">
           <h3>💬 Комментарии ({comments.length})</h3>
           <div className="comments-list">
@@ -962,16 +1157,18 @@ function FilmPage() {
               </div>
             ))}
           </div>
-          <div className="comment-form">
-            <input
-              type="text"
-              placeholder="Написать комментарий..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && addComment()}
-            />
-            <button onClick={addComment}>📤</button>
-          </div>
+          {currentUser && (
+            <div className="comment-form">
+              <input
+                type="text"
+                placeholder="Написать комментарий..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addComment()}
+              />
+              <button onClick={addComment}>📤</button>
+            </div>
+          )}
         </div>
 
         {film.trailer && (
@@ -990,7 +1187,7 @@ function FilmPage() {
   );
 }
 
-// ===== ВХОД / РЕГИСТРАЦИЯ =====
+// ===== СТРАНИЦА: ВХОД / РЕГИСТРАЦИЯ =====
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -999,6 +1196,13 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1060,7 +1264,7 @@ function LoginPage() {
   );
 }
 
-// ===== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ =====
+// ===== СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ =====
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [ratings, setRatings] = useState([]);
@@ -1079,14 +1283,16 @@ function ProfilePage() {
       return;
     }
     loadProfile();
-  }, []);
+  }, [navigate]);
 
   const loadProfile = async () => {
     try {
-      const userResponse = await api.get('/auth/me');
+      const [userResponse, ratingsResponse] = await Promise.all([
+        api.get('/auth/me'),
+        api.get('/ratings/user')
+      ]);
+      
       setUser(userResponse.data);
-
-      const ratingsResponse = await api.get('/ratings/user');
       setRatings(ratingsResponse.data || []);
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
@@ -1104,7 +1310,6 @@ function ProfilePage() {
     navigate('/');
   };
 
-  // ===== ИСПРАВЛЕНО: rating._id вместо rating.id =====
   const openRatingDetails = async (rating) => {
     try {
       const response = await api.get(`/ratings/${rating._id}/details`);
@@ -1115,7 +1320,6 @@ function ProfilePage() {
     }
   };
 
-  // ===== АКТИВАЦИЯ АДМИНА =====
   const activateAdmin = async () => {
     if (!adminSecret.trim()) {
       setAdminError('Введите секретный ключ');
@@ -1225,7 +1429,7 @@ function ProfilePage() {
   );
 }
 
-// ===== ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ =====
+// ===== СТРАНИЦА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ =====
 function UserProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -1252,7 +1456,6 @@ function UserProfilePage() {
     }
   };
 
-  // ===== ИСПРАВЛЕНО: rating.id → rating._id =====
   const openRatingDetails = async (rating) => {
     try {
       const response = await api.get(`/ratings/${rating._id}/details`);
@@ -1279,7 +1482,7 @@ function UserProfilePage() {
             {user.nickname}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
           </h1>
-          <p>📅 Зарегистрирован: {new Date(user.registeredAt).toLocaleDateString()}</p>
+          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
           <p>⭐ Всего оценок: {ratings.length}</p>
           <p>📝 Рецензий: {reviews.length}</p>
           <p>🏆 Баллов: {user.totalPoints || 0}</p>
@@ -1350,6 +1553,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/top" element={<TopUsersPage />} />
+        <Route path="/admin/:nickname" element={<AdminPanel />} />
         <Route path="/film/:id" element={<FilmPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
