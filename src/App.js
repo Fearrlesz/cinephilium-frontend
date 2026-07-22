@@ -143,7 +143,7 @@ function ActivityFeed({ events }) {
   );
 }
 
-// ===== СТРАНИЦА: О СИСТЕМЕ =====
+// ===== СТРАНИЦА: О СИСТЕМЕ (ИСПРАВЛЕННАЯ) =====
 function AboutPage() {
   return (
     <div className="container about-page">
@@ -151,8 +151,8 @@ function AboutPage() {
       
       <h1 className="about-title">📖 О системе оценки</h1>
       
-      <div className="about-intro">
-        <p>
+      <div className="about-intro glass-card">
+        <p className="neon-text">
           Мы оцениваем фильмы по <strong>20 критериям</strong>, разбитым на 4 блока.
           Каждый критерий оценивается от <strong>1 до 10</strong>.
         </p>
@@ -165,8 +165,8 @@ function AboutPage() {
 
       <div className="about-blocks">
         {[0, 1, 2, 3].map((blockIndex) => (
-          <div key={blockIndex} className="about-block">
-            <h2 className="about-block-title">{baseNames[blockIndex]}</h2>
+          <div key={blockIndex} className="about-block glass-card">
+            <h2 className="about-block-title neon-text">{baseNames[blockIndex]}</h2>
             <div className="about-criteria">
               {criteriaNames[blockIndex].map((name, critIndex) => (
                 <div key={critIndex} className="about-criterion">
@@ -179,7 +179,7 @@ function AboutPage() {
         ))}
       </div>
 
-      <div className="about-formula">
+      <div className="about-formula glass-card">
         <h2>🔢 Формула расчёта</h2>
         <div className="formula-steps">
           <div className="formula-step">
@@ -295,12 +295,6 @@ function AdminPanel() {
       const userResponse = await api.get('/auth/me');
       setUser(userResponse.data);
 
-      // Проверяем только права администратора
-if (!userResponse.data.isAdmin) {
-  navigate('/');
-  return;
-}
-
       if (!userResponse.data.isAdmin) {
         navigate('/');
         return;
@@ -365,7 +359,7 @@ if (!userResponse.data.isAdmin) {
       <h1 className="admin-title">🛡️ Админ-панель</h1>
       <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
 
-      <div className="admin-section">
+      <div className="admin-section glass-card">
         <h2>💬 Комментарии на модерации ({pendingComments.length})</h2>
         {pendingComments.length === 0 ? (
           <p className="admin-empty">Нет комментариев для проверки</p>
@@ -388,7 +382,7 @@ if (!userResponse.data.isAdmin) {
         )}
       </div>
 
-      <div className="admin-section">
+      <div className="admin-section glass-card">
         <h2>📝 Рецензии на модерации ({pendingReviews.length})</h2>
         {pendingReviews.length === 0 ? (
           <p className="admin-empty">Нет рецензий для проверки</p>
@@ -561,7 +555,6 @@ function HomePage() {
               <button
                 onClick={handleLogout}
                 className="btn-logout"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff' }}
               >
                 Выйти
               </button>
@@ -572,7 +565,7 @@ function HomePage() {
         </div>
       </header>
 
-      <div className="hero">
+      <div className="hero glass-card">
         <h2>Храм честного кино — 20 критериев для подробной оценки</h2>
         <div className="search-box">
           <input
@@ -589,7 +582,7 @@ function HomePage() {
       {error && <div className="error-msg">{error}</div>}
 
       {showSearch && searchResults.length > 0 && (
-        <div className="search-results">
+        <div className="search-results glass-card">
           <h3>Результаты поиска:</h3>
           <div className="films-grid">
             {searchResults.map((film) => (
@@ -598,11 +591,13 @@ function HomePage() {
                   src={film.poster_path ? `https://image.tmdb.org/t/p/w200${film.poster_path}` : '/no-poster.jpg'} 
                   alt={film.title}
                 />
-                <h4>{film.title}</h4>
-                <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
-                <button onClick={() => importFilm(film.id)} disabled={isImporting}>
-                  {isImporting ? 'Добавление...' : '➕ Добавить'}
-                </button>
+                <div className="film-info">
+                  <h4>{film.title}</h4>
+                  <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
+                  <button onClick={() => importFilm(film.id)} disabled={isImporting} className="btn-add">
+                    {isImporting ? 'Добавление...' : '➕ Добавить'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -610,7 +605,7 @@ function HomePage() {
       )}
 
       {topFilms.length > 0 && (
-        <div className="top-films">
+        <div className="top-films glass-card">
           <h3>🏆 Топ-5 сообщества</h3>
           <div className="top-list">
             {topFilms.map((film, i) => (
@@ -629,7 +624,7 @@ function HomePage() {
       <ActivityFeed events={events} />
 
       {films.length === 0 ? (
-        <div className="no-films">Нет добавленных фильмов. Найдите и добавьте первый!</div>
+        <div className="no-films glass-card">Нет добавленных фильмов. Найдите и добавьте первый!</div>
       ) : (
         <>
           <div className="films-grid">
@@ -663,7 +658,7 @@ function HomePage() {
   );
 }
 
-// ===== СТРАНИЦА: ФИЛЬМ =====
+// ===== СТРАНИЦА: ФИЛЬМ (ИСПРАВЛЕННАЯ) =====
 function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -962,7 +957,7 @@ function FilmPage() {
             </div>
 
             {userRating && (
-              <div className="your-rating">
+              <div className="your-rating glass-card">
                 <h4>Ваша оценка:</h4>
                 <div className="user-rating-display" style={{ color: getScoreColor(userRating.finalScore) }}>
                   {userRating.finalScore}
@@ -976,7 +971,7 @@ function FilmPage() {
           </div>
         </div>
 
-        <div className="reviews-section">
+        <div className="reviews-section glass-card">
           <div className="reviews-header">
             <h3>📝 Рецензии ({reviews.length})</h3>
             {currentUser && (
@@ -1031,7 +1026,7 @@ function FilmPage() {
         {usersLoading ? (
           <div className="loading">Загрузка пользователей...</div>
         ) : filmUsers.length > 0 ? (
-          <div className="film-users">
+          <div className="film-users glass-card">
             <h3>Оценили фильм: {filmUsers.length} человек</h3>
             <div className="users-list">
               {filmUsers.map((item) => (
@@ -1055,7 +1050,7 @@ function FilmPage() {
         ) : null}
 
         {isRatingMode && (
-          <div className="rating-form">
+          <div className="rating-form glass-card">
             <h2>Оценка по 20 критериям</h2>
             <p className="rating-hint">Оценка от 1 до 10 (1 — ужасно, 10 — идеально)</p>
             
@@ -1127,7 +1122,7 @@ function FilmPage() {
               </div>
               <div className="score-bar" style={{ 
                 width: `${(previewScore - 6) / 84 * 100}%`,
-                background: `linear-gradient(to right, #ff1744, #ffab00, #00e676)`
+                background: `linear-gradient(to right, #7c3aed, #22d3ee)`
               }}></div>
               <div className="score-labels">
                 <span>6 (провал)</span>
@@ -1140,7 +1135,7 @@ function FilmPage() {
           </div>
         )}
 
-        <div className="comments-section">
+        <div className="comments-section glass-card">
           <h3>💬 Комментарии ({comments.length})</h3>
           <div className="comments-list">
             {comments.map((comment) => (
@@ -1173,7 +1168,7 @@ function FilmPage() {
         </div>
 
         {film.trailer && (
-          <div className="trailer">
+          <div className="trailer glass-card">
             <h3>Трейлер</h3>
             <iframe src={film.trailer} title="Трейлер" allowFullScreen />
           </div>
@@ -1226,7 +1221,7 @@ function LoginPage() {
 
   return (
     <div className="container auth-container">
-      <div className="auth-box">
+      <div className="auth-box glass-card">
         <h1>{isLogin ? 'Вход в Синефилиум' : 'Регистрация'}</h1>
         {error && <div className="error-msg">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -1352,7 +1347,7 @@ function ProfilePage() {
     <div className="container profile-page">
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
       
-      <div className="profile-header">
+      <div className="profile-header glass-card">
         <div className="profile-avatar">
           <div className="avatar-placeholder">{user.nickname[0]}</div>
         </div>
@@ -1368,7 +1363,7 @@ function ProfilePage() {
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
           {!user.isAdmin && (
-            <div className="admin-activation">
+            <div className="admin-activation glass-card">
               <h4>🔑 Стать администратором</h4>
               <p className="admin-hint">Введите секретный ключ, чтобы получить права администратора</p>
               <div className="admin-form">
@@ -1390,7 +1385,7 @@ function ProfilePage() {
         </div>
       </div>
 
-      <div className="profile-ratings">
+      <div className="profile-ratings glass-card">
         <h2>Мои оценки</h2>
         {ratings.length === 0 ? (
           <p>Вы еще не оценили ни одного фильма</p>
@@ -1474,7 +1469,7 @@ function UserProfilePage() {
     <div className="container profile-page">
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
       
-      <div className="profile-header">
+      <div className="profile-header glass-card">
         <div className="profile-avatar">
           <div className="avatar-placeholder">{user.nickname[0]}</div>
         </div>
@@ -1490,7 +1485,7 @@ function UserProfilePage() {
         </div>
       </div>
 
-      <div className="profile-ratings">
+      <div className="profile-ratings glass-card">
         <h2>Оценки пользователя</h2>
         {ratings.length === 0 ? (
           <p>Пользователь еще не оценил ни одного фильма</p>
@@ -1523,7 +1518,7 @@ function UserProfilePage() {
       </div>
 
       {reviews.length > 0 && (
-        <div className="profile-reviews">
+        <div className="profile-reviews glass-card">
           <h2>Рецензии</h2>
           {reviews.map((review) => (
             <div key={review._id} className="review-item">
