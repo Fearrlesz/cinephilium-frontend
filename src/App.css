@@ -2425,3 +2425,226 @@ body {
   box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
   transform: translateY(-1px);
 }
+
+/* ============================================================
+   ТОП-5 В СТИЛЕ NETFLIX
+   ============================================================ */
+.top-films-netflix {
+  margin: 30px 0 20px;
+  padding: 20px 0 12px;
+  position: relative;
+}
+
+.top-header-netflix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px 16px 4px;
+}
+
+.top-header-netflix h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.top-header-netflix h3::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.top-all-link-netflix {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+}
+
+.top-all-link-netflix:hover {
+  color: var(--text-primary);
+  border-color: var(--glass-border);
+}
+
+.top-scroll-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.top-scroll-wrapper {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px 16px 4px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: var(--neon-cyan);
+  border-radius: 4px;
+  box-shadow: 0 0 20px var(--neon-cyan-glow);
+}
+
+.top-card-netflix {
+  flex: 0 0 160px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.top-card-netflix:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.top-card-netflix:hover .top-card-poster {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.top-card-poster-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.top-card-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+  transition: box-shadow 0.3s ease;
+  background: var(--bg-deep);
+}
+
+/* Ранг на постере */
+.top-card-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 20px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Оценка на постере (как на Netflix) */
+.top-card-score {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Информация под постером */
+.top-card-info {
+  padding: 10px 4px 4px;
+}
+
+.top-card-title {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-card-year {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 768px) {
+  .top-card-netflix {
+    flex: 0 0 130px;
+  }
+  .top-card-rank {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    top: 6px;
+    left: 6px;
+  }
+  .top-card-score {
+    font-size: 13px;
+    padding: 2px 10px;
+    bottom: 6px;
+    right: 6px;
+  }
+  .top-card-title {
+    font-size: 13px;
+  }
+  .top-header-netflix h3 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-card-netflix {
+    flex: 0 0 110px;
+  }
+  .top-card-rank {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+  .top-card-score {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  .top-card-title {
+    font-size: 12px;
+  }
+  .top-header-netflix h3 {
+    font-size: 18px;
+  }
+}
