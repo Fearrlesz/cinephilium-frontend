@@ -295,10 +295,11 @@ function AdminPanel() {
       const userResponse = await api.get('/auth/me');
       setUser(userResponse.data);
 
-      if (userResponse.data.nickname !== nickname) {
-        navigate('/');
-        return;
-      }
+      // Проверяем только права администратора
+if (!userResponse.data.isAdmin) {
+  navigate('/');
+  return;
+}
 
       if (!userResponse.data.isAdmin) {
         navigate('/');
