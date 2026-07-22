@@ -707,22 +707,44 @@ function HomePage() {
         </div>
       )}
 
-      {topFilms.length > 0 && (
-        <div className="top-films glass-card">
-          <h3>🏆 Топ-5 сообщества</h3>
-          <div className="top-list">
-            {topFilms.map((film, i) => (
-              <Link to={`/film/${film._id}`} key={film._id} className="top-item">
-                <span className="top-rank">#{i+1}</span>
-                <span className="top-title">{film.title}</span>
-                <span className="top-score" style={{ color: getScoreColor(film.averageRating) }}>
-                  {film.averageRating?.toFixed(1)}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ===== ТОП-5 СООБЩЕСТВА (как Netflix) ===== */}
+{topFilms.length > 0 && (
+  <div className="top-films-netflix">
+    <div className="top-header-netflix">
+      <h3>🏆 Топ-5 сообщества</h3>
+      <Link to="/top-films" className="top-all-link-netflix">Смотреть все →</Link>
+    </div>
+    <div className="top-scroll-container">
+      <div className="top-scroll-wrapper">
+        {topFilms.map((film, i) => (
+          <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
+            <div className="top-card-poster-wrapper">
+              <img 
+                src={film.poster || '/no-poster.jpg'} 
+                alt={film.title} 
+                className="top-card-poster"
+              />
+              <div className="top-card-rank">
+                {i === 0 && '👑'}
+                {i === 1 && '🥇'}
+                {i === 2 && '🥈'}
+                {i === 3 && '🥉'}
+                {i >= 4 && `#${i + 1}`}
+              </div>
+              <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
+                {film.averageRating?.toFixed(1)}
+              </div>
+            </div>
+            <div className="top-card-info">
+              <span className="top-card-title">{film.title}</span>
+              <span className="top-card-year">{film.year}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
       <ActivityFeed events={events} />
 
