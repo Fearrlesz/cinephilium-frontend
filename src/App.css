@@ -16,6 +16,7 @@ body {
   padding: 20px;
 }
 
+/* ===== ХЕДЕР ===== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -37,10 +38,14 @@ body {
 .header-actions {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .btn-profile,
-.btn-login {
+.btn-login,
+.btn-about,
+.btn-top {
   padding: 10px 25px;
   border-radius: 8px;
   text-decoration: none;
@@ -66,6 +71,41 @@ body {
   background: #d50000;
 }
 
+.btn-about {
+  background: #2a2a2a;
+  color: #ffd700;
+}
+
+.btn-about:hover {
+  background: #333;
+}
+
+.btn-top {
+  background: #2a2a2a;
+  color: #ffd700;
+}
+
+.btn-top:hover {
+  background: #333;
+}
+
+.btn-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 25px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.btn-logout:hover {
+  background: #ff174433;
+  color: #ff1744;
+}
+
+/* ===== ГЕРОЙ ===== */
 .hero {
   text-align: center;
   padding: 60px 20px;
@@ -121,6 +161,7 @@ body {
   background: #ffed4a;
 }
 
+/* ===== ГРИД ФИЛЬМОВ ===== */
 .films-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -196,6 +237,7 @@ body {
   font-size: 12px;
 }
 
+/* ===== СТРАНИЦА ФИЛЬМА ===== */
 .film-page {
   max-width: 1000px;
   margin: 0 auto;
@@ -305,6 +347,7 @@ body {
   transform: scale(1.02);
 }
 
+/* ===== ФОРМА ОЦЕНКИ ===== */
 .rating-form {
   background: #1a1a1a;
   padding: 30px;
@@ -440,6 +483,13 @@ body {
   border-color: #ffd700;
 }
 
+.char-counter {
+  text-align: right;
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .rating-preview {
   background: #111;
   padding: 30px;
@@ -496,6 +546,12 @@ body {
   box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
 }
 
+.save-rating-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== ТРЕЙЛЕР ===== */
 .trailer {
   margin: 30px 0;
 }
@@ -512,6 +568,7 @@ body {
   border: none;
 }
 
+/* ===== АВТОРИЗАЦИЯ ===== */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -567,6 +624,11 @@ body {
   background: #ffed4a;
 }
 
+.auth-box button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .toggle-auth {
   text-align: center;
   margin-top: 20px;
@@ -587,6 +649,16 @@ body {
   text-align: center;
 }
 
+.success-msg {
+  background: #114411;
+  color: #6bff6b;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* ===== ПРОФИЛЬ ===== */
 .profile-page {
   max-width: 900px;
   margin: 0 auto;
@@ -630,6 +702,22 @@ body {
   margin-bottom: 5px;
 }
 
+.profile-stats {
+  display: flex;
+  gap: 20px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.profile-stats p {
+  color: #888;
+  font-size: 14px;
+}
+
+.profile-stats strong {
+  color: #ffd700;
+}
+
 .logout-btn {
   padding: 10px 20px;
   background: #441111;
@@ -646,6 +734,75 @@ body {
   color: white;
 }
 
+/* ===== АДМИН-АКТИВАЦИЯ ===== */
+.admin-activation {
+  background: #1a1a2a;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid #ffd70033;
+}
+
+.admin-activation h4 {
+  color: #ffd700;
+  margin-bottom: 5px;
+}
+
+.admin-hint {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.admin-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-form input {
+  flex: 1;
+  padding: 10px 15px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.admin-form input:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.admin-form button {
+  padding: 10px 25px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.admin-form button:hover {
+  background: #ffed4a;
+}
+
+.admin-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== АДМИН-БЕЙДЖ ===== */
+.admin-badge {
+  color: #ffd700;
+  font-size: 16px;
+}
+
+/* ===== РЕЙТИНГИ В ПРОФИЛЕ ===== */
 .profile-ratings {
   background: #1a1a1a;
   padding: 30px;
@@ -656,6 +813,45 @@ body {
 .profile-ratings h2 {
   color: #ffd700;
   margin-bottom: 20px;
+}
+
+.profile-reviews {
+  background: #1a1a1a;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  margin-top: 20px;
+}
+
+.profile-reviews h2 {
+  color: #ffd700;
+  margin-bottom: 20px;
+}
+
+.review-item {
+  padding: 15px;
+  background: #111;
+  border-radius: 8px;
+  border-left: 4px solid #ffd700;
+  margin-bottom: 10px;
+}
+
+.review-item a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.review-item h4 {
+  color: #ffd700;
+}
+
+.review-item p {
+  color: #888;
+}
+
+.review-preview {
+  color: #ddd !important;
+  margin-top: 5px;
 }
 
 .ratings-list {
@@ -708,83 +904,7 @@ body {
   font-weight: bold;
 }
 
-.loading {
-  text-align: center;
-  padding: 60px;
-  color: #888;
-}
-
-.error {
-  text-align: center;
-  padding: 60px;
-  color: #ff1744;
-}
-
-.search-results {
-  margin: 30px 0;
-  padding: 20px;
-  background: #1a1a1a;
-  border-radius: 12px;
-  border: 1px solid #333;
-}
-
-.search-results h3 {
-  color: #ffd700;
-  margin-bottom: 20px;
-}
-
-/* Адаптивность для телефонов и планшетов */
-@media (max-width: 768px) {
-  .film-header {
-    grid-template-columns: 1fr;
-  }
-
-  .film-poster-large {
-    max-width: 300px;
-    margin: 0 auto;
-  }
-
-  .films-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-  }
-
-  .film-card img {
-    height: 220px;
-  }
-
-  .hero h2 {
-    font-size: 20px;
-  }
-
-  .search-box {
-    flex-direction: column;
-  }
-
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .rating-item {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .trailer iframe {
-    height: 250px;
-  }
-
-  .header {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .preview-score {
-    font-size: 48px;
-  }
-}
-/* ===== СПИСОК ПОЛЬЗОВАТЕЛЕЙ НА СТРАНИЦЕ ФИЛЬМА ===== */
+/* ===== ПОЛЬЗОВАТЕЛИ, ОЦЕНИВШИЕ ФИЛЬМ ===== */
 .film-users {
   margin: 30px 0;
   padding: 20px;
@@ -849,6 +969,249 @@ body {
 .details-btn:hover {
   background: #ffd700;
   color: #0a0a0a;
+}
+
+/* ===== КОММЕНТАРИИ ===== */
+.comments-section {
+  margin: 30px 0;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.comments-section h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.comment-item {
+  padding: 12px 15px;
+  background: #111;
+  border-radius: 8px;
+  border-left: 3px solid #ffd700;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-nickname {
+  color: #ffd700;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.comment-text {
+  color: #ddd;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.like-btn:hover {
+  color: #ffd700;
+  background: #2a2a2a;
+}
+
+.comment-form {
+  display: flex;
+  gap: 10px;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 10px 15px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+}
+
+.comment-form input:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.comment-form button {
+  padding: 10px 20px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.comment-form button:hover {
+  background: #ffed4a;
+}
+
+/* ===== РЕЦЕНЗИИ ===== */
+.reviews-section {
+  margin: 30px 0;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reviews-header h3 {
+  color: #ffd700;
+  margin: 0;
+}
+
+.btn-add-review {
+  padding: 8px 20px;
+  background: #2a2a2a;
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  color: #ffd700;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-add-review:hover {
+  background: #ffd700;
+  color: #0a0a0a;
+}
+
+.review-form {
+  background: #111;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+}
+
+.review-form input,
+.review-form textarea {
+  width: 100%;
+  padding: 10px 15px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.review-form input:focus,
+.review-form textarea:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.review-form textarea {
+  resize: vertical;
+}
+
+.review-form button {
+  padding: 10px 30px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.review-form button:hover {
+  background: #ffed4a;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.review-card {
+  background: #111;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #ffd700;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-nickname {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.review-rating {
+  color: #888;
+  font-size: 14px;
+}
+
+.review-title {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.review-text {
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-actions {
+  margin-top: 10px;
 }
 
 /* ===== МОДАЛЬНОЕ ОКНО ===== */
@@ -988,21 +1351,8 @@ body {
   min-width: 30px;
   text-align: center;
 }
+
 /* ===== СТРАНИЦА "О СИСТЕМЕ" ===== */
-.btn-about {
-  padding: 10px 25px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s;
-  font-weight: 600;
-  background: #2a2a2a;
-  color: #ffd700;
-}
-
-.btn-about:hover {
-  background: #333;
-}
-
 .about-page {
   max-width: 900px;
   margin: 0 auto;
@@ -1158,6 +1508,98 @@ body {
   border-top: 1px solid #2a2a2a;
 }
 
+/* ===== ТОП ПОЛЬЗОВАТЕЛЕЙ ===== */
+.top-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.top-title {
+  color: #ffd700;
+  font-size: 32px;
+  margin: 20px 0 30px;
+  text-align: center;
+}
+
+.top-users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-user-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+}
+
+.top-user-item:hover {
+  background: #2a2a2a;
+  border-color: #ffd700;
+  transform: translateX(5px);
+}
+
+.top-user-rank {
+  font-size: 24px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.top-user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffd700;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder-small {
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.top-user-info {
+  flex: 1;
+}
+
+.top-user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-user-stats {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.top-user-stats span {
+  color: #888;
+  font-size: 13px;
+}
+
+.top-user-stats span:first-child {
+  color: #ffd700;
+  font-weight: 600;
+}
+
 /* ===== ПАГИНАЦИЯ ===== */
 .load-more {
   display: flex;
@@ -1188,23 +1630,6 @@ body {
 .page-info {
   color: #666;
   font-size: 14px;
-}
-
-/* ===== СТАТИСТИКА В ПРОФИЛЕ ===== */
-.profile-stats {
-  display: flex;
-  gap: 20px;
-  margin: 10px 0;
-  flex-wrap: wrap;
-}
-
-.profile-stats p {
-  color: #888;
-  font-size: 14px;
-}
-
-.profile-stats strong {
-  color: #ffd700;
 }
 
 /* ===== ТОП-5 ФИЛЬМОВ ===== */
@@ -1310,10 +1735,37 @@ body {
   font-size: 12px;
 }
 
+/* ===== ЗАГРУЗКА И ОШИБКИ ===== */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #888;
+}
+
+.error {
+  text-align: center;
+  padding: 60px;
+  color: #ff1744;
+}
+
+/* ===== РЕЗУЛЬТАТЫ ПОИСКА ===== */
+.search-results {
+  margin: 30px 0;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.search-results h3 {
+  color: #ffd700;
+  margin-bottom: 20px;
+}
+
 /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
 @media (max-width: 768px) {
   .film-header {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .film-poster-large {
@@ -1369,11 +1821,137 @@ body {
     gap: 5px;
   }
 
-  .preview-score {
-    font-size: 40px;
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .rating-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .rating-film-info {
+    justify-content: center;
   }
 
   .trailer iframe {
     height: 200px;
   }
+
+  .preview-score {
+    font-size: 40px;
   }
+
+  .modal-content {
+    padding: 15px;
+  }
+
+  .reviews-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-form {
+    flex-direction: column;
+  }
+
+  .comment-form {
+    flex-direction: column;
+  }
+
+  .top-user-item {
+    flex-wrap: wrap;
+  }
+
+  .top-user-stats {
+    gap: 8px;
+  }
+
+  .user-rating-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .users-list {
+    gap: 8px;
+  }
+
+  .film-users {
+    padding: 15px;
+  }
+
+  .about-blocks {
+    gap: 15px;
+  }
+
+  .about-criterion {
+    padding: 8px 12px;
+  }
+
+  .auth-box {
+    padding: 20px;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .avatar-placeholder {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .films-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .film-card img {
+    height: 160px;
+  }
+
+  .film-card .info h3 {
+    font-size: 12px;
+  }
+
+  .film-card .info p {
+    font-size: 11px;
+  }
+
+  .rating-badge {
+    font-size: 14px;
+    padding: 2px 8px;
+  }
+
+  .votes-count {
+    font-size: 10px;
+  }
+
+  .preview-score {
+    font-size: 32px;
+  }
+
+  .modal-content {
+    padding: 12px;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .btn-profile,
+  .btn-login,
+  .btn-about,
+  .btn-top {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
