@@ -620,13 +620,13 @@ body {
 }
 
 /* ============================================================
-   ФОРМА ОЦЕНКИ
+   ФОРМА ОЦЕНКИ (НОВЫЙ ДИЗАЙН)
    ============================================================ */
 .rating-form {
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
-  padding: 28px;
-  border-radius: 16px;
+  padding: 32px 36px;
+  border-radius: 20px;
   margin: 30px 0;
   border: 1px solid var(--glass-border);
 }
@@ -634,7 +634,7 @@ body {
 .rating-form h2 {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 24px;
+  font-size: 28px;
   color: var(--text-primary);
   margin-bottom: 4px;
   letter-spacing: -0.02em;
@@ -643,86 +643,319 @@ body {
 .rating-hint {
   color: var(--text-secondary);
   font-size: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
+/* ===== БАЗА (ГРУППА КРИТЕРИЕВ) ===== */
 .rating-base {
-  margin-bottom: 24px;
-  padding: 16px 20px;
+  margin-bottom: 28px;
+  padding: 20px 24px 24px;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid var(--glass-border);
+  transition: border-color 0.3s ease;
+}
+
+.rating-base:hover {
+  border-color: rgba(124, 58, 237, 0.15);
 }
 
 .rating-base h3 {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--neon-cyan);
-  margin-bottom: 14px;
+  margin-bottom: 18px;
+  letter-spacing: -0.01em;
 }
 
+/* ===== ОДИН КРИТЕРИЙ ===== */
 .criterion {
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
+.criterion:last-child {
+  margin-bottom: 0;
 }
 
 .criterion label {
-  display: block;
-  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
   color: var(--text-secondary);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-weight: 500;
   font-family: var(--font-sans);
 }
 
-.criterion-hint {
-  display: inline-block;
-  margin-left: 6px;
+.criterion label .criterion-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-muted);
-  cursor: help;
   font-size: 12px;
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.3s;
+  margin-left: 8px;
 }
 
+.criterion label .criterion-hint:hover {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--neon-cyan);
+}
+
+/* ===== КРУПНЫЙ СЛАЙДЕР (НОВЫЙ ДИЗАЙН) ===== */
 .slider-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  padding: 4px 0;
 }
 
+/* Метки "1" и "10" */
+.slider-container .slider-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-muted);
+  min-width: 18px;
+  text-align: center;
+  user-select: none;
+}
+
+/* САМ ПОЛЗУНОК */
 .slider-container input[type="range"] {
   flex: 1;
   -webkit-appearance: none;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.08);
+  appearance: none;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
   outline: none;
-  transition: background 0.3s;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  padding: 0;
+  margin: 8px 0;
 }
+
+/* Дорожка (трек) */
+.slider-container input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease;
+}
+
 .slider-container input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--neon-cyan);
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+  margin-top: -8px;
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.15),
+              0 0 60px rgba(34, 211, 238, 0.05);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.05);
 }
+
 .slider-container input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.25),
+              0 0 80px rgba(34, 211, 238, 0.08);
 }
 
-.slider-container span {
-  color: var(--text-secondary);
-  font-size: 13px;
-  min-width: 20px;
+.slider-container input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.92);
 }
 
-.value-display {
+/* Firefox */
+.slider-container input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.15);
+}
+
+/* ===== ЗНАЧЕНИЕ СПРАВА (КРУПНОЕ) ===== */
+.slider-container .value-display {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
   color: var(--neon-cyan);
-  min-width: 28px;
+  min-width: 32px;
   text-align: center;
+  transition: all 0.2s ease;
+  background: rgba(34, 211, 238, 0.04);
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.slider-container input[type="range"]:focus + .value-display,
+.slider-container .value-display.active {
+  border-color: rgba(34, 211, 238, 0.15);
+  background: rgba(34, 211, 238, 0.06);
+}
+
+/* ===== СУБЪЕКТИВНЫЙ МНОЖИТЕЛЬ ===== */
+.subjective-block {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 20px 24px 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.3s ease;
+}
+
+.subjective-block:hover {
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.subjective-block h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--neon-cyan);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.subjective-block p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.subjective-block .slider-container input[type="range"]::-webkit-slider-thumb {
+  background: var(--neon-purple);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15),
+              0 0 60px rgba(124, 58, 237, 0.05);
+}
+
+.subjective-block .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.25),
+              0 0 80px rgba(124, 58, 237, 0.08);
+}
+
+.subjective-block .slider-container .value-display {
+  color: var(--neon-purple);
+  background: rgba(124, 58, 237, 0.04);
+}
+
+.subjective-block .slider-container input[type="range"]::-moz-range-thumb {
+  background: var(--neon-purple);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .rating-form {
+    padding: 20px 18px;
+  }
+  .rating-form h2 {
+    font-size: 22px;
+  }
+  .rating-base {
+    padding: 14px 16px 18px;
+  }
+  .rating-base h3 {
+    font-size: 16px;
+  }
+  .criterion label {
+    font-size: 14px;
+  }
+  .slider-container {
+    gap: 10px;
+  }
+  .slider-container .value-display {
+    font-size: 18px;
+    min-width: 28px;
+  }
+  .slider-container input[type="range"]::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    margin-top: -6px;
+  }
+  .subjective-block {
+    padding: 16px 16px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-form {
+    padding: 14px 12px;
+  }
+  .rating-form h2 {
+    font-size: 18px;
+  }
+  .rating-base {
+    padding: 10px 12px 14px;
+    margin-bottom: 16px;
+  }
+  .rating-base h3 {
+    font-size: 14px;
+  }
+  .criterion {
+    margin-bottom: 14px;
+  }
+  .criterion label {
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .slider-container {
+    gap: 8px;
+  }
+  .slider-container .slider-label {
+    font-size: 11px;
+    min-width: 12px;
+  }
+  .slider-container .value-display {
+    font-size: 16px;
+    min-width: 24px;
+    padding: 0 4px;
+  }
+  .slider-container input[type="range"] {
+    height: 4px;
+  }
+  .slider-container input[type="range"]::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+  }
+  .subjective-block {
+    padding: 12px 12px 16px;
+  }
+  .subjective-block h3 {
+    font-size: 16px;
+  }
+  .subjective-block p {
+    font-size: 12px;
+  }
 }
 
 /* ============================================================
