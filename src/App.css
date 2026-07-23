@@ -4096,3 +4096,262 @@ textarea {
 .film-card-link:focus-visible {
   outline: none !important;
 }
+
+/* ============================================================
+   НОВЫЙ ДИЗАЙН КАРТОЧЕК — АТМОСФЕРА И РАЗНООБРАЗИЕ
+   ============================================================ */
+
+/* ----- 1. УБИРАЕМ БРАУЗЕРНОЕ СВЕЧЕНИЕ ----- */
+.film-card-link,
+.film-card-link:focus,
+.film-card-link:active,
+.film-card-link:visited {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+}
+
+/* ----- 2. КАРТОЧКИ С АТМОСФЕРОЙ (на мобильных) ----- */
+@media (max-width: 768px) {
+  .films-grid {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 12px 44px 12px;
+    scroll-behavior: smooth;
+    flex-wrap: nowrap;
+    margin: 0 -4px;
+    position: relative;
+  }
+
+  /* Полка снизу */
+  .films-grid::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    opacity: 0.3;
+  }
+
+  .films-grid .film-card-link {
+    flex: 0 0 200px;
+    max-width: 200px;
+    min-width: 200px;
+    height: auto;
+    scroll-snap-align: start;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ----- КАРТОЧКА С АТМОСФЕРНЫМ ФОНОМ ----- */
+  .films-grid .film-card {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Цветовая подсветка карточки (цвет от постера) */
+  .films-grid .film-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.03) 0%,
+      rgba(124, 58, 237, 0.03) 50%,
+      rgba(236, 72, 153, 0.02) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Неоновое свечение по краям */
+  .films-grid .film-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      rgba(34, 211, 238, 0.05) 25%,
+      transparent 50%,
+      rgba(124, 58, 237, 0.05) 75%,
+      transparent 100%
+    );
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .films-grid .film-card-link:active .film-card::after {
+    opacity: 1;
+  }
+
+  .films-grid .film-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ----- ИНФОРМАЦИЯ С АТМОСФЕРОЙ ----- */
+  .films-grid .film-info {
+    padding: 12px 14px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(10, 10, 18, 0.4) 30%,
+      rgba(10, 10, 18, 0.7) 100%
+    );
+  }
+
+  /* Название — крупное, с акцентом */
+  .films-grid .film-info h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Год — вынесен в отдельный элемент */
+  .films-grid .film-info .film-year-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+    align-self: flex-start;
+  }
+
+  /* Рейтинг — крупный и яркий */
+  .films-grid .rating-badge {
+    font-size: 18px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    margin-top: 6px;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Количество оценок */
+  .films-grid .votes-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-family: var(--font-sans);
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+
+  /* ----- 3D-НАКЛОН ПРИ НАЖАТИИ (без синего свечения) ----- */
+  .film-card-link {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .film-card-link:active .film-card {
+    transform: perspective(800px) rotateX(2deg) rotateY(4deg) scale(1.03) translateY(-4px);
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-color: var(--neon-cyan);
+    box-shadow:
+      0 8px 32px rgba(34, 211, 238, 0.12),
+      0 4px 16px rgba(124, 58, 237, 0.08),
+      0 12px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ГРАДИЕНТ ПРИ НАЖАТИИ */
+  .film-card-link:active .film-card .film-info {
+    background: linear-gradient(
+      to bottom,
+      rgba(34, 211, 238, 0.02) 0%,
+      rgba(34, 211, 238, 0.04) 30%,
+      rgba(124, 58, 237, 0.08) 100%
+    );
+  }
+
+  .film-card-link:active .film-card .film-info h3 {
+    color: var(--neon-cyan);
+  }
+
+  /* ----- СКРОЛЛБАР ----- */
+  .films-grid::-webkit-scrollbar {
+    height: 3px;
+  }
+  .films-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .films-grid::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================
+   ДОПОЛНИТЕЛЬНО: РАЗНЫЕ ЦВЕТА ДЛЯ РАЗНЫХ КАРТОЧЕК
+   ============================================================ */
+/* Добавляем случайный цветной отлив каждой карточке */
+@media (max-width: 768px) {
+  .films-grid .film-card-link:nth-child(3n+1) .film-card::before {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.04), rgba(34, 211, 238, 0.01));
+  }
+  .films-grid .film-card-link:nth-child(3n+2) .film-card::before {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.04), rgba(124, 58, 237, 0.01));
+  }
+  .films-grid .film-card-link:nth-child(3n+3) .film-card::before {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.04), rgba(236, 72, 153, 0.01));
+  }
+}
+
+/* ============================================================
+   УБИРАЕМ outline НА ВСЕХ ЭЛЕМЕНТАХ
+   ============================================================ */
+.film-card-link,
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  outline: none !important;
+}
+
+.film-card-link:focus-visible {
+  outline: none !important;
+}
