@@ -3,8 +3,7 @@
 // Полностью переписанный и исправленный
 // ============================================
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 
@@ -414,11 +413,17 @@ function ActivityFeed({ events, loading }) {
       <h3>📰 Последние события</h3>
       <div className="feed-list">
         {events.slice(0, 10).map((event, index) => (
-          <div key={event._id || index} className="feed-item">
-            <span className="feed-icon">{getEventIcon(event.type)}</span>
-            <span className="feed-text">{getEventText(event)}</span>
-            <span className="feed-time">{event.time || 'только что'}</span>
-          </div>
+          <Link 
+            to={`/film/${event.filmId}`}
+            key={event._id || index}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+          >
+            <div className="feed-item">
+              <span className="feed-icon">{getEventIcon(event.type)}</span>
+              <span className="feed-text">{getEventText(event)}</span>
+              <span className="feed-time">{event.time || 'только что'}</span>
+            </div>
+          </Link>
         ))}
       </div>
     </div>
@@ -883,38 +888,53 @@ function HomePage() {
     if (isImporting) return;
     setIsImporting(true);
     
-    try {
-      await api.post('/films/import', { tmdbId });
-      setShowSearch(false);
-      setSearchQuery('');
-      setSearchResults([]);
-      
-      if (user) {
-        await addEvent({
-          type: 'film_add',
-          user: user.nickname,
-          film: filmTitle || 'Новый фильм'
-        });
-      }
-      
-      setPage(1);
-      await loadFilms(1);
-      
-      showNotification({
-        title: 'Фильм добавлен!',
-        message: 'Фильм успешно добавлен в каталог',
-        type: 'success'
-      });
-    } catch (err) {
-      showNotification({
-        title: 'Ошибка',
-        message: err.response?.data?.error || 'Не удалось добавить фильм',
-        type: 'error'
-      });
-    } finally {
-      setIsImporting(false);
-    }
-  };
+  try {
+  const response = await api.post('/films/import', { tmdbId });
+  
+  if (response.data.alreadyExists) {
+    showNotification({
+      title: 'Уже в каталоге',
+      message: `Фильм "${response.data.film.title}" уже есть. Переход...`,
+      type: 'info'
+    });
+    
+    setTimeout(() => {
+      navigate(`/film/${response.data.film._id}`);
+    }, 1000);
+    
+    setIsImporting(false);
+    return;
+  }
+  
+  setShowSearch(false);
+  setSearchQuery('');
+  setSearchResults([]);
+  
+  if (user) {
+    await addEvent({
+      type: 'film_add',
+      user: user.nickname,
+      film: filmTitle || 'Новый фильм'
+    });
+  }
+  
+  setPage(1);
+  await loadFilms(1);
+  
+  showNotification({
+    title: 'Фильм добавлен!',
+    message: 'Фильм успешно добавлен в каталог',
+    type: 'success'
+  });
+} catch (err) {
+  showNotification({
+    title: 'Ошибка',
+    message: err.response?.data?.error || 'Не удалось добавить фильм',
+    type: 'error'
+  });
+} finally {
+  setIsImporting(false);
+}
 
   const handleLogout = () => {
     localStorage.removeItem('token');
