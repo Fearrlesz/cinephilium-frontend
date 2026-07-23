@@ -594,7 +594,11 @@ function AdminPanel() {
   const [pendingComments, setPendingComments] = useState([]);
   const [pendingReviews, setPendingReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification();
+  const notificationContext = useContext(NotificationContext);
+if (!notificationContext) {
+  return <div className="error-msg">Ошибка: контекст уведомлений не найден</div>;
+}
+const { showNotification } = notificationContext;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -1229,12 +1233,12 @@ function FilmPage() {
       setIsRatingMode(false);
       
       if (currentUser && film) {
-        const finalScore = calculatePreview();
+    
         await addEvent({
           type: 'rating',
           user: currentUser.nickname,
           film: film.title,
-          score: finalScore
+          score: response.data.rating.finalScore
         });
       }
       
