@@ -1,9 +1,17 @@
+// ============================================
+// Файл: App.js
+// Полностью переписанный и исправленный
+// ============================================
+
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 
-// ===== КОНСТАНТЫ =====
+// ============================================================
+// 1. КОНСТАНТЫ
+// ============================================================
+
 const baseNames = [
   '🎭 Сценарий и драматургия',
   '🎭 Персонажи и актерская игра',
@@ -25,9 +33,16 @@ const baseDescriptions = [
   ['Помогает ли музыка понять чувства героя?', 'Соответствуют ли инструменты эпохе, месту и жанру?', 'Работают ли бытовые шумы на атмосферу?', 'Умеет ли режиссер вовремя выключить музыку?', 'Все ли слышно? Не перекрывает ли бас или музыка голоса актеров?']
 ];
 
-// ===== API КЛИЕНТ =====
+const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add'];
+const VALID_FILM_TYPES = ['view', 'like', 'rating', 'comment', 'share', 'favorite'];
+
+// ============================================================
+// 2. API КЛИЕНТ
+// ============================================================
+
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
+  timeout: 10000,
 });
 
 api.interceptors.response.use(
@@ -43,7 +58,7 @@ api.interceptors.response.use(
   }
 );
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -51,15 +66,35 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ===== КОНТЕКСТ ДЛЯ УВЕДОМЛЕНИЙ =====
+// ============================================================
+// 3. КОНТЕКСТЫ
+// ============================================================
+
 const NotificationContext = createContext();
 
 export function useNotification() {
-  return useContext(NotificationContext);
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotification must be used within NotificationProvider');
+  }
+  return context;
 }
 
-// ===== УТИЛИТЫ =====
-function getScoreColor(score) {
+const AuthContext = createContext();
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+}
+
+// ============================================================
+// 4. УТИЛИТЫ
+// ============================================================
+
+export function getScoreColor(score) {
   if (score === undefined || score === null || isNaN(score)) return '#666';
   const clampedScore = Math.max(6, Math.min(90, score));
   const normalized = (clampedScore - 6) / 84;
@@ -67,7 +102,7 @@ function getScoreColor(score) {
   return `hsl(${hue}, 85%, ${45 + normalized * 15}%)`;
 }
 
-function formatDate(date) {
+export function formatDate(date) {
   if (!date) return 'Неизвестно';
   try {
     return new Date(date).toLocaleDateString('ru-RU', {
@@ -80,7 +115,7 @@ function formatDate(date) {
   }
 }
 
-function getTimeAgo(date) {
+export function getTimeAgo(date) {
   if (!date) return 'только что';
   try {
     const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -94,25 +129,192 @@ function getTimeAgo(date) {
   }
 }
 
-function sanitizeText(text) {
+export function sanitizeText(text) {
   if (!text) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// ===== КОМПОНЕНТ: МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ОЦЕНКИ =====
+export function truncateText(text, maxLength = 200) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
+
+export function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+export function validatePassword(password) {
+  return password.length >= 6;
+}
+
+export function validateNickname(nickname) {
+  return nickname.length >= 2 && nickname.length <= 20;
+}
+
+// ============================================================
+// 5. ХУК ДЛЯ СОБЫТИЙ
+// ============================================================
+
+function useActivityEvents() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.get('/events');
+      if (response.data && Array.isArray(response.data)) {
+        const formattedEvents = response.data.map(e => ({
+          ...e,
+          time: e.time || getTimeAgo(e.createdAt) || 'только что'
+        }));
+        setEvents(formattedEvents);
+      } else {
+        setEvents([]);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки событий:', err.message);
+      setError('Не удалось загрузить события');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addEvent = useCallback(async (eventData) => {
+    // Валидация события перед отправкой
+    if (!eventData.type || !VALID_EVENT_TYPES.includes(eventData.type)) {
+      console.error('❌ Некорректный тип события:', eventData.type);
+      return;
+    }
+    
+    if (!eventData.user) {
+      console.error('❌ Не указан пользователь события');
+      return;
+    }
+    
+    if (!eventData.film) {
+      console.error('❌ Не указан фильм события');
+      return;
+    }
+
+    try {
+      const response = await api.post('/events', {
+        type: eventData.type,
+        user: eventData.user,
+        film: eventData.film,
+        score: eventData.score || null
+      });
+      
+      const newEvent = {
+        _id: response.data._id || Date.now().toString(),
+        time: 'только что',
+        ...eventData
+      };
+      
+      setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+      
+      console.log('✅ Событие сохранено на сервере:', eventData);
+    } catch (err) {
+      console.error('❌ Ошибка сохранения события:', err.message);
+      
+      // Запасной вариант - добавляем локально
+      const newEvent = {
+        _id: `local_${Date.now()}`,
+        time: 'только что',
+        ...eventData
+      };
+      setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+    }
+  }, []);
+
+  const removeEvent = useCallback(async (eventId) => {
+    try {
+      await api.delete(`/events/${eventId}`);
+      setEvents(prev => prev.filter(e => e._id !== eventId));
+      console.log('✅ Событие удалено:', eventId);
+    } catch (err) {
+      console.error('❌ Ошибка удаления события:', err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  return { events, loading, error, addEvent, removeEvent, refresh: loadEvents };
+}
+
+// ============================================================
+// 6. КОМПОНЕНТ: УВЕДОМЛЕНИЯ
+// ============================================================
+
+function NotificationModal({ isOpen, onClose, title, message, type = 'success' }) {
+  if (!isOpen) return null;
+
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    warning: '⚠️'
+  };
+
+  const typeLabels = {
+    success: 'Успешно',
+    error: 'Ошибка',
+    info: 'Информация',
+    warning: 'Внимание'
+  };
+
+  const buttonLabels = {
+    success: 'Отлично',
+    error: 'Понятно',
+    info: 'Закрыть',
+    warning: 'Понял'
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-glass" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-content">
+          <div className={`modal-icon ${type}`}>
+            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ️'}</span>
+          </div>
+          <h3 className="modal-title">{title || typeLabels[type] || 'Уведомление'}</h3>
+          <p className="modal-message">{message}</p>
+          <button className="btn-modal btn-primary" onClick={onClose}>
+            {buttonLabels[type] || 'Закрыть'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 7. КОМПОНЕНТ: ДЕТАЛИ ОЦЕНКИ
+// ============================================================
+
 function RatingDetailsModal({ rating, onClose }) {
   if (!rating) return null;
 
   const bases = [rating.base1, rating.base2, rating.base3, rating.base4];
   const baseAverages = bases.map(base => 
-    base && base.length === 5 ? (base.reduce((a, b) => a + b, 0) / 5).toFixed(1) : '0.0'
+    base && Array.isArray(base) && base.length === 5 
+      ? (base.reduce((a, b) => a + b, 0) / 5).toFixed(1) 
+      : '0.0'
   );
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
         
         <div className="modal-header">
@@ -129,7 +331,7 @@ function RatingDetailsModal({ rating, onClose }) {
         </div>
 
         <div className="modal-bases">
-          {[0, 1, 2, 3].map((baseIndex) => (
+          {[0, 1, 2, 3].map(baseIndex => (
             <div key={baseIndex} className="modal-base">
               <h4>{baseNames[baseIndex]} <span className="modal-base-avg">(среднее: {baseAverages[baseIndex]})</span></h4>
               <div className="modal-criteria">
@@ -148,44 +350,10 @@ function RatingDetailsModal({ rating, onClose }) {
   );
 }
 
-// ===== КОМПОНЕНТ: УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ УВЕДОМЛЕНИЙ =====
-function NotificationModal({ isOpen, onClose, title, message, type = 'success' }) {
-  if (!isOpen) return null;
+// ============================================================
+// 8. КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ
+// ============================================================
 
-  const icons = {
-    success: '✅',
-    error: '❌',
-    info: 'ℹ️',
-    warning: '⚠️'
-  };
-
-  const typeLabels = {
-    success: 'Успешно',
-    error: 'Ошибка',
-    info: 'Информация',
-    warning: 'Внимание'
-  };
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-glass" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
-        <div className="modal-content">
-          <div className={`modal-icon ${type}`}>
-            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ️'}</span>
-          </div>
-          <h3 className="modal-title">{title || typeLabels[type] || 'Уведомление'}</h3>
-          <p className="modal-message">{message}</p>
-          <button className="btn-modal btn-primary" onClick={onClose}>
-            {type === 'success' ? 'Отлично' : type === 'error' ? 'Понятно' : 'Закрыть'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ===== КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ =====
 function ActivityFeed({ events, loading }) {
   if (loading) {
     return (
@@ -217,13 +385,13 @@ function ActivityFeed({ events, loading }) {
   }
 
   const getEventIcon = (type) => {
-    switch(type) {
-      case 'rating': return '⭐';
-      case 'review': return '📝';
-      case 'comment': return '💬';
-      case 'film_add': return '🎬';
-      default: return '📌';
-    }
+    const icons = {
+      'rating': '⭐',
+      'review': '📝',
+      'comment': '💬',
+      'film_add': '🎬'
+    };
+    return icons[type] || '📌';
   };
 
   const getEventText = (event) => {
@@ -231,18 +399,14 @@ function ActivityFeed({ events, loading }) {
     const film = sanitizeText(event.film || 'фильм');
     const score = event.score || '';
     
-    switch(event.type) {
-      case 'rating':
-        return `«${user}» оценил «${film}» на ${score} баллов`;
-      case 'review':
-        return `«${user}» написал рецензию на «${film}»`;
-      case 'comment':
-        return `«${user}» прокомментировал «${film}»`;
-      case 'film_add':
-        return `«${user}» добавил фильм «${film}» в каталог`;
-      default:
-        return `«${user}» сделал что-то с «${film}»`;
-    }
+    const templates = {
+      'rating': `«${user}» оценил «${film}» на ${score} баллов`,
+      'review': `«${user}» написал рецензию на «${film}»`,
+      'comment': `«${user}» прокомментировал «${film}»`,
+      'film_add': `«${user}» добавил фильм «${film}» в каталог`
+    };
+    
+    return templates[event.type] || `«${user}» сделал что-то с «${film}»`;
   };
 
   return (
@@ -261,49 +425,37 @@ function ActivityFeed({ events, loading }) {
   );
 }
 
-// ===== ХУК ДЛЯ РЕАЛЬНЫХ СОБЫТИЙ (БЕЗ ВЫДУМАННЫХ) =====
-function useActivityEvents() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+// ============================================================
+// 9. КОМПОНЕНТ: ШАПКА
+// ============================================================
 
-  const loadEvents = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await api.get('/events');
-      if (response.data && Array.isArray(response.data)) {
-        const formattedEvents = response.data.map(e => ({
-          ...e,
-          time: e.time || getTimeAgo(e.createdAt) || 'только что'
-        }));
-        setEvents(formattedEvents);
-      } else {
-        setEvents([]);
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки событий:', err.message);
-      setEvents([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const addEvent = useCallback((eventData) => {
-    const newEvent = {
-      _id: Date.now().toString(),
-      time: 'только что',
-      ...eventData
-    };
-    setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
-  }, []);
-
-  useEffect(() => {
-    loadEvents();
-  }, [loadEvents]);
-
-  return { events, loading, addEvent, refresh: loadEvents };
+function Header({ user, onLogout }) {
+  return (
+    <header className="header">
+      <h1>🎬 СИНЕФИЛИУМ</h1>
+      <div className="header-actions">
+        <Link to="/about" className="btn-about">📖 О системе</Link>
+        <Link to="/top" className="btn-top">🏆 Топ</Link>
+        {user ? (
+          <>
+            <Link to="/profile" className="btn-profile">👤 {user.nickname}</Link>
+            {user.isAdmin && (
+              <Link to="/admin" className="btn-admin">🛡️ Админка</Link>
+            )}
+            <button onClick={onLogout} className="btn-logout">Выйти</button>
+          </>
+        ) : (
+          <Link to="/login" className="btn-login">Войти</Link>
+        )}
+      </div>
+    </header>
+  );
 }
 
-// ===== СТРАНИЦА: О СИСТЕМЕ =====
+// ============================================================
+// 10. СТРАНИЦА: О СИСТЕМЕ
+// ============================================================
+
 function AboutPage() {
   return (
     <div className="container about-page">
@@ -324,7 +476,7 @@ function AboutPage() {
       </div>
 
       <div className="about-blocks">
-        {[0, 1, 2, 3].map((blockIndex) => (
+        {[0, 1, 2, 3].map(blockIndex => (
           <div key={blockIndex} className="about-block glass-card">
             <h2 className="about-block-title neon-text">{baseNames[blockIndex]}</h2>
             <div className="about-criteria">
@@ -363,18 +515,18 @@ function AboutPage() {
           <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
         </div>
       </div>
-
-      <div className="about-version">
-        <p>Синефилиум v1.0 — Храм честного кино.</p>
-      </div>
     </div>
   );
 }
 
-// ===== СТРАНИЦА: ТОП ПОЛЬЗОВАТЕЛЕЙ =====
+// ============================================================
+// 11. СТРАНИЦА: ТОП ПОЛЬЗОВАТЕЛЕЙ
+// ============================================================
+
 function TopUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadTopUsers();
@@ -382,24 +534,24 @@ function TopUsersPage() {
 
   const loadTopUsers = async () => {
     setLoading(true);
+    setError('');
     try {
       const response = await api.get('/top/users');
       setUsers(response.data || []);
     } catch (err) {
       console.error('Ошибка загрузки топа:', err);
+      setError('Не удалось загрузить топ пользователей');
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) return <div className="loading">Загрузка...</div>;
+  if (error) return <div className="error-msg">{error}</div>;
 
   const getMedal = (index) => {
-    if (index === 0) return '👑';
-    if (index === 1) return '🥇';
-    if (index === 2) return '🥈';
-    if (index === 3) return '🥉';
-    return `#${index + 1}`;
+    const medals = ['👑', '🥇', '🥈', '🥉'];
+    return medals[index] || `#${index + 1}`;
   };
 
   return (
@@ -432,7 +584,10 @@ function TopUsersPage() {
   );
 }
 
-// ===== СТРАНИЦА: АДМИН-ПАНЕЛЬ =====
+// ============================================================
+// 12. СТРАНИЦА: АДМИН-ПАНЕЛЬ
+// ============================================================
+
 function AdminPanel() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -605,7 +760,10 @@ function AdminPanel() {
   );
 }
 
-// ===== СТРАНИЦА: ГЛАВНАЯ =====
+// ============================================================
+// 13. СТРАНИЦА: ГЛАВНАЯ
+// ============================================================
+
 function HomePage() {
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -627,6 +785,10 @@ function HomePage() {
     loadFilms(page);
     loadCurrentUser();
   }, [page]);
+
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
 
   const loadCurrentUser = async () => {
     const token = localStorage.getItem('token');
@@ -724,7 +886,7 @@ function HomePage() {
       setSearchResults([]);
       
       if (user) {
-        addEvent({
+        await addEvent({
           type: 'film_add',
           user: user.nickname,
           film: filmTitle || 'Новый фильм'
@@ -761,8 +923,6 @@ function HomePage() {
     });
   };
 
-  const token = localStorage.getItem('token');
-
   if (loading && page === 1) return <div className="loading">Загрузка...</div>;
 
   const topFilms = [...films]
@@ -772,29 +932,7 @@ function HomePage() {
 
   return (
     <div className="container">
-      <header className="header">
-        <h1>🎬 СИНЕФИЛИУМ</h1>
-        <div className="header-actions">
-          <Link to="/about" className="btn-about">📖 О системе</Link>
-          <Link to="/top" className="btn-top">🏆 Топ</Link>
-          {token && user ? (
-            <>
-              <Link to="/profile" className="btn-profile">👤 {user.nickname}</Link>
-              {user.isAdmin && (
-                <Link to="/admin" className="btn-admin">🛡️ Админка</Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="btn-logout"
-              >
-                Выйти
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="btn-login">Войти</Link>
-          )}
-        </div>
-      </header>
+      <Header user={user} onLogout={handleLogout} />
 
       <div className="hero glass-card">
         <h2>Храм честного кино — 20 критериев для подробной оценки</h2>
@@ -914,7 +1052,10 @@ function HomePage() {
   );
 }
 
-// ===== СТРАНИЦА: ФИЛЬМ =====
+// ============================================================
+// 14. СТРАНИЦА: ФИЛЬМ
+// ============================================================
+
 function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -934,6 +1075,7 @@ function FilmPage() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { showNotification } = useNotification();
+  const { addEvent } = useActivityEvents();
 
   const [base1, setBase1] = useState([5, 5, 5, 5, 5]);
   const [base2, setBase2] = useState([5, 5, 5, 5, 5]);
@@ -950,6 +1092,17 @@ function FilmPage() {
     loadCurrentUser();
   }, [id]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isRatingMode && !isSaving) {
+        e.preventDefault();
+        e.returnValue = 'Вы уверены, что хотите закрыть страницу? Ваши изменения не будут сохранены.';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isRatingMode, isSaving]);
+
   const loadCurrentUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -964,17 +1117,6 @@ function FilmPage() {
     }
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (isRatingMode && !isSaving) {
-        e.preventDefault();
-        e.returnValue = 'Вы уверены, что хотите закрыть страницу? Ваши изменения не будут сохранены.';
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isRatingMode, isSaving]);
-
   const loadFilm = async () => {
     setLoading(true);
     try {
@@ -983,17 +1125,17 @@ function FilmPage() {
       if (response.data.userRating) {
         const ur = response.data.userRating;
         setUserRating(ur);
-        setBase1(ur.base1 || [5,5,5,5,5]);
-        setBase2(ur.base2 || [5,5,5,5,5]);
-        setBase3(ur.base3 || [5,5,5,5,5]);
-        setBase4(ur.base4 || [5,5,5,5,5]);
+        setBase1(ur.base1 || [5, 5, 5, 5, 5]);
+        setBase2(ur.base2 || [5, 5, 5, 5, 5]);
+        setBase3(ur.base3 || [5, 5, 5, 5, 5]);
+        setBase4(ur.base4 || [5, 5, 5, 5, 5]);
         setSubjectiveM(ur.subjectiveM || 5);
         setTextReview(ur.textReview || '');
       } else {
-        setBase1([5,5,5,5,5]);
-        setBase2([5,5,5,5,5]);
-        setBase3([5,5,5,5,5]);
-        setBase4([5,5,5,5,5]);
+        setBase1([5, 5, 5, 5, 5]);
+        setBase2([5, 5, 5, 5, 5]);
+        setBase3([5, 5, 5, 5, 5]);
+        setBase4([5, 5, 5, 5, 5]);
         setSubjectiveM(5);
         setTextReview('');
         setUserRating(null);
@@ -1086,6 +1228,16 @@ function FilmPage() {
       await loadFilmUsers();
       setIsRatingMode(false);
       
+      if (currentUser && film) {
+        const finalScore = calculatePreview();
+        await addEvent({
+          type: 'rating',
+          user: currentUser.nickname,
+          film: film.title,
+          score: finalScore
+        });
+      }
+      
       showNotification({
         title: 'Оценка сохранена!',
         message: 'Ваша оценка успешно добавлена',
@@ -1153,6 +1305,15 @@ function FilmPage() {
       await api.post('/comments', { filmId: id, text: trimmedText });
       setCommentText('');
       await loadComments();
+      
+      if (currentUser && film) {
+        await addEvent({
+          type: 'comment',
+          user: currentUser.nickname,
+          film: film.title
+        });
+      }
+      
       showNotification({
         title: 'Комментарий добавлен',
         message: 'Ваш комментарий опубликован',
@@ -1233,6 +1394,15 @@ function FilmPage() {
       setNewReview({ title: '', text: '' });
       setShowReviewForm(false);
       await loadReviews();
+      
+      if (currentUser && film) {
+        await addEvent({
+          type: 'review',
+          user: currentUser.nickname,
+          film: film.title
+        });
+      }
+      
       showNotification({
         title: 'Рецензия добавлена!',
         message: 'Ваша рецензия опубликована',
@@ -1397,13 +1567,12 @@ function FilmPage() {
             <h2>Оценка по 20 критериям</h2>
             <p className="rating-hint">Оценка от 1 до 10 (1 — ужасно, 10 — идеально)</p>
             
-            {[0, 1, 2, 3].map((baseIndex) => (
-              <div key={baseIndex} className="rating-base">
-                <h3>{baseNames[baseIndex]}</h3>
-                {criteriaNames[baseIndex].map((name, critIndex) => {
-                  const values = [base1, base2, base3, base4];
-                  const value = values[baseIndex][critIndex];
-                  return (
+            {[0, 1, 2, 3].map((baseIndex) => {
+              const bases = [base1, base2, base3, base4];
+              return (
+                <div key={baseIndex} className="rating-base">
+                  <h3>{baseNames[baseIndex]}</h3>
+                  {criteriaNames[baseIndex].map((name, critIndex) => (
                     <div key={critIndex} className="criterion">
                       <label>
                         {name}
@@ -1416,17 +1585,17 @@ function FilmPage() {
                           min="1"
                           max="10"
                           step="1"
-                          value={value}
+                          value={bases[baseIndex][critIndex]}
                           onChange={(e) => handleRatingChange(baseIndex, critIndex, e.target.value)}
                         />
                         <span>10</span>
-                        <span className="value-display">{value}</span>
+                        <span className="value-display">{bases[baseIndex][critIndex]}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                  ))}
+                </div>
+              );
+            })}
 
             <div className="subjective-block">
               <h3>Субъективный множитель «Вайб»</h3>
@@ -1465,7 +1634,7 @@ function FilmPage() {
               </div>
               <div className="score-bar" style={{ 
                 width: `${(previewScore - 6) / 84 * 100}%`,
-                background: `linear-gradient(to right, #7c3aed, #22d3ee)`
+                background: 'linear-gradient(to right, #7c3aed, #22d3ee)'
               }}></div>
               <div className="score-labels">
                 <span>6 (провал)</span>
@@ -1535,7 +1704,10 @@ function FilmPage() {
   );
 }
 
-// ===== СТРАНИЦА: ВХОД / РЕГИСТРАЦИЯ =====
+// ============================================================
+// 15. СТРАНИЦА: ВХОД / РЕГИСТРАЦИЯ
+// ============================================================
+
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -1557,6 +1729,25 @@ function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Клиентская валидация
+    if (!validateEmail(email)) {
+      setError('Введите корректный email');
+      setLoading(false);
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError('Пароль должен содержать минимум 6 символов');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && !validateNickname(nickname)) {
+      setError('Никнейм должен быть от 2 до 20 символов');
+      setLoading(false);
+      return;
+    }
 
     try {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
@@ -1621,7 +1812,10 @@ function LoginPage() {
   );
 }
 
-// ===== СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ =====
+// ============================================================
+// 16. СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+// ============================================================
+
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [ratings, setRatings] = useState([]);
@@ -1801,7 +1995,10 @@ function ProfilePage() {
   );
 }
 
-// ===== СТРАНИЦА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ =====
+// ============================================================
+// 17. СТРАНИЦА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ
+// ============================================================
+
 function UserProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -1817,6 +2014,7 @@ function UserProfilePage() {
   }, [id]);
 
   const loadUserProfile = async () => {
+    setLoading(true);
     try {
       const response = await api.get(`/users/${id}`);
       setUser(response.data.user);
@@ -1907,7 +2105,7 @@ function UserProfilePage() {
                 <h4>{review.title}</h4>
                 <p>{review.film?.title || review.filmId?.title || 'Фильм'} ({review.film?.year || review.filmId?.year})</p>
               </Link>
-              <p className="review-preview">{review.text?.slice(0, 200) || ''}...</p>
+              <p className="review-preview">{truncateText(review.text, 200)}</p>
               <span>❤️ {review.likes?.length || 0}</span>
             </div>
           ))}
@@ -1922,7 +2120,10 @@ function UserProfilePage() {
   );
 }
 
-// ===== ГЛАВНОЕ ПРИЛОЖЕНИЕ =====
+// ============================================================
+// 18. ГЛАВНОЕ ПРИЛОЖЕНИЕ
+// ============================================================
+
 function App() {
   const [notification, setNotification] = useState({
     isOpen: false,
@@ -1931,13 +2132,13 @@ function App() {
     type: 'success'
   });
 
-  const showNotification = ({ title, message, type = 'success' }) => {
+  const showNotification = useCallback(({ title, message, type = 'success' }) => {
     setNotification({ isOpen: true, title, message, type });
-  };
+  }, []);
 
-  const closeNotification = () => {
-    setNotification({ ...notification, isOpen: false });
-  };
+  const closeNotification = useCallback(() => {
+    setNotification(prev => ({ ...prev, isOpen: false }));
+  }, []);
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
