@@ -271,18 +271,28 @@ body {
 }
 
 /* ============================================================
-   ГРИД ФИЛЬМОВ
+   СТЕКЛЯННАЯ ПОЛКА (ВАРИАНТ 5)
    ============================================================ */
 .films-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
-  margin-top: 30px;
+  gap: 30px 20px;
+  padding: 30px 0 60px 0;
+  position: relative;
 }
 
-/* ============================================================
-   КАРТОЧКА ФИЛЬМА
-   ============================================================ */
+/* Полка снизу */
+.films-grid::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.2;
+}
+
 .film-card-link {
   text-decoration: none;
   color: inherit;
@@ -292,12 +302,13 @@ body {
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--glass-border);
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
+  position: relative;
+  transform: perspective(800px) rotateX(0deg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   opacity: 0;
   animation: fadeUp 0.6s cubic-bezier(0.2, 0, 0, 1) forwards;
 }
@@ -320,10 +331,28 @@ body {
 .film-card:nth-child(11) { animation-delay: 0.55s; }
 .film-card:nth-child(12) { animation-delay: 0.60s; }
 
+/* Отражение снизу */
+.film-card::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 5%;
+  width: 90%;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--glass-border), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: blur(8px);
+}
+
+.film-card:hover::after {
+  opacity: 0.3;
+}
+
 .film-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(124, 58, 237, 0.2);
-  box-shadow: 0 12px 48px rgba(124, 58, 237, 0.08);
+  transform: perspective(800px) rotateX(2deg) translateY(-8px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .film-card img {
@@ -354,7 +383,7 @@ body {
   margin: 0;
 }
 
-/* ===== РЕЙТИНГ В КАРТОЧКЕ (новый стиль) ===== */
+/* ===== РЕЙТИНГ В КАРТОЧКЕ ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
@@ -3194,3 +3223,465 @@ body {
     font-size: 16px;
   }
 }
+
+/* ============================================================
+   НЕОНОВАЯ ДОРОЖКА + 3D-ОБЪЕМ
+   ============================================================ */
+
+/* ----- ОБЩИЙ КОНТЕЙНЕР ----- */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+/* ----- МЕТКИ "1" И "10" ----- */
+.slider-container .slider-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  min-width: 18px;
+  text-align: center;
+  user-select: none;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.slider-container:hover .slider-label {
+  opacity: 1;
+}
+
+/* ----- САМ ПОЛЗУНОК (ДОРОЖКА) ----- */
+.slider-container input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 10px 0;
+  
+  /* 3D-объем дорожки */
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  
+  /* Неоновое свечение при наведении */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.slider-container input[type="range"]:hover {
+  border-color: rgba(34, 211, 238, 0.1);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(34, 211, 238, 0.03);
+}
+
+/* ----- ТРЕК (ЗАПОЛНЕННАЯ ЧАСТЬ) ----- */
+.slider-container input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+/* ----- БЕГУНОК (ОБЪЕМНЫЙ 3D) ----- */
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-top: -11px;
+  cursor: pointer;
+  
+  /* 3D-объем бегунка */
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(34, 211, 238, 0.9) 40%,
+    rgba(34, 211, 238, 0.6) 80%,
+    rgba(0, 100, 120, 0.8) 100%
+  );
+  box-shadow: 
+    0 4px 15px rgba(34, 211, 238, 0.25),
+    0 0 30px rgba(34, 211, 238, 0.08),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 
+    0 4px 25px rgba(34, 211, 238, 0.4),
+    0 0 50px rgba(34, 211, 238, 0.15),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.92);
+  box-shadow: 
+    0 2px 10px rgba(34, 211, 238, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+/* ----- ЗНАЧЕНИЕ СПРАВА (3D-объем) ----- */
+.slider-container .value-display {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  color: var(--neon-cyan);
+  min-width: 38px;
+  text-align: center;
+  user-select: none;
+  padding: 4px 8px;
+  border-radius: 10px;
+  
+  /* 3D-эффект цифры */
+  text-shadow: 
+    0 0 20px rgba(34, 211, 238, 0.15),
+    0 0 40px rgba(34, 211, 238, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(34, 211, 238, 0.02);
+  border: 1px solid rgba(34, 211, 238, 0.03);
+  transition: all 0.3s ease;
+}
+
+.slider-container input[type="range"]:hover + .value-display,
+.slider-container .value-display:hover {
+  transform: scale(1.05);
+  text-shadow: 
+    0 0 30px rgba(34, 211, 238, 0.25),
+    0 0 60px rgba(34, 211, 238, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(34, 211, 238, 0.04);
+  border-color: rgba(34, 211, 238, 0.06);
+}
+
+/* ============================================================
+   СУБЪЕКТИВНЫЙ МНОЖИТЕЛЬ — ПУРПУРНАЯ ВЕРСИЯ
+   ============================================================ */
+.subjective-block .slider-container input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow: 
+    0 4px 15px rgba(124, 58, 237, 0.25),
+    0 0 30px rgba(124, 58, 237, 0.08),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+.subjective-block .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 
+    0 4px 25px rgba(124, 58, 237, 0.4),
+    0 0 50px rgba(124, 58, 237, 0.15),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.subjective-block .slider-container .value-display {
+  color: var(--neon-purple);
+  text-shadow: 
+    0 0 20px rgba(124, 58, 237, 0.15),
+    0 0 40px rgba(124, 58, 237, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(124, 58, 237, 0.02);
+  border-color: rgba(124, 58, 237, 0.03);
+}
+
+.subjective-block .slider-container input[type="range"]:hover + .value-display,
+.subjective-block .slider-container .value-display:hover {
+  text-shadow: 
+    0 0 30px rgba(124, 58, 237, 0.25),
+    0 0 60px rgba(124, 58, 237, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(124, 58, 237, 0.04);
+  border-color: rgba(124, 58, 237, 0.06);
+}
+
+/* ============================================================
+   FIREFOX
+   ============================================================ */
+.slider-container input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(34, 211, 238, 0.9) 40%,
+    rgba(34, 211, 238, 0.6) 80%,
+    rgba(0, 100, 120, 0.8) 100%
+  );
+  box-shadow: 
+    0 4px 15px rgba(34, 211, 238, 0.25),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+.subjective-block .slider-container input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow: 
+    0 4px 15px rgba(124, 58, 237, 0.25),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+
+/* ============================================================
+   ТЕКСТОВЫЙ ОТЗЫВ — НОВЫЙ ДИЗАЙН
+   ============================================================ */
+
+/* ----- КОНТЕЙНЕР ОТЗЫВА ----- */
+.text-review {
+  margin-top: 28px;
+  padding: 24px 28px 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Декоративная линия сверху */
+.text-review::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--neon-cyan), 
+    var(--neon-purple), 
+    transparent
+  );
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+
+.text-review:hover::before {
+  opacity: 0.8;
+}
+
+/* ----- ЗАГОЛОВОК ----- */
+.text-review h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.text-review h3::after {
+  content: ' ✍️';
+  font-size: 18px;
+  opacity: 0.3;
+}
+
+/* ----- ПОДЗАГОЛОВОК ----- */
+.text-review .review-hint {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+  font-weight: 400;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.text-review:hover .review-hint {
+  opacity: 0.8;
+}
+
+/* ----- ПОЛЕ ВВОДА (СТИЛЬНЫЙ ТЕКСТАРИЯ) ----- */
+.text-review textarea {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Плейсхолдер */
+.text-review textarea::placeholder {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-style: italic;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.text-review textarea:focus::placeholder {
+  opacity: 0.2;
+}
+
+/* Фокус */
+.text-review textarea:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.1),
+    0 0 40px rgba(34, 211, 238, 0.02);
+}
+
+/* ----- СЧЁТЧИК СИМВОЛОВ ----- */
+.text-review .char-counter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.4;
+  transition: all 0.3s ease;
+}
+
+.text-review:hover .char-counter {
+  opacity: 0.7;
+}
+
+.text-review .char-counter .char-count-current {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.text-review .char-counter .char-count-current.near-limit {
+  color: var(--neon-pink);
+}
+
+.text-review .char-counter .char-count-max {
+  opacity: 0.5;
+}
+
+/* ----- ДЕКОРАТИВНАЯ ЛИНИЯ ВНИЗУ (ПОДПИСЬ) ----- */
+.text-review .review-signature {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.2;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  transition: opacity 0.3s;
+}
+
+.text-review:hover .review-signature {
+  opacity: 0.5;
+}
+
+/* ----- АНИМАЦИЯ ПОЯВЛЕНИЯ ----- */
+.text-review {
+  animation: reviewFadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes reviewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .text-review {
+    padding: 18px 16px 20px;
+    margin-top: 20px;
+  }
+  
+  .text-review h3 {
+    font-size: 15px;
+  }
+  
+  .text-review textarea {
+    padding: 14px 16px;
+    font-size: 14px;
+    min-height: 100px;
+  }
+  
+  .text-review .review-hint {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-review {
+    padding: 14px 12px 16px;
+    margin-top: 16px;
+  }
+  
+  .text-review h3 {
+    font-size: 13px;
+  }
+  
+  .text-review textarea {
+    padding: 12px 14px;
+    font-size: 13px;
+    min-height: 80px;
+    border-radius: 10px;
+  }
+  
+  .text-review .review-hint {
+    font-size: 11px;
+  }
+  
+  .text-review .char-counter {
+    font-size: 10px;
+  }
+   }
