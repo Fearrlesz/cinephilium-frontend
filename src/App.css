@@ -2990,3 +2990,207 @@ body {
     font-size: 12px;
   }
 }
+
+
+/* ============================================================
+   МОБИЛЬНЫЙ СВАЙП ДЛЯ КАРТОЧЕК
+   ============================================================ */
+@media (max-width: 768px) {
+  .films-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 4px 20px 4px;
+    scroll-behavior: smooth;
+    flex-wrap: nowrap;
+    margin: 0 -4px;
+  }
+
+  .films-grid .film-card-link {
+    flex: 0 0 180px;
+    scroll-snap-align: start;
+  }
+
+  .films-grid .film-card-link:first-child {
+    margin-left: 4px;
+  }
+
+  .films-grid .film-card-link:last-child {
+    margin-right: 4px;
+  }
+
+  .films-grid::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  .films-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+  }
+
+  .films-grid::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================
+   ПУЛЬСИРУЮЩАЯ КНОПКА ДЛЯ МОБИЛЬНЫХ
+   ============================================================ */
+@media (max-width: 768px) {
+  .rate-btn {
+    animation: mobilePulse 2.5s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes mobilePulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+    }
+    50% {
+      box-shadow: 0 0 30px 4px rgba(124, 58, 237, 0.15);
+    }
+  }
+
+  .rate-btn:active {
+    animation: none;
+    transform: scale(0.95);
+  }
+}
+
+/* ============================================================
+   МОБИЛЬНЫЙ ПОИСК С АНИМАЦИЕЙ
+   ============================================================ */
+@media (max-width: 768px) {
+  .search-box {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box input {
+    font-size: 16px !important;
+    padding: 14px 20px !important;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .search-box input:focus {
+    transform: scale(1.02);
+    border-color: var(--neon-cyan) !important;
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.06) !important;
+  }
+
+  .search-box button {
+    padding: 14px 28px !important;
+    font-size: 16px !important;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   ТАКТИЛЬНАЯ ОБРАТНАЯ СВЯЗЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .film-card-link:active .film-card {
+    transform: scale(0.96);
+    transition-duration: 0.08s;
+  }
+
+  .rate-btn:active,
+  .save-rating-btn:active,
+  .btn-login:active,
+  .btn-add-review:active,
+  .like-btn:active {
+    transform: scale(0.92);
+    transition-duration: 0.08s;
+  }
+
+  .comment-form button:active,
+  .search-box button:active,
+  .btn-approve:active,
+  .btn-reject:active {
+    transform: scale(0.92);
+    transition-duration: 0.08s;
+  }
+
+  .film-card-link .film-card,
+  .rate-btn,
+  .save-rating-btn,
+  .btn-login,
+  .btn-add-review,
+  .like-btn,
+  .comment-form button,
+  .search-box button,
+  .btn-approve,
+  .btn-reject {
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+/* ============================================================
+   ГОЛОГРАФИЧЕСКАЯ АНИМАЦИЯ
+   ============================================================ */
+
+.hero h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, 
+    var(--text-primary) 20%, 
+    var(--neon-cyan) 40%, 
+    var(--neon-purple) 60%, 
+    var(--neon-cyan) 80%, 
+    var(--text-primary) 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  animation: holographic 4s ease-in-out infinite;
+  position: relative;
+  display: inline-block;
+  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.1));
+}
+
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Добавляем мерцание поверх */
+.hero h2::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 50%,
+    rgba(34, 211, 238, 0.05),
+    transparent 60%
+  );
+  pointer-events: none;
+  animation: shimmer 3s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@media (max-width: 768px) {
+  .hero h2 {
+    font-size: 20px;
+    animation-duration: 3s;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero h2 {
+    font-size: 16px;
+  }
+}
