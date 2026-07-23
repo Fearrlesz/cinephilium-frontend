@@ -1538,7 +1538,7 @@ function FilmPage() {
 
           <div className="reviews-list">
             {reviews.map((review) => (
-              <div key={review._id} className="review-card">
+              <div key={review._id} id={review._id} className="review-card">
                 <div className="review-header">
                   <div className="review-author">
                     <span className="review-nickname">{review.userId?.nickname || 'Пользователь'}</span>
@@ -1675,7 +1675,7 @@ function FilmPage() {
           <h3>💬 Комментарии ({comments.length})</h3>
           <div className="comments-list">
             {comments.map((comment) => (
-              <div key={comment._id} className="comment-item">
+              <div key={comment._id} id={comment._id} className="comment-item">
                 <div className="comment-author">
                   <span className="comment-nickname">{comment.userId?.nickname || 'Пользователь'}</span>
                   {comment.userId?.isAdmin && <span className="admin-badge">👑</span>}
