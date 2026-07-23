@@ -730,17 +730,7 @@ function HomePage() {
     setLoading(false);
   }
 }; 
-        setTotalPages(response.data.totalPages || 1);
-      } else {
-        setFilms([]);
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки фильмов:', err);
-      setError('Не удалось загрузить фильмы. Попробуйте позже.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        
 
   const loadMore = () => {
     if (page < totalPages) {
