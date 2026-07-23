@@ -704,19 +704,32 @@ function HomePage() {
     }
   };
 
-  const loadFilms = async (pageNum = 1) => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.get(`/films?page=${pageNum}&limit=20`);
-      if (Array.isArray(response.data.films)) {
-        if (pageNum === 1) {
-          setFilms(response.data.films);
-        } else {
-          const existingIds = new Set(films.map(f => f._id));
+ const loadFilms = async (pageNum = 1) => {
+  setLoading(true);
+  setError('');
+  try {
+    const response = await api.get(`/films?page=${pageNum}&limit=20`);
+    if (Array.isArray(response.data.films)) {
+      if (pageNum === 1) {
+        setFilms(response.data.films);
+      } else {
+        setFilms(prev => {
+          const existingIds = new Set(prev.map(f => f._id));
           const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-          setFilms(prev => [...prev, ...newFilms]);
-        }
+          return [...prev, ...newFilms];
+        });
+      }
+      setTotalPages(response.data.totalPages || 1);
+    } else {
+      setFilms([]);
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки фильмов:', err);
+    setError('Не удалось загрузить фильмы. Попробуйте позже.');
+  } finally {
+    setLoading(false);
+  }
+}; 
         setTotalPages(response.data.totalPages || 1);
       } else {
         setFilms([]);
