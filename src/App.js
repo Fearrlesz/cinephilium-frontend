@@ -261,6 +261,48 @@ function ActivityFeed({ events, loading }) {
   );
 }
 
+// ===== ХУК ДЛЯ РЕАЛЬНЫХ СОБЫТИЙ (БЕЗ ВЫДУМАННЫХ) =====
+function useActivityEvents() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/events');
+      if (response.data && Array.isArray(response.data)) {
+        const formattedEvents = response.data.map(e => ({
+          ...e,
+          time: e.time || getTimeAgo(e.createdAt) || 'только что'
+        }));
+        setEvents(formattedEvents);
+      } else {
+        setEvents([]);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки событий:', err.message);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addEvent = useCallback((eventData) => {
+    const newEvent = {
+      _id: Date.now().toString(),
+      time: 'только что',
+      ...eventData
+    };
+    setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  return { events, loading, addEvent, refresh: loadEvents };
+}
+
 // ===== СТРАНИЦА: О СИСТЕМЕ =====
 function AboutPage() {
   return (
@@ -563,110 +605,6 @@ function AdminPanel() {
   );
 }
 
-// ===== ХУК ДЛЯ ЛОКАЛЬНЫХ СОБЫТИЙ =====
-function useActivityEvents() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadEvents = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await api.get('/events');
-      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        const formattedEvents = response.data.map(e => ({
-          ...e,
-          time: e.time || getTimeAgo(e.createdAt) || 'только что'
-        }));
-        setEvents(formattedEvents);
-      } else {
-        loadLocalEvents();
-      }
-    } catch (err) {
-      console.warn('Ошибка загрузки событий из API, используем локальные:', err.message);
-      loadLocalEvents();
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadLocalEvents = useCallback(() => {
-    try {
-      const saved = localStorage.getItem('activityEvents');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setEvents(parsed);
-      } else {
-        const demoEvents = [
-          {
-            _id: '1',
-            type: 'rating',
-            user: 'Алексей',
-            film: 'Дюна',
-            score: 8.5,
-            time: '5 мин назад'
-          },
-          {
-            _id: '2',
-            type: 'review',
-            user: 'Мария',
-            film: 'Оппенгеймер',
-            time: '12 мин назад'
-          },
-          {
-            _id: '3',
-            type: 'rating',
-            user: 'Иван',
-            film: 'Барби',
-            score: 7.2,
-            time: '1 час назад'
-          },
-          {
-            _id: '4',
-            type: 'comment',
-            user: 'Елена',
-            film: 'Аватар',
-            time: '2 часа назад'
-          },
-          {
-            _id: '5',
-            type: 'film_add',
-            user: 'Дмитрий',
-            film: 'Начало',
-            time: '3 часа назад'
-          }
-        ];
-        setEvents(demoEvents);
-        localStorage.setItem('activityEvents', JSON.stringify(demoEvents));
-      }
-    } catch (e) {
-      console.error('Ошибка загрузки локальных событий:', e);
-      setEvents([]);
-    }
-  }, []);
-
-  const addEvent = useCallback((eventData) => {
-    const newEvent = {
-      _id: Date.now().toString(),
-      time: 'только что',
-      ...eventData
-    };
-    
-    setEvents(prev => {
-      const updated = [newEvent, ...prev.slice(0, 19)];
-      try {
-        localStorage.setItem('activityEvents', JSON.stringify(updated));
-      } catch (e) {}
-      return updated;
-    });
-  }, []);
-
-  useEffect(() => {
-    loadEvents();
-  }, [loadEvents]);
-
-  return { events, loading, addEvent, refresh: loadEvents };
-}
-
 // ===== СТРАНИЦА: ГЛАВНАЯ =====
 function HomePage() {
   const [films, setFilms] = useState([]);
@@ -704,33 +642,32 @@ function HomePage() {
     }
   };
 
- const loadFilms = async (pageNum = 1) => {
-  setLoading(true);
-  setError('');
-  try {
-    const response = await api.get(`/films?page=${pageNum}&limit=20`);
-    if (Array.isArray(response.data.films)) {
-      if (pageNum === 1) {
-        setFilms(response.data.films);
+  const loadFilms = async (pageNum = 1) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.get(`/films?page=${pageNum}&limit=20`);
+      if (Array.isArray(response.data.films)) {
+        if (pageNum === 1) {
+          setFilms(response.data.films);
+        } else {
+          setFilms(prev => {
+            const existingIds = new Set(prev.map(f => f._id));
+            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+            return [...prev, ...newFilms];
+          });
+        }
+        setTotalPages(response.data.totalPages || 1);
       } else {
-        setFilms(prev => {
-          const existingIds = new Set(prev.map(f => f._id));
-          const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-          return [...prev, ...newFilms];
-        });
+        setFilms([]);
       }
-      setTotalPages(response.data.totalPages || 1);
-    } else {
-      setFilms([]);
+    } catch (err) {
+      console.error('Ошибка загрузки фильмов:', err);
+      setError('Не удалось загрузить фильмы. Попробуйте позже.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Ошибка загрузки фильмов:', err);
-    setError('Не удалось загрузить фильмы. Попробуйте позже.');
-  } finally {
-    setLoading(false);
-  }
-}; 
-        
+  };
 
   const loadMore = () => {
     if (page < totalPages) {
