@@ -121,11 +121,49 @@ body {
   font-size: 22px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, var(--text-primary) 40%, var(--neon-cyan));
+  
+  /* ✨ ГОЛОГРАФИЧЕСКИЙ ПЕРЕЛИВ */
+  background: linear-gradient(135deg, 
+    var(--text-primary) 20%, 
+    var(--neon-cyan) 35%, 
+    var(--neon-purple) 55%, 
+    var(--neon-cyan) 75%, 
+    var(--text-primary) 90%
+  );
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: holographicTitle 5s ease-in-out infinite;
+  
   margin: 0;
+  
+  /* ✨ СВЕЧЕНИЕ */
+  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.1));
+}
+
+@keyframes holographicTitle {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ✨ ТОЧКА ПОСЛЕ НАЗВАНИЯ (тоже переливается) */
+.header h1::after {
+  content: '•';
+  display: inline-block;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: dotGlow 1.5s ease-in-out infinite;
+  margin-left: 6px;
+  font-size: 26px;
+}
+
+@keyframes dotGlow {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
 
 .header-actions {
