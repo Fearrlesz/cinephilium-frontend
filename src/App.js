@@ -68,11 +68,37 @@ function getScoreColor(score) {
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
+  if (!date) return 'Неизвестно';
+  try {
+    return new Date(date).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } catch {
+    return 'Неизвестно';
+  }
+}
+
+function getTimeAgo(date) {
+  if (!date) return 'только что';
+  try {
+    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return `${Math.floor(diff / 60)} мин назад`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} ч назад`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} дн назад`;
+    return formatDate(date);
+  } catch {
+    return 'только что';
+  }
+}
+
+function sanitizeText(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // ===== КОМПОНЕНТ: МОДАЛЬНОЕ ОКНО С ДЕТАЛЯМИ ОЦЕНКИ =====
@@ -90,7 +116,7 @@ function RatingDetailsModal({ rating, onClose }) {
         <button className="modal-close" onClick={onClose}>✕</button>
         
         <div className="modal-header">
-          <h2>{rating.filmId?.title || 'Фильм'}</h2>
+          <h2>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h2>
           <p>Оценка: <span style={{ color: getScoreColor(rating.finalScore), fontSize: '28px', fontWeight: 'bold' }}>{rating.finalScore}</span></p>
           <p className="modal-user">👤 {rating.userId?.nickname || 'Пользователь'}</p>
           <p>Субъективный множитель «Вайб»: <strong>{rating.subjectiveM}</strong></p>
@@ -160,26 +186,74 @@ function NotificationModal({ isOpen, onClose, title, message, type = 'success' }
 }
 
 // ===== КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ =====
-function ActivityFeed({ events }) {
-  if (!events || events.length === 0) return null;
+function ActivityFeed({ events, loading }) {
+  if (loading) {
+    return (
+      <div className="activity-feed">
+        <h3>📰 Последние события</h3>
+        <div className="feed-loading" style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-secondary)' }}>
+          Загрузка событий...
+        </div>
+      </div>
+    );
+  }
+
+  if (!events || events.length === 0) {
+    return (
+      <div className="activity-feed">
+        <h3>📰 Последние события</h3>
+        <div className="feed-empty" style={{ 
+          textAlign: 'center', 
+          padding: '30px 20px',
+          color: 'var(--text-muted)',
+          fontSize: '14px'
+        }}>
+          <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}>🌊</span>
+          Пока нет событий в сообществе.<br />
+          Оцените фильм, напишите рецензию или комментарий!
+        </div>
+      </div>
+    );
+  }
+
+  const getEventIcon = (type) => {
+    switch(type) {
+      case 'rating': return '⭐';
+      case 'review': return '📝';
+      case 'comment': return '💬';
+      case 'film_add': return '🎬';
+      default: return '📌';
+    }
+  };
+
+  const getEventText = (event) => {
+    const user = sanitizeText(event.user || 'Кто-то');
+    const film = sanitizeText(event.film || 'фильм');
+    const score = event.score || '';
+    
+    switch(event.type) {
+      case 'rating':
+        return `«${user}» оценил «${film}» на ${score} баллов`;
+      case 'review':
+        return `«${user}» написал рецензию на «${film}»`;
+      case 'comment':
+        return `«${user}» прокомментировал «${film}»`;
+      case 'film_add':
+        return `«${user}» добавил фильм «${film}» в каталог`;
+      default:
+        return `«${user}» сделал что-то с «${film}»`;
+    }
+  };
 
   return (
     <div className="activity-feed">
       <h3>📰 Последние события</h3>
       <div className="feed-list">
-        {events.slice(0, 10).map((e, i) => (
-          <div key={i} className="feed-item">
-            <span className="feed-icon">
-              {e.type === 'rating' ? '⭐' : e.type === 'review' ? '📝' : '➕'}
-            </span>
-            <span className="feed-text">
-              {e.type === 'rating' 
-                ? `«${e.user}» оценил «${e.film}» на ${e.score} баллов`
-                : e.type === 'review'
-                ? `«${e.user}» написал рецензию на «${e.film}»`
-                : `«${e.user}» добавил «${e.film}» в базу`}
-            </span>
-            <span className="feed-time">{e.time}</span>
+        {events.slice(0, 10).map((event, index) => (
+          <div key={event._id || index} className="feed-item">
+            <span className="feed-icon">{getEventIcon(event.type)}</span>
+            <span className="feed-text">{getEventText(event)}</span>
+            <span className="feed-time">{event.time || 'только что'}</span>
           </div>
         ))}
       </div>
@@ -295,15 +369,15 @@ function TopUsersPage() {
           <Link to={`/user/${user._id}`} key={user._id} className="top-user-item">
             <div className="top-user-rank">{getMedal(index)}</div>
             <div className="top-user-avatar">
-              <div className="avatar-placeholder-small">{user.nickname[0]}</div>
+              <div className="avatar-placeholder-small">{user.nickname?.[0] || '?'}</div>
             </div>
             <div className="top-user-info">
               <div className="top-user-name">
-                {user.nickname}
+                {user.nickname || 'Пользователь'}
                 {user.isAdmin && <span className="admin-badge">👑</span>}
               </div>
               <div className="top-user-stats">
-                <span>⭐ {user.totalPoints} баллов</span>
+                <span>⭐ {user.totalPoints || 0} баллов</span>
                 <span>🎯 {user.ratingsCount || 0} оценок</span>
                 <span>📝 {user.reviewsCount || 0} рецензий</span>
                 <span>💬 {user.commentsCount || 0} комментариев</span>
@@ -318,7 +392,6 @@ function TopUsersPage() {
 
 // ===== СТРАНИЦА: АДМИН-ПАНЕЛЬ =====
 function AdminPanel() {
-  const { nickname } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [pendingComments, setPendingComments] = useState([]);
@@ -333,7 +406,7 @@ function AdminPanel() {
       return;
     }
     loadAdminData();
-  }, [nickname, navigate]);
+  }, [navigate]);
 
   const loadAdminData = async () => {
     try {
@@ -449,8 +522,8 @@ function AdminPanel() {
             {pendingComments.map(c => (
               <div key={c._id} className="admin-item">
                 <div className="admin-item-header">
-                  <span className="admin-item-author">👤 {c.userId?.nickname}</span>
-                  <span className="admin-item-film">🎬 {c.filmId?.title}</span>
+                  <span className="admin-item-author">👤 {c.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film">🎬 {c.filmId?.title || 'Фильм'}</span>
                 </div>
                 <p className="admin-item-text">{c.text}</p>
                 <div className="admin-item-actions">
@@ -472,8 +545,8 @@ function AdminPanel() {
             {pendingReviews.map(r => (
               <div key={r._id} className="admin-item">
                 <div className="admin-item-header">
-                  <span className="admin-item-author">👤 {r.userId?.nickname}</span>
-                  <span className="admin-item-film">🎬 {r.filmId?.title}</span>
+                  <span className="admin-item-author">👤 {r.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film">🎬 {r.filmId?.title || 'Фильм'}</span>
                 </div>
                 <h4 className="admin-item-title">{r.title}</h4>
                 <p className="admin-item-text">{r.text}</p>
@@ -490,6 +563,110 @@ function AdminPanel() {
   );
 }
 
+// ===== ХУК ДЛЯ ЛОКАЛЬНЫХ СОБЫТИЙ =====
+function useActivityEvents() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/events');
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const formattedEvents = response.data.map(e => ({
+          ...e,
+          time: e.time || getTimeAgo(e.createdAt) || 'только что'
+        }));
+        setEvents(formattedEvents);
+      } else {
+        loadLocalEvents();
+      }
+    } catch (err) {
+      console.warn('Ошибка загрузки событий из API, используем локальные:', err.message);
+      loadLocalEvents();
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadLocalEvents = useCallback(() => {
+    try {
+      const saved = localStorage.getItem('activityEvents');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setEvents(parsed);
+      } else {
+        const demoEvents = [
+          {
+            _id: '1',
+            type: 'rating',
+            user: 'Алексей',
+            film: 'Дюна',
+            score: 8.5,
+            time: '5 мин назад'
+          },
+          {
+            _id: '2',
+            type: 'review',
+            user: 'Мария',
+            film: 'Оппенгеймер',
+            time: '12 мин назад'
+          },
+          {
+            _id: '3',
+            type: 'rating',
+            user: 'Иван',
+            film: 'Барби',
+            score: 7.2,
+            time: '1 час назад'
+          },
+          {
+            _id: '4',
+            type: 'comment',
+            user: 'Елена',
+            film: 'Аватар',
+            time: '2 часа назад'
+          },
+          {
+            _id: '5',
+            type: 'film_add',
+            user: 'Дмитрий',
+            film: 'Начало',
+            time: '3 часа назад'
+          }
+        ];
+        setEvents(demoEvents);
+        localStorage.setItem('activityEvents', JSON.stringify(demoEvents));
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки локальных событий:', e);
+      setEvents([]);
+    }
+  }, []);
+
+  const addEvent = useCallback((eventData) => {
+    const newEvent = {
+      _id: Date.now().toString(),
+      time: 'только что',
+      ...eventData
+    };
+    
+    setEvents(prev => {
+      const updated = [newEvent, ...prev.slice(0, 19)];
+      try {
+        localStorage.setItem('activityEvents', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  return { events, loading, addEvent, refresh: loadEvents };
+}
+
 // ===== СТРАНИЦА: ГЛАВНАЯ =====
 function HomePage() {
   const [films, setFilms] = useState([]);
@@ -501,14 +678,15 @@ function HomePage() {
   const [isImporting, setIsImporting] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [events, setEvents] = useState([]);
   const [user, setUser] = useState(null);
+  const [searchError, setSearchError] = useState('');
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  
+  const { events, loading: eventsLoading, addEvent, refresh: refreshEvents } = useActivityEvents();
 
   useEffect(() => {
     loadFilms(page);
-    loadEvents();
     loadCurrentUser();
   }, [page]);
 
@@ -551,15 +729,6 @@ function HomePage() {
     }
   };
 
-  const loadEvents = async () => {
-    try {
-      const response = await api.get('/events');
-      setEvents(response.data || []);
-    } catch (err) {
-      console.error('Ошибка загрузки событий:', err);
-    }
-  };
-
   const loadMore = () => {
     if (page < totalPages) {
       setPage(prev => prev + 1);
@@ -567,15 +736,24 @@ function HomePage() {
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchError('Введите название фильма');
+      return;
+    }
+    
+    setSearchError('');
+    setShowSearch(false);
+    
     try {
       const response = await api.get('/tmdb/search', {
-        params: { query: searchQuery }
+        params: { query }
       });
       setSearchResults(response.data.results || []);
       setShowSearch(true);
     } catch (err) {
       console.error('Ошибка поиска:', err);
+      setSearchError(err.response?.data?.error || 'Не удалось найти фильмы');
       showNotification({
         title: 'Ошибка поиска',
         message: err.response?.data?.error || 'Не удалось найти фильмы',
@@ -584,7 +762,7 @@ function HomePage() {
     }
   };
 
-  const importFilm = async (tmdbId) => {
+  const importFilm = async (tmdbId, filmTitle) => {
     const token = localStorage.getItem('token');
     if (!token) {
       showNotification({
@@ -603,9 +781,19 @@ function HomePage() {
       await api.post('/films/import', { tmdbId });
       setShowSearch(false);
       setSearchQuery('');
+      setSearchResults([]);
+      
+      if (user) {
+        addEvent({
+          type: 'film_add',
+          user: user.nickname,
+          film: filmTitle || 'Новый фильм'
+        });
+      }
+      
       setPage(1);
       await loadFilms(1);
-      await loadEvents();
+      
       showNotification({
         title: 'Фильм добавлен!',
         message: 'Фильм успешно добавлен в каталог',
@@ -653,7 +841,7 @@ function HomePage() {
             <>
               <Link to="/profile" className="btn-profile">👤 {user.nickname}</Link>
               {user.isAdmin && (
-                <Link to={`/admin/${user.nickname}`} className="btn-admin">🛡️ Админка</Link>
+                <Link to="/admin" className="btn-admin">🛡️ Админка</Link>
               )}
               <button
                 onClick={handleLogout}
@@ -675,11 +863,15 @@ function HomePage() {
             type="text"
             placeholder="Найти фильм в TMDB..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchError('');
+            }}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
           <button onClick={handleSearch}>🔍 Найти</button>
         </div>
+        {searchError && <div className="error-msg">{searchError}</div>}
       </div>
 
       {error && <div className="error-msg">{error}</div>}
@@ -697,7 +889,7 @@ function HomePage() {
                 <div className="film-info">
                   <h4>{film.title}</h4>
                   <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
-                  <button onClick={() => importFilm(film.id)} disabled={isImporting} className="btn-add">
+                  <button onClick={() => importFilm(film.id, film.title)} disabled={isImporting} className="btn-add">
                     {isImporting ? 'Добавление...' : '➕ Добавить'}
                   </button>
                 </div>
@@ -707,46 +899,45 @@ function HomePage() {
         </div>
       )}
 
-      {/* ===== ТОП-5 СООБЩЕСТВА (как Netflix) ===== */}
-{topFilms.length > 0 && (
-  <div className="top-films-netflix">
-    <div className="top-header-netflix">
-      <h3>🏆 Топ-5 сообщества</h3>
-      <Link to="/top-films" className="top-all-link-netflix">Смотреть все →</Link>
-    </div>
-    <div className="top-scroll-container">
-      <div className="top-scroll-wrapper">
-        {topFilms.map((film, i) => (
-          <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
-            <div className="top-card-poster-wrapper">
-              <img 
-                src={film.poster || '/no-poster.jpg'} 
-                alt={film.title} 
-                className="top-card-poster"
-              />
-              <div className="top-card-rank">
-                {i === 0 && '👑'}
-                {i === 1 && '🥇'}
-                {i === 2 && '🥈'}
-                {i === 3 && '🥉'}
-                {i >= 4 && `#${i + 1}`}
-              </div>
-              <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
-                {film.averageRating?.toFixed(1)}
-              </div>
+      {topFilms.length > 0 && (
+        <div className="top-films-netflix">
+          <div className="top-header-netflix">
+            <h3>🏆 Топ-5 сообщества</h3>
+            <Link to="/top-films" className="top-all-link-netflix">Смотреть все →</Link>
+          </div>
+          <div className="top-scroll-container">
+            <div className="top-scroll-wrapper">
+              {topFilms.map((film, i) => (
+                <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
+                  <div className="top-card-poster-wrapper">
+                    <img 
+                      src={film.poster || '/no-poster.jpg'} 
+                      alt={film.title} 
+                      className="top-card-poster"
+                    />
+                    <div className="top-card-rank">
+                      {i === 0 && '👑'}
+                      {i === 1 && '🥇'}
+                      {i === 2 && '🥈'}
+                      {i === 3 && '🥉'}
+                      {i >= 4 && `#${i + 1}`}
+                    </div>
+                    <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
+                      {film.averageRating?.toFixed(1)}
+                    </div>
+                  </div>
+                  <div className="top-card-info">
+                    <span className="top-card-title">{film.title}</span>
+                    <span className="top-card-year">{film.year}</span>
+                  </div>
+                </Link>
+              ))}
             </div>
-            <div className="top-card-info">
-              <span className="top-card-title">{film.title}</span>
-              <span className="top-card-year">{film.year}</span>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
-      <ActivityFeed events={events} />
+      <ActivityFeed events={events} loading={eventsLoading} />
 
       {films.length === 0 ? (
         <div className="no-films glass-card">Нет добавленных фильмов. Найдите и добавьте первый!</div>
@@ -797,6 +988,7 @@ function FilmPage() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
+  const [commentError, setCommentError] = useState('');
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ title: '', text: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -953,6 +1145,7 @@ function FilmPage() {
       await loadFilm();
       await loadFilmUsers();
       setIsRatingMode(false);
+      
       showNotification({
         title: 'Оценка сохранена!',
         message: 'Ваша оценка успешно добавлена',
@@ -1002,9 +1195,22 @@ function FilmPage() {
       navigate('/login');
       return;
     }
-    if (!commentText.trim()) return;
+    
+    const trimmedText = commentText.trim();
+    if (!trimmedText) {
+      setCommentError('Введите текст комментария');
+      return;
+    }
+    
+    if (trimmedText.length < 2) {
+      setCommentError('Комментарий должен содержать минимум 2 символа');
+      return;
+    }
+    
+    setCommentError('');
+    
     try {
-      await api.post('/comments', { filmId: id, text: commentText });
+      await api.post('/comments', { filmId: id, text: trimmedText });
       setCommentText('');
       await loadComments();
       showNotification({
@@ -1013,6 +1219,7 @@ function FilmPage() {
         type: 'success'
       });
     } catch (err) {
+      setCommentError(err.response?.data?.error || 'Не удалось добавить комментарий');
       showNotification({
         title: 'Ошибка',
         message: err.response?.data?.error || 'Не удалось добавить комментарий',
@@ -1063,7 +1270,11 @@ function FilmPage() {
       });
       return;
     }
-    if (!newReview.title.trim() || !newReview.text.trim()) {
+    
+    const trimmedTitle = newReview.title.trim();
+    const trimmedText = newReview.text.trim();
+    
+    if (!trimmedTitle || !trimmedText) {
       showNotification({
         title: 'Заполните все поля',
         message: 'Заголовок и текст рецензии обязательны',
@@ -1071,12 +1282,13 @@ function FilmPage() {
       });
       return;
     }
+    
     try {
       await api.post('/reviews', {
         filmId: id,
         ratingId: userRating._id,
-        title: newReview.title,
-        text: newReview.text
+        title: trimmedTitle,
+        text: trimmedText
       });
       setNewReview({ title: '', text: '' });
       setShowReviewForm(false);
@@ -1195,7 +1407,7 @@ function FilmPage() {
               <div key={review._id} className="review-card">
                 <div className="review-header">
                   <div className="review-author">
-                    <span className="review-nickname">{review.userId?.nickname}</span>
+                    <span className="review-nickname">{review.userId?.nickname || 'Пользователь'}</span>
                     {review.userId?.isAdmin && <span className="admin-badge">👑</span>}
                   </div>
                   <div className="review-rating">
@@ -1223,7 +1435,7 @@ function FilmPage() {
               {filmUsers.map((item) => (
                 <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item">
                   <Link to={`/user/${item.user._id}`} className="user-link">
-                    👤 {item.user.nickname}
+                    👤 {item.user.nickname || 'Пользователь'}
                   </Link>
                   <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
                     {item.rating.finalScore}
@@ -1332,7 +1544,7 @@ function FilmPage() {
             {comments.map((comment) => (
               <div key={comment._id} className="comment-item">
                 <div className="comment-author">
-                  <span className="comment-nickname">{comment.userId?.nickname}</span>
+                  <span className="comment-nickname">{comment.userId?.nickname || 'Пользователь'}</span>
                   {comment.userId?.isAdmin && <span className="admin-badge">👑</span>}
                 </div>
                 <p className="comment-text">{comment.text}</p>
@@ -1350,10 +1562,14 @@ function FilmPage() {
                 type="text"
                 placeholder="Написать комментарий..."
                 value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                  setCommentError('');
+                }}
                 onKeyPress={(e) => e.key === 'Enter' && addComment()}
               />
               <button onClick={addComment}>📤</button>
+              {commentError && <div className="error-msg">{commentError}</div>}
             </div>
           )}
         </div>
@@ -1361,7 +1577,12 @@ function FilmPage() {
         {film.trailer && (
           <div className="trailer glass-card">
             <h3>Трейлер</h3>
-            <iframe src={film.trailer} title="Трейлер" allowFullScreen />
+            <iframe 
+              src={film.trailer} 
+              title="Трейлер" 
+              allowFullScreen
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+            />
           </div>
         )}
       </div>
@@ -1436,6 +1657,8 @@ function LoginPage() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               required
+              minLength={2}
+              maxLength={20}
             />
           )}
           <input
@@ -1444,6 +1667,7 @@ function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
           />
           <button type="submit" disabled={loading}>
             {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
@@ -1561,11 +1785,11 @@ function ProfilePage() {
       
       <div className="profile-header glass-card">
         <div className="profile-avatar">
-          <div className="avatar-placeholder">{user.nickname[0]}</div>
+          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
         </div>
         <div className="profile-info">
           <h1>
-            {user.nickname}
+            {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
           </h1>
           <p>📧 {user.email}</p>
@@ -1605,12 +1829,12 @@ function ProfilePage() {
           <div className="ratings-list">
             {ratings.map((rating) => (
               <div key={rating._id} className="rating-item">
-                <Link to={`/film/${rating.filmId._id}`}>
+                <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
                   <div className="rating-film-info">
-                    <img src={rating.filmId.poster || '/no-poster.jpg'} alt={rating.filmId.title} className="rating-poster-small" />
+                    <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
                     <div>
-                      <h4>{rating.filmId.title}</h4>
-                      <p>{rating.filmId.year}</p>
+                      <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
+                      <p>{rating.filmId?.year || rating.film?.year}</p>
                     </div>
                   </div>
                 </Link>
@@ -1688,11 +1912,11 @@ function UserProfilePage() {
       
       <div className="profile-header glass-card">
         <div className="profile-avatar">
-          <div className="avatar-placeholder">{user.nickname[0]}</div>
+          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
         </div>
         <div className="profile-info">
           <h1>
-            {user.nickname}
+            {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
           </h1>
           <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
@@ -1710,12 +1934,12 @@ function UserProfilePage() {
           <div className="ratings-list">
             {ratings.map((rating) => (
               <div key={rating._id} className="rating-item">
-                <Link to={`/film/${rating.film._id}`}>
+                <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
                   <div className="rating-film-info">
-                    <img src={rating.film.poster || '/no-poster.jpg'} alt={rating.film.title} className="rating-poster-small" />
+                    <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
                     <div>
-                      <h4>{rating.film.title}</h4>
-                      <p>{rating.film.year}</p>
+                      <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                      <p>{rating.film?.year || rating.filmId?.year}</p>
                     </div>
                   </div>
                 </Link>
@@ -1739,12 +1963,12 @@ function UserProfilePage() {
           <h2>Рецензии</h2>
           {reviews.map((review) => (
             <div key={review._id} className="review-item">
-              <Link to={`/film/${review.film._id}`}>
+              <Link to={`/film/${review.film?._id || review.filmId?._id}`}>
                 <h4>{review.title}</h4>
-                <p>{review.film.title} ({review.film.year})</p>
+                <p>{review.film?.title || review.filmId?.title || 'Фильм'} ({review.film?.year || review.filmId?.year})</p>
               </Link>
-              <p className="review-preview">{review.text.slice(0, 200)}...</p>
-              <span>❤️ {review.likes || 0}</span>
+              <p className="review-preview">{review.text?.slice(0, 200) || ''}...</p>
+              <span>❤️ {review.likes?.length || 0}</span>
             </div>
           ))}
         </div>
@@ -1782,7 +2006,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/top" element={<TopUsersPage />} />
-          <Route path="/admin/:nickname" element={<AdminPanel />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/film/:id" element={<FilmPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
