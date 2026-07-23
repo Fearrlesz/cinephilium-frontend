@@ -2,7 +2,7 @@
 // Файл: App.js
 // Полностью переписанный и исправленный
 // ============================================
-
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
@@ -911,12 +911,13 @@ function HomePage() {
   setSearchResults([]);
   
   if (user) {
-    await addEvent({
-      type: 'film_add',
-      user: user.nickname,
-      film: filmTitle || 'Новый фильм'
-    });
-  }
+  await addEvent({
+    type: 'film_add',
+    user: user.nickname,
+    film: filmTitle || 'Новый фильм',
+    filmId: response.data.film._id
+  });
+}
   
   setPage(1);
   await loadFilms(1);
@@ -934,7 +935,9 @@ function HomePage() {
   });
 } finally {
   setIsImporting(false);
-}
+} 
+
+};
 
   const handleLogout = () => {
     localStorage.removeItem('token');
