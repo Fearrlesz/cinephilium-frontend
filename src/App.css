@@ -959,31 +959,6 @@ body {
 }
 
 /* ============================================================
-   СУБЪЕКТИВНЫЙ МНОЖИТЕЛЬ
-   ============================================================ */
-.subjective-block {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px solid var(--glass-border);
-}
-
-.subjective-block h3 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--neon-cyan);
-  margin-bottom: 4px;
-}
-
-.subjective-block p {
-  color: var(--text-secondary);
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-/* ============================================================
    ПРЕДПРОСМОТР ОЦЕНКИ
    ============================================================ */
 .rating-preview {
