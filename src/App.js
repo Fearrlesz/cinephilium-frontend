@@ -1875,14 +1875,6 @@ function ProfilePage() {
         api.get('/auth/me'),
         api.get('/ratings/user')
       ]);
-      const loadAchievementProgress = async () => {
-  try {
-    const response = await api.get('/users/me/achievements');
-    setAchievementProgress(response.data);
-  } catch (err) {
-    console.error('Ошибка загрузки прогресса достижений:', err);
-  }
-};
       
       setUser(userResponse.data);
       setRatings(ratingsResponse.data || []);
