@@ -388,7 +388,7 @@ function ActivityFeed({ events, loading }) {
       'rating': '⭐',
       'review': '📝',
       'comment': '💬',
-      'film_add': '🎬'
+      'film_add': '🎬', 
       'achievement': '🏆'
     };
     return icons[type] || '📌';
