@@ -396,6 +396,10 @@ function ActivityFeed({ events, loading }) {
 
   const getEventText = (event) => {
     const user = sanitizeText(event.user || 'Кто-то');
+    if (event.type === 'achievement') {
+  const list = event.metadata?.achievements?.join(', ') || '';
+  return `🏆 ${user} получил достижение: ${list}`;
+}
     const film = sanitizeText(event.film || 'фильм');
     const score = event.score || '';
     
