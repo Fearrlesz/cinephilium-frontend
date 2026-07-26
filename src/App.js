@@ -389,6 +389,7 @@ function ActivityFeed({ events, loading }) {
       'review': '📝',
       'comment': '💬',
       'film_add': '🎬'
+      'achievement': '🏆'
     };
     return icons[type] || '📌';
   };
