@@ -32,7 +32,7 @@ const baseDescriptions = [
   ['Помогает ли музыка понять чувства героя?', 'Соответствуют ли инструменты эпохе, месту и жанру?', 'Работают ли бытовые шумы на атмосферу?', 'Умеет ли режиссер вовремя выключить музыку?', 'Все ли слышно? Не перекрывает ли бас или музыка голоса актеров?']
 ];
 
-const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add'];
+const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add', 'achievement'];
 const VALID_FILM_TYPES = ['view', 'like', 'rating', 'comment', 'share', 'favorite'];
 
 // ============================================================
