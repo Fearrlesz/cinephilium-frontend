@@ -1889,6 +1889,15 @@ function ProfilePage() {
     }
   };
 
+  const loadAchievementProgress = async () => {
+  try {
+    const response = await api.get('/users/me/achievements');
+    setAchievementProgress(response.data);
+  } catch (err) {
+    console.error('Ошибка загрузки прогресса достижений:', err);
+  }
+};
+
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
