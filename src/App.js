@@ -541,31 +541,37 @@ function AboutPage() {
         ))}
       </div>
 
-      <div className="about-formula glass-card">
-        <h2>🔢 Формула расчёта</h2>
-        <div className="formula-steps">
-          <div className="formula-step">
-            <span className="step-number">1.</span>
-            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">2.</span>
-            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">3.</span>
-            <span>Субъективный множитель <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">4.</span>
-            <span>Итог = T + 34 × (M − 1) ÷ 9</span>
-          </div>
-        </div>
-        <div className="formula-result">
-          <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
-        </div>
-      </div>
+     <div className="about-formula glass-card">
+  <h2>🔢 Формула расчёта</h2>
+  <div className="formula-steps">
+    <div className="formula-step">
+      <span className="step-number">1.</span>
+      <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
     </div>
+    <div className="formula-step">
+      <span className="step-number">2.</span>
+      <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × 1.4</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">3.</span>
+      <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">4.</span>
+      <span>Вайб-множитель = 1 + (M − 1) × 0.06747</span>
+    </div>
+    <div className="formula-step">
+      <span className="step-number">5.</span>
+      <span>Итог = T × Вайб-множитель</span>
+    </div>
+  </div>
+  <div className="formula-result">
+    <p>Итоговая оценка всегда в диапазоне от <strong>6</strong> до <strong>90</strong>.</p>
+    <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
+      💡 Округление происходит только в самом конце, поэтому все нюансы оценок сохраняются.
+    </p>
+  </div>
+</div>
   );
 }
 
