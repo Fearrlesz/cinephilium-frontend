@@ -444,70 +444,6 @@ body {
   margin-top: 2px;
 }
 
-/* ============================================================
-   ТОП-5
-   ============================================================ */
-.top-films {
-  margin: 30px 0;
-  padding: 20px 24px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
-}
-
-.top-films h3 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
-}
-
-.top-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.top-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s;
-}
-.top-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateX(4px);
-}
-
-.top-rank {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--neon-cyan);
-  min-width: 32px;
-}
-
-.top-title {
-  flex: 1;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.top-score {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-}
 
 /* ============================================================
    ЛЕНТА СОБЫТИЙ
@@ -687,15 +623,21 @@ body {
 }
 
 /* ============================================================
-   ФОРМА ОЦЕНКИ (НОВЫЙ ДИЗАЙН)
+   ФОРМА ОЦЕНКИ
    ============================================================ */
 .rating-form {
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 32px 36px;
   border-radius: 20px;
   margin: 30px 0;
   border: 1px solid var(--glass-border);
+  transition: border-color 0.3s ease;
+}
+
+.rating-form:hover {
+  border-color: var(--glass-border-hover);
 }
 
 .rating-form h2 {
@@ -720,11 +662,30 @@ body {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 16px;
   border: 1px solid var(--glass-border);
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .rating-base:hover {
   border-color: rgba(124, 58, 237, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Декоративная линия сверху */
+.rating-base::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.rating-base:hover::after {
+  opacity: 0.3;
 }
 
 .rating-base h3 {
@@ -778,126 +739,21 @@ body {
   color: var(--neon-cyan);
 }
 
-/* ===== КРУПНЫЙ СЛАЙДЕР (НОВЫЙ ДИЗАЙН) ===== */
-.slider-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 4px 0;
-}
-
-/* Метки "1" и "10" */
-.slider-container .slider-label {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-muted);
-  min-width: 18px;
-  text-align: center;
-  user-select: none;
-}
-
-/* САМ ПОЛЗУНОК */
-.slider-container input[type="range"] {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  outline: none;
-  transition: background 0.2s ease;
-  cursor: pointer;
-  padding: 0;
-  margin: 8px 0;
-}
-
-/* Дорожка (трек) */
-.slider-container input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  transition: background 0.2s ease;
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--neon-cyan);
-  cursor: pointer;
-  margin-top: -8px;
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.15),
-              0 0 60px rgba(34, 211, 238, 0.05);
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.05);
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 0 40px rgba(34, 211, 238, 0.25),
-              0 0 80px rgba(34, 211, 238, 0.08);
-}
-
-.slider-container input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(0.92);
-}
-
-/* Firefox */
-.slider-container input[type="range"]::-moz-range-track {
-  height: 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  border: none;
-}
-
-.slider-container input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--neon-cyan);
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.15);
-}
-
-/* ===== ЗНАЧЕНИЕ СПРАВА (КРУПНОЕ) ===== */
-.slider-container .value-display {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
-  color: var(--neon-cyan);
-  min-width: 32px;
-  text-align: center;
-  transition: all 0.2s ease;
-  background: rgba(34, 211, 238, 0.04);
-  padding: 2px 6px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  user-select: none;
-}
-
-.slider-container input[type="range"]:focus + .value-display,
-.slider-container .value-display.active {
-  border-color: rgba(34, 211, 238, 0.15);
-  background: rgba(34, 211, 238, 0.06);
-}
-
-/* ===== СУБЪЕКТИВНЫЙ МНОЖИТЕЛЬ ===== */
+/* ============================================================
+   СУБЪЕКТИВНЫЙ МНОЖИТЕЛЬ — БАЗОВЫЕ СТИЛИ
+   ============================================================ */
 .subjective-block {
   background: rgba(255, 255, 255, 0.02);
   padding: 20px 24px 24px;
   border-radius: 16px;
   margin-bottom: 24px;
   border: 1px solid var(--glass-border);
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .subjective-block:hover {
   border-color: rgba(124, 58, 237, 0.15);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .subjective-block h3 {
@@ -915,25 +771,60 @@ body {
   margin-bottom: 14px;
 }
 
+/* ============================================================
+   ПУРПУРНЫЙ БЕГУНОК ДЛЯ СУБЪЕКТИВНОГО БЛОКА
+   ============================================================ */
 .subjective-block .slider-container input[type="range"]::-webkit-slider-thumb {
-  background: var(--neon-purple);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15),
-              0 0 60px rgba(124, 58, 237, 0.05);
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25),
+              0 0 30px rgba(124, 58, 237, 0.08),
+              inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+              inset 0 4px 8px rgba(255, 255, 255, 0.3);
 }
 
 .subjective-block .slider-container input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.25),
-              0 0 80px rgba(124, 58, 237, 0.08);
+  box-shadow: 0 4px 25px rgba(124, 58, 237, 0.4),
+              0 0 50px rgba(124, 58, 237, 0.15),
+              inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+              inset 0 4px 8px rgba(255, 255, 255, 0.4);
 }
 
 .subjective-block .slider-container .value-display {
   color: var(--neon-purple);
-  background: rgba(124, 58, 237, 0.04);
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.15),
+               0 0 40px rgba(124, 58, 237, 0.05),
+               0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(124, 58, 237, 0.02);
+  border-color: rgba(124, 58, 237, 0.03);
 }
 
+.subjective-block .slider-container input[type="range"]:hover + .value-display,
+.subjective-block .slider-container .value-display:hover {
+  text-shadow: 0 0 30px rgba(124, 58, 237, 0.25),
+               0 0 60px rgba(124, 58, 237, 0.08),
+               0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(124, 58, 237, 0.04);
+  border-color: rgba(124, 58, 237, 0.06);
+}
+
+/* Firefox для субъективного */
 .subjective-block .slider-container input[type="range"]::-moz-range-thumb {
-  background: var(--neon-purple);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25),
+              inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+              inset 0 4px 8px rgba(255, 255, 255, 0.3);
 }
 
 /* ============================================================
@@ -3058,79 +2949,6 @@ body {
   }
 }
 
-/* ============================================================
-   МОБИЛЬНЫЙ СВАЙП + СТЕКЛЯННАЯ ПОЛКА
-   ============================================================ */
-@media (max-width: 768px) {
-  .films-grid {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding: 30px 4px 40px 4px;  /* ← увеличил отступ снизу для полки */
-    scroll-behavior: smooth;
-    flex-wrap: nowrap;
-    margin: 0 -4px;
-    position: relative;
-  }
-
-  /* Полка снизу (как на десктопе) */
-  .films-grid::after {
-    content: '';
-    position: absolute;
-    bottom: 8px;  /* ← сместил, чтобы была видна */
-    left: 10%;
-    width: 80%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    opacity: 0.3;
-  }
-
-  .films-grid .film-card-link {
-    flex: 0 0 180px;
-    scroll-snap-align: start;
-    transition: all 0.3s ease;
-  }
-
-  /* Отражение для каждой карточки */
-  .films-grid .film-card::after {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    left: 5%;
-    width: 90%;
-    height: 16px;
-    background: linear-gradient(to bottom, var(--glass-border), transparent);
-    opacity: 0.15;
-    filter: blur(6px);
-    transition: opacity 0.4s ease;
-  }
-
-  /* 3D-эффект при касании (активация) */
-  .films-grid .film-card-link:active .film-card {
-    transform: perspective(800px) rotateX(2deg) translateY(-4px) scale(1.02);
-    border-color: var(--neon-cyan);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-  }
-
-  .films-grid .film-card-link:active .film-card::after {
-    opacity: 0.3;
-  }
-
-  /* Скрываем скроллбар для красоты (но оставляем возможность скролла) */
-  .films-grid::-webkit-scrollbar {
-    height: 3px;
-  }
-  .films-grid::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 4px;
-  }
-  .films-grid::-webkit-scrollbar-thumb {
-    background: var(--neon-cyan);
-    border-radius: 4px;
-  }
-}
 
 /* ============================================================
    ПУЛЬСИРУЮЩАЯ КНОПКА ДЛЯ МОБИЛЬНЫХ
@@ -3292,10 +3110,9 @@ body {
 }
 
 /* ============================================================
-   НЕОНОВАЯ ДОРОЖКА + 3D-ОБЪЕМ
+   НЕОНОВАЯ ДОРОЖКА + 3D-ОБЪЕМ (с динамическим заполнением)
    ============================================================ */
 
-/* ----- ОБЩИЙ КОНТЕЙНЕР ----- */
 .slider-container {
   display: flex;
   align-items: center;
@@ -3331,34 +3148,44 @@ body {
   cursor: pointer;
   padding: 0;
   margin: 10px 0;
-  
-  /* 3D-объем дорожки */
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: 
+
+  /* Фон с градиентом, зависящим от значения */
+  background: linear-gradient(
+    to right,
+    var(--neon-cyan) 0%,
+    var(--neon-cyan) var(--fill, 50%),
+    rgba(255, 255, 255, 0.06) var(--fill, 50%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.02);
-  
-  /* Неоновое свечение при наведении */
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .slider-container input[type="range"]:hover {
   border-color: rgba(34, 211, 238, 0.1);
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.4),
     0 0 30px rgba(34, 211, 238, 0.03);
 }
 
-/* ----- ТРЕК (ЗАПОЛНЕННАЯ ЧАСТЬ) ----- */
+/* ----- ТРЕК (заполненная часть) ----- */
 .slider-container input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
   border-radius: 4px;
-  background: transparent;
-  transition: background 0.2s ease;
+  background: transparent; /* фон управляется родителем */
 }
 
-/* ----- БЕГУНОК (ОБЪЕМНЫЙ 3D) ----- */
+.slider-container input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+}
+
+/* ----- БЕГУНОК (3D-объём) ----- */
 .slider-container input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -3367,8 +3194,7 @@ body {
   border-radius: 50%;
   margin-top: -11px;
   cursor: pointer;
-  
-  /* 3D-объем бегунка */
+
   background: radial-gradient(
     circle at 35% 30%,
     rgba(255, 255, 255, 0.9) 0%,
@@ -3376,19 +3202,18 @@ body {
     rgba(34, 211, 238, 0.6) 80%,
     rgba(0, 100, 120, 0.8) 100%
   );
-  box-shadow: 
+  box-shadow:
     0 4px 15px rgba(34, 211, 238, 0.25),
     0 0 30px rgba(34, 211, 238, 0.08),
     inset 0 -4px 8px rgba(0, 0, 0, 0.2),
     inset 0 4px 8px rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .slider-container input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 
+  box-shadow:
     0 4px 25px rgba(34, 211, 238, 0.4),
     0 0 50px rgba(34, 211, 238, 0.15),
     inset 0 -4px 8px rgba(0, 0, 0, 0.2),
@@ -3397,13 +3222,28 @@ body {
 
 .slider-container input[type="range"]::-webkit-slider-thumb:active {
   transform: scale(0.92);
-  box-shadow: 
-    0 2px 10px rgba(34, 211, 238, 0.2),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-/* ----- ЗНАЧЕНИЕ СПРАВА (3D-объем) ----- */
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(34, 211, 238, 0.9) 40%,
+    rgba(34, 211, 238, 0.6) 80%,
+    rgba(0, 100, 120, 0.8) 100%
+  );
+  box-shadow:
+    0 4px 15px rgba(34, 211, 238, 0.25),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+/* ----- ЗНАЧЕНИЕ СПРАВА (3D-объём) ----- */
 .slider-container .value-display {
   font-family: var(--font-mono);
   font-weight: 800;
@@ -3415,9 +3255,7 @@ body {
   user-select: none;
   padding: 4px 8px;
   border-radius: 10px;
-  
-  /* 3D-эффект цифры */
-  text-shadow: 
+  text-shadow:
     0 0 20px rgba(34, 211, 238, 0.15),
     0 0 40px rgba(34, 211, 238, 0.05),
     0 2px 4px rgba(0, 0, 0, 0.3);
@@ -3429,7 +3267,7 @@ body {
 .slider-container input[type="range"]:hover + .value-display,
 .slider-container .value-display:hover {
   transform: scale(1.05);
-  text-shadow: 
+  text-shadow:
     0 0 30px rgba(34, 211, 238, 0.25),
     0 0 60px rgba(34, 211, 238, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.3);
