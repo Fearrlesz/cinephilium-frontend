@@ -2149,7 +2149,7 @@ function ProfilePage() {
 }
 
 // ============================================================
-// 17. СТРАНИЦА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ
+// 17. СТРАНИЦА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ (ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function UserProfilePage() {
@@ -2160,7 +2160,6 @@ function UserProfilePage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
-  const [achievementProgress, setAchievementProgress] = useState(null);
   const { showNotification } = useNotification();
 
   useEffect(() => {
@@ -2176,6 +2175,18 @@ function UserProfilePage() {
       setReviews(response.data.reviews || []);
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
+      // Обработка 404
+      if (err.response?.status === 404) {
+        setUser(null);
+      }
+      // Показываем уведомление
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.status === 404 
+          ? 'Пользователь не найден' 
+          : 'Не удалось загрузить профиль',
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }
@@ -2196,7 +2207,19 @@ function UserProfilePage() {
   };
 
   if (loading) return <div className="loading">Загрузка...</div>;
-  if (!user) return <div className="error">Пользователь не найден</div>;
+  
+  // Если пользователь не найден – показываем страницу с ошибкой и кнопкой назад
+  if (!user) {
+    return (
+      <div className="container">
+        <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+        <div className="error-msg" style={{ textAlign: 'center', padding: '40px' }}>
+          <h2>😕 Пользователь не найден</h2>
+          <p>Возможно, этот пользователь был удалён или вы перешли по неверной ссылке.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container profile-page">
