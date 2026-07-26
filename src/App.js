@@ -1959,6 +1959,38 @@ function ProfilePage() {
             <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
+<div className="achievements-section" style={{ marginTop: '20px' }}>
+  <h3>🏅 Достижения</h3>
+  {user.achievements?.length > 0 ? (
+    <div style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+      gap: '10px',
+      marginTop: '10px'
+    }}>
+      {user.achievements.map(ach => (
+        <div key={ach} style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px',
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '8px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <span style={{ fontSize: '24px' }}>🏅</span>
+          <div>
+            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p style={{ color: '#888', padding: '10px 0' }}>
+      Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
+    </p>
+  )}
+</div>
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
               <h4>🔑 Стать администратором</h4>
