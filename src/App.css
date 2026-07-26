@@ -4163,3 +4163,35 @@ textarea {
 .film-card-link:focus-visible {
   outline: none !important;
 }
+
+/* ============================================================
+   ДОСТИЖЕНИЯ (ACHIEVEMENTS)
+   ============================================================ */
+.achievements-section {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.achievements-section:hover {
+  border-color: var(--glass-border-hover);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.achievements-section h3,
+.achievements-section h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.achievements-section h3 {
+  font-size: 18px;
+}
+
+.achievements-section h4 {
+  font-size: 16px;
+}
