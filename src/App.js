@@ -1085,7 +1085,7 @@ function HomePage() {
 }
 
 // ============================================================
-// 14. СТРАНИЦА: ФИЛЬМ
+// 14. СТРАНИЦА: ФИЛЬМ (ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function FilmPage() {
@@ -1261,11 +1261,11 @@ function FilmPage() {
       setIsRatingMode(false);
       
       if (currentUser && film) {
-    
         await addEvent({
           type: 'rating',
           user: currentUser.nickname,
           film: film.title,
+          filmId: film._id,
           score: response.data.rating.finalScore
         });
       }
@@ -1308,6 +1308,7 @@ function FilmPage() {
     setIsRatingMode(!isRatingMode);
   };
 
+  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ addComment =====
   const addComment = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -1342,7 +1343,8 @@ function FilmPage() {
         await addEvent({
           type: 'comment',
           user: currentUser.nickname,
-          film: film.title
+          film: film.title,
+          filmId: film._id   // ✅ ДОБАВЛЕНО
         });
       }
       
@@ -1384,6 +1386,7 @@ function FilmPage() {
     }
   };
 
+  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ addReview =====
   const addReview = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -1429,9 +1432,10 @@ function FilmPage() {
       
       if (currentUser && film) {
         await addEvent({
-          type: 'review',
+          type: 'review',          // ✅ ИСПРАВЛЕНО (было 'comment')
           user: currentUser.nickname,
-          film: film.title
+          film: film.title,
+          filmId: film._id
         });
       }
       
@@ -1845,7 +1849,7 @@ function LoginPage() {
 }
 
 // ============================================================
-// 16. СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+// 16. СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function ProfilePage() {
@@ -1857,8 +1861,10 @@ function ProfilePage() {
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
+  const [achievementProgress, setAchievementProgress] = useState(null);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  const { addEvent } = useActivityEvents();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -1869,6 +1875,48 @@ function ProfilePage() {
     loadProfile();
   }, [navigate]);
 
+  const loadAchievementProgress = async () => {
+    try {
+      const response = await api.get('/users/me/achievements');
+      setAchievementProgress(response.data);
+      
+      if (response.data?.achievements) {
+        // Находим новые достижения
+        const oldAchievements = user?.achievements || [];
+        const newAchievements = response.data.achievements;
+        const freshAchievements = newAchievements.filter(
+          ach => !oldAchievements.includes(ach)
+        );
+        
+        // Создаём событие для новых достижений
+        if (freshAchievements.length > 0) {
+          try {
+            await addEvent({
+              type: 'achievement',
+              user: user?.nickname || 'Пользователь',
+              film: 'система',
+              filmId: 'system',
+              metadata: {
+                achievements: freshAchievements
+              }
+            });
+            console.log('✅ Событие о достижениях создано:', freshAchievements);
+          } catch (err) {
+            console.error('❌ Ошибка создания события о достижениях:', err);
+          }
+        }
+        
+        setUser(prev => ({ 
+          ...prev, 
+          achievements: newAchievements,
+          totalPoints: response.data.totalPoints || prev.totalPoints
+        }));
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки прогресса достижений:', err);
+    }
+  };
+
   const loadProfile = async () => {
     try {
       const [userResponse, ratingsResponse] = await Promise.all([
@@ -1878,6 +1926,9 @@ function ProfilePage() {
       
       setUser(userResponse.data);
       setRatings(ratingsResponse.data || []);
+      
+      await loadAchievementProgress();
+      
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
       if (err.response?.status === 401) {
@@ -1888,15 +1939,6 @@ function ProfilePage() {
       setLoading(false);
     }
   };
-
-  const loadAchievementProgress = async () => {
-  try {
-    const response = await api.get('/users/me/achievements');
-    setAchievementProgress(response.data);
-  } catch (err) {
-    console.error('Ошибка загрузки прогресса достижений:', err);
-  }
-};
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -1973,38 +2015,40 @@ function ProfilePage() {
             <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
-<div className="achievements-section" style={{ marginTop: '20px' }}>
-  <h3>🏅 Достижения</h3>
-  {user.achievements?.length > 0 ? (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-      gap: '10px',
-      marginTop: '10px'
-    }}>
-      {user.achievements.map(ach => (
-        <div key={ach} style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '10px',
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '8px',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <span style={{ fontSize: '24px' }}>🏅</span>
-          <div>
-            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
+          
+          <div className="achievements-section" style={{ marginTop: '20px' }}>
+            <h3>🏅 Достижения</h3>
+            {user.achievements?.length > 0 ? (
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+                gap: '10px',
+                marginTop: '10px'
+              }}>
+                {user.achievements.map(ach => (
+                  <div key={ach} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <span style={{ fontSize: '24px' }}>🏅</span>
+                    <div>
+                      <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#888', padding: '10px 0' }}>
+                Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
+              </p>
+            )}
           </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p style={{ color: '#888', padding: '10px 0' }}>
-      Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
-    </p>
-  )}
-</div>
+
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
               <h4>🔑 Стать администратором</h4>
