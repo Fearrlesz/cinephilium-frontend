@@ -817,7 +817,7 @@ function AdminPanel() {
 }
 
 // ============================================================
-// 13. СТРАНИЦА: ГЛАВНАЯ
+// 13. СТРАНИЦА: ГЛАВНАЯ (ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function HomePage() {
@@ -837,30 +837,23 @@ function HomePage() {
   
   const { events, loading: eventsLoading, addEvent, refresh: refreshEvents } = useActivityEvents();
 
+  // ----- 1. ЗАГРУЗКА ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ (только при монтировании) -----
   useEffect(() => {
-    loadFilms(page);
-    loadCurrentUser();
-  }, [page]);
-
-  useEffect(() => {
-    refreshEvents();
-  }, [refreshEvents]);
-
-  const loadCurrentUser = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await api.get('/auth/me');
-        setUser(response.data);
-      } catch (err) {
+    if (!token) return;
+    
+    api.get('/auth/me')
+      .then(res => setUser(res.data))
+      .catch(err => {
         if (err.response?.status === 401) {
           localStorage.removeItem('token');
         }
-      }
-    }
-  };
+        console.warn('Не удалось загрузить пользователя:', err.message);
+      });
+  }, []); // ✅ пустой массив – один раз
 
-  const loadFilms = async (pageNum = 1) => {
+  // ----- 2. ЗАГРУЗКА ФИЛЬМОВ ПРИ СМЕНЕ СТРАНИЦЫ -----
+  const loadFilms = useCallback(async (pageNum = 1) => {
     setLoading(true);
     setError('');
     try {
@@ -885,15 +878,26 @@ function HomePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // ✅ стабильная функция, без зависимостей
 
-  const loadMore = () => {
+  useEffect(() => {
+    loadFilms(page);
+  }, [page, loadFilms]); // ✅ зависимость от loadFilms (стабильна)
+
+  // ----- 3. ОБНОВЛЕНИЕ ЛЕНТЫ СОБЫТИЙ -----
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]); // ✅ корректно
+
+  // ----- 4. ЗАГРУЗКА СЛЕДУЮЩЕЙ СТРАНИЦЫ -----
+  const loadMore = useCallback(() => {
     if (page < totalPages) {
       setPage(prev => prev + 1);
     }
-  };
+  }, [page, totalPages]);
 
-  const handleSearch = async () => {
+  // ----- 5. ПОИСК ФИЛЬМОВ В TMDB -----
+  const handleSearch = useCallback(async () => {
     const query = searchQuery.trim();
     if (!query) {
       setSearchError('Введите название фильма');
@@ -904,9 +908,7 @@ function HomePage() {
     setShowSearch(false);
     
     try {
-      const response = await api.get('/tmdb/search', {
-        params: { query }
-      });
+      const response = await api.get('/tmdb/search', { params: { query } });
       setSearchResults(response.data.results || []);
       setShowSearch(true);
     } catch (err) {
@@ -918,9 +920,10 @@ function HomePage() {
         type: 'error'
       });
     }
-  };
+  }, [searchQuery, showNotification]);
 
-  const importFilm = async (tmdbId, filmTitle) => {
+  // ----- 6. ИМПОРТ ФИЛЬМА (исправлен дублирующий запрос) -----
+  const importFilm = useCallback(async (tmdbId, filmTitle) => {
     const token = localStorage.getItem('token');
     if (!token) {
       showNotification({
@@ -935,58 +938,60 @@ function HomePage() {
     if (isImporting) return;
     setIsImporting(true);
     
-  try {
-  const response = await api.post('/films/import', { tmdbId });
-  
-  if (response.data.alreadyExists) {
-    showNotification({
-      title: 'Уже в каталоге',
-      message: `Фильм "${response.data.film.title}" уже есть. Переход...`,
-      type: 'info'
-    });
-    
-    setTimeout(() => {
-      navigate(`/film/${response.data.film._id}`);
-    }, 1000);
-    
-    setIsImporting(false);
-    return;
-  }
-  
-  setShowSearch(false);
-  setSearchQuery('');
-  setSearchResults([]);
-  
-  if (user) {
-  await addEvent({
-    type: 'film_add',
-    user: user.nickname,
-    film: filmTitle || 'Новый фильм',
-    filmId: response.data.film._id
-  });
-}
-  
-  setPage(1);
-  await loadFilms(1);
-  
-  showNotification({
-    title: 'Фильм добавлен!',
-    message: 'Фильм успешно добавлен в каталог',
-    type: 'success'
-  });
-} catch (err) {
-  showNotification({
-    title: 'Ошибка',
-    message: err.response?.data?.error || 'Не удалось добавить фильм',
-    type: 'error'
-  });
-} finally {
-  setIsImporting(false);
-} 
+    try {
+      const response = await api.post('/films/import', { tmdbId });
+      
+      if (response.data.alreadyExists) {
+        showNotification({
+          title: 'Уже в каталоге',
+          message: `Фильм "${response.data.film.title}" уже есть. Переход...`,
+          type: 'info'
+        });
+        setTimeout(() => navigate(`/film/${response.data.film._id}`), 1000);
+        setIsImporting(false);
+        return;
+      }
+      
+      setShowSearch(false);
+      setSearchQuery('');
+      setSearchResults([]);
+      
+      // Сохраняем событие, если пользователь авторизован
+      if (user) {
+        try {
+          await addEvent({
+            type: 'film_add',
+            user: user.nickname,
+            film: filmTitle || 'Новый фильм',
+            filmId: response.data.film._id
+          });
+        } catch (eventErr) {
+          console.warn('⚠️ Не удалось сохранить событие, но фильм добавлен:', eventErr.message);
+        }
+      }
+      
+      // ✅ ТОЛЬКО setPage(1) – useEffect сам перезагрузит фильмы
+      setPage(1);
+      
+      showNotification({
+        title: 'Фильм добавлен!',
+        message: 'Фильм успешно добавлен в каталог',
+        type: 'success'
+      });
+      
+    } catch (err) {
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось добавить фильм',
+        type: 'error'
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  }, [isImporting, user, addEvent, navigate, showNotification]);
 
-};
-
-  const handleLogout = () => {
+  // ----- 7. ВЫХОД -----
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);
     navigate('/');
@@ -995,8 +1000,9 @@ function HomePage() {
       message: 'Вы вышли из аккаунта',
       type: 'info'
     });
-  };
+  }, [navigate, showNotification]);
 
+  // ----- 8. РЕНДЕР -----
   if (loading && page === 1) return <div className="loading">Загрузка...</div>;
 
   const topFilms = [...films]
@@ -1055,7 +1061,9 @@ function HomePage() {
         <div className="top-films-netflix">
           <div className="top-header-netflix">
             <h3>🏆 Топ-5 сообщества</h3>
-            <Link to="/top-films" className="top-all-link-netflix">Смотреть все →</Link>
+            {/* ❗ Исправлено: убрана несуществующая ссылка /top-films */}
+            {/* Если нужна ссылка на топ пользователей – раскомментировать: */}
+            {/* <Link to="/top" className="top-all-link-netflix">Смотреть все →</Link> */}
           </div>
           <div className="top-scroll-container">
             <div className="top-scroll-wrapper">
@@ -1908,7 +1916,7 @@ function LoginPage() {
 }
 
 // ============================================================
-// 16. СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ)
+// 16. СТРАНИЦА: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function ProfilePage() {
@@ -1934,25 +1942,26 @@ function ProfilePage() {
     loadProfile();
   }, [navigate]);
 
-  const loadAchievementProgress = async () => {
+  // ✅ ИСПРАВЛЕНО: добавлен параметр userData
+  const loadAchievementProgress = async (userData) => {
     try {
       const response = await api.get('/users/me/achievements');
       setAchievementProgress(response.data);
       
       if (response.data?.achievements) {
-        // Находим новые достижения
-        const oldAchievements = user?.achievements || [];
+        // ✅ используем переданные userData, а не устаревший user из замыкания
+        const oldAchievements = userData?.achievements || [];
         const newAchievements = response.data.achievements;
         const freshAchievements = newAchievements.filter(
           ach => !oldAchievements.includes(ach)
         );
         
-        // Создаём событие для новых достижений
+        // Создаём событие для новых достижений (только если они действительно новые)
         if (freshAchievements.length > 0) {
           try {
             await addEvent({
               type: 'achievement',
-              user: user?.nickname || 'Пользователь',
+              user: userData?.nickname || 'Пользователь', // ✅ используем userData
               film: 'система',
               filmId: 'system',
               metadata: {
@@ -1965,6 +1974,7 @@ function ProfilePage() {
           }
         }
         
+        // Обновляем состояние пользователя, добавляя новые достижения
         setUser(prev => ({ 
           ...prev, 
           achievements: newAchievements,
@@ -1983,10 +1993,15 @@ function ProfilePage() {
         api.get('/ratings/user')
       ]);
       
-      setUser(userResponse.data);
+      // ✅ Сохраняем данные пользователя в переменную
+      const userData = userResponse.data;
+      
+      // Обновляем состояние
+      setUser(userData);
       setRatings(ratingsResponse.data || []);
       
-      await loadAchievementProgress();
+      // ✅ Передаём userData в функцию загрузки достижений
+      await loadAchievementProgress(userData);
       
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
