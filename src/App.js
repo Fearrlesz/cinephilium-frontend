@@ -2071,6 +2071,7 @@ function UserProfilePage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
+  const [achievementProgress, setAchievementProgress] = useState(null);
   const { showNotification } = useNotification();
 
   useEffect(() => {
