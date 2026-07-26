@@ -155,7 +155,7 @@ export function validateNickname(nickname) {
 }
 
 // ============================================================
-// 5. ХУК ДЛЯ СОБЫТИЙ
+// 5. ХУК ДЛЯ СОБЫТИЙ (ИСПРАВЛЕННЫЙ)
 // ============================================================
 
 function useActivityEvents() {
@@ -163,6 +163,7 @@ function useActivityEvents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Загрузка событий с сервера
   const loadEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -186,8 +187,9 @@ function useActivityEvents() {
     }
   }, []);
 
+  // Добавление нового события
   const addEvent = useCallback(async (eventData) => {
-    // Валидация события перед отправкой
+    // Валидация обязательных полей
     if (!eventData.type || !VALID_EVENT_TYPES.includes(eventData.type)) {
       console.error('❌ Некорректный тип события:', eventData.type);
       return;
@@ -203,27 +205,44 @@ function useActivityEvents() {
       return;
     }
 
+    // Для событий, которые не являются достижениями, filmId должен быть передан
+    if (eventData.type !== 'achievement' && !eventData.filmId) {
+      console.error('❌ Для события типа', eventData.type, 'не указан filmId');
+      return;
+    }
+
+    // Для достижений filmId может быть 'system', но он всё равно должен быть
+    if (eventData.type === 'achievement' && !eventData.filmId) {
+      console.warn('⚠️ Для достижения не указан filmId, устанавливаем "system"');
+      eventData.filmId = 'system';
+    }
+
     try {
+      // Отправляем на сервер с filmId
       const response = await api.post('/events', {
         type: eventData.type,
         user: eventData.user,
         film: eventData.film,
-        score: eventData.score || null
+        filmId: eventData.filmId,   // ✅ ТЕПЕРЬ ПЕРЕДАЁТСЯ
+        score: eventData.score || null,
+        metadata: eventData.metadata || null
       });
       
+      // Создаём локальное событие с полученным _id
       const newEvent = {
         _id: response.data._id || Date.now().toString(),
         time: 'только что',
         ...eventData
       };
       
+      // Добавляем в начало списка (не более 20 последних)
       setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
       
       console.log('✅ Событие сохранено на сервере:', eventData);
     } catch (err) {
       console.error('❌ Ошибка сохранения события:', err.message);
       
-      // Запасной вариант - добавляем локально
+      // Запасной вариант — добавляем локально с временным ID
       const newEvent = {
         _id: `local_${Date.now()}`,
         time: 'только что',
@@ -233,6 +252,7 @@ function useActivityEvents() {
     }
   }, []);
 
+  // Удаление события (для администрирования)
   const removeEvent = useCallback(async (eventId) => {
     try {
       await api.delete(`/events/${eventId}`);
@@ -243,6 +263,7 @@ function useActivityEvents() {
     }
   }, []);
 
+  // При монтировании загружаем события
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
@@ -350,7 +371,7 @@ function RatingDetailsModal({ rating, onClose }) {
 }
 
 // ============================================================
-// 8. КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ
+// 8. КОМПОНЕНТ: ЛЕНТА СОБЫТИЙ (ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function ActivityFeed({ events, loading }) {
@@ -397,9 +418,9 @@ function ActivityFeed({ events, loading }) {
   const getEventText = (event) => {
     const user = sanitizeText(event.user || 'Кто-то');
     if (event.type === 'achievement') {
-  const list = event.metadata?.achievements?.join(', ') || '';
-  return `🏆 ${user} получил достижение: ${list}`;
-}
+      const list = event.metadata?.achievements?.join(', ') || '';
+      return `🏆 ${user} получил достижение: ${list}`;
+    }
     const film = sanitizeText(event.film || 'фильм');
     const score = event.score || '';
     
@@ -417,19 +438,38 @@ function ActivityFeed({ events, loading }) {
     <div className="activity-feed">
       <h3>📰 Последние события</h3>
       <div className="feed-list">
-        {events.slice(0, 10).map((event, index) => (
-          <Link 
-            to={`/film/${event.filmId}`}
-            key={event._id || index}
-            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
-          >
+        {events.slice(0, 10).map((event, index) => {
+          // Проверяем, есть ли валидный filmId для создания ссылки
+          const hasFilmId = event.filmId && 
+                            event.filmId !== 'undefined' && 
+                            event.filmId !== 'system' &&
+                            event.filmId !== null &&
+                            event.filmId !== 'null';
+
+          // Контент события (общий для обоих вариантов)
+          const content = (
             <div className="feed-item">
               <span className="feed-icon">{getEventIcon(event.type)}</span>
               <span className="feed-text">{getEventText(event)}</span>
               <span className="feed-time">{event.time || 'только что'}</span>
             </div>
-          </Link>
-        ))}
+          );
+
+          // Если filmId валидный – оборачиваем в Link, иначе просто div
+          return hasFilmId ? (
+            <Link 
+              to={`/film/${event.filmId}`}
+              key={event._id || index}
+              style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+            >
+              {content}
+            </Link>
+          ) : (
+            <div key={event._id || index} style={{ display: 'block' }}>
+              {content}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -595,7 +635,7 @@ function TopUsersPage() {
 }
 
 // ============================================================
-// 12. СТРАНИЦА: АДМИН-ПАНЕЛЬ
+// 12. СТРАНИЦА: АДМИН-ПАНЕЛЬ (ИСПРАВЛЕННАЯ)
 // ============================================================
 
 function AdminPanel() {
@@ -604,11 +644,7 @@ function AdminPanel() {
   const [pendingComments, setPendingComments] = useState([]);
   const [pendingReviews, setPendingReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const notificationContext = useContext(NotificationContext);
-if (!notificationContext) {
-  return <div className="error-msg">Ошибка: контекст уведомлений не найден</div>;
-}
-const { showNotification } = notificationContext;
+  const { showNotification } = useNotification(); // ✅ ИСПРАВЛЕНО
 
   useEffect(() => {
     const token = localStorage.getItem('token');
