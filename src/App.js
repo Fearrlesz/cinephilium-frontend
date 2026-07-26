@@ -1685,23 +1685,25 @@ const calculatePreview = useCallback(() => {
 })}
 
             <div className="subjective-block">
-              <h3>Субъективный множитель «Вайб»</h3>
-              <p>Насколько лично вам понравился фильм, несмотря на технические оценки?</p>
-              <div className="slider-container">
-                <span>1</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  step="1"
-                  value={subjectiveM}
-                  onChange={(e) => setSubjectiveM(Number(e.target.value))}
-                />
-                <span>10</span>
-                <span className="value-display">{subjectiveM}</span>
-              </div>
-            </div>
-
+  <h3>Субъективный множитель «Вайб»</h3>
+  <p>Насколько лично вам понравился фильм, несмотря на технические оценки?</p>
+  <div className="slider-container">
+    <span>1</span>
+    <input
+      type="range"
+      min="1"
+      max="10"
+      step="1"
+      value={subjectiveM}
+      onChange={(e) => setSubjectiveM(Number(e.target.value))}
+      style={{
+        '--fill': `${((subjectiveM - 1) / 9) * 100}%`
+      }}
+    />
+    <span>10</span>
+    <span className="value-display">{subjectiveM}</span>
+  </div>
+</div>
             <div className="text-review">
               <h3>Текстовый отзыв (необязательно)</h3>
               <textarea
