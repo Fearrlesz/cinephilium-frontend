@@ -1777,6 +1777,7 @@ function LoginPage() {
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [ratings, setRatings] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
   const [adminSecret, setAdminSecret] = useState('');
@@ -1784,6 +1785,7 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const [achievementProgress, setAchievementProgress] = useState(null);
+  const [activeTab, setActiveTab] = useState('ratings');
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -1795,7 +1797,6 @@ function ProfilePage() {
       return;
     }
     loadProfile();
-    
   }, [navigate]);
 
   const loadAchievementProgress = async (userData) => {
@@ -1832,13 +1833,15 @@ function ProfilePage() {
 
   const loadProfile = async () => {
     try {
-      const [userResponse, ratingsResponse] = await Promise.all([
+      const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
         api.get('/auth/me'),
-        api.get('/ratings/user')
+        api.get('/ratings/user'),
+        api.get('/reviews/user')
       ]);
       const userData = userResponse.data;
       setUser(userData);
       setRatings(ratingsResponse.data || []);
+      setReviews(reviewsResponse.data || []);
       await loadAchievementProgress(userData);
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
@@ -1864,6 +1867,23 @@ function ProfilePage() {
     } catch (err) {
       console.error('Ошибка загрузки деталей оценки:', err);
       showNotification({ title: 'Ошибка', message: 'Не удалось загрузить детали оценки', type: 'error' });
+    }
+  };
+
+  const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/reviews/${reviewId}/like`);
+      const response = await api.get('/reviews/user');
+      setReviews(response.data || []);
+      showNotification({ title: 'Лайк поставлен!', message: 'Вы оценили рецензию', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
     }
   };
 
@@ -1910,6 +1930,7 @@ function ProfilePage() {
           <div className="profile-stats">
             <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
             <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
+            <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
 
@@ -1947,27 +1968,96 @@ function ProfilePage() {
         </div>
       </div>
 
-      <div className="profile-ratings glass-card">
-        <h2>Мои оценки</h2>
-        {ratings.length === 0 ? (
-          <p>Вы еще не оценили ни одного фильма</p>
-        ) : (
-          <div className="ratings-list">
-            {ratings.map((rating) => (
-              <div key={rating._id} className="rating-item">
-                <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
-                  <div className="rating-film-info">
-                    <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
-                    <div>
-                      <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                      <p>{rating.filmId?.year || rating.film?.year}</p>
+      {/* Вкладки */}
+      <div className="profile-tabs glass-card">
+        <div className="tabs-header">
+          <button 
+            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ratings')}
+          >
+            ⭐ Мои оценки ({ratings.length})
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            📝 Мои рецензии ({reviews.length})
+          </button>
+        </div>
+
+        {/* Вкладка с оценками */}
+        {activeTab === 'ratings' && (
+          <div className="profile-ratings">
+            <h2>Мои оценки</h2>
+            {ratings.length === 0 ? (
+              <p>Вы еще не оценили ни одного фильма</p>
+            ) : (
+              <div className="ratings-list">
+                {ratings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
+                      <div className="rating-film-info">
+                        <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
+                        <div>
+                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
+                          <p>{rating.filmId?.year || rating.film?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Вкладка с рецензиями */}
+        {activeTab === 'reviews' && (
+          <div className="profile-reviews">
+            <h2>Мои рецензии</h2>
+            {reviews.length === 0 ? (
+              <p>Вы еще не написали ни одной рецензии</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => (
+                  <div key={review._id} className="review-item">
+                    <div className="review-header">
+                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-film-link">
+                        <h3 className="review-title">{review.title}</h3>
+                        <p className="review-film-name">
+                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'} 
+                          ({review.filmId?.year || review.film?.year || 'N/A'})
+                        </p>
+                      </Link>
+                      <div className="review-rating">
+                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
+                      </div>
+                    </div>
+                    
+                    <p className="review-text">{review.text}</p>
+                    
+                    <div className="review-footer">
+                      <div className="review-actions">
+                        <button 
+                          className="like-btn" 
+                          onClick={() => likeReview(review._id)}
+                        >
+                          ❤️ {review.likes?.length || 0}
+                        </button>
+                        <span className="review-date">
+                          📅 {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-go-to-film">
+                        🎬 Перейти к фильму
+                      </Link>
                     </div>
                   </div>
-                </Link>
-                <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
-                <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
@@ -1985,12 +2075,28 @@ function UserProfilePage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
+  const [activeTab, setActiveTab] = useState('ratings');
+  const [currentUser, setCurrentUser] = useState(null);
   const { showNotification } = useNotification();
 
   useEffect(() => {
     loadUserProfile();
-    
+    loadCurrentUser();
   }, [id]);
+
+  const loadCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await api.get('/auth/me');
+        setCurrentUser(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    }
+  };
 
   const loadUserProfile = async () => {
     setLoading(true);
@@ -2024,6 +2130,24 @@ function UserProfilePage() {
     }
   };
 
+  const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/reviews/${reviewId}/like`);
+      // Обновляем список рецензий
+      const response = await api.get(`/users/${id}`);
+      setReviews(response.data.reviews || []);
+      showNotification({ title: 'Лайк поставлен!', message: 'Вы оценили рецензию', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+    }
+  };
+
   if (loading) return <div className="loading">Загрузка...</div>;
 
   if (!user) {
@@ -2037,6 +2161,8 @@ function UserProfilePage() {
       </div>
     );
   }
+
+  const isOwnProfile = currentUser?._id === user._id;
 
   return (
     <div className="container profile-page">
@@ -2052,9 +2178,10 @@ function UserProfilePage() {
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
           </h1>
           <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
-          <p>⭐ Всего оценок: {ratings.length}</p>
-          <p>📝 Рецензий: {reviews.length}</p>
-          <p>🏆 Баллов: {user.totalPoints || 0}</p>
+          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
+          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
+          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
+          
           <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4>🏅 Достижения</h4>
             {user.achievements?.length > 0 ? (
@@ -2069,49 +2196,108 @@ function UserProfilePage() {
               <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
             )}
           </div>
+
+          {isOwnProfile && (
+            <button onClick={() => navigate('/profile')} className="btn-edit-profile" style={{ marginTop: '15px' }}>
+              ✏️ Редактировать профиль
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="profile-ratings glass-card">
-        <h2>Оценки пользователя</h2>
-        {ratings.length === 0 ? (
-          <p>Пользователь еще не оценил ни одного фильма</p>
-        ) : (
-          <div className="ratings-list">
-            {ratings.map((rating) => (
-              <div key={rating._id} className="rating-item">
-                <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
-                  <div className="rating-film-info">
-                    <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
-                    <div>
-                      <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
-                      <p>{rating.film?.year || rating.filmId?.year}</p>
+      {/* Вкладки */}
+      <div className="profile-tabs glass-card">
+        <div className="tabs-header">
+          <button 
+            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ratings')}
+          >
+            ⭐ Оценки ({ratings.length})
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            📝 Рецензии ({reviews.length})
+          </button>
+        </div>
+
+        {/* Вкладка с оценками */}
+        {activeTab === 'ratings' && (
+          <div className="profile-ratings">
+            <h2>Оценки пользователя</h2>
+            {ratings.length === 0 ? (
+              <p>Пользователь еще не оценил ни одного фильма</p>
+            ) : (
+              <div className="ratings-list">
+                {ratings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
+                      <div className="rating-film-info">
+                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
+                        <div>
+                          <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                          <p>{rating.film?.year || rating.filmId?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Вкладка с рецензиями */}
+        {activeTab === 'reviews' && (
+          <div className="profile-reviews">
+            <h2>Рецензии пользователя</h2>
+            {reviews.length === 0 ? (
+              <p>Пользователь еще не написал ни одной рецензии</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => (
+                  <div key={review._id} className="review-item">
+                    <div className="review-header">
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
+                        <h3 className="review-title">{review.title}</h3>
+                        <p className="review-film-name">
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          ({review.film?.year || review.filmId?.year || 'N/A'})
+                        </p>
+                      </Link>
+                      <div className="review-rating">
+                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
+                      </div>
+                    </div>
+                    
+                    <p className="review-text">{review.text}</p>
+                    
+                    <div className="review-footer">
+                      <div className="review-actions">
+                        <button 
+                          className="like-btn" 
+                          onClick={() => likeReview(review._id)}
+                        >
+                          ❤️ {review.likes?.length || 0}
+                        </button>
+                        <span className="review-date">
+                          📅 {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-go-to-film">
+                        🎬 Перейти к фильму
+                      </Link>
                     </div>
                   </div>
-                </Link>
-                <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
-                <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
-
-      {reviews.length > 0 && (
-        <div className="profile-reviews glass-card">
-          <h2>Рецензии</h2>
-          {reviews.map((review) => (
-            <div key={review._id} className="review-item">
-              <Link to={`/film/${review.film?._id || review.filmId?._id}`}>
-                <h4>{review.title}</h4>
-                <p>{review.film?.title || review.filmId?.title || 'Фильм'} ({review.film?.year || review.filmId?.year})</p>
-              </Link>
-              <p className="review-preview">{truncateText(review.text, 200)}</p>
-              <span>❤️ {review.likes?.length || 0}</span>
-            </div>
-          ))}
-        </div>
-      )}
 
       <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
     </div>
