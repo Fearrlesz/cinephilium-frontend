@@ -653,18 +653,6 @@ function AboutPage() {
           </p>
         </div>
       </div>
-
-      <div className="about-vibe-table glass-card">
-        <h2>📊 Таблица вайб-множителей</h2>
-        <div className="vibe-grid">
-          {[1,2,3,4,5,6,7,8,9,10].map(m => (
-            <div key={m} className="vibe-item">
-              <span className="vibe-value">{m}</span>
-              <span className="vibe-multiplier">{(1 + (m - 1) * VIBE_STEP).toFixed(4)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
