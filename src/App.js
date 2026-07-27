@@ -163,6 +163,7 @@ function useActivityEvents() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pendingEvents, setPendingEvents] = useState(new Map()); // Для отслеживания несинхронизированных событий
 
   // Загрузка событий с сервера
   const loadEvents = useCallback(async () => {
@@ -173,7 +174,8 @@ function useActivityEvents() {
       if (response.data && Array.isArray(response.data)) {
         const formattedEvents = response.data.map(e => ({
           ...e,
-          time: e.time || getTimeAgo(e.createdAt) || 'только что'
+          time: e.time || getTimeAgo(e.createdAt) || 'только что',
+          _synced: true // Помечаем как синхронизированные
         }));
         setEvents(formattedEvents);
       } else {
@@ -190,75 +192,163 @@ function useActivityEvents() {
 
   // Добавление нового события
   const addEvent = useCallback(async (eventData) => {
-    // Валидация обязательных полей
+    // ВАЛИДАЦИЯ
     if (!eventData.type || !VALID_EVENT_TYPES.includes(eventData.type)) {
       console.error('❌ Некорректный тип события:', eventData.type);
-      return;
+      return false;
     }
 
     if (!eventData.user) {
       console.error('❌ Не указан пользователь события');
-      return;
+      return false;
     }
 
     if (!eventData.film) {
       console.error('❌ Не указан фильм события');
-      return;
+      return false;
     }
 
-    // Для событий, которые не являются достижениями, filmId должен быть передан
-    if (eventData.type !== 'achievement' && !eventData.filmId) {
+    // ИЗВЛЕКАЕМ FILM_ID ИЗ РАЗНЫХ МЕСТ
+    let filmId = eventData.filmId;
+    
+    // Если filmId не указан напрямую, пробуем извлечь из metadata
+    if (!filmId && eventData.metadata?.filmId) {
+      filmId = eventData.metadata.filmId;
+    }
+    
+    // Если всё ещё нет filmId и это не достижение
+    if (eventData.type !== 'achievement' && !filmId) {
       console.error('❌ Для события типа', eventData.type, 'не указан filmId');
-      return;
+      return false;
     }
 
-    // Для достижений filmId может быть 'system', но он всё равно должен быть
-    if (eventData.type === 'achievement' && !eventData.filmId) {
-      console.warn('⚠️ Для достижения не указан filmId, устанавливаем "system"');
-      eventData.filmId = 'system';
+    // Для достижений устанавливаем 'system' если не указан
+    if (eventData.type === 'achievement' && !filmId) {
+      filmId = 'system';
     }
+
+    // ПРОВЕРКА НА ДУБЛИКАТ (опционально)
+    const duplicate = events.some(e => 
+      e.type === eventData.type && 
+      e.user === eventData.user && 
+      e.film === eventData.film &&
+      e.score === eventData.score &&
+      new Date().getTime() - new Date(e.createdAt || e.time).getTime() < 5000 // 5 секунд
+    );
+
+    if (duplicate) {
+      console.warn('⚠️ Обнаружен дубликат события, пропускаем');
+      return false;
+    }
+
+    // ПОДГОТОВКА ДАННЫХ ДЛЯ ОТПРАВКИ
+    const payload = {
+      type: eventData.type,
+      user: eventData.user,
+      film: eventData.film,
+      filmId: filmId, // ← ТЕПЕРЬ ВСЕГДА ЕСТЬ
+      score: eventData.score || null,
+      metadata: eventData.metadata || null
+    };
+
+    // ГЕНЕРИРУЕМ ЛОКАЛЬНЫЙ ID
+    const localId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // СОЗДАЁМ ЛОКАЛЬНОЕ СОБЫТИЕ
+    const newEvent = {
+      _id: localId,
+      _synced: false, // Помечаем как несинхронизированное
+      time: 'только что',
+      ...eventData,
+      filmId: filmId
+    };
+
+    // ДОБАВЛЯЕМ ЛОКАЛЬНО
+    setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+    setPendingEvents(prev => new Map(prev).set(localId, payload));
 
     try {
-      // Отправляем на сервер с filmId
-      const response = await api.post('/events', {
-        type: eventData.type,
-        user: eventData.user,
-        film: eventData.film,
-        filmId: eventData.filmId,   // ✅ ТЕПЕРЬ ПЕРЕДАЁТСЯ
-        score: eventData.score || null,
-        metadata: eventData.metadata || null
-      });
+      // ОТПРАВКА НА СЕРВЕР
+      const response = await api.post('/events', payload);
 
-      // Создаём локальное событие с полученным _id
-      const newEvent = {
-        _id: response.data._id || Date.now().toString(),
-        time: 'только что',
-        ...eventData
-      };
-
-      // Добавляем в начало списка (не более 20 последних)
-      setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
-
-      console.log('✅ Событие сохранено на сервере:', eventData);
+      // ОБНОВЛЯЕМ ЛОКАЛЬНОЕ СОБЫТИЕ ДАННЫМИ С СЕРВЕРА
+      if (response.data && response.data._id) {
+        setEvents(prev => prev.map(e => 
+          e._id === localId 
+            ? { 
+                ...e, 
+                _id: response.data._id, 
+                _synced: true,
+                createdAt: response.data.createdAt || e.createdAt
+              } 
+            : e
+        ));
+        setPendingEvents(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(localId);
+          return newMap;
+        });
+        console.log('✅ Событие сохранено на сервере:', payload);
+        return true;
+      } else {
+        throw new Error('Сервер не вернул _id');
+      }
     } catch (err) {
       console.error('❌ Ошибка сохранения события:', err.message);
-
-      // Запасной вариант — добавляем локально с временным ID
-      const newEvent = {
-        _id: `local_${Date.now()}`,
-        time: 'только что',
-        ...eventData
-      };
-      setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+      // Оставляем локальное событие с пометкой _synced: false
+      return false;
     }
-  }, []);
+  }, [events]);
+
+  // СИНХРОНИЗАЦИЯ НЕСИНХРОНИЗИРОВАННЫХ СОБЫТИЙ
+  const syncPendingEvents = useCallback(async () => {
+    const pending = Array.from(pendingEvents.entries());
+    if (pending.length === 0) return;
+
+    console.log(`🔄 Синхронизация ${pending.length} событий...`);
+    
+    for (const [localId, payload] of pending) {
+      try {
+        const response = await api.post('/events', payload);
+        if (response.data && response.data._id) {
+          setEvents(prev => prev.map(e => 
+            e._id === localId 
+              ? { ...e, _id: response.data._id, _synced: true }
+              : e
+          ));
+          setPendingEvents(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(localId);
+            return newMap;
+          });
+          console.log(`✅ Событие ${localId} синхронизировано`);
+        }
+      } catch (err) {
+        console.error(`❌ Ошибка синхронизации ${localId}:`, err.message);
+      }
+    }
+  }, [pendingEvents]);
 
   // Удаление события (для администрирования)
   const removeEvent = useCallback(async (eventId) => {
+    // Если событие локальное (не синхронизировано), просто удаляем из состояния
+    const isLocal = eventId.startsWith('local_');
+    
+    if (isLocal) {
+      setEvents(prev => prev.filter(e => e._id !== eventId));
+      setPendingEvents(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(eventId);
+        return newMap;
+      });
+      console.log('✅ Локальное событие удалено:', eventId);
+      return;
+    }
+
     try {
       await api.delete(`/events/${eventId}`);
       setEvents(prev => prev.filter(e => e._id !== eventId));
-      console.log('✅ Событие удалено:', eventId);
+      console.log('✅ Событие удалено с сервера:', eventId);
     } catch (err) {
       console.error('❌ Ошибка удаления события:', err.message);
     }
@@ -269,7 +359,35 @@ function useActivityEvents() {
     loadEvents();
   }, [loadEvents]);
 
-  return { events, loading, error, addEvent, removeEvent, refresh: loadEvents };
+  // Периодическая синхронизация (каждые 30 секунд)
+  useEffect(() => {
+    const interval = setInterval(syncPendingEvents, 30000);
+    return () => clearInterval(interval);
+  }, [syncPendingEvents]);
+
+  // Синхронизация при уходе со страницы
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (pendingEvents.size > 0) {
+        // Используем sendBeacon для отправки в фоне
+        // (здесь можно добавить логику)
+        console.log('📤 Отправка несинхронизированных событий...');
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [pendingEvents]);
+
+  return { 
+    events, 
+    loading, 
+    error, 
+    addEvent, 
+    removeEvent, 
+    refresh: loadEvents,
+    pendingEvents: pendingEvents.size,
+    syncPendingEvents
+  };
 }
 
 // ============================================================
