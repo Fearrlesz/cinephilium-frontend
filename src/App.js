@@ -154,6 +154,7 @@ export function validateNickname(nickname) {
   return nickname.length >= 2 && nickname.length <= 20;
 }
 
+ 
 // ============================================================
 // 5. ХУК ДЛЯ СОБЫТИЙ (ИСПРАВЛЕННЫЙ)
 // ============================================================
@@ -171,8 +172,8 @@ function useActivityEvents() {
       const response = await api.get('/events');
       if (response.data && Array.isArray(response.data)) {
         const formattedEvents = response.data.map(e => ({
-          ...e,;
-          time: e.time || getTimeAgo(e.createdAt) || 'только что';
+          ...e,
+          time: e.time || getTimeAgo(e.createdAt) || 'только что'
         }));
         setEvents(formattedEvents);
       } else {
@@ -220,19 +221,19 @@ function useActivityEvents() {
     try {
       // Отправляем на сервер с filmId
       const response = await api.post('/events', {
-        type: eventData.type,;
-        user: eventData.user,;
-        film: eventData.film,;
+        type: eventData.type,
+        user: eventData.user,
+        film: eventData.film,
         filmId: eventData.filmId,   // ✅ ТЕПЕРЬ ПЕРЕДАЁТСЯ
-        score: eventData.score || null,;
-        metadata: eventData.metadata || null;
+        score: eventData.score || null,
+        metadata: eventData.metadata || null
       });
 
       // Создаём локальное событие с полученным _id
       const newEvent = {
-        _id: response.data._id || Date.now().toString(),;
-        time: 'только что',;
-        ...eventData;
+        _id: response.data._id || Date.now().toString(),
+        time: 'только что',
+        ...eventData
       };
 
       // Добавляем в начало списка (не более 20 последних)
@@ -244,9 +245,9 @@ function useActivityEvents() {
 
       // Запасной вариант — добавляем локально с временным ID
       const newEvent = {
-        _id: `local_${Date.now()}`,;
-        time: 'только что',;
-        ...eventData;
+        _id: `local_${Date.now()}`,
+        time: 'только что',
+        ...eventData
       };
       setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
     }
