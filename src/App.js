@@ -676,7 +676,7 @@ function TopUsersPage() {
 
   useEffect(() => {
     loadTopUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const loadTopUsers = async () => {
@@ -746,7 +746,7 @@ function AdminPanel() {
       return;
     }
     loadAdminData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [navigate]);
 
   const loadAdminData = async () => {
@@ -1172,7 +1172,7 @@ function FilmPage() {
     loadComments();
     loadReviews();
     loadCurrentUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [id]);
 
   useEffect(() => {
@@ -1807,7 +1807,7 @@ function ProfilePage() {
       return;
     }
     loadProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [navigate]);
 
   const loadAchievementProgress = async (userData) => {
@@ -2001,7 +2001,7 @@ function UserProfilePage() {
 
   useEffect(() => {
     loadUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [id]);
 
   const loadUserProfile = async () => {
