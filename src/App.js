@@ -1861,14 +1861,28 @@ function ProfilePage() {
   };
 
   const openRatingDetails = async (rating) => {
-    try {
-      const response = await api.get(`/ratings/${rating._id}/details`);
-      setSelectedRating(response.data);
-    } catch (err) {
-      console.error('Ошибка загрузки деталей оценки:', err);
-      showNotification({ title: 'Ошибка', message: 'Не удалось загрузить детали оценки', type: 'error' });
+  try {
+    const ratingId = rating._id || rating.id;
+    if (!ratingId) {
+      showNotification({ 
+        title: 'Ошибка', 
+        message: 'ID оценки не найден', 
+        type: 'error' 
+      });
+      return;
     }
-  };
+
+    const response = await api.get(`/ratings/${ratingId}/details`);
+    setSelectedRating(response.data);
+  } catch (err) {
+    console.error('Ошибка загрузки деталей оценки:', err);
+    showNotification({ 
+      title: 'Ошибка', 
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
+      type: 'error' 
+    });
+  }
+};
 
   const likeReview = async (reviewId) => {
     const token = localStorage.getItem('token');
@@ -2120,15 +2134,29 @@ function UserProfilePage() {
     }
   };
 
-  const openRatingDetails = async (rating) => {
-    try {
-      const response = await api.get(`/ratings/${rating._id}/details`);
-      setSelectedRating(response.data);
-    } catch (err) {
-      console.error('Ошибка загрузки деталей оценки:', err);
-      showNotification({ title: 'Ошибка', message: 'Не удалось загрузить детали оценки', type: 'error' });
+const openRatingDetails = async (rating) => {
+  try {
+    const ratingId = rating._id || rating.id;
+    if (!ratingId) {
+      showNotification({ 
+        title: 'Ошибка', 
+        message: 'ID оценки не найден', 
+        type: 'error' 
+      });
+      return;
     }
-  };
+
+    const response = await api.get(`/ratings/${ratingId}/details`);
+    setSelectedRating(response.data);
+  } catch (err) {
+    console.error('Ошибка загрузки деталей оценки:', err);
+    showNotification({ 
+      title: 'Ошибка', 
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
+      type: 'error' 
+    });
+  }
+};
 
   const likeReview = async (reviewId) => {
     const token = localStorage.getItem('token');
