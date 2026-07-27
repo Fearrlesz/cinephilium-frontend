@@ -1146,6 +1146,7 @@ function FilmPage() {
   const [currentUser, setCurrentUser] = useState(null);
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
+  const [showUsersModal, setShowUsersModal] = useState(false);
 
   const [base1, setBase1] = useState([5,5,5,5,5]);
   const [base2, setBase2] = useState([5,5,5,5,5]);
@@ -1329,10 +1330,14 @@ function FilmPage() {
     }
   };
 
+    const openUsersModal = () => {
+    setShowUsersModal(true);
+  };
+
   const toggleRatingMode = () => {
     setIsRatingMode(prev => !prev);
   };
-
+   
   const addComment = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -1547,24 +1552,72 @@ function FilmPage() {
           </div>
         </div>
 
-        {usersLoading ? (
-          <div className="loading">Загрузка пользователей...</div>
-        ) : filmUsers.length > 0 ? (
-          <div className="film-users glass-card">
-            <h3>Оценили фильм: {filmUsers.length} человек</h3>
-            <div className="users-list">
-              {filmUsers.map((item) => (
-                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item">
+               {/* ОЦЕНИЛИ ФИЛЬМ */}
+        <div className="film-users glass-card">
+          <div className="film-users-header">
+            <h3>👥 Оценили фильм: <strong>{filmUsers.length}</strong> человек</h3>
+            {filmUsers.length > 0 && (
+              <button className="btn-show-users" onClick={openUsersModal}>
+                👁️ Подробнее
+              </button>
+            )}
+          </div>
+          
+          {usersLoading ? (
+            <div className="loading-users">Загрузка...</div>
+          ) : filmUsers.length === 0 ? (
+            <p className="no-users">Пока никто не оценил этот фильм. Будьте первым! ⭐</p>
+          ) : (
+            <div className="users-preview">
+              {filmUsers.slice(0, 5).map((item) => (
+                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-preview">
                   <Link to={`/user/${item.user._id}`} className="user-link">👤 {item.user.nickname || 'Пользователь'}</Link>
                   <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
                     {item.rating.finalScore}
                   </span>
-                  <button className="details-btn" onClick={() => openRatingDetails(item.rating)}>🔍 Детали</button>
                 </div>
               ))}
+              {filmUsers.length > 5 && (
+                <div className="more-users">и ещё {filmUsers.length - 5} человек...</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* МОДАЛЬНОЕ ОКНО СО ВСЕМИ ОЦЕНКАМИ */}
+        {showUsersModal && (
+          <div className="modal-overlay" onClick={() => setShowUsersModal(false)}>
+            <div className="modal-content users-modal" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
+              <h2>👥 Все оценки фильма</h2>
+              <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
+              
+              <div className="users-modal-list">
+                {filmUsers.map((item) => (
+                  <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
+                    <div className="user-info">
+                      <Link to={`/user/${item.user._id}`} className="user-link">
+                        👤 {item.user.nickname || 'Пользователь'}
+                      </Link>
+                      {item.user.isAdmin && <span className="admin-badge">👑</span>}
+                    </div>
+                    <div className="rating-info">
+                      <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
+                        {item.rating.finalScore}
+                      </span>
+                      <button className="details-btn" onClick={() => {
+                        setShowUsersModal(false);
+                        openRatingDetails(item.rating);
+                      }}>
+                        🔍 Детали
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        ) : null}
+        )}
 
         {isRatingMode && (
           <div className="rating-form glass-card">
