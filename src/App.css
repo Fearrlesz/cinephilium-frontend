@@ -1968,6 +1968,67 @@ body {
 }
 
 /* ============================================================
+   ПОИСКОВЫЕ РЕЗУЛЬТАТЫ (МОБИЛЬНАЯ ВЕРСИЯ)
+   ============================================================ */
+@media (max-width: 768px) {
+  .search-results .films-grid {
+    display: flex !important;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 4px 20px 4px;
+    scroll-behavior: smooth;
+    flex-wrap: nowrap;
+    margin: 0 -4px;
+    position: relative;
+  }
+
+  .search-results .films-grid .film-card {
+    flex: 0 0 160px;
+    min-width: 140px;
+    max-width: 160px;
+    scroll-snap-align: start;
+  }
+
+  .search-results .films-grid .film-card img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+  }
+
+  .search-results .films-grid .film-info h4 {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-results .films-grid .film-info p {
+    font-size: 12px;
+  }
+
+  .search-results .films-grid .btn-add {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  /* Скрываем скроллбар для красоты */
+  .search-results .films-grid::-webkit-scrollbar {
+    height: 3px;
+  }
+  .search-results .films-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .search-results .films-grid::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================
    ОБЩИЕ СОСТОЯНИЯ
    ============================================================ */
 .loading {
