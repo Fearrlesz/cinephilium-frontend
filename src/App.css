@@ -4864,7 +4864,25 @@ textarea {
     align-items: stretch;
     gap: 8px;
   }
-  
+
+/* ============================================================
+   ДОСТИЖЕНИЕ «ПЕРВЫЙ КАДР»
+   ============================================================ */
+.achievement-first-frame {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 165, 0, 0.05));
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.03);
+}
+
+.achievement-first-frame .achievement-icon {
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+  animation: firstFrameGlow 2s ease-in-out infinite;
+}
+
+@keyframes firstFrameGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
   .user-rating-item-full .rating-info {
     justify-content: space-between;
   }
