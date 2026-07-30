@@ -4887,3 +4887,24 @@ textarea {
     justify-content: space-between;
   }
 }
+
+.btn-telegram {
+  padding: 8px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  background: rgba(34, 211, 238, 0.06);
+  color: var(--neon-cyan);
+}
+
+.btn-telegram:hover {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: rgba(34, 211, 238, 0.3);
+  transform: translateY(-2px);
+}
