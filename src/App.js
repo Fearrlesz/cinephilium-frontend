@@ -570,7 +570,7 @@ function Header({ user, onLogout }) {
       <div className="header-actions">
         <Link to="/about" className="btn-about">📖 О системе</Link>
         <Link to="/top" className="btn-top">🏆 Топ</Link>
-        <a href="https:cinephilium//" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
+     <a href="https://t.me/Cinephilium" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
         {user ? (
           <>
             <Link to={`/user/${user._id}`} className="btn-profile">👤 {user.nickname}</Link>
