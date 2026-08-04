@@ -633,12 +633,16 @@ a:hover {
   font-size: 13px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
-  color: var(--text-muted);
-  filter: none;
+  
+  /* Сбрасываем градиент */
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  background: none !important;
+  
+  /* Устанавливаем серый цвет */
+  color: var(--text-muted) !important;
+  filter: none !important;
   opacity: 0.6;
   padding: 2px 12px;
   border: 1px solid rgba(255, 255, 255, 0.04);
