@@ -1218,7 +1218,7 @@ color: var(--text-muted) !important;
   line-height: 1.1;
 }
 
-/* ===== НЕТ ОЦЕНКИ — ФИОЛЕТОВЫЙ (ДРУГОЙ ЦВЕТ) ===== */
+/* ===== НЕТ ОЦЕНКИ — ФИОЛЕТОВЫЙ ===== */
 .preview-score.no-rating {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -1226,7 +1226,8 @@ color: var(--text-muted) !important;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   
-  background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
+  /* ГРАДИЕНТ ДЛЯ ТЕКСТА */
+  background-image: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1236,7 +1237,9 @@ color: var(--text-muted) !important;
   padding: 4px 16px;
   border: 1px solid rgba(139, 92, 246, 0.08);
   border-radius: 30px;
-  background: rgba(139, 92, 246, 0.02);
+  
+  /* ФОН ЭЛЕМЕНТА — ПРОЗРАЧНЫЙ */
+  background-color: transparent;
 }
 
 .preview-score.no-rating:hover {
