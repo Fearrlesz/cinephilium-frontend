@@ -1183,7 +1183,7 @@ color: var(--text-muted) !important;
 }
 
 /* ============================================================
-   ПРЕДПРОСМОТР ОЦЕНКИ — улучшенный (ФИОЛЕТОВЫЙ)
+   ПРЕДПРОСМОТР ОЦЕНКИ — улучшенный
    ============================================================ */
 .rating-preview {
   background: rgba(255, 255, 255, 0.02);
@@ -1200,6 +1200,7 @@ color: var(--text-muted) !important;
   margin-bottom: 8px;
 }
 
+/* ===== ЦИФРА ОЦЕНКИ — ГОЛУБОЙ ===== */
 .preview-score {
   font-family: var(--font-mono);
   font-weight: 800;
@@ -1207,18 +1208,17 @@ color: var(--text-muted) !important;
   font-variant-numeric: tabular-nums;
   margin: 8px 0;
   
-  /* 🟣 ФИОЛЕТОВЫЙ ГРАДИЕНТ */
-  background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-cyan-deep));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   
-  filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.15));
+  filter: drop-shadow(0 0 30px rgba(6, 230, 255, 0.15));
   letter-spacing: -0.03em;
   line-height: 1.1;
 }
 
-/* ===== НЕТ ОЦЕНКИ — ТОТ ЖЕ ФИОЛЕТОВЫЙ ЦВЕТ ===== */
+/* ===== НЕТ ОЦЕНКИ — ФИОЛЕТОВЫЙ (ДРУГОЙ ЦВЕТ) ===== */
 .preview-score.no-rating {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -1226,7 +1226,6 @@ color: var(--text-muted) !important;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   
-  /* 🟣 ТОТ ЖЕ ФИОЛЕТОВЫЙ ГРАДИЕНТ */
   background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
