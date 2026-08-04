@@ -224,21 +224,24 @@ a:hover {
 }
 
 /* ============================================================
-   SCROLLBAR
+   SCROLLBAR (УЛУЧШЕННЫЙ)
    ============================================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-deep);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--neon-purple);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
 }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--neon-purple), var(--neon-cyan));
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-cyan);
+  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+  box-shadow: 0 0 30px rgba(6, 230, 255, 0.2);
 }
 
 /* ============================================================
@@ -594,18 +597,61 @@ a:hover {
   margin: 0;
 }
 
-/* ===== РЕЙТИНГ В КАРТОЧКЕ ===== */
+/* ===== РЕЙТИНГ В КАРТОЧКЕ — улучшенный ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 18px;
   font-variant-numeric: tabular-nums;
   margin-top: 6px;
   padding: 0;
   background: none;
   border-radius: 0;
   letter-spacing: -0.02em;
+  
+  /* ✨ ГРАДИЕНТ ДЛЯ ЦИФРЫ ОЦЕНКИ */
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* ✨ СВЕЧЕНИЕ */
+  filter: drop-shadow(0 0 12px rgba(6, 230, 255, 0.15));
+  transition: all 0.3s ease;
+}
+
+.rating-badge:hover {
+  filter: drop-shadow(0 0 24px rgba(6, 230, 255, 0.3));
+  transform: scale(1.05);
+}
+
+/* ===== НЕТ ОЦЕНКИ — новый стиль ===== */
+.rating-badge.no-rating {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  color: var(--text-muted);
+  filter: none;
+  opacity: 0.6;
+  padding: 2px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.rating-badge.no-rating:hover {
+  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  transform: scale(1.02);
 }
 
 .votes-count {
@@ -615,6 +661,7 @@ a:hover {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
+  opacity: 0.7;
 }
 
 
