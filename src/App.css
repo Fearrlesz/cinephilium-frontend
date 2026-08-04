@@ -805,9 +805,51 @@ a:hover {
 
 .avg-rating {
   font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 32px;
+  font-weight: 800;
+  font-size: 40px;
   font-variant-numeric: tabular-nums;
+  
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  filter: drop-shadow(0 0 24px rgba(6, 230, 255, 0.15));
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.avg-rating.no-rating {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  color: var(--text-muted);
+  filter: none;
+  opacity: 0.5;
+  padding: 4px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.user-rating-display {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  filter: drop-shadow(0 0 16px rgba(244, 114, 182, 0.15));
 }
 
 .your-rating {
@@ -1137,7 +1179,7 @@ a:hover {
 }
 
 /* ============================================================
-   ПРЕДПРОСМОТР ОЦЕНКИ
+   ПРЕДПРОСМОТР ОЦЕНКИ — улучшенный
    ============================================================ */
 .rating-preview {
   background: rgba(255, 255, 255, 0.02);
@@ -1156,11 +1198,34 @@ a:hover {
 
 .preview-score {
   font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 56px;
+  font-weight: 800;
+  font-size: 64px;
   font-variant-numeric: tabular-nums;
   margin: 8px 0;
-  transition: color 0.3s;
+  
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  filter: drop-shadow(0 0 30px rgba(6, 230, 255, 0.1));
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.preview-score.no-rating {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  color: var(--text-muted);
+  filter: none;
+  opacity: 0.5;
 }
 
 .score-bar {
@@ -1213,6 +1278,7 @@ a:hover {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 
 /* ============================================================
    КОММЕНТАРИИ
