@@ -1213,19 +1213,32 @@ a:hover {
   line-height: 1.1;
 }
 
+/* ===== НЕТ ОЦЕНКИ — КРАСНЫЙ ЦВЕТ ===== */
 .preview-score.no-rating {
   font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 28px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
-  color: var(--text-muted);
-  filter: none;
-  opacity: 0.5;
+  
+  /* 🔴 КРАСНЫЙ ГРАДИЕНТ */
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-rose));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  filter: drop-shadow(0 0 30px rgba(244, 114, 182, 0.15));
+  opacity: 0.7;
+  padding: 4px 16px;
+  border: 1px solid rgba(244, 114, 182, 0.08);
+  border-radius: 30px;
+  background: rgba(244, 114, 182, 0.02);
+}
+
+.preview-score.no-rating:hover {
+  opacity: 1;
+  border-color: rgba(244, 114, 182, 0.2);
+  filter: drop-shadow(0 0 40px rgba(244, 114, 182, 0.2));
 }
 
 .score-bar {
@@ -1278,7 +1291,6 @@ a:hover {
   opacity: 0.4;
   cursor: not-allowed;
 }
-
 
 /* ============================================================
    КОММЕНТАРИИ
