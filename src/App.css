@@ -1183,7 +1183,7 @@ color: var(--text-muted) !important;
 }
 
 /* ============================================================
-   ПРЕДПРОСМОТР ОЦЕНКИ — улучшенный
+   ПРЕДПРОСМОТР ОЦЕНКИ — улучшенный (ФИОЛЕТОВЫЙ)
    ============================================================ */
 .rating-preview {
   background: rgba(255, 255, 255, 0.02);
@@ -1207,17 +1207,18 @@ color: var(--text-muted) !important;
   font-variant-numeric: tabular-nums;
   margin: 8px 0;
   
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple-light));
+  /* 🟣 ФИОЛЕТОВЫЙ ГРАДИЕНТ */
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   
-  filter: drop-shadow(0 0 30px rgba(6, 230, 255, 0.1));
+  filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.15));
   letter-spacing: -0.03em;
   line-height: 1.1;
 }
 
-/* ===== НЕТ ОЦЕНКИ — ТОТ ЖЕ ЦВЕТ, ЧТО И У ЦИФРЫ ===== */
+/* ===== НЕТ ОЦЕНКИ — ТОТ ЖЕ ФИОЛЕТОВЫЙ ЦВЕТ ===== */
 .preview-score.no-rating {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -1225,24 +1226,24 @@ color: var(--text-muted) !important;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   
-  /* ✨ ТОТ ЖЕ ГРАДИЕНТ, ЧТО И У ЦИФРЫ */
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple-light));
+  /* 🟣 ТОТ ЖЕ ФИОЛЕТОВЫЙ ГРАДИЕНТ */
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   
-  filter: drop-shadow(0 0 30px rgba(6, 230, 255, 0.1));
+  filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.15));
   opacity: 0.7;
   padding: 4px 16px;
-  border: 1px solid rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.08);
   border-radius: 30px;
-  background: rgba(34, 211, 238, 0.02);
+  background: rgba(139, 92, 246, 0.02);
 }
 
 .preview-score.no-rating:hover {
   opacity: 1;
-  border-color: rgba(34, 211, 238, 0.15);
-  filter: drop-shadow(0 0 40px rgba(6, 230, 255, 0.15));
+  border-color: rgba(139, 92, 246, 0.15);
+  filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.2));
 }
 
 .score-bar {
