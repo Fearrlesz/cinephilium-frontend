@@ -1481,7 +1481,7 @@ return (
           <div className="film-details">
             <h1>{film.title}</h1>
 {isDogville && (
-  <div className="dogville-badge">⭐ Сегодняшний разбор в 20:30</div>
+  <div className="dogville-badge">⭐ Сегодняшний разбор в 20:30 в «Telegram»</div>
 )}
             <p className="film-year">{film.year}</p>
             <p className="film-description">{film.description}</p>
