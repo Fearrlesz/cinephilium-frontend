@@ -5191,7 +5191,11 @@ textarea {
   --dogville-transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* ---- 1. КАРТОЧКА ПОСТЕРА — золотое свечение + парящий эффект ---- */
+/* ============================================================
+   1. СТРАНИЦА ФИЛЬМА (ДОГВИЛЛЬ)
+   ============================================================ */
+
+/* ---- 1.1 КАРТОЧКА ПОСТЕРА — золотое свечение + парящий эффект ---- */
 .film-dogville .film-poster-large {
   position: relative;
   border-radius: var(--dogville-card-radius);
@@ -5202,14 +5206,12 @@ textarea {
     0 0 120px rgba(255, 215, 0, 0.04),
     inset 0 0 60px rgba(255, 215, 0, 0.02);
   transition: all var(--dogville-transition);
-  /* Стеклянный подложка для эффекта глубины */
   background: rgba(10, 10, 10, 0.5);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   overflow: hidden;
 }
 
-/* Декоративное золотое сияние поверх карточки (псевдоэлемент) */
 .film-dogville .film-poster-large::before {
   content: '';
   position: absolute;
@@ -5239,7 +5241,6 @@ textarea {
   opacity: 1;
 }
 
-/* Парящий эффект при наведении */
 .film-dogville .film-poster-large:hover {
   transform: scale(1.015) translateY(-6px);
   border-color: rgba(255, 215, 0, 0.5);
@@ -5250,7 +5251,7 @@ textarea {
     inset 0 0 80px rgba(255, 215, 0, 0.04);
 }
 
-/* ---- 2. СТЕКЛЯННЫЙ БЕЙДЖ (увеличен, с динамическим свечением) ---- */
+/* ---- 1.2 СТЕКЛЯННЫЙ БЕЙДЖ ---- */
 .film-dogville .special-badge {
   display: inline-block;
   margin: 16px 0 24px;
@@ -5266,17 +5267,13 @@ textarea {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    0 0 60px rgba(255, 215, 0, 0.04),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 60px rgba(255, 215, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.1);
   transition: all 0.4s ease;
   animation: dogvilleBadgePulse 2.8s ease-in-out infinite;
   position: relative;
   overflow: hidden;
 }
 
-/* Блик на бейдже */
 .film-dogville .special-badge::after {
   content: '';
   position: absolute;
@@ -5296,9 +5293,7 @@ textarea {
 .film-dogville .special-badge:hover {
   transform: scale(1.03);
   border-color: rgba(255, 215, 0, 0.5);
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3),
-    0 0 80px rgba(255, 215, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.08);
 }
 
 @keyframes dogvilleBadgePulse {
@@ -5314,19 +5309,13 @@ textarea {
   }
 }
 
-/* ---- 3. ЗАГОЛОВОК ФИЛЬМА — улучшенный стеклянный градиент ---- */
+/* ---- 1.3 ЗАГОЛОВОК ФИЛЬМА ---- */
 .film-dogville .film-details h1 {
   font-size: clamp(2.2rem, 5vw, 3.8rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 215, 0, 0.9) 40%,
-    rgba(255, 255, 255, 0.8) 70%,
-    rgba(255, 215, 0, 0.6) 100%
-  );
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 215, 0, 0.9) 40%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 215, 0, 0.6) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -5338,7 +5327,6 @@ textarea {
   filter: drop-shadow(0 4px 40px rgba(255, 215, 0, 0.2));
 }
 
-/* ---- 4. ДЕКОРАТИВНАЯ ЛИНИЯ ПОД ЗАГОЛОВКОМ ---- */
 .film-dogville .film-details h1::after {
   content: '';
   display: block;
@@ -5347,7 +5335,7 @@ textarea {
   margin-top: 12px;
   background: linear-gradient(90deg, var(--dogville-gold), transparent);
   border-radius: 4px;
-  -webkit-text-fill-color: initial; /* сброс для псевдоэлемента */
+  -webkit-text-fill-color: initial;
   opacity: 0.6;
   transition: width 0.6s ease, opacity 0.4s ease;
 }
@@ -5357,7 +5345,7 @@ textarea {
   opacity: 1;
 }
 
-/* ---- 5. ФОНОВОЕ СВЕЧЕНИЕ (атмосферное) ---- */
+/* ---- 1.4 ФОНОВОЕ СВЕЧЕНИЕ ---- */
 .film-dogville {
   position: relative;
   isolation: isolate;
@@ -5380,7 +5368,7 @@ textarea {
   100% { opacity: 0.7; transform: scale(1.02); }
 }
 
-/* ---- 6. МИКРО-АНИМАЦИЯ ПРИ ЗАГРУЗКЕ (появление) ---- */
+/* ---- 1.5 АНИМАЦИЯ ПОЯВЛЕНИЯ ---- */
 .film-dogville .film-poster-large,
 .film-dogville .film-details h1,
 .film-dogville .special-badge {
@@ -5397,7 +5385,7 @@ textarea {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ---- 7. АДАПТИВНОСТЬ (мобильные устройства) ---- */
+/* ---- 1.6 АДАПТИВНОСТЬ ---- */
 @media (max-width: 768px) {
   .film-dogville .film-poster-large {
     border-radius: 14px;
@@ -5429,4 +5417,69 @@ textarea {
     font-size: 11px;
     border-radius: 30px;
   }
+}
+
+/* ============================================================
+   2. ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ (для тех, кто оценил Догвилль)
+   ============================================================ */
+
+/* ---- 2.1 Шапка профиля ---- */
+.profile-dogville .profile-header {
+  border: 2px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
+  background: rgba(255, 215, 0, 0.02);
+  transition: all 0.4s ease;
+}
+
+.profile-dogville .profile-header:hover {
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.08);
+}
+
+/* ---- 2.2 Аватар ---- */
+.profile-dogville .profile-avatar {
+  border: 3px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+  transition: all 0.4s ease;
+}
+
+.profile-dogville .profile-avatar:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+}
+
+/* ---- 2.3 Золотая иконка достижения в имени ---- */
+.dogville-icon {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 20px;
+  animation: goldIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes goldIconPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+/* ---- 2.4 Статус «Окно Овертона» ---- */
+.profile-status {
+  display: inline-block;
+  padding: 4px 14px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 184, 0, 0.04));
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #ffd700;
+  margin: 6px 0 10px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ---- 2.5 Дополнительный глянец для профиля (по желанию) ---- */
+.profile-dogville .profile-info h1 {
+  background: linear-gradient(135deg, #ffffff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
 }
