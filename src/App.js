@@ -1990,8 +1990,7 @@ function ProfilePage() {
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
   const hasDogvilleRating = ratings.some(
-  r => (r.filmId?.title === DOGVILLE_TITLE || r.film?.title === DOGVILLE_TITLE) &&
-       new Date() <= DOGVILLE_DEADLINE
+  r => SPECIAL_FILMS[r.filmId?.title] || SPECIAL_FILMS[r.film?.title]
 );
 
 return (
@@ -2263,11 +2262,9 @@ const openRatingDetails = async (rating) => {
 
   const isOwnProfile = currentUser?._id === user._id;
 
-  const hasDogvilleRating = ratings.some(
-  r => (r.film?.title === DOGVILLE_TITLE || r.filmId?.title === DOGVILLE_TITLE) &&
-       new Date() <= DOGVILLE_DEADLINE
+const hasDogvilleRating = ratings.some(
+  r => SPECIAL_FILMS[r.film?.title] || SPECIAL_FILMS[r.filmId?.title]
 );
-
 return (
   <div className={`container profile-page ${hasDogvilleRating ? 'profile-dogville' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
