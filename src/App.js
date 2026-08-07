@@ -1300,6 +1300,26 @@ function FilmPage() {
       await loadFilmUsers();
       setIsRatingMode(false);
 
+       // ---------- ДОБАВЛЕНИЕ ДОСТИЖЕНИЯ ЗА СПЕЦИАЛЬНЫЙ ФИЛЬМ ----------
+if (isSpecialFilm && filmConfig) {
+  try {
+    await api.post('/achievements/add', {
+      id: filmConfig.id,
+      title: filmConfig.title,
+      icon: filmConfig.icon,
+      description: filmConfig.description
+    });
+    showNotification({
+      title: '🎉 Новое достижение!',
+      message: `Вы получили «${filmConfig.title}»`,
+      type: 'success'
+    });
+  } catch (err) {
+    console.error('Ошибка сохранения достижения:', err);
+  }
+}
+// ---------- КОНЕЦ БЛОКА ----------
+
       if (currentUser && film) {
         await addEvent({
           type: 'rating',
