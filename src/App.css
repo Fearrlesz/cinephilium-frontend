@@ -5177,72 +5177,256 @@ textarea {
 }
 
 /* ============================================================
-   ДОСТИЖЕНИЕ «ПЕРВЫЙ КАДР»
-   ============================================================ */
-.achievement-first-frame {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 165, 0, 0.05));
-  border: 1px solid rgba(255, 215, 0, 0.15);
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.03);
-}
-
-.achievement-first-frame .achievement-icon {
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
-  animation: firstFrameGlow 2s ease-in-out infinite;
-}
-
-@keyframes firstFrameGlow {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.btn-telegram {
-  padding: 8px 20px;
-  border-radius: 40px;
-  text-decoration: none;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: 1px solid rgba(34, 211, 238, 0.15);
-  background: rgba(34, 211, 238, 0.06);
-  color: var(--neon-cyan);
-}
-
-.btn-telegram:hover {
-  background: rgba(34, 211, 238, 0.12);
-  border-color: rgba(34, 211, 238, 0.3);
-  transform: translateY(-2px);
-}
-
-/* ============================================================
-   БЕЙДЖ ДЛЯ ДОГВИЛЛЯ (ПРЕЖНИЙ СТИЛЬ)
+   УНИКАЛЬНЫЙ ДИЗАЙН ДЛЯ «ДОГВИЛЛЯ» — улучшенная версия
    ============================================================ */
 
+/* ---- CSS-ПЕРЕМЕННЫЕ (легкая кастомизация) ---- */
+:root {
+  --dogville-gold: #ffd700;
+  --dogville-gold-dim: rgba(255, 215, 0, 0.3);
+  --dogville-gold-glow: rgba(255, 215, 0, 0.12);
+  --dogville-glass-bg: rgba(255, 255, 255, 0.04);
+  --dogville-glass-border: rgba(255, 215, 0, 0.15);
+  --dogville-card-radius: 20px;
+  --dogville-transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ---- 1. КАРТОЧКА ПОСТЕРА — золотое свечение + парящий эффект ---- */
+.film-dogville .film-poster-large {
+  position: relative;
+  border-radius: var(--dogville-card-radius);
+  border: 1px solid var(--dogville-glass-border);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    0 0 60px var(--dogville-gold-glow),
+    0 0 120px rgba(255, 215, 0, 0.04),
+    inset 0 0 60px rgba(255, 215, 0, 0.02);
+  transition: all var(--dogville-transition);
+  /* Стеклянный подложка для эффекта глубины */
+  background: rgba(10, 10, 10, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  overflow: hidden;
+}
+
+/* Декоративное золотое сияние поверх карточки (псевдоэлемент) */
+.film-dogville .film-poster-large::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    rgba(255, 215, 0, 0.1),
+    transparent 30%,
+    rgba(255, 215, 0, 0.05),
+    transparent 60%,
+    rgba(255, 215, 0, 0.1),
+    transparent
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  animation: dogvilleConicSpin 10s linear infinite;
+}
+
+@keyframes dogvilleConicSpin {
+  to { transform: rotate(360deg); }
+}
+
+.film-dogville .film-poster-large:hover::before {
+  opacity: 1;
+}
+
+/* Парящий эффект при наведении */
+.film-dogville .film-poster-large:hover {
+  transform: scale(1.015) translateY(-6px);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(255, 215, 0, 0.2),
+    0 0 160px rgba(255, 215, 0, 0.08),
+    inset 0 0 80px rgba(255, 215, 0, 0.04);
+}
+
+/* ---- 2. СТЕКЛЯННЫЙ БЕЙДЖ (увеличен, с динамическим свечением) ---- */
 .film-dogville .special-badge {
   display: inline-block;
-  margin: 8px 0 16px;
-  padding: 6px 16px;
-  background: rgba(255, 215, 0, 0.06);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 20px;
-  color: #ffd700;
-  font-size: 12px;
+  margin: 16px 0 24px;
+  padding: 14px 34px;
+  background: var(--dogville-glass-bg);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: 50px;
+  color: var(--dogville-gold);
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  animation: badgePulse 2s ease-in-out infinite;
-  backdrop-filter: blur(4px);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    0 0 60px rgba(255, 215, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.4s ease;
+  animation: dogvilleBadgePulse 2.8s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes badgePulse {
+/* Блик на бейдже */
+.film-dogville .special-badge::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.1), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.film-dogville .special-badge:hover::after {
+  opacity: 1;
+}
+
+.film-dogville .special-badge:hover {
+  transform: scale(1.03);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3),
+    0 0 80px rgba(255, 215, 0, 0.08);
+}
+
+@keyframes dogvilleBadgePulse {
   0%, 100% {
-    opacity: 0.7;
+    opacity: 0.85;
     transform: scale(1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 40px rgba(255, 215, 0, 0.03);
   }
   50% {
     opacity: 1;
     transform: scale(1.02);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25), 0 0 70px rgba(255, 215, 0, 0.08);
+  }
+}
+
+/* ---- 3. ЗАГОЛОВОК ФИЛЬМА — улучшенный стеклянный градиент ---- */
+.film-dogville .film-details h1 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 215, 0, 0.9) 40%,
+    rgba(255, 255, 255, 0.8) 70%,
+    rgba(255, 215, 0, 0.6) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 20px rgba(255, 215, 0, 0.08));
+  transition: filter 0.5s ease;
+}
+
+.film-dogville .film-details h1:hover {
+  filter: drop-shadow(0 4px 40px rgba(255, 215, 0, 0.2));
+}
+
+/* ---- 4. ДЕКОРАТИВНАЯ ЛИНИЯ ПОД ЗАГОЛОВКОМ ---- */
+.film-dogville .film-details h1::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  margin-top: 12px;
+  background: linear-gradient(90deg, var(--dogville-gold), transparent);
+  border-radius: 4px;
+  -webkit-text-fill-color: initial; /* сброс для псевдоэлемента */
+  opacity: 0.6;
+  transition: width 0.6s ease, opacity 0.4s ease;
+}
+
+.film-dogville .film-details h1:hover::after {
+  width: 160px;
+  opacity: 1;
+}
+
+/* ---- 5. ФОНОВОЕ СВЕЧЕНИЕ (атмосферное) ---- */
+.film-dogville {
+  position: relative;
+  isolation: isolate;
+}
+
+.film-dogville::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(255, 215, 0, 0.04), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255, 215, 0, 0.02), transparent 40%);
+  animation: dogvilleBgGlow 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes dogvilleBgGlow {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
+}
+
+/* ---- 6. МИКРО-АНИМАЦИЯ ПРИ ЗАГРУЗКЕ (появление) ---- */
+.film-dogville .film-poster-large,
+.film-dogville .film-details h1,
+.film-dogville .special-badge {
+  animation: dogvilleFadeIn 0.8s ease forwards;
+  opacity: 0;
+}
+
+.film-dogville .film-details h1 { animation-delay: 0.1s; }
+.film-dogville .special-badge   { animation-delay: 0.2s; }
+.film-dogville .film-poster-large { animation-delay: 0.3s; }
+
+@keyframes dogvilleFadeIn {
+  0% { opacity: 0; transform: translateY(12px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---- 7. АДАПТИВНОСТЬ (мобильные устройства) ---- */
+@media (max-width: 768px) {
+  .film-dogville .film-poster-large {
+    border-radius: 14px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3), 0 0 40px var(--dogville-gold-glow);
+  }
+  .film-dogville .special-badge {
+    padding: 10px 24px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+  .film-dogville .film-details h1 {
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+  }
+  .film-dogville .film-details h1::after {
+    width: 60px;
+  }
+  .film-dogville .film-details h1:hover::after {
+    width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .film-dogville .film-poster-large {
+    border-radius: 12px;
+    border-width: 1px;
+  }
+  .film-dogville .special-badge {
+    padding: 8px 18px;
+    font-size: 11px;
+    border-radius: 30px;
   }
 }
