@@ -1904,6 +1904,7 @@ function ProfilePage() {
       setUser(userData);
       setRatings(ratingsResponse.data || []);
       setReviews(reviewsResponse.data || []);
+      await loadAchievements();
       await loadAchievementProgress(userData);
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
@@ -1921,6 +1922,42 @@ function ProfilePage() {
     navigate('/');
     showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });
   };
+const loadAchievements = async () => {
+  try {
+    const response = await api.get('/achievements');
+    setUser(prev => ({
+      ...prev,
+      achievements: response.data
+    }));
+  } catch (err) {
+    console.error('Ошибка загрузки достижений:', err);
+  }
+};
+
+const activateAchievement = async (id) => {
+  try {
+    await api.post('/achievements/activate', { id });
+    setUser(prev => ({
+      ...prev,
+      achievements: {
+        ...prev.achievements,
+        active: id
+      }
+    }));
+    showNotification({ 
+      title: 'Достижение выбрано!', 
+      message: 'Оно теперь отображается в вашем профиле', 
+      type: 'success' 
+    });
+  } catch (err) {
+    showNotification({ 
+      title: 'Ошибка', 
+      message: 'Не удалось выбрать достижение', 
+      type: 'error' 
+    });
+  }
+};
+   
 
   const openRatingDetails = async (rating) => {
   try {
@@ -2019,22 +2056,72 @@ return (
           </div>
 
           <div className="achievements-section" style={{ marginTop: '20px' }}>
-            <h3>🏅 Достижения</h3>
-            {user.achievements?.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
-                {user.achievements.map(ach => (
-                  <div key={ach} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    <span style={{ fontSize: '24px' }}>🏅</span>
-                    <div>
-                      <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
-                    </div>
-                  </div>
-                ))}
+  <h3>🏅 Достижения</h3>
+  
+  {/* Активное достижение */}
+  {user.achievements?.active && (
+    <div style={{
+      padding: '16px 20px',
+      marginBottom: '16px',
+      background: 'rgba(255,215,0,0.05)',
+      borderRadius: '12px',
+      border: '2px solid rgba(255,215,0,0.2)',
+      textAlign: 'center'
+    }}>
+      <span style={{ fontSize: '32px' }}>
+        {user.achievements.all?.find(a => a.id === user.achievements.active)?.icon || '🏅'}
+      </span>
+      <h4 style={{ margin: '4px 0', color: '#ffd700' }}>
+        {user.achievements.all?.find(a => a.id === user.achievements.active)?.title || 'Нет достижения'}
+      </h4>
+      <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+        {user.achievements.all?.find(a => a.id === user.achievements.active)?.description || ''}
+      </p>
+      <span style={{ fontSize: '11px', color: '#ffd700' }}>⭐ Активно сейчас</span>
+    </div>
+  )}
+
+  {/* Все достижения */}
+  {user.achievements?.all?.length > 0 ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+      {user.achievements.all.map(ach => {
+        const isActive = ach.id === user.achievements.active;
+        return (
+          <div key={ach.id} style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+            background: isActive ? 'rgba(255,215,0,0.06)' : 'rgba(255,255,255,0.02)',
+            border: isActive ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.04)',
+            borderRadius: '10px',
+            cursor: isActive ? 'default' : 'pointer',
+            transition: 'all 0.3s'
+          }} onClick={() => !isActive && activateAchievement(ach.id)}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '24px' }}>{ach.icon || '🏅'}</span>
+              <div>
+                <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach.title}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{ach.description}</div>
               </div>
-            ) : (
-              <p style={{ color: '#888', padding: '10px 0' }}>Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!</p>
-            )}
+            </div>
+            <div style={{ fontSize: '13px', fontWeight: '600' }}>
+              {isActive ? (
+                <span style={{ color: '#ffd700' }}>✅ Активно</span>
+              ) : (
+                <span style={{ color: 'var(--text-muted)' }}>💠 Выбрать</span>
+              )}
+            </div>
           </div>
+        );
+      })}
+    </div>
+  ) : (
+    <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
+      Нет достижений. Участвуйте в разборах!
+    </p>
+  )}
+</div>
 
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
