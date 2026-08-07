@@ -5217,75 +5217,32 @@ textarea {
 }
 
 /* ============================================================
-   УНИКАЛЬНЫЙ ДИЗАЙН ДЛЯ ДОГВИЛЛЯ (через film-dogville)
+   БЕЙДЖ ДЛЯ ДОГВИЛЛЯ (ПРЕЖНИЙ СТИЛЬ)
    ============================================================ */
 
-/* Золотой бейдж */
 .film-dogville .special-badge {
   display: inline-block;
   margin: 8px 0 16px;
-  padding: 10px 24px;
-  background: linear-gradient(135deg, #ffd700, #f59e0b);
-  border: none;
-  border-radius: 30px;
-  color: #0a0a12;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  padding: 6px 16px;
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 20px;
+  color: #ffd700;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
-  animation: dogvilleBadgeGlow 2s ease-in-out infinite;
+  animation: badgePulse 2s ease-in-out infinite;
+  backdrop-filter: blur(4px);
 }
 
-@keyframes dogvilleBadgeGlow {
+@keyframes badgePulse {
   0%, 100% {
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+    opacity: 0.7;
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 60px rgba(255, 215, 0, 0.4);
+    opacity: 1;
     transform: scale(1.02);
   }
-}
-
-/* Золотой заголовок */
-.film-dogville .film-details h1 {
-  background: linear-gradient(135deg, #ffd700, #ffb800, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: dogvilleGoldShift 4s ease-in-out infinite;
-}
-
-@keyframes dogvilleGoldShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Золотая рамка постера */
-.film-dogville .film-poster-large {
-  border: 3px solid #ffd700;
-  box-shadow: 0 0 60px rgba(255, 215, 0, 0.15);
-  transition: all 0.5s ease;
-}
-
-.film-dogville .film-poster-large:hover {
-  border-color: #f59e0b;
-  box-shadow: 0 0 80px rgba(255, 215, 0, 0.3);
-}
-
-/* Золотое свечение фона */
-.film-dogville::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse at 50% 50%, rgba(255, 215, 0, 0.04), transparent 70%);
-  animation: dogvilleGlow 4s ease-in-out infinite;
-}
-
-@keyframes dogvilleGlow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
 }
