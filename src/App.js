@@ -17,13 +17,7 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
-
-// ============================================================
-// СПЕЦИАЛЬНЫЕ АКЦИИ
-// ============================================================
-
-const DOGVILLE_TITLE = 'Догвилль';
-const DOGVILLE_DEADLINE = new Date('2026-08-07T23:59:59+03:00');
+import { SPECIAL_FILMS, SPECIAL_FILM_TITLES } from './constants';
 
 // ============================================================
 // CONSTANTS
