@@ -19,6 +19,13 @@ import axios from 'axios';
 import './App.css';
 
 // ============================================================
+// СПЕЦИАЛЬНЫЕ АКЦИИ
+// ============================================================
+
+const DOGVILLE_TITLE = 'Догвилль';
+const DOGVILLE_DEADLINE = new Date('2026-08-07T23:59:59+03:00');
+
+// ============================================================
 // CONSTANTS
 // ============================================================
 
@@ -1462,15 +1469,20 @@ function FilmPage() {
 
   const previewScore = calculatePreview();
 
-  return (
-    <div className="container">
-      <div className="film-page">
+  const isDogville = film?.title === DOGVILLE_TITLE;
+
+return (
+  <div className="container">
+    <div className={`film-page ${isDogville ? 'film-page-dogville' : ''}`}>
         <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
         <div className="film-header">
           <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="film-poster-large" />
           <div className="film-details">
             <h1>{film.title}</h1>
+{isDogville && (
+  <div className="dogville-badge">⭐ Сегодняшний разбор в 20:30</div>
+)}
             <p className="film-year">{film.year}</p>
             <p className="film-description">{film.description}</p>
             <p><strong>Режиссёр:</strong> {film.director}</p>
@@ -1981,8 +1993,13 @@ function ProfilePage() {
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
-  return (
-    <div className="container profile-page">
+  const hasDogvilleRating = ratings.some(
+  r => (r.filmId?.title === DOGVILLE_TITLE || r.film?.title === DOGVILLE_TITLE) &&
+       new Date() <= DOGVILLE_DEADLINE
+);
+
+return (
+    <div className={`container profile-page ${hasDogvilleRating ? 'profile-dogville' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
       <div className="profile-header glass-card">
@@ -1991,9 +2008,13 @@ function ProfilePage() {
         </div>
         <div className="profile-info">
           <h1>
-            {user.nickname || 'Пользователь'}
-            {user.isAdmin && <span className="admin-badge"> 👑</span>}
-          </h1>
+  {user.nickname || 'Пользователь'}
+  {user.isAdmin && <span className="admin-badge"> 👑</span>}
+  {hasDogvilleRating && <span className="dogville-icon">⭐</span>}
+</h1>
+{hasDogvilleRating && (
+  <div className="profile-status">🏆 «Окно Овертона» — оценка Догвилля</div>
+)}
           <p>📧 {user.email}</p>
           <div className="profile-stats">
             <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
@@ -2246,8 +2267,13 @@ const openRatingDetails = async (rating) => {
 
   const isOwnProfile = currentUser?._id === user._id;
 
-  return (
-    <div className="container profile-page">
+  const hasDogvilleRating = ratings.some(
+  r => (r.film?.title === DOGVILLE_TITLE || r.filmId?.title === DOGVILLE_TITLE) &&
+       new Date() <= DOGVILLE_DEADLINE
+);
+
+return (
+  <div className={`container profile-page ${hasDogvilleRating ? 'profile-dogville' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
       <div className="profile-header glass-card">
@@ -2256,9 +2282,13 @@ const openRatingDetails = async (rating) => {
         </div>
         <div className="profile-info">
           <h1>
-            {user.nickname || 'Пользователь'}
-            {user.isAdmin && <span className="admin-badge"> 👑</span>}
-          </h1>
+  {user.nickname || 'Пользователь'}
+  {user.isAdmin && <span className="admin-badge"> 👑</span>}
+  {hasDogvilleRating && <span className="dogville-icon">⭐</span>}
+</h1>
+{hasDogvilleRating && (
+  <div className="profile-status">🏆 «Окно Овертона» — оценка Догвилля</div>
+)}
           <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
           <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
           <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
