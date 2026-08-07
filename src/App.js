@@ -1463,7 +1463,9 @@ function FilmPage() {
 
   const previewScore = calculatePreview();
 
-  const isDogville = film?.title === DOGVILLE_TITLE;
+  const filmConfig = SPECIAL_FILMS[film?.title];
+const isSpecialFilm = !!filmConfig;
+const cssClass = filmConfig?.cssClass || '';
 
 return (
   <div className="container">
