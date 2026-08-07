@@ -1469,15 +1469,15 @@ const cssClass = filmConfig?.cssClass || '';
 
 return (
   <div className="container">
-    <div className={`film-page ${isDogville ? 'film-page-dogville' : ''}`}>
+    <div className={`film-page ${isSpecialFilm ? 'film-page-special ' + cssClass : ''}`}>
         <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
         <div className="film-header">
           <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="film-poster-large" />
           <div className="film-details">
             <h1>{film.title}</h1>
-{isDogville && (
-  <div className="dogville-badge">⭐ Доступен разбор в «Telegram»</div>
+{isSpecialFilm && (
+  <div className="special-badge">⭐ Доступен разбор в «Telegram»</div>
 )}
             <p className="film-year">{film.year}</p>
             <p className="film-description">{film.description}</p>
