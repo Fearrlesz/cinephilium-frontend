@@ -1957,7 +1957,6 @@ function ProfilePage() {
       setUser(userData);
       setRatings(ratingsResponse.data || []);
       setReviews(reviewsResponse.data || []);
-      await loadAchievements();
       await loadAchievementProgress(userData);
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
