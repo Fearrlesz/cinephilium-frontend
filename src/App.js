@@ -2082,7 +2082,7 @@ const activeSpecial = useMemo(() => {
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
 return (
-    <div className={`container profile-page ${hasDogvilleRating ? 'profile-dogville' : ''}`}>
+    <div className={`container profile-page ${activeSpecial ? 'profile-dogville' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
       <div className="profile-header glass-card">
@@ -2109,31 +2109,6 @@ return (
           <div className="achievements-section" style={{ marginTop: '20px' }}>
   <h3>🏅 Достижения</h3>
   
-  {/* Активное достижение */}
-  {user.achievements?.active && (
-    <div style={{
-      padding: '16px 20px',
-      marginBottom: '16px',
-      background: 'rgba(255,215,0,0.05)',
-      borderRadius: '12px',
-      border: '2px solid rgba(255,215,0,0.2)',
-      textAlign: 'center'
-    }}>
-      <span style={{ fontSize: '32px' }}>
-        {user.achievements.all?.find(a => a.id === user.achievements.active)?.icon || '🏅'}
-      </span>
-      <h4 style={{ margin: '4px 0', color: '#ffd700' }}>
-        {user.achievements.all?.find(a => a.id === user.achievements.active)?.title || 'Нет достижения'}
-      </h4>
-      <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-        {user.achievements.all?.find(a => a.id === user.achievements.active)?.description || ''}
-      </p>
-      <span style={{ fontSize: '11px', color: '#ffd700' }}>⭐ Активно сейчас</span>
-    </div>
-  )}
-
-<div className="achievements-section" style={{ marginTop: '20px' }}>
-  <h3>🏅 Достижения</h3>
 
   {/* Активное особое достижение */}
   {activeSpecial && (
