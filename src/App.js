@@ -6,7 +6,7 @@
    - Kept original structure and intent
 */
 
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext, useMemo } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,7 +18,6 @@ import {
 import axios from 'axios';
 import './App.css';
 import { SPECIAL_FILMS, SPECIAL_FILM_TITLES } from './constants';
-import React, { useState, useEffect, useCallback, createContext, useContext, useMemo } from 'react';
 
 // ============================================================
 // CONSTANTS
