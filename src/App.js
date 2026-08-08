@@ -18,6 +18,7 @@ import {
 import axios from 'axios';
 import './App.css';
 import { SPECIAL_FILMS, SPECIAL_FILM_TITLES } from './constants';
+import React, { useState, useEffect, useCallback, createContext, useContext, useMemo } from 'react';
 
 // ============================================================
 // CONSTANTS
@@ -1302,20 +1303,32 @@ function FilmPage() {
 
        // ---------- ДОБАВЛЕНИЕ ДОСТИЖЕНИЯ ЗА СПЕЦИАЛЬНЫЙ ФИЛЬМ ----------
 if (isSpecialFilm && filmConfig) {
-  try {
-    await api.post('/achievements/add', {
-      id: filmConfig.id,
-      title: filmConfig.title,
-      icon: filmConfig.icon,
-      description: filmConfig.description
-    });
+  const now = new Date();
+  const deadline = filmConfig.deadline ? new Date(filmConfig.deadline) : null;
+
+  if (deadline && now <= deadline) {
+    try {
+      await api.post('/achievements/add', {
+        id: filmConfig.id,
+        title: filmConfig.title,
+        icon: filmConfig.icon,
+        description: filmConfig.description
+      });
+      showNotification({
+        title: '🎉 Новое достижение!',
+        message: `Вы получили «${filmConfig.title}»`,
+        type: 'success'
+      });
+    } catch (err) {
+      console.error('Ошибка сохранения достижения:', err);
+    }
+  } else if (deadline) {
+    // Акция завершена – уведомление (опционально)
     showNotification({
-      title: '🎉 Новое достижение!',
-      message: `Вы получили «${filmConfig.title}»`,
-      type: 'success'
+      title: 'Акция завершена',
+      message: `Достижение «${filmConfig.title}» больше не выдаётся`,
+      type: 'info'
     });
-  } catch (err) {
-    console.error('Ошибка сохранения достижения:', err);
   }
 }
 // ---------- КОНЕЦ БЛОКА ----------
@@ -2054,13 +2067,20 @@ const activateAchievement = async (id) => {
   };
 
   const avgRating = ratings.length ? (ratings.reduce((sum,r)=>sum+r.finalScore,0)/ratings.length).toFixed(1) : 'Нет';
+// Вычисляем особые достижения (только те, что есть в user.achievements.all)
+const specialAchievements = useMemo(() => {
+  if (!user?.achievements?.all) return [];
+  return user.achievements.all.filter(ach =>
+    Object.values(SPECIAL_FILMS).some(sf => sf.id === ach.id)
+  );
+}, [user?.achievements?.all]);
 
+const activeSpecial = useMemo(() => {
+  if (!user?.achievements?.active) return null;
+  return specialAchievements.find(a => a.id === user.achievements.active) || null;
+}, [user?.achievements?.active, specialAchievements]);
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
-
-  const hasDogvilleRating = ratings.some(
-  r => SPECIAL_FILMS[r.filmId?.title] || SPECIAL_FILMS[r.film?.title]
-);
 
 return (
     <div className={`container profile-page ${hasDogvilleRating ? 'profile-dogville' : ''}`}>
@@ -2074,10 +2094,10 @@ return (
           <h1>
   {user.nickname || 'Пользователь'}
   {user.isAdmin && <span className="admin-badge"> 👑</span>}
-  {hasDogvilleRating && <span className="dogville-icon">⭐</span>}
+  {activeSpecial && <span className="dogville-icon">{activeSpecial.icon}</span>}
 </h1>
-{hasDogvilleRating && (
-  <div className="profile-status">🏆 «Окно Овертона» — оценка Догвилля</div>
+{activeSpecial && (
+  <div className="profile-status">🏆 {activeSpecial.title}</div>
 )}
           <p>📧 {user.email}</p>
           <div className="profile-stats">
@@ -2113,41 +2133,101 @@ return (
     </div>
   )}
 
-  {/* Все достижения */}
-  {user.achievements?.all?.length > 0 ? (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
-      {user.achievements.all.map(ach => {
-        const isActive = ach.id === user.achievements.active;
-        return (
-          <div key={ach.id} style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
-            background: isActive ? 'rgba(255,215,0,0.06)' : 'rgba(255,255,255,0.02)',
-            border: isActive ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.04)',
-            borderRadius: '10px',
-            cursor: isActive ? 'default' : 'pointer',
-            transition: 'all 0.3s'
-          }} onClick={() => !isActive && activateAchievement(ach.id)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '24px' }}>{ach.icon || '🏅'}</span>
-              <div>
-                <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach.title}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{ach.description}</div>
+<div className="achievements-section" style={{ marginTop: '20px' }}>
+  <h3>🏅 Достижения</h3>
+
+  {/* Активное особое достижение */}
+  {activeSpecial && (
+    <div style={{
+      padding: '16px 20px',
+      marginBottom: '16px',
+      background: 'rgba(255,215,0,0.05)',
+      borderRadius: '12px',
+      border: '2px solid rgba(255,215,0,0.2)',
+      textAlign: 'center'
+    }}>
+      <span style={{ fontSize: '32px' }}>{activeSpecial.icon}</span>
+      <h4 style={{ margin: '4px 0', color: '#ffd700' }}>{activeSpecial.title}</h4>
+      <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{activeSpecial.description}</p>
+      <span style={{ fontSize: '11px', color: '#ffd700' }}>⭐ Активно сейчас</span>
+    </div>
+  )}
+
+  {/* Список особых достижений (для выбора) */}
+  {specialAchievements.length > 0 && (
+    <div style={{ marginTop: '12px' }}>
+      <h4 style={{ fontSize: '16px', marginBottom: '8px' }}>⭐ Особенные</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {specialAchievements.map(ach => {
+          const isActive = ach.id === user?.achievements?.active;
+          return (
+            <div
+              key={ach.id}
+              onClick={() => !isActive && activateAchievement(ach.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 16px',
+                background: isActive ? 'rgba(255,215,0,0.06)' : 'rgba(255,255,255,0.02)',
+                border: isActive ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.04)',
+                borderRadius: '10px',
+                cursor: isActive ? 'default' : 'pointer',
+                transition: 'all 0.3s'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '24px' }}>{ach.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach.title}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{ach.description}</div>
+                </div>
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: '600' }}>
+                {isActive ? (
+                  <span style={{ color: '#ffd700' }}>✅ Активно</span>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)' }}>💠 Выбрать</span>
+                )}
               </div>
             </div>
-            <div style={{ fontSize: '13px', fontWeight: '600' }}>
-              {isActive ? (
-                <span style={{ color: '#ffd700' }}>✅ Активно</span>
-              ) : (
-                <span style={{ color: 'var(--text-muted)' }}>💠 Выбрать</span>
-              )}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
+  )}
+
+  {/* Обычные достижения (все остальные) */}
+  {user.achievements?.all?.length > 0 && (
+    <div style={{ marginTop: '12px' }}>
+      <h4 style={{ fontSize: '16px', marginBottom: '8px' }}>📜 Обычные</h4>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        {user.achievements.all
+          .filter(ach => !Object.values(SPECIAL_FILMS).some(sf => sf.id === ach.id))
+          .map(ach => (
+            <span key={ach.id} style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '4px 10px',
+              background: 'rgba(255,255,255,0.08)',
+              borderRadius: '20px',
+              fontSize: '13px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              {ach.icon || '🏅'} {ach.title}
+            </span>
+          ))}
+      </div>
+    </div>
+  )}
+
+  {(!user.achievements?.all || user.achievements.all.length === 0) && (
+    <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
+      Нет достижений. Участвуйте в разборах!
+    </p>
+  )}
+</div>
   ) : (
     <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
       Нет достижений. Участвуйте в разборах!
