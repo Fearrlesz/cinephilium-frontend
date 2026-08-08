@@ -1882,36 +1882,45 @@ function ProfilePage() {
   }, [navigate]);
 
   const loadAchievementProgress = async (userData) => {
-    try {
-      const response = await api.get('/users/me/achievements');
-      setAchievementProgress(response.data);
+  try {
+    const response = await api.get('/users/me/achievements');
+    setAchievementProgress(response.data);
 
-      if (response.data?.achievements) {
-        const oldAchievements = userData?.achievements || [];
-        const newAchievements = response.data.achievements;
-        const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+    if (response.data?.achievements) {
+      // ✅ ИЗМЕНЕНИЕ: достаём из prev.achievements.all
+      const oldAchievements = userData?.achievements?.all || [];
+      const newAchievements = response.data.achievements;
+      const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
 
-        if (freshAchievements.length > 0) {
-          try {
-            await addEvent({
-              type: 'achievement',
-              user: userData?.nickname || 'Пользователь',
-              film: 'система',
-              filmId: 'system',
-              metadata: { achievements: freshAchievements }
-            });
-            console.log('Событие о достижениях создано:', freshAchievements);
-          } catch (err) {
-            console.error('Ошибка создания события о достижениях:', err);
-          }
+      if (freshAchievements.length > 0) {
+        try {
+          await addEvent({
+            type: 'achievement',
+            user: userData?.nickname || 'Пользователь',
+            film: 'система',
+            filmId: 'system',
+            metadata: { achievements: freshAchievements }
+          });
+          console.log('Событие о достижениях создано:', freshAchievements);
+        } catch (err) {
+          console.error('Ошибка создания события о достижениях:', err);
         }
-
-        setUser(prev => ({ ...prev, achievements: newAchievements, totalPoints: response.data.totalPoints || prev?.totalPoints }));
       }
-    } catch (err) {
-      console.error('Ошибка загрузки прогресса достижений:', err);
+
+      // ✅ ИЗМЕНЕНИЕ: сохраняем как объект { all, active }
+      setUser(prev => ({ 
+        ...prev, 
+        achievements: {
+          all: newAchievements,
+          active: response.data.active || null
+        },
+        totalPoints: response.data.totalPoints || prev?.totalPoints 
+      }));
     }
-  };
+  } catch (err) {
+    console.error('Ошибка загрузки прогресса достижений:', err);
+  }
+};
 
   const loadProfile = async () => {
     try {
@@ -1947,7 +1956,10 @@ const loadAchievements = async () => {
     const response = await api.get('/achievements');
     setUser(prev => ({
       ...prev,
-      achievements: response.data
+      achievements: {
+        all: response.data,                      // ✅ массив всех достижений
+        active: prev.achievements?.active || null // ✅ сохраняем активное
+      }
     }));
   } catch (err) {
     console.error('Ошибка загрузки достижений:', err);
