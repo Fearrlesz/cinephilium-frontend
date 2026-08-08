@@ -2202,12 +2202,6 @@ return (
     </p>
   )}
 </div>
-  ) : (
-    <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
-      Нет достижений. Участвуйте в разборах!
-    </p>
-  )}
-</div>
 
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
