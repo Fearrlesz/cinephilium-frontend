@@ -1899,10 +1899,42 @@ function ProfilePage() {
     setAchievementProgress(response.data);
 
     if (response.data?.achievements) {
-      // ✅ ИЗМЕНЕНИЕ: достаём из prev.achievements.all
+      // 1️⃣ Старые достижения – массив объектов
       const oldAchievements = userData?.achievements?.all || [];
-      const newAchievements = response.data.achievements;
-      const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+
+      // 2️⃣ Новые достижения (сырые данные) – массив строк или объектов
+      const rawAchievements = response.data.achievements;
+
+      // 3️⃣ Преобразуем в массив объектов с полями id, title, icon, description
+      const newAchievements = rawAchievements.map(ach => {
+        // Если уже объект с id – оставляем как есть
+        if (typeof ach === 'object' && ach !== null && ach.id) {
+          return ach;
+        }
+
+        // Если это строка – ищем в SPECIAL_FILMS
+        if (typeof ach === 'string') {
+          const special = Object.values(SPECIAL_FILMS).find(sf => sf.id === ach);
+          if (special) {
+            return {
+              id: special.id,
+              title: special.title,
+              icon: special.icon || '🏅',
+              description: special.description || ''
+            };
+          }
+          // Если не особое – создаём заглушку (чтобы не сломать рендер)
+          return { id: ach, title: ach, icon: '🏅', description: '' };
+        }
+
+        return ach; // fallback
+      });
+
+      // 4️⃣ Находим только что добавленные (для события)
+      const oldIds = oldAchievements.map(a => a.id);
+      const freshAchievements = newAchievements
+        .filter(ach => !oldIds.includes(ach.id))
+        .map(ach => ach.title || ach.id);
 
       if (freshAchievements.length > 0) {
         try {
@@ -1919,14 +1951,14 @@ function ProfilePage() {
         }
       }
 
-      // ✅ ИЗМЕНЕНИЕ: сохраняем как объект { all, active }
-      setUser(prev => ({ 
-        ...prev, 
+      // 5️⃣ Сохраняем как объект { all, active }
+      setUser(prev => ({
+        ...prev,
         achievements: {
           all: newAchievements,
           active: response.data.active || null
         },
-        totalPoints: response.data.totalPoints || prev?.totalPoints 
+        totalPoints: response.data.totalPoints || prev?.totalPoints
       }));
     }
   } catch (err) {
