@@ -20,6 +20,25 @@ import './App.css';
 import { SPECIAL_FILMS, SPECIAL_FILM_TITLES } from './constants';
 
 // ============================================================
+// СПЕЦИАЛЬНЫЕ ДОСТИЖЕНИЯ
+// ============================================================
+
+const SPECIAL_ACHIEVEMENTS = {
+  'dogville': {
+    id: 'dogville',
+    title: '🐕 Окно Овертона',
+    icon: '🐕',
+    description: 'Оценка фильма «Догвилль» в срок'
+  },
+  'first_frame': {
+    id: 'first_frame',
+    title: '🎬 Первый кадр',
+    icon: '🎬',
+    description: 'Быть среди первых 100 пользователей'
+  }
+};
+
+// ============================================================
 // CONSTANTS
 // ============================================================
 
@@ -1300,37 +1319,6 @@ function FilmPage() {
       await loadFilmUsers();
       setIsRatingMode(false);
 
-       // ---------- ДОБАВЛЕНИЕ ДОСТИЖЕНИЯ ЗА СПЕЦИАЛЬНЫЙ ФИЛЬМ ----------
-if (isSpecialFilm && filmConfig) {
-  const now = new Date();
-  const deadline = filmConfig.deadline ? new Date(filmConfig.deadline) : null;
-
-  if (deadline && now <= deadline) {
-    try {
-      await api.post('/achievements/add', {
-        id: filmConfig.id,
-        title: filmConfig.title,
-        icon: filmConfig.icon,
-        description: filmConfig.description
-      });
-      showNotification({
-        title: '🎉 Новое достижение!',
-        message: `Вы получили «${filmConfig.title}»`,
-        type: 'success'
-      });
-    } catch (err) {
-      console.error('Ошибка сохранения достижения:', err);
-    }
-  } else if (deadline) {
-    // Акция завершена – уведомление (опционально)
-    showNotification({
-      title: 'Акция завершена',
-      message: `Достижение «${filmConfig.title}» больше не выдаётся`,
-      type: 'info'
-    });
-  }
-}
-// ---------- КОНЕЦ БЛОКА ----------
 
       if (currentUser && film) {
         await addEvent({
