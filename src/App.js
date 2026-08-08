@@ -102,7 +102,7 @@ const MAX_SCORE = 90;
 
 const api = axios.create({
   baseURL: 'https://cinephilium-backend.onrender.com/api',
-  timeout: 10000
+  timeout: 30000
 });
 
 api.interceptors.response.use(
@@ -2080,9 +2080,10 @@ const activateAchievement = async (id) => {
 // Вычисляем особые достижения (только те, что есть в user.achievements.all)
 const specialAchievements = useMemo(() => {
   if (!user?.achievements?.all) return [];
-  return user.achievements.all.filter(ach =>
-    Object.values(SPECIAL_FILMS).some(sf => sf.id === ach.id)
-  );
+  return user.achievements.all.filter(ach => {
+    const achId = typeof ach === 'string' ? ach : ach.id;
+    return SPECIAL_ACHIEVEMENTS[achId] !== undefined;
+  });
 }, [user?.achievements?.all]);
 
 const activeSpecial = useMemo(() => {
@@ -2187,19 +2188,30 @@ return (
     <div style={{ marginTop: '12px' }}>
       <h4 style={{ fontSize: '16px', marginBottom: '8px' }}>📜 Обычные</h4>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-        {user.achievements.all
-          .filter(ach => !Object.values(SPECIAL_FILMS).some(sf => sf.id === ach.id))
-          .map(ach => (
-            <span key={ach.id} style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '4px 10px',
-              background: 'rgba(255,255,255,0.08)',
-              borderRadius: '20px',
-              fontSize: '13px',
-              border: '1px solid rgba(255,255,255,0.1)'
-            }}>
+       {user.achievements.all
+  .filter(ach => {
+    const achId = typeof ach === 'string' ? ach : ach.id;
+    return !SPECIAL_ACHIEVEMENTS[achId];
+  })
+  .map(ach => {
+    const achObj = typeof ach === 'string' 
+      ? { id: ach, title: ach, icon: '🏅', description: '' } 
+      : ach;
+    return (
+      <span key={achObj.id} style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '5px',
+        padding: '4px 10px',
+        background: 'rgba(255,255,255,0.08)',
+        borderRadius: '20px',
+        fontSize: '13px',
+        border: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        {achObj.icon || '🏅'} {achObj.title}
+      </span>
+    );
+  })} 
               {ach.icon || '🏅'} {ach.title}
             </span>
           ))}
