@@ -5483,3 +5483,179 @@ textarea {
   background-clip: text;
   display: inline-block;
 }
+/* ============================================================
+   ДОСТИЖЕНИЯ — РАСШИРЕННЫЙ ДИЗАЙН
+   ============================================================ */
+
+/* ----- Заголовки секций ----- */
+.achievements-section h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
+  margin: 12px 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.achievements-section h4:first-of-type {
+  margin-top: 0;
+}
+
+/* ----- Контейнер списка особых достижений ----- */
+.achievements-section .special-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* ----- Карточка особого достижения ----- */
+.achievement-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.achievement-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+}
+
+.achievement-card.active {
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(255, 215, 0, 0.2);
+  cursor: default;
+}
+
+.achievement-card.active:hover {
+  transform: none;
+}
+
+/* ----- Левая часть карточки (иконка + текст) ----- */
+.achievement-card .ach-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.achievement-card .ach-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.achievement-card .ach-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.achievement-card .ach-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: color 0.3s;
+}
+
+.achievement-card:not(.active):hover .ach-title {
+  color: var(--neon-cyan);
+}
+
+.achievement-card .ach-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* ----- Правая часть (статус) ----- */
+.achievement-card .ach-status {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.achievement-card .ach-status.active {
+  color: #ffd700;
+}
+
+.achievement-card .ach-status.inactive {
+  color: var(--text-muted);
+}
+
+/* ----- Значки обычных достижений (как в JSX) ----- */
+.achievement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.achievement-badge:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ----- Контейнер для списка обычных достижений (Flex-wrap) ----- */
+.achievements-section .ordinary-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ
+   ============================================================ */
+@media (max-width: 768px) {
+  .achievement-card {
+    padding: 10px 14px;
+  }
+
+  .achievement-card .ach-icon {
+    font-size: 20px;
+  }
+
+  .achievement-card .ach-title {
+    font-size: 13px;
+  }
+
+  .achievement-card .ach-desc {
+    font-size: 11px;
+  }
+
+  .achievement-card .ach-status {
+    font-size: 12px;
+  }
+
+  .achievement-badge {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievement-card {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .achievement-card .ach-left {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .achievement-card .ach-status {
+    margin-left: auto;
+  }
+}
