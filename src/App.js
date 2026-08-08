@@ -1887,38 +1887,32 @@ function ProfilePage() {
     setAchievementProgress(response.data);
 
     if (response.data?.achievements) {
-      // 1️⃣ Старые достижения – массив объектов
       const oldAchievements = userData?.achievements?.all || [];
-
-      // 2️⃣ Новые достижения (сырые данные) – массив строк или объектов
       const rawAchievements = response.data.achievements;
 
-      // 3️⃣ Преобразуем в массив объектов с полями id, title, icon, description
+      // ✅ ПРЕОБРАЗУЕМ СТРОКИ В ОБЪЕКТЫ
       const newAchievements = rawAchievements.map(ach => {
-        // Если уже объект с id – оставляем как есть
+        // Если уже объект с id – оставляем
         if (typeof ach === 'object' && ach !== null && ach.id) {
           return ach;
         }
 
-        // Если это строка – ищем в SPECIAL_FILMS
+        // Если строка – ищем в SPECIAL_ACHIEVEMENTS
         if (typeof ach === 'string') {
-          const special = Object.values(SPECIAL_FILMS).find(sf => sf.id === ach);
+          // ✅ Ищем в SPECIAL_ACHIEVEMENTS (а не в SPECIAL_FILMS)
+          const special = SPECIAL_ACHIEVEMENTS[ach] || 
+                         Object.values(SPECIAL_ACHIEVEMENTS).find(s => s.title === ach);
           if (special) {
-            return {
-              id: special.id,
-              title: special.title,
-              icon: special.icon || '🏅',
-              description: special.description || ''
-            };
+            return { ...special };
           }
-          // Если не особое – создаём заглушку (чтобы не сломать рендер)
+          // Обычное достижение – заглушка
           return { id: ach, title: ach, icon: '🏅', description: '' };
         }
 
-        return ach; // fallback
+        return ach;
       });
 
-      // 4️⃣ Находим только что добавленные (для события)
+      // Находим новые достижения для события
       const oldIds = oldAchievements.map(a => a.id);
       const freshAchievements = newAchievements
         .filter(ach => !oldIds.includes(ach.id))
@@ -1933,13 +1927,11 @@ function ProfilePage() {
             filmId: 'system',
             metadata: { achievements: freshAchievements }
           });
-          console.log('Событие о достижениях создано:', freshAchievements);
         } catch (err) {
           console.error('Ошибка создания события о достижениях:', err);
         }
       }
 
-      // 5️⃣ Сохраняем как объект { all, active }
       setUser(prev => ({
         ...prev,
         achievements: {
@@ -1950,7 +1942,7 @@ function ProfilePage() {
       }));
     }
   } catch (err) {
-    console.error('Ошибка загрузки прогресса достижений:', err);
+    console.error('Ошибка загрузки достижений:', err);
   }
 };
 
