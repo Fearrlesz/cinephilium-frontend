@@ -2080,47 +2080,19 @@ const activateAchievement = async (id) => {
 // Вычисляем особые достижения (только те, что есть в user.achievements.all)
 const specialAchievements = useMemo(() => {
   if (!user?.achievements?.all) return [];
-  return user.achievements.all.filter(ach => {
-    const achId = typeof ach === 'string' ? ach : ach.id;
-    return SPECIAL_ACHIEVEMENTS[achId] !== undefined;
-  });
+  return user.achievements.all
+    .filter(ach => {
+      const achId = typeof ach === 'string' ? ach : ach.id;
+      return SPECIAL_ACHIEVEMENTS[achId] !== undefined;
+    })
+    .map(ach => {
+      if (typeof ach === 'string') {
+        const special = SPECIAL_ACHIEVEMENTS[ach];
+        return special ? { ...special } : { id: ach, title: ach, icon: '🏅', description: '' };
+      }
+      return ach;
+    });
 }, [user?.achievements?.all]);
-
-const activeSpecial = useMemo(() => {
-  if (!user?.achievements?.active) return null;
-  return specialAchievements.find(a => a.id === user.achievements.active) || null;
-}, [user?.achievements?.active, specialAchievements]);
-  if (loading) return <div className="loading">Загрузка...</div>;
-  if (!user) return <div className="error">Не удалось загрузить профиль</div>;
-
-return (
-    <div className={`container profile-page ${activeSpecial ? 'profile-dogville' : ''}`}>
-      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
-
-      <div className="profile-header glass-card">
-        <div className="profile-avatar">
-          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
-        </div>
-        <div className="profile-info">
-          <h1>
-  {user.nickname || 'Пользователь'}
-  {user.isAdmin && <span className="admin-badge"> 👑</span>}
-  {activeSpecial && <span className="dogville-icon">{activeSpecial.icon}</span>}
-</h1>
-{activeSpecial && (
-  <div className="profile-status">🏆 {activeSpecial.title}</div>
-)}
-          <p>📧 {user.email}</p>
-          <div className="profile-stats">
-            <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
-            <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
-            <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
-            <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
-          </div>
-
-          <div className="achievements-section" style={{ marginTop: '20px' }}>
-  <h3>🏅 Достижения</h3>
-  
 
   {/* Активное особое достижение */}
   {activeSpecial && (
