@@ -2188,33 +2188,30 @@ return (
     <div style={{ marginTop: '12px' }}>
       <h4 style={{ fontSize: '16px', marginBottom: '8px' }}>📜 Обычные</h4>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-       {user.achievements.all
-  .filter(ach => {
-    const achId = typeof ach === 'string' ? ach : ach.id;
-    return !SPECIAL_ACHIEVEMENTS[achId];
-  })
-  .map(ach => {
-    const achObj = typeof ach === 'string' 
-      ? { id: ach, title: ach, icon: '🏅', description: '' } 
-      : ach;
-    return (
-      <span key={achObj.id} style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '5px',
-        padding: '4px 10px',
-        background: 'rgba(255,255,255,0.08)',
-        borderRadius: '20px',
-        fontSize: '13px',
-        border: '1px solid rgba(255,255,255,0.1)'
-      }}>
-        {achObj.icon || '🏅'} {achObj.title}
-      </span>
-    );
-  })} 
-              {ach.icon || '🏅'} {ach.title}
-            </span>
-          ))}
+        {user.achievements.all
+          .filter(ach => {
+            const achId = typeof ach === 'string' ? ach : ach.id;
+            return !SPECIAL_ACHIEVEMENTS[achId];
+          })
+          .map(ach => {
+            const achObj = typeof ach === 'string' 
+              ? { id: ach, title: ach, icon: '🏅', description: '' } 
+              : ach;
+            return (
+              <span key={achObj.id} style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                background: 'rgba(255,255,255,0.08)',
+                borderRadius: '20px',
+                fontSize: '13px',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                {achObj.icon || '🏅'} {achObj.title}
+              </span>
+            );
+          })}
       </div>
     </div>
   )}
@@ -2224,7 +2221,6 @@ return (
       Нет достижений. Участвуйте в разборах!
     </p>
   )}
-</div>
 
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
