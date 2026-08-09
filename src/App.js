@@ -1913,7 +1913,7 @@ function ProfilePage() {
       });
 
       // Находим новые достижения для события
-      const oldIds = oldAchievements.map(a => a.id);
+      const oldIds = oldAchievements.map(a => typeof a === 'string' ? a : a.id);
       const freshAchievements = newAchievements
         .filter(ach => !oldIds.includes(ach.id))
         .map(ach => ach.title || ach.id);
