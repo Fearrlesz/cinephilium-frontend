@@ -685,7 +685,7 @@ function TopUsersPage() {
 
   useEffect(() => {
     loadTopUsers();
-     
+
   }, []);
 
   const loadTopUsers = async () => {
@@ -755,7 +755,7 @@ function AdminPanel() {
       return;
     }
     loadAdminData();
-    
+
   }, [navigate]);
 
   const loadAdminData = async () => {
@@ -1182,7 +1182,7 @@ function FilmPage() {
     loadComments();
     loadReviews();
     loadCurrentUser();
-    
+
   }, [id]);
 
   useEffect(() => {
@@ -1359,7 +1359,7 @@ function FilmPage() {
   const toggleRatingMode = () => {
     setIsRatingMode(prev => !prev);
   };
-   
+
   const addComment = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -1591,7 +1591,7 @@ return (
               </button>
             )}
           </div>
-          
+
           {usersLoading ? (
             <div className="loading-users">Загрузка...</div>
           ) : filmUsers.length === 0 ? (
@@ -1620,7 +1620,7 @@ return (
               <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
               <h2>👥 Все оценки фильма</h2>
               <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
-              
+
               <div className="users-modal-list">
                 {filmUsers.map((item) => (
                   <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
@@ -1900,7 +1900,7 @@ function ProfilePage() {
         // Если строка – ищем в SPECIAL_ACHIEVEMENTS
         if (typeof ach === 'string') {
           // ✅ Ищем в SPECIAL_ACHIEVEMENTS (а не в SPECIAL_FILMS)
-          const special = SPECIAL_ACHIEVEMENTS[ach] || 
+          const special = SPECIAL_ACHIEVEMENTS[ach] ||
                          Object.values(SPECIAL_ACHIEVEMENTS).find(s => s.title === ach);
           if (special) {
             return { ...special };
@@ -1999,29 +1999,29 @@ const activateAchievement = async (id) => {
         active: id
       }
     }));
-    showNotification({ 
-      title: 'Достижение выбрано!', 
-      message: 'Оно теперь отображается в вашем профиле', 
-      type: 'success' 
+    showNotification({
+      title: 'Достижение выбрано!',
+      message: 'Оно теперь отображается в вашем профиле',
+      type: 'success'
     });
   } catch (err) {
-    showNotification({ 
-      title: 'Ошибка', 
-      message: 'Не удалось выбрать достижение', 
-      type: 'error' 
+    showNotification({
+      title: 'Ошибка',
+      message: 'Не удалось выбрать достижение',
+      type: 'error'
     });
   }
 };
-   
+
 
   const openRatingDetails = async (rating) => {
   try {
     const ratingId = rating._id || rating.id;
     if (!ratingId) {
-      showNotification({ 
-        title: 'Ошибка', 
-        message: 'ID оценки не найден', 
-        type: 'error' 
+      showNotification({
+        title: 'Ошибка',
+        message: 'ID оценки не найден',
+        type: 'error'
       });
       return;
     }
@@ -2030,10 +2030,10 @@ const activateAchievement = async (id) => {
     setSelectedRating(response.data);
   } catch (err) {
     console.error('Ошибка загрузки деталей оценки:', err);
-    showNotification({ 
-      title: 'Ошибка', 
-      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
-      type: 'error' 
+    showNotification({
+      title: 'Ошибка',
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки',
+      type: 'error'
     });
   }
 };
@@ -2172,8 +2172,8 @@ const activeSpecial = useMemo(() => {
             return !SPECIAL_ACHIEVEMENTS[achId];
           })
           .map(ach => {
-            const achObj = typeof ach === 'string' 
-              ? { id: ach, title: ach, icon: '🏅', description: '' } 
+            const achObj = typeof ach === 'string'
+              ? { id: ach, title: ach, icon: '🏅', description: '' }
               : ach;
             return (
               <span key={achObj.id} style={{
@@ -2219,13 +2219,13 @@ const activeSpecial = useMemo(() => {
       {/* Вкладки */}
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Мои оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -2275,7 +2275,7 @@ const activeSpecial = useMemo(() => {
                       <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'} 
+                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'}
                           ({review.filmId?.year || review.film?.year || 'N/A'})
                         </p>
                       </Link>
@@ -2283,13 +2283,13 @@ const activeSpecial = useMemo(() => {
                         ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
                       </div>
                     </div>
-                    
+
                     <p className="review-text">{review.text}</p>
-                    
+
                     <div className="review-footer">
                       <div className="review-actions">
-                        <button 
-                          className="like-btn" 
+                        <button
+                          className="like-btn"
                           onClick={() => likeReview(review._id)}
                         >
                           ❤️ {review.likes?.length || 0}
@@ -2372,10 +2372,10 @@ const openRatingDetails = async (rating) => {
   try {
     const ratingId = rating._id || rating.id;
     if (!ratingId) {
-      showNotification({ 
-        title: 'Ошибка', 
-        message: 'ID оценки не найден', 
-        type: 'error' 
+      showNotification({
+        title: 'Ошибка',
+        message: 'ID оценки не найден',
+        type: 'error'
       });
       return;
     }
@@ -2384,10 +2384,10 @@ const openRatingDetails = async (rating) => {
     setSelectedRating(response.data);
   } catch (err) {
     console.error('Ошибка загрузки деталей оценки:', err);
-    showNotification({ 
-      title: 'Ошибка', 
-      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
-      type: 'error' 
+    showNotification({
+      title: 'Ошибка',
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки',
+      type: 'error'
     });
   }
 };
@@ -2450,7 +2450,7 @@ return (
           <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
           <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
           <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
-          
+
           <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4>🏅 Достижения</h4>
             {user.achievements?.length > 0 ? (
@@ -2477,13 +2477,13 @@ return (
       {/* Вкладки */}
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -2533,7 +2533,7 @@ return (
                       <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
                           ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
@@ -2541,13 +2541,13 @@ return (
                         ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
                       </div>
                     </div>
-                    
+
                     <p className="review-text">{review.text}</p>
-                    
+
                     <div className="review-footer">
                       <div className="review-actions">
-                        <button 
-                          className="like-btn" 
+                        <button
+                          className="like-btn"
                           onClick={() => likeReview(review._id)}
                         >
                           ❤️ {review.likes?.length || 0}
