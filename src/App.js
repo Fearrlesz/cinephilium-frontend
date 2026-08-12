@@ -2100,6 +2100,8 @@ const activeSpecial = useMemo(() => {
   return specialAchievements.find(a => a.id === user.achievements.active) || null;
 }, [user?.achievements?.active, specialAchievements]);
 
+ {/* === БЛОК ДОСТИЖЕНИЙ === */}
+<div className="achievements-section glass-card" style={{ padding: '16px', marginBottom: '20px' }}>
   {/* Активное особое достижение */}
   {activeSpecial && (
     <div style={{
@@ -2199,116 +2201,7 @@ const activeSpecial = useMemo(() => {
       Нет достижений. Участвуйте в разборах!
     </p>
   )}
-
-          {!user.isAdmin && (
-            <div className="admin-activation glass-card">
-              <h4>🔑 Стать администратором</h4>
-              <p className="admin-hint">Введите секретный ключ, чтобы получить права администратора</p>
-              <div className="admin-form">
-                <input type="password" placeholder="Секретный ключ..." value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)} />
-                <button onClick={activateAdmin} disabled={adminLoading}>{adminLoading ? 'Проверка...' : '👑 Активировать'}</button>
-              </div>
-              {adminError && <div className="error-msg">{adminError}</div>}
-              {adminSuccess && <div className="success-msg">{adminSuccess}</div>}
-            </div>
-          )}
-          <button onClick={logout} className="logout-btn">🚪 Выйти</button>
-        </div>
-      </div>
-
-      {/* Вкладки */}
-      <div className="profile-tabs glass-card">
-        <div className="tabs-header">
-          <button
-            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ratings')}
-          >
-            ⭐ Мои оценки ({ratings.length})
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-            onClick={() => setActiveTab('reviews')}
-          >
-            📝 Мои рецензии ({reviews.length})
-          </button>
-        </div>
-
-        {/* Вкладка с оценками */}
-        {activeTab === 'ratings' && (
-          <div className="profile-ratings">
-            <h2>Мои оценки</h2>
-            {ratings.length === 0 ? (
-              <p>Вы еще не оценили ни одного фильма</p>
-            ) : (
-              <div className="ratings-list">
-                {ratings.map((rating) => (
-                  <div key={rating._id} className="rating-item">
-                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
-                      <div className="rating-film-info">
-                        <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
-                        <div>
-                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                          <p>{rating.filmId?.year || rating.film?.year}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Вкладка с рецензиями */}
-        {activeTab === 'reviews' && (
-          <div className="profile-reviews">
-            <h2>Мои рецензии</h2>
-            {reviews.length === 0 ? (
-              <p>Вы еще не написали ни одной рецензии</p>
-            ) : (
-              <div className="reviews-list">
-                {reviews.map((review) => (
-                  <div key={review._id} className="review-item">
-                    <div className="review-header">
-                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-film-link">
-                        <h3 className="review-title">{review.title}</h3>
-                        <p className="review-film-name">
-                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'}
-                          ({review.filmId?.year || review.film?.year || 'N/A'})
-                        </p>
-                      </Link>
-                      <div className="review-rating">
-                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
-                      </div>
-                    </div>
-
-                    <p className="review-text">{review.text}</p>
-
-                    <div className="review-footer">
-                      <div className="review-actions">
-                        <button
-                          className="like-btn"
-                          onClick={() => likeReview(review._id)}
-                        >
-                          ❤️ {review.likes?.length || 0}
-                        </button>
-                        <span className="review-date">
-                          📅 {formatDate(review.createdAt)}
-                        </span>
-                      </div>
-                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-go-to-film">
-                        🎬 Перейти к фильму
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+</div>
 
       <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
     </div>
