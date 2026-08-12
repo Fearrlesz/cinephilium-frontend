@@ -2094,6 +2094,12 @@ const specialAchievements = useMemo(() => {
     });
 }, [user?.achievements?.all]);
 
+   // Вычисляем активное особое достижение
+const activeSpecial = useMemo(() => {
+  if (!user?.achievements?.active) return null;
+  return specialAchievements.find(a => a.id === user.achievements.active) || null;
+}, [user?.achievements?.active, specialAchievements]);
+
   {/* Активное особое достижение */}
   {activeSpecial && (
     <div style={{
