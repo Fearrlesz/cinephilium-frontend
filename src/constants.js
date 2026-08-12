@@ -2,7 +2,7 @@
 
 export const SPECIAL_FILMS = {
   'Догвилль': {
-    id: 'dogville_overton',
+    id: 'dogville',
     title: 'Окно Овертона',
     icon: '⭐',
     description: 'Первый разбор — Догвилль, 07.08.2026',
