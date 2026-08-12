@@ -2196,13 +2196,14 @@ const activeSpecial = useMemo(() => {
     </div>
   )}
 
-{(!user.achievements?.all?.length) && (
-  <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
-    Нет достижений. Участвуйте в разборах!
-  </p>
-)}
-
-<RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+<>
+  {(!user.achievements?.all?.length) && (
+    <p style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '12px 0' }}>
+      Нет достижений. Участвуйте в разборах!
+    </p>
+  )}
+  <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+</>
 
 function UserProfilePage() {
   const { id } = useParams();
