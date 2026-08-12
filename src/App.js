@@ -17,7 +17,7 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
-import { SPECIAL_FILMS, SPECIAL_FILM_TITLES } from './constants';
+import { SPECIAL_FILMS } from './constants';
 
 // ============================================================
 // СПЕЦИАЛЬНЫЕ ДОСТИЖЕНИЯ
