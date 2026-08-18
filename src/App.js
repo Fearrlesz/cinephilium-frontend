@@ -82,7 +82,7 @@ const MAX_SCORE = 90;
 
 const api = axios.create({
   baseURL: 'https://cinephilium-backend.onrender.com/api',
-  timeout: 30000
+  timeout: 20000
 });
 
 api.interceptors.response.use(
