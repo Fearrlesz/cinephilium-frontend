@@ -1811,7 +1811,7 @@ function ProfilePage() {
   const [activeTab, setActiveTab] = useState('ratings');
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-  const { addEvent } = useActivityEvents();
+  
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -1823,29 +1823,25 @@ function ProfilePage() {
   }, [navigate]);
 
   const loadAchievementProgress = async (userData) => {
-    try {
-      const response = await api.get('/users/me/achievements');
-      setAchievementProgress(response.data);
+  try {
+    const response = await api.get('/users/me/achievements');
+    setAchievementProgress(response.data);
 
-      if (response.data?.achievements) {
-        const oldAchievements = userData?.achievements || [];
-        const newAchievements = response.data.achievements;
-        const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+    if (response.data?.achievements) {
+      setUser(prev => ({
+        ...prev,
+        achievements: {
+          all: response.data.achievements,
+          active: response.data.active || []
+        },
+        totalPoints: response.data.totalPoints || prev?.totalPoints
+      }));
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки прогресса достижений:', err);
+  }
+};
 
-        if (freshAchievements.length > 0) {
-          try {
-            await addEvent({
-              type: 'achievement',
-              user: userData?.nickname || 'Пользователь',
-              film: 'система',
-              filmId: 'system',
-              metadata: { achievements: freshAchievements }
-            });
-            console.log('Событие о достижениях создано:', freshAchievements);
-          } catch (err) {
-            console.error('Ошибка создания события о достижениях:', err);
-          }
-        }
 
         setUser(prev => ({ ...prev, achievements: newAchievements, totalPoints: response.data.totalPoints || prev?.totalPoints }));
       }
@@ -2233,28 +2229,21 @@ const openRatingDetails = async (rating) => {
           <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
           <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
           
-          <div className="achievements-section" style={{ marginTop: '15px' }}>
-            <h4>🏅 Достижения</h4>
-            {user.achievements?.length > 0 ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
-                {user.achievements.map(ach => (
-                  <span key={ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    🏅 {ach}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
-            )}
-          </div>
+<div className="achievements-section" style={{ marginTop: '15px' }}>
+  <h4>🏅 Достижения</h4>
+  {user.achievements?.length > 0 ? (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+      {user.achievements.map(ach => (
+        <span key={ach.id || ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          {ach.icon || '🏅'} {ach.title || ach}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
+  )}
+</div>
 
-          {isOwnProfile && (
-            <button onClick={() => navigate('/profile')} className="btn-edit-profile" style={{ marginTop: '15px' }}>
-              ✏️ Редактировать профиль
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* Вкладки */}
       <div className="profile-tabs glass-card">
