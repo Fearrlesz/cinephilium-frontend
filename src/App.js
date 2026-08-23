@@ -1842,14 +1842,6 @@ function ProfilePage() {
   }
 };
 
-
-        setUser(prev => ({ ...prev, achievements: newAchievements, totalPoints: response.data.totalPoints || prev?.totalPoints }));
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки прогресса достижений:', err);
-    }
-  };
-
   const loadProfile = async () => {
     try {
       const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
