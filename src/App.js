@@ -2214,14 +2214,16 @@ const openRatingDetails = async (rating) => {
         </span>
       ))}
     </div>
-  ) : (
+    ) : (
     <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
   )}
-</div>
-
+          </div>{/* конец achievements-section */}
+        </div>{/* конец profile-info */}
+      </div>{/* конец profile-header */}
 
       {/* Вкладки */}
       <div className="profile-tabs glass-card">
+
         <div className="tabs-header">
           <button 
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
