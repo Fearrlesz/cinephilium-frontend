@@ -1938,7 +1938,7 @@ function ProfilePage() {
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
-  return (
+       return (
     <div className="container profile-page">
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
@@ -1951,81 +1951,61 @@ function ProfilePage() {
             {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
           </h1>
-          <p>📧 {user.email}</p>
-          <div className="profile-stats">
-            <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
-            <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
-            <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
-            <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
-          </div>
+          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
+          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
+          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
+          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
 
-         <div className="achievements-section" style={{ marginTop: '20px' }}>
-  <h3>🏅 Достижения</h3>
-  {user.achievements?.all?.length > 0 ? (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
-      {user.achievements.all.map(ach => (
-        <div key={ach.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-          <span style={{ fontSize: '24px' }}>{ach.icon || '🏅'}</span>
-          <div>
-            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach.title || ach.id || 'Достижение'}</div>
-            {ach.description && <div style={{ fontSize: '12px', color: '#888' }}>{ach.description}</div>}
-          </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p style={{ color: '#888', padding: '10px 0' }}>Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!</p>
-  )}
-</div>
-          {!user.isAdmin && (
-            <div className="admin-activation glass-card">
-              <h4>🔑 Стать администратором</h4>
-              <p className="admin-hint">Введите секретный ключ, чтобы получить права администратора</p>
-              <div className="admin-form">
-                <input type="password" placeholder="Секретный ключ..." value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)} />
-                <button onClick={activateAdmin} disabled={adminLoading}>{adminLoading ? 'Проверка...' : '👑 Активировать'}</button>
+          <div className="achievements-section" style={{ marginTop: '15px' }}>
+            <h4>🏅 Достижения</h4>
+            {user.achievements?.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                {user.achievements.map(ach => (
+                  <span key={ach.id || ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {ach.icon || '🏅'} {ach.title || ach}
+                  </span>
+                ))}
               </div>
-              {adminError && <div className="error-msg">{adminError}</div>}
-              {adminSuccess && <div className="success-msg">{adminSuccess}</div>}
-            </div>
-          )}
-          <button onClick={logout} className="logout-btn">🚪 Выйти</button>
-        </div>
-      </div>
+            ) : (
+              <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
+            )}
+          </div>
+        </div>{/* ← ДОБАВЛЕНО: конец profile-info */}
+      </div>{/* ← ДОБАВЛЕНО: конец profile-header */}
 
       {/* Вкладки */}
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
-            ⭐ Мои оценки ({ratings.length})
+            ⭐ Оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            📝 Мои рецензии ({reviews.length})
+            📝 Рецензии ({reviews.length})
           </button>
         </div>
 
         {/* Вкладка с оценками */}
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <h2>Мои оценки</h2>
+            <h2>Оценки пользователя</h2>
             {ratings.length === 0 ? (
-              <p>Вы еще не оценили ни одного фильма</p>
+              <p>Пользователь еще не оценил ни одного фильма</p>
             ) : (
               <div className="ratings-list">
                 {ratings.map((rating) => (
                   <div key={rating._id} className="rating-item">
-                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
+                    <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
                       <div className="rating-film-info">
-                        <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
+                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
                         <div>
-                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                          <p>{rating.filmId?.year || rating.film?.year}</p>
+                          <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                          <p>{rating.film?.year || rating.filmId?.year}</p>
                         </div>
                       </div>
                     </Link>
@@ -2041,32 +2021,32 @@ function ProfilePage() {
         {/* Вкладка с рецензиями */}
         {activeTab === 'reviews' && (
           <div className="profile-reviews">
-            <h2>Мои рецензии</h2>
+            <h2>Рецензии пользователя</h2>
             {reviews.length === 0 ? (
-              <p>Вы еще не написали ни одной рецензии</p>
+              <p>Пользователь еще не написал ни одной рецензии</p>
             ) : (
               <div className="reviews-list">
                 {reviews.map((review) => (
                   <div key={review._id} className="review-item">
                     <div className="review-header">
-                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-film-link">
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'} 
-                          ({review.filmId?.year || review.film?.year || 'N/A'})
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
+                          ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
                       <div className="review-rating">
                         ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
                       </div>
                     </div>
-                    
+
                     <p className="review-text">{review.text}</p>
-                    
+
                     <div className="review-footer">
                       <div className="review-actions">
-                        <button 
-                          className="like-btn" 
+                        <button
+                          className="like-btn"
                           onClick={() => likeReview(review._id)}
                         >
                           ❤️ {review.likes?.length || 0}
@@ -2075,7 +2055,7 @@ function ProfilePage() {
                           📅 {formatDate(review.createdAt)}
                         </span>
                       </div>
-                      <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-go-to-film">
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-go-to-film">
                         🎬 Перейти к фильму
                       </Link>
                     </div>
@@ -2091,6 +2071,9 @@ function ProfilePage() {
     </div>
   );
 }
+      
+
+
 
 function UserProfilePage() {
   const { id } = useParams();
