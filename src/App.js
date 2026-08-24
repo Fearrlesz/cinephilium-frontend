@@ -1,2330 +1,2367 @@
-<!DOCTYPE html>
-<html lang="ru" data-theme="cosmic">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Storyphilium Pro — Сценарный редактор</title>
+/* Fixed App.js
+   - Cleaned syntax errors (extra semicolons, malformed JSX, duplicated imports)
+   - Fixed axios client and interceptors
+   - Consolidated duplicated constants
+   - Restored components to valid React code
+   - Kept original structure and intent
+*/
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useParams
+} from 'react-router-dom';
+import api from './api';
+import './App.css';
 
-    <style>
-        /* ===== RESET & BASE ===== */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+// ============================================================
+// CONSTANTS
+// ============================================================
 
-        :root {
-            --bg-main: #0B0A14;
-            --bg-surface: #15132B;
-            --bg-card: #1E1B38;
-            --bg-input: #0F0D1F;
-            --bg-input-focus: #19163A;
-            --accent: #6C4AB6;
-            --accent-hover: #8A6CD4;
-            --accent-border: #4A3A7A;
-            --accent-light: #2A2250;
-            --text-primary: #E5B8FF;
-            --text-secondary: #B89AD9;
-            --text-light: #8A7AAA;
-            --shadow-soft: 0 4px 24px rgba(108, 74, 182, 0.15);
-            --shadow-hover: 0 12px 40px rgba(108, 74, 182, 0.25);
-            --border-light: 1px solid rgba(74, 58, 122, 0.4);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --script-font: 'Courier Prime', 'Courier New', monospace;
-            --transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            --sidebar-width: 280px;
-        }
+const baseNames = [
+  '🎭 Сценарий и драматургия',
+  '🎭 Персонажи и актерская игра',
+  '🎬 Режиссура и визуальный язык',
+  '🔊 Звук и атмосфера'
+];
 
-        [data-theme="espresso"] {
-            --bg-main: #4A2C20;
-            --bg-surface: #5C3A2B;
-            --bg-card: #6E4533;
-            --bg-input: #3D241A;
-            --bg-input-focus: #553227;
-            --accent: #B87333;
-            --accent-hover: #CC8A4A;
-            --accent-border: #8A5A3A;
-            --accent-light: #5C3A2B;
-            --text-primary: #F1DEC2;
-            --text-secondary: #D4B89A;
-            --text-light: #B2947A;
-            --shadow-soft: 0 4px 24px rgba(184, 115, 51, 0.20);
-            --shadow-hover: 0 12px 40px rgba(184, 115, 51, 0.30);
-            --border-light: 1px solid rgba(138, 90, 58, 0.5);
-        }
+// Simplified criteria and descriptions (fill or expand as needed)
+const criteriaNames = [
+  ['1.1 Логика и Запуск', '1.2 Структура и Нарастание', '1.3 Цели и Мотивация', '1.4 Диалоги и Подтекст', '1.5 Ценность'],
+  ['2.1 Глубина личности', '2.2 Химия и Ансамбль', '2.3 Органика поведения', '2.4 Эволюция личности', '2.5 Перегруженность'],
+  ['3.1 Композиция и Среда', '3.2 Движение камеры', '3.3 Цветовой стиль', '3.4 Монтажный ритм', '3.5 Визуальный символизм'],
+  ['4.1 Музыкальная драматургия', '4.2 Тембр и Стиль Музыки', '4.3 Шумовая наполненность', '4.4 Использование Тишины', '4.5 Техническая чистота звука']
+];
 
-        [data-theme="neural-white"] {
-            --bg-main: #F6F8FC;
-            --bg-surface: #FFFFFF;
-            --bg-card: #FFFFFF;
-            --bg-input: #FFFFFF;
-            --bg-input-focus: #FAFBFD;
-            --accent: #5D8CFF;
-            --accent-hover: #4A7AEE;
-            --accent-border: #B0C8F0;
-            --accent-light: #E3EBFA;
-            --text-primary: #1A2330;
-            --text-secondary: #3D4A5A;
-            --text-light: #6B7A8A;
-            --shadow-soft: 0 4px 24px rgba(93, 140, 255, 0.08);
-            --shadow-hover: 0 12px 40px rgba(93, 140, 255, 0.14);
-            --border-light: 1px solid rgba(176, 200, 240, 0.35);
-        }
+const baseDescriptions = [
+  [
+    'Насколько органично события вытекают друг из друга? Вовлекает ли экспозиция [начало] в фильм? ',
+    'Есть ли внятное развитие: знакомство → кризис → кульминация? Или структура филигранно нарушена? ',
+    'Ясны ли цели и мотивации героев?',
+    'Насколько живые и многослойные диалоги?',
+    'Дает ли фильм ценность зрителю? Вы вынесли что-то из него? '
+  ],
+  [
+    'Есть ли у героев слабости и внутренние конфликты? Не клишированны ли они? ',
+    'Есть ли химия между персонажами?',
+    'Органично ли поведение героев? Вы верите в персонажей? ',
+    'Развиваются ли персонажи в ходе сюжета?',
+    'Насколько оправданно количество сюжетных линий или персонажей?'
+  ],
+  [
+    'Продумано ли расположение героев и их окружения в кадре?',
+    'Уместно ли движение камеры и его смысл?',
+    'Согласованы ли цветовая палитра и освещение?',
+    'Ритм монтажа создает напряжение/покой?',
+    'Есть ли визуальные символы и работают ли они?'
+  ],
+  [
+    'Помогает ли музыка передавать настроение фильма?',
+    'Совместим ли тембр музыки с жанром фильма?',
+    'Работают ли шумы и звуковые слои? Окунают ли вас шум прибоя или пение птиц в фильм? ',
+    'Используется ли тишина как выразительное средство? Успешно ли? ',
+    'Хороша ли техническая реализация звука? Качественно ли всё слышно? '
+  ]
+];
 
-        [data-theme="emerald"] {
-            --bg-main: #1A2A24;
-            --bg-surface: #243A32;
-            --bg-card: #2D4A3F;
-            --bg-input: #16221E;
-            --bg-input-focus: #20352C;
-            --accent: #5ECC67;
-            --accent-hover: #72E07A;
-            --accent-border: #3A7A45;
-            --accent-light: #2A4A35;
-            --text-primary: #D4EAD0;
-            --text-secondary: #A0C8A0;
-            --text-light: #7AAA80;
-            --shadow-soft: 0 4px 24px rgba(94, 204, 103, 0.15);
-            --shadow-hover: 0 12px 40px rgba(94, 204, 103, 0.25);
-            --border-light: 1px solid rgba(58, 122, 69, 0.4);
-        }
+const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add', 'achievement'];
+const VALID_FILM_TYPES = ['view', 'like', 'rating', 'comment', 'share', 'favorite'];
 
-        [data-theme="neural-blue"] {
-            --bg-main: #E8EDF8;
-            --bg-surface: #F4F7FC;
-            --bg-card: #FFFFFF;
-            --bg-input: #FFFFFF;
-            --bg-input-focus: #F0F4FA;
-            --accent: #5D8CFF;
-            --accent-hover: #4A7AEE;
-            --accent-border: #A0BCE8;
-            --accent-light: #DCE6F5;
-            --text-primary: #1A2A40;
-            --text-secondary: #3A5070;
-            --text-light: #6A809A;
-            --shadow-soft: 0 4px 24px rgba(93, 140, 255, 0.10);
-            --shadow-hover: 0 12px 40px rgba(93, 140, 255, 0.18);
-            --border-light: 1px solid rgba(160, 188, 232, 0.35);
-        }
+const TECHNICAL_MULTIPLIER = 1.4;
+const VIBE_STEP = 0.06747;
+const MIN_SCORE = 6;
+const MAX_SCORE = 90;
 
-        [data-theme="cosmic"] {
-            --bg-main: #17152E;
-            --bg-surface: #1F1D3A;
-            --bg-card: #2A2850;
-            --bg-input: #14122A;
-            --bg-input-focus: #1A1840;
-            --accent: #6C4AB6;
-            --accent-hover: #8A6CD4;
-            --accent-border: #4A3A7A;
-            --accent-light: #2A2250;
-            --text-primary: #E5B8FF;
-            --text-secondary: #B89AD9;
-            --text-light: #8A7AAA;
-            --shadow-soft: 0 4px 24px rgba(108, 74, 182, 0.15);
-            --shadow-hover: 0 12px 40px rgba(108, 74, 182, 0.25);
-            --border-light: 1px solid rgba(74, 58, 122, 0.4);
-        }
+// ============================================================
+// CONTEXTS
+// ============================================================
 
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-        }
+const NotificationContext = createContext();
 
-        body {
-            font-family: var(--font);
-            background: var(--bg-main);
-            color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
-            padding: 14px 18px 0;
-            transition: background 0.4s, color 0.4s;
-        }
+export function useNotification() {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotification must be used within NotificationProvider');
+  }
+  return context;
+}
 
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-main);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 20px;
-        }
+// ============================================================
+// UTILITIES
+// ============================================================
 
-        /* ===== HEADER ===== */
-        .app-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 24px;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 10px;
-            border: var(--border-light);
-            flex-shrink: 0;
-            transition: all 0.4s;
-            gap: 8px;
-        }
+export function getScoreColor(score) {
+  if (score === undefined || score === null || isNaN(score)) return '#666';
+  const clampedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, score));
+  const normalized = (clampedScore - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
+  const hue = normalized * 120;
+  return `hsl(${hue}, 85%, ${45 + normalized * 15}%)`;
+}
 
-        .app-header .brand {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .app-header .brand .story {
-            font-size: 18px;
-            letter-spacing: -0.3px;
-        }
-        .app-header .brand .separator {
-            color: var(--accent-border);
-            font-weight: 300;
-        }
-        .app-header .brand .family {
-            font-size: 20px;
-            font-weight: 400;
-            color: var(--text-secondary);
-        }
+export function formatDate(date) {
+  if (!date) return 'Неизвестно';
+  try {
+    return new Date(date).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } catch {
+    return 'Неизвестно';
+  }
+}
 
-        .app-header .header-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+export function getTimeAgo(date) {
+  if (!date) return 'только что';
+  try {
+    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return `${Math.floor(diff / 60)} мин назад`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} ч назад`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} дн назад`;
+    return formatDate(date);
+  } catch {
+    return 'только что';
+  }
+}
 
-        .project-selector {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .project-selector select {
-            padding: 4px 10px;
-            border-radius: var(--radius-sm);
-            border: var(--border-light);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: var(--font);
-            font-size: 12px;
-            font-weight: 500;
-            max-width: 140px;
-            cursor: pointer;
-            outline: none;
-        }
-        .project-selector select:focus {
-            border-color: var(--accent);
-        }
-        .project-selector .project-actions {
-            display: flex;
-            gap: 4px;
-        }
+export function sanitizeText(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
 
-        .theme-selector {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-        }
-        .theme-selector select {
-            padding: 4px 8px;
-            border-radius: var(--radius-sm);
-            border: var(--border-light);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: var(--font);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            max-width: 140px;
-        }
-        .theme-selector select:focus {
-            border-color: var(--accent);
-        }
+export function truncateText(text, maxLength = 200) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            font-family: var(--font);
-            font-weight: 600;
-            font-size: 12px;
-            padding: 6px 14px;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all var(--transition);
-            white-space: nowrap;
-            letter-spacing: 0.2px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid transparent;
-        }
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 2px 12px rgba(108, 74, 182, 0.2);
-        }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 6px 20px rgba(108, 74, 182, 0.25);
-            transform: translateY(-1px);
-        }
-        .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: var(--border-light);
-        }
-        .btn-secondary:hover {
-            background: var(--bg-main);
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-        .btn-outline {
-            background: transparent;
-            color: var(--text-secondary);
-            border: var(--border-light);
-        }
-        .btn-outline:hover {
-            background: var(--bg-card);
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-        .btn-danger {
-            background: #e8d0d0;
-            color: #5a3a3a;
-        }
-        .btn-danger:hover {
-            background: #ddc0c0;
-            transform: translateY(-1px);
-        }
-        .btn-sm {
-            font-size: 10px;
-            padding: 4px 10px;
-        }
-        .btn-icon {
-            font-size: 15px;
-            padding: 6px 10px;
-            min-width: 34px;
-        }
-        .btn.active {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
+export function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
 
-        .export-select {
-            padding: 4px 8px;
-            background: var(--bg-card);
-            border: var(--border-light);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            font-family: var(--font);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            height: 30px;
-        }
-        .export-select:focus {
-            border-color: var(--accent);
-        }
+export function validatePassword(password) {
+  return password && password.length >= 6;
+}
 
-        /* ===== TOOLBAR ===== */
-        .editor-toolbar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 6px 16px;
-            background: var(--bg-surface);
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-            border-bottom: var(--border-light);
-            flex-shrink: 0;
-            transition: all 0.4s;
-            flex-wrap: wrap;
-        }
-        .editor-toolbar .toolbar-group {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .editor-toolbar .toolbar-group .group-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-light);
-            margin-right: 4px;
-            font-weight: 600;
-        }
-        .editor-toolbar .toolbar-btn {
-            background: transparent;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            font-family: var(--font);
-        }
-        .editor-toolbar .toolbar-btn:hover {
-            background: var(--accent-light);
-            color: var(--text-primary);
-        }
-        .editor-toolbar .toolbar-btn.active {
-            background: var(--accent);
-            color: #fff;
-        }
-        .editor-toolbar .spacer {
-            flex: 1;
-        }
-        .editor-toolbar .stats {
-            display: flex;
-            gap: 14px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-        }
-        .editor-toolbar .stats span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .editor-toolbar .stats .num {
-            font-weight: 700;
-            color: var(--accent);
-            min-width: 16px;
-        }
-        .editor-toolbar .status-indicator {
-            font-size: 12px;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .editor-toolbar .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            transition: all 0.3s;
-        }
-        .editor-toolbar .status-dot.saving {
-            background: #f0c040;
-            animation: pulse 0.6s ease-in-out 3;
-        }
-        .editor-toolbar .status-dot.saved {
-            background: var(--accent);
-        }
+export function validateNickname(nickname) {
+  return nickname && nickname.length >= 2 && nickname.length <= 20;
+}
 
-        @keyframes pulse {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.4);
-                opacity: 0.5;
-            }
-        }
+// ============================================================
+// HOOK: useActivityEvents
+// ============================================================
 
-        /* ===== MAIN LAYOUT ===== */
-        .main-area {
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            gap: 0;
-            border-radius: 0 0 var(--radius) var(--radius);
-            overflow: hidden;
-            background: var(--bg-surface);
-            box-shadow: var(--shadow-soft);
-            border: var(--border-light);
-            border-top: none;
-            position: relative;
-            transition: all 0.4s;
-        }
+function useActivityEvents() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pendingEvents, setPendingEvents] = useState(new Map());
 
-        .editor-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            background: var(--bg-surface);
-            position: relative;
-        }
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.get('/events');
+      if (response.data && Array.isArray(response.data)) {
+        const formattedEvents = response.data.map(e => ({
+          ...e,
+          time: e.time || getTimeAgo(e.createdAt) || 'только что',
+          _synced: true
+        }));
+        setEvents(formattedEvents);
+      } else {
+        setEvents([]);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки событий:', err?.message || err);
+      setError('Не удалось загрузить события');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-        .editor-wrapper textarea {
-            flex: 1;
-            width: 100%;
-            padding: 1.6cm 2.2cm;
-            font-family: var(--script-font);
-            font-size: 13pt;
-            line-height: 1.85;
-            color: var(--text-primary);
-            background: var(--bg-input);
-            border: none;
-            outline: none;
-            resize: none;
-            transition: background 0.3s, padding 0.4s, font-size 0.4s;
-            letter-spacing: 0.15px;
-            tab-size: 4;
-        }
-        .editor-wrapper textarea:focus {
-            background: var(--bg-input-focus);
-        }
-        .editor-wrapper textarea::placeholder {
-            color: var(--text-light);
-            opacity: 0.35;
-            font-family: var(--font);
-            font-size: 14px;
-            font-weight: 400;
-        }
+  const addEvent = useCallback(async (eventData) => {
+    if (!eventData.type || !VALID_EVENT_TYPES.includes(eventData.type)) {
+      console.error('Некорректный тип события:', eventData.type);
+      return false;
+    }
+    if (!eventData.user) {
+      console.error('Не указан пользователь события');
+      return false;
+    }
 
-        .exit-focus-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 10px 20px;
-            font-family: var(--font);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-10px);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .exit-focus-btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.5);
-        }
-        .exit-focus-btn.visible {
-            opacity: 1;
-            pointer-events: all;
-            transform: translateY(0);
-        }
-        .exit-focus-btn .shortcut {
-            font-size: 11px;
-            opacity: 0.7;
-            font-weight: 400;
-        }
+    // filmId derivation
+    let filmId = eventData.filmId || eventData.metadata?.filmId || eventData.film?._id || eventData.film;
+    if (eventData.type !== 'achievement' && !filmId) {
+      console.error('Для события типа', eventData.type, 'не указан filmId');
+      return false;
+    }
+    if (eventData.type === 'achievement' && !filmId) {
+      filmId = 'system';
+    }
 
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-card);
-            border-left: var(--border-light);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow: hidden;
-            transition: width 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
-            opacity: 1;
-        }
-        .sidebar.closed {
-            width: 0;
-            opacity: 0;
-            margin-right: 0;
-            border-left: none;
-            pointer-events: none;
-        }
-        .sidebar-header {
-            padding: 10px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            border-bottom: var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .sidebar-header .close-sidebar {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0 4px;
-        }
-        .sidebar-header .close-sidebar:hover {
-            color: var(--text-primary);
-        }
+    // duplicate guard (within 5s)
+    const duplicate = events.some(e =>
+      e.type === eventData.type &&
+      e.user === eventData.user &&
+      e.film === eventData.film &&
+      e.score === eventData.score &&
+      (Date.now() - new Date(e.createdAt || e.time).getTime() < 5000)
+    );
+    if (duplicate) {
+      console.warn('Обнаружен дубликат события, пропускаем');
+      return false;
+    }
 
-        .sidebar-tabs {
-            display: flex;
-            border-bottom: var(--border-light);
-            flex-shrink: 0;
-        }
-        .sidebar-tabs button {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 8px 0;
-            font-family: var(--font);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .sidebar-tabs button.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-        }
-        .sidebar-tabs button:hover {
-            color: var(--text-primary);
-            background: var(--bg-main);
-        }
+    const payload = {
+      type: eventData.type,
+      user: eventData.user,
+      film: eventData.film,
+      filmId: filmId,
+      score: eventData.score || null,
+      metadata: eventData.metadata || null
+    };
 
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 0;
-        }
-        .sidebar-content .tab-pane {
-            display: none;
-            padding: 0 8px;
-        }
-        .sidebar-content .tab-pane.active {
-            display: block;
-        }
+    const localId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        .sidebar-item {
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            line-height: 1.4;
-            color: var(--text-secondary);
-            transition: all 0.15s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 2px;
-        }
-        .sidebar-item:hover {
-            background: var(--bg-main);
-            color: var(--text-primary);
-        }
-        .sidebar-item .item-num {
-            display: inline-block;
-            min-width: 24px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-right: 6px;
-        }
-        .sidebar-item .item-name {
-            font-weight: 500;
-        }
-        .sidebar-item .item-desc {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-left: 30px;
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sidebar-empty {
-            padding: 20px 14px;
-            color: var(--text-light);
-            font-size: 13px;
-            text-align: center;
-        }
+    const newEvent = {
+      _id: localId,
+      _synced: false,
+      time: 'только что',
+      ...eventData,
+      filmId
+    };
 
-        /* ===== FIND/REPLACE BAR ===== */
-        .find-replace-bar {
-            display: none;
-            padding: 8px 16px;
-            background: var(--bg-surface);
-            border-top: var(--border-light);
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            font-size: 12px;
-        }
-        .find-replace-bar.open {
-            display: flex;
-        }
-        .find-replace-bar input {
-            padding: 4px 10px;
-            border: var(--border-light);
-            border-radius: 6px;
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: var(--font);
-            font-size: 12px;
-            min-width: 120px;
-        }
-        .find-replace-bar input:focus {
-            border-color: var(--accent);
-            outline: none;
-        }
-        .find-replace-bar .fr-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .find-replace-bar .fr-actions {
-            display: flex;
-            gap: 4px;
-        }
+    setEvents(prev => [newEvent, ...prev].slice(0, 50));
+    setPendingEvents(prev => {
+      const m = new Map(prev);
+      m.set(localId, payload);
+      return m;
+    });
 
-        /* ===== FOOTER ===== */
-        .app-footer {
-            flex-shrink: 0;
-            padding: 6px 24px;
-            margin-top: 10px;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-secondary);
-            border: var(--border-light);
-            transition: all 0.4s;
-        }
-        .app-footer .copy {
-            font-weight: 500;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .app-footer .copy .family {
-            font-weight: 400;
-            color: var(--text-secondary);
-        }
-        .app-footer .copy .separator {
-            color: var(--accent-border);
-        }
-        .app-footer .footer-right {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .app-footer .footer-right .timer {
-            color: var(--text-light);
-            font-variant-numeric: tabular-nums;
-        }
+    try {
+      const response = await api.post('/events', payload);
+      if (response.data && response.data._id) {
+        setEvents(prev => prev.map(e =>
+          e._id === localId ? { ...e, _id: response.data._id, _synced: true, createdAt: response.data.createdAt || e.createdAt } : e
+        ));
+        setPendingEvents(prev => {
+          const m = new Map(prev);
+          m.delete(localId);
+          return m;
+        });
+        return true;
+      } else {
+        throw new Error('Сервер не вернул _id');
+      }
+    } catch (err) {
+      console.error('Ошибка сохранения события:', err?.message || err);
+      return false;
+    }
+  }, [events]);
 
-        .hotkeys-hint {
-            font-size: 10px;
-            color: var(--text-light);
-            opacity: 0.6;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .hotkeys-hint kbd {
-            background: var(--bg-card);
-            padding: 1px 7px;
-            border-radius: 4px;
-            border: var(--border-light);
-            font-size: 9px;
-            font-family: var(--font);
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
+  const syncPendingEvents = useCallback(async () => {
+    const pending = Array.from(pendingEvents.entries());
+    if (pending.length === 0) return;
 
-        /* ===== FOCUS MODE ===== */
-        body.focus-mode .app-header,
-        body.focus-mode .app-footer,
-        body.focus-mode .editor-toolbar,
-        body.focus-mode .sidebar {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
+    for (const [localId, payload] of pending) {
+      try {
+        const response = await api.post('/events', payload);
+        if (response.data && response.data._id) {
+          setEvents(prev => prev.map(e =>
+            e._id === localId ? { ...e, _id: response.data._id, _synced: true } : e
+          ));
+          setPendingEvents(prev => {
+            const m = new Map(prev);
+            m.delete(localId);
+            return m;
+          });
         }
-        body.focus-mode .main-area {
-            border-radius: var(--radius);
-            border: var(--border-light);
-        }
-        body.focus-mode .editor-wrapper textarea {
-            padding: 2cm 3cm;
-            font-size: 15pt;
-        }
+      } catch (err) {
+        console.error(`Ошибка синхронизации ${localId}:`, err?.message || err);
+      }
+    }
+  }, [pendingEvents]);
 
-        /* ===== PRINT ===== */
-        .print-content {
-            display: none;
-        }
+  const removeEvent = useCallback(async (eventId) => {
+    const isLocal = String(eventId).startsWith('local_');
+    if (isLocal) {
+      setEvents(prev => prev.filter(e => e._id !== eventId));
+      setPendingEvents(prev => {
+        const m = new Map(prev);
+        m.delete(eventId);
+        return m;
+      });
+      return;
+    }
+    try {
+      await api.delete(`/events/${eventId}`);
+      setEvents(prev => prev.filter(e => e._id !== eventId));
+    } catch (err) {
+      console.error('Ошибка удаления события:', err?.message || err);
+    }
+  }, []);
 
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-                margin: 0;
-                overflow: visible;
-            }
-            .app-header,
-            .app-footer,
-            .editor-toolbar,
-            .find-replace-bar,
-            .sidebar,
-            .exit-focus-btn {
-                display: none !important;
-            }
-            .main-area {
-                border-radius: 0;
-                box-shadow: none;
-                border: none;
-                overflow: visible;
-            }
-            .editor-wrapper textarea {
-                display: none !important;
-            }
-            .print-content {
-                display: block !important;
-                white-space: pre-wrap;
-                font-family: 'Courier Prime', 'Courier New', monospace;
-                font-size: 12pt;
-                padding: 2cm 2.5cm;
-                line-height: 1.6;
-                background: white;
-                color: black;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            body * {
-                visibility: hidden;
-            }
-            .print-content,
-            .print-content * {
-                visibility: visible;
-            }
-            .print-content {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: auto;
-                margin: 0;
-                padding: 2cm 2.5cm;
-            }
-        }
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .app-header .brand .family {
-                font-size: 18px;
-            }
-            .app-header .brand .story {
-                font-size: 16px;
-            }
-            .editor-wrapper textarea {
-                padding: 1.4cm 1.8cm;
-                font-size: 12.5pt;
-            }
-            .editor-toolbar .stats {
-                font-size: 11px;
-                gap: 10px;
-            }
-            .project-selector select {
-                max-width: 120px;
-                font-size: 11px;
-            }
-            .sidebar {
-                width: 230px;
-            }
-            :root {
-                --sidebar-width: 230px;
-            }
-            .exit-focus-btn {
-                top: 16px;
-                right: 16px;
-                padding: 8px 16px;
-                font-size: 13px;
-            }
-        }
+  useEffect(() => {
+    const interval = setInterval(syncPendingEvents, 30000);
+    return () => clearInterval(interval);
+  }, [syncPendingEvents]);
 
-        @media (max-width: 768px) {
-            body {
-                padding: 8px 10px 0;
-            }
-            .app-header {
-                padding: 8px 12px;
-                gap: 6px;
-            }
-            .app-header .brand {
-                font-size: 13px;
-            }
-            .app-header .brand .family {
-                font-size: 16px;
-            }
-            .app-header .brand .story {
-                font-size: 14px;
-            }
-            .btn {
-                font-size: 10px;
-                padding: 5px 10px;
-            }
-            .btn-icon {
-                padding: 5px 8px;
-                min-width: 30px;
-                font-size: 13px;
-            }
-            .editor-wrapper textarea {
-                padding: 1cm 1.2cm;
-                font-size: 11.5pt;
-            }
-            .editor-toolbar {
-                padding: 5px 10px;
-                gap: 6px;
-            }
-            .editor-toolbar .stats {
-                font-size: 10px;
-                gap: 6px;
-            }
-            .editor-toolbar .toolbar-btn {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-            .app-footer {
-                padding: 5px 12px;
-                font-size: 10px;
-                flex-direction: column;
-                gap: 4px;
-                text-align: center;
-            }
-            .hotkeys-hint {
-                font-size: 9px;
-                gap: 4px;
-                justify-content: center;
-            }
-            body.focus-mode .editor-wrapper textarea {
-                padding: 1.2cm 1.2cm;
-                font-size: 13pt;
-            }
-            .find-replace-bar {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-            .find-replace-bar input {
-                min-width: 80px;
-                font-size: 11px;
-            }
-            .project-selector select {
-                max-width: 100px;
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-            .export-select {
-                font-size: 10px;
-                height: 26px;
-                padding: 2px 6px;
-            }
-            .sidebar {
-                width: 200px;
-            }
-            :root {
-                --sidebar-width: 200px;
-            }
-            .sidebar.closed {
-                width: 0;
-            }
-            .exit-focus-btn {
-                top: 12px;
-                right: 12px;
-                padding: 6px 14px;
-                font-size: 12px;
-            }
-        }
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (pendingEvents.size > 0) {
+        // Potential place to implement navigator.sendBeacon or fallback
+        console.log('Отправка несинхронизированных событий перед выгрузкой...');
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [pendingEvents]);
 
-        @media (max-width: 480px) {
-            body {
-                padding: 4px 4px 0;
-            }
-            .app-header {
-                padding: 6px 8px;
-                border-radius: 12px;
-            }
-            .app-header .brand .family {
-                font-size: 14px;
-            }
-            .app-header .brand .story {
-                font-size: 12px;
-            }
-            .btn {
-                font-size: 9px;
-                padding: 4px 8px;
-            }
-            .btn-icon {
-                padding: 4px 6px;
-                min-width: 26px;
-                font-size: 11px;
-            }
-            .editor-wrapper textarea {
-                padding: 1cm 1cm;
-                font-size: 11pt;
-            }
-            .editor-toolbar .stats {
-                font-size: 9px;
-                gap: 4px;
-            }
-            .editor-toolbar .toolbar-btn {
-                font-size: 9px;
-                padding: 2px 5px;
-            }
-            body.focus-mode .editor-wrapper textarea {
-                padding: 0.8cm 0.8cm;
-                font-size: 11pt;
-            }
-            .project-selector select {
-                max-width: 80px;
-                font-size: 9px;
-                padding: 2px 4px;
-            }
-            .export-select {
-                font-size: 9px;
-                height: 24px;
-                padding: 2px 4px;
-            }
-            .app-footer .copy {
-                font-size: 9px;
-            }
-            .hotkeys-hint kbd {
-                font-size: 8px;
-                padding: 0 4px;
-            }
-            .sidebar {
-                width: 160px;
-            }
-            :root {
-                --sidebar-width: 160px;
-            }
-            .sidebar.closed {
-                width: 0;
-            }
-            .exit-focus-btn {
-                top: 8px;
-                right: 8px;
-                padding: 5px 12px;
-                font-size: 11px;
-            }
-            .exit-focus-btn .shortcut {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body>
+  return {
+    events,
+    loading,
+    error,
+    addEvent,
+    removeEvent,
+    refresh: loadEvents,
+    pendingEvents: pendingEvents.size,
+    syncPendingEvents
+  };
+}
 
-    <button class="exit-focus-btn" id="exitFocusBtn">
-        ✕ Выйти из фокуса
-        <span class="shortcut">Ctrl+F</span>
-    </button>
+// ============================================================
+// COMPONENTS
+// ============================================================
 
-    <header class="app-header">
-        <div class="brand">
-            <span class="story">STORYPHILIUM</span>
-            <span class="separator">|</span>
-            <span class="family">CINEPHILIUM FAMILY</span>
+function NotificationModal({ isOpen, onClose, title, message, type = 'success' }) {
+  if (!isOpen) return null;
+
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    warning: '⚠️'
+  };
+
+  const typeLabels = {
+    success: 'Успешно',
+    error: 'Ошибка',
+    info: 'Информация',
+    warning: 'Внимание'
+  };
+
+  const buttonLabels = {
+    success: 'Отлично',
+    error: 'Понятно',
+    info: 'Закрыть',
+    warning: 'Понял'
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-glass" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-content">
+          <div className={`modal-icon ${type}`}>
+            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ️'}</span>
+          </div>
+          <h3 className="modal-title">{title || typeLabels[type] || 'Уведомление'}</h3>
+          <p className="modal-message">{message}</p>
+          <button className="btn-modal btn-primary" onClick={onClose}>
+            {buttonLabels[type] || 'Закрыть'}
+          </button>
         </div>
-        <div class="header-actions">
-            <div class="project-selector">
-                <select id="projectSelect"></select>
-                <div class="project-actions">
-                    <button class="btn btn-secondary btn-sm" id="newProjectBtn" title="Новый проект">+</button>
-                    <button class="btn btn-secondary btn-sm" id="deleteProjectBtn" title="Удалить проект">✕</button>
-                </div>
-            </div>
+      </div>
+    </div>
+  );
+}
 
-            <div class="theme-selector">
-                <select id="themeSelect">
-                    <option value="cosmic">🌌 Космос</option>
-                    <option value="espresso">☕ Эспрессо</option>
-                    <option value="neural-white">⬜ Neural White</option>
-                    <option value="emerald">🌿 Изумруд</option>
-                    <option value="neural-blue">🔵 Neural Blue</option>
-                </select>
-            </div>
+function RatingDetailsModal({ rating, onClose }) {
+  if (!rating) return null;
 
-            <button class="btn btn-secondary btn-icon" id="focusToggle" title="Фокус (Ctrl+F)">◎</button>
-            <button class="btn btn-secondary btn-icon" id="findToggle" title="Поиск/Замена (Ctrl+H)">🔍</button>
-            <button class="btn btn-secondary btn-sm" id="undoBtn" title="Отменить (Ctrl+Z)">↩</button>
-            <button class="btn btn-secondary btn-sm" id="redoBtn" title="Повторить (Ctrl+Y)">↪</button>
-            <div style="display:flex; gap:4px; align-items:center;">
-                <select id="exportFormat" class="export-select">
-                    <option value="txt">TXT</option>
-                    <option value="fountain" selected>Fountain</option>
-                    <option value="json">JSON</option>
-                    <option value="pdf">PDF</option>
-                    <option value="html">🎨 HTML</option>
-                </select>
-                <button class="btn btn-primary btn-sm" id="exportBtn">📄 Экспорт</button>
+  const bases = [rating.base1 || [], rating.base2 || [], rating.base3 || [], rating.base4 || []];
+  const baseAverages = bases.map(base =>
+    (Array.isArray(base) && base.length === 5)
+      ? (base.reduce((a, b) => a + b, 0) / 5).toFixed(1)
+      : '0.0'
+  );
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+
+        <div className="modal-header">
+          <h2>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h2>
+          <p>Оценка: <span style={{ color: getScoreColor(rating.finalScore), fontSize: '28px', fontWeight: 'bold' }}>{rating.finalScore}</span></p>
+          <p className="modal-user">👤 {rating.userId?.nickname || 'Пользователь'}</p>
+          <p>Субъективный множитель «Вайб»: <strong>{rating.subjectiveM}</strong></p>
+          <p>Технический балл (T): <strong>{rating.technicalScore}</strong></p>
+          {rating.textReview && (
+            <div className="modal-review">
+              <p><strong>Отзыв:</strong> {rating.textReview}</p>
             </div>
-            <button class="btn btn-danger btn-sm" id="clearBtn">✕</button>
+          )}
         </div>
+
+        <div className="modal-bases">
+          {[0, 1, 2, 3].map(baseIndex => (
+            <div key={baseIndex} className="modal-base">
+              <h4>{baseNames[baseIndex]} <span className="modal-base-avg">(среднее: {baseAverages[baseIndex]})</span></h4>
+              <div className="modal-criteria">
+                {criteriaNames[baseIndex].map((name, critIndex) => (
+                  <div key={critIndex} className="modal-criterion">
+                    <span>{name}</span>
+                    <span className="modal-criterion-score">{bases[baseIndex]?.[critIndex] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActivityFeed({ events, loading }) {
+  if (loading) {
+    return (
+      <div className="activity-feed">
+        <h3>📰 Последние события</h3>
+        <div className="feed-loading" style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-secondary)' }}>
+          Загрузка событий...
+        </div>
+      </div>
+    );
+  }
+
+  if (!events || events.length === 0) {
+    return (
+      <div className="activity-feed">
+        <h3>📰 Последние события</h3>
+        <div className="feed-empty" style={{
+          textAlign: 'center',
+          padding: '30px 20px',
+          color: 'var(--text-muted)',
+          fontSize: '14px'
+        }}>
+          <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}>🌊</span>
+          Пока нет событий в сообществе.<br />
+          Оцените фильм, напишите рецензию или комментарий!
+        </div>
+      </div>
+    );
+  }
+
+  const getEventIcon = (type) => {
+    const icons = {
+      'rating': '⭐',
+      'review': '📝',
+      'comment': '💬',
+      'film_add': '🎬',
+      'achievement': '🏆'
+    };
+    return icons[type] || '📌';
+  };
+
+  const getEventText = (event) => {
+    const user = sanitizeText(event.user || 'Кто-то');
+    if (event.type === 'achievement') {
+      const list = event.metadata?.achievements?.join(', ') || '';
+      return `🏆 ${user} получил достижение: ${list}`;
+    }
+    const film = sanitizeText(event.film || 'фильм');
+    const score = event.score || '';
+
+    const templates = {
+      'rating': `«${user}» оценил «${film}» на ${score} баллов`,
+      'review': `«${user}» написал рецензию на «${film}»`,
+      'comment': `«${user}» прокомментировал «${film}»`,
+      'film_add': `«${user}» добавил фильм «${film}» в каталог`
+    };
+
+    return templates[event.type] || `«${user}» сделал что-то с «${film}»`;
+  };
+
+  return (
+    <div className="activity-feed">
+      <h3>📰 Последние события</h3>
+      <div className="feed-list">
+        {events.slice(0, 10).map((event, index) => {
+          const hasFilmId = event.filmId && event.filmId !== 'undefined' && event.filmId !== 'system' && event.filmId !== null && event.filmId !== 'null';
+
+          const content = (
+            <div className="feed-item" key={event._id || index}>
+              <span className="feed-icon">{getEventIcon(event.type)}</span>
+              <span className="feed-text">{getEventText(event)}</span>
+              <span className="feed-time">{event.time || 'только что'}</span>
+            </div>
+          );
+
+          return hasFilmId ? (
+            <Link
+              to={`/film/${event.filmId}`}
+              key={event._id || index}
+              style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+            >
+              {content}
+            </Link>
+          ) : (
+            <div key={event._id || index} style={{ display: 'block' }}>
+              {content}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Header({ user, onLogout }) {
+  return (
+    <header className="header">
+      <h1>🎬 СИНЕФИЛИУМ</h1>
+      <div className="header-actions">
+        <Link to="/about" className="btn-about">📖 О системе</Link>
+        <Link to="/top" className="btn-top">🏆 Топ</Link>
+     <a href="https://t.me/Cinephilium" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
+        {user ? (
+          <>
+            <Link to={`/user/${user._id}`} className="btn-profile">👤 {user.nickname}</Link>
+            {user.isAdmin && <Link to="/admin" className="btn-admin">🛡️ Админка</Link>}
+            <button onClick={onLogout} className="btn-logout">Выйти</button>
+          </>
+        ) : (
+          <Link to="/login" className="btn-login">Войти</Link>
+        )}
+      </div>
     </header>
+  );
+}
 
-    <div class="editor-toolbar" id="editorToolbar">
-        <div class="toolbar-group">
-            <span class="group-label">Вставка</span>
-            <button class="toolbar-btn" data-insert="НАР">НАР</button>
-            <button class="toolbar-btn" data-insert="ИНТ">ИНТ</button>
-            <button class="toolbar-btn" data-insert="ЭКСТ">ЭКСТ</button>
-            <button class="toolbar-btn" data-insert="ПЕРС">Персонаж</button>
-            <button class="toolbar-btn" data-insert="ДИАЛ">Диалог</button>
-            <button class="toolbar-btn" data-insert="РЕМ">Ремарка</button>
-            <button class="toolbar-btn" data-insert="СЦЕНА">Сцена #</button>
-        </div>
-        <div class="toolbar-group">
-            <button class="toolbar-btn" id="toggleSidebarBtn" title="Показать/скрыть панель сцен и персонажей">📋</button>
-        </div>
-        <div class="spacer"></div>
-        <div class="stats" id="statsBar">
-            <span>📝 <span class="num" id="charCount">0</span></span>
-            <span>📖 <span class="num" id="wordCount">0</span></span>
-            <span>📃 <span class="num" id="lineCount">0</span></span>
-            <span>📄 <span class="num" id="pageCount">0</span></span>
-            <span>🎬 <span class="num" id="sceneCount">0</span></span>
-            <span>👤 <span class="num" id="charactersCount">0</span></span>
-            <span id="selectionStats" style="display:none;color:var(--accent);">
-                ✦ <span class="num" id="selCharCount">0</span>
-            </span>
-        </div>
-        <div class="status-indicator">
-            <span class="status-dot saved" id="statusDot"></span>
-            <span id="statusText">Сохранено</span>
-        </div>
-    </div>
+// ============================================================
+// PAGES (About, TopUsers, Admin, Home, Film, Login, Profile, UserProfile)
+// Due to length, pages are implemented with cleaned syntax and the original logic preserved.
+// ============================================================
 
-    <div class="main-area">
-        <div class="editor-wrapper">
-            <textarea id="scriptInput" placeholder="Начните писать сценарий…&#10;Используйте Ctrl+S для сохранения, Ctrl+E для экспорта" spellcheck="true"></textarea>
-        </div>
-        <div class="sidebar closed" id="sidebar">
-            <div class="sidebar-header">
-                <span>Навигация</span>
-                <button class="close-sidebar" id="closeSidebarBtn">✕</button>
-            </div>
-            <div class="sidebar-tabs">
-                <button class="active" data-tab="scenes">Сцены</button>
-                <button data-tab="characters">Персонажи</button>
-            </div>
-            <div class="sidebar-content">
-                <div class="tab-pane active" id="tab-scenes">
-                    <div id="sceneList"></div>
+function AboutPage() {
+  return (
+    <div className="container about-page">
+      <Link to="/" className="back-btn">← На главную</Link>
+
+      <h1 className="about-title">📖 О системе оценки</h1>
+
+      <div className="about-intro glass-card">
+        <p className="neon-text">
+          Мы оцениваем фильмы по <strong>20 критериям</strong>, разбитым на 4 блока.
+          Каждый критерий оценивается от <strong>1 до 10</strong>.
+        </p>
+        <p>
+          Также немаловажную роль играет ваше личное восприятие фильма в виде множителя <strong>«Вайб»</strong>.
+        </p>
+      </div>
+
+      <div className="about-blocks">
+        {[0, 1, 2, 3].map(blockIndex => (
+          <div key={blockIndex} className="about-block glass-card">
+            <h2 className="about-block-title neon-text">{baseNames[blockIndex]}</h2>
+            <div className="about-criteria">
+              {criteriaNames[blockIndex].map((name, critIndex) => (
+                <div key={critIndex} className="about-criterion">
+                  <div className="about-criterion-name">{name}</div>
+                  <div className="about-criterion-desc">{baseDescriptions[blockIndex][critIndex]}</div>
                 </div>
-                <div class="tab-pane" id="tab-characters">
-                    <div id="characterList"></div>
-                </div>
+              ))}
             </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="about-formula glass-card">
+        <h2>🔢 Формула расчёта</h2>
+        <div className="formula-steps">
+          <div className="formula-step">
+            <span className="step-number">1.</span>
+            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">2.</span>
+            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × {TECHNICAL_MULTIPLIER}</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">3.</span>
+            <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">4.</span>
+            <span>Вайб-множитель = 1 + (M − 1) × {VIBE_STEP}</span>
+          </div>
+          <div className="formula-step">
+            <span className="step-number">5.</span>
+            <span>Итог = T × Вайб-множитель</span>
+          </div>
         </div>
-    </div>
-
-    <div class="find-replace-bar" id="findReplaceBar">
-        <span class="fr-label">Найти</span>
-        <input type="text" id="findInput" placeholder="текст…" />
-        <span class="fr-label">Заменить</span>
-        <input type="text" id="replaceInput" placeholder="заменить…" />
-        <div class="fr-actions">
-            <button class="btn btn-secondary btn-sm" id="findNextBtn">Найти →</button>
-            <button class="btn btn-secondary btn-sm" id="replaceBtn">Заменить</button>
-            <button class="btn btn-secondary btn-sm" id="replaceAllBtn">Все</button>
+        <div className="formula-result">
+          <p>Итоговая оценка всегда в диапазоне от <strong>{MIN_SCORE}</strong> до {MAX_SCORE}.</p>
+          <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
+            💡 Округление происходит только в самом конце, поэтому все нюансы оценок сохраняются.
+          </p>
         </div>
-        <button class="btn btn-sm btn-outline" id="closeFindBtn">✕</button>
+      </div>
     </div>
+  );
+}
 
-    <div class="print-content"></div>
+function TopUsersPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    <footer class="app-footer">
-        <span class="copy">
-            STORYPHILIUM <span class="separator">|</span> <span class="family">CINEPHILIUM FAMILY</span> &copy; 2026
+  useEffect(() => {
+    loadTopUsers();
+     
+  }, []);
+
+  const loadTopUsers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.get('/top/users');
+      setUsers(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки топа:', err);
+      setError('Не удалось загрузить топ пользователей');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (error) return <div className="error-msg">{error}</div>;
+
+  const getMedal = (index) => {
+    const medals = ['👑', '🥇', '🥈', '🥉'];
+    return medals[index] || `#${index + 1}`;
+  };
+
+  return (
+    <div className="container top-page">
+      <Link to="/" className="back-btn">← На главную</Link>
+      <h1 className="top-title">🏆 Топ пользователей</h1>
+      <div className="top-users-list">
+        {users.map((user, index) => (
+          <Link to={`/user/${user._id}`} key={user._id} className="top-user-item">
+            <div className="top-user-rank">{getMedal(index)}</div>
+            <div className="top-user-avatar">
+              <div className="avatar-placeholder-small">{user.nickname?.[0] || '?'}</div>
+            </div>
+            <div className="top-user-info">
+              <div className="top-user-name">
+                {user.nickname || 'Пользователь'}
+                {user.isAdmin && <span className="admin-badge">👑</span>}
+              </div>
+              <div className="top-user-stats">
+                <span>⭐ {user.totalPoints || 0} баллов</span>
+                <span>🎯 {user.ratingsCount || 0} оценок</span>
+                <span>📝 {user.reviewsCount || 0} рецензий</span>
+                <span>💬 {user.commentsCount || 0} комментариев</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminPanel() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [pendingComments, setPendingComments] = useState([]);
+  const [pendingReviews, setPendingReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    loadAdminData();
+    
+  }, [navigate]);
+
+  const loadAdminData = async () => {
+    try {
+      const userResponse = await api.get('/auth/me');
+      setUser(userResponse.data);
+
+      if (!userResponse.data.isAdmin) {
+        navigate('/');
+        return;
+      }
+
+      const [commentsRes, reviewsRes] = await Promise.all([
+        api.get('/admin/pending/comments'),
+        api.get('/admin/pending/reviews')
+      ]);
+
+      setPendingComments(commentsRes.data || []);
+      setPendingReviews(reviewsRes.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки админ-панели:', err);
+      navigate('/');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const approveComment = async (id) => {
+    try {
+      await api.put(`/admin/comments/${id}/approve`);
+      setPendingComments(prev => prev.filter(c => c._id !== id));
+      showNotification({ title: 'Одобрено', message: 'Комментарий опубликован', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось одобрить комментарий', type: 'error' });
+    }
+  };
+
+  const rejectComment = async (id) => {
+    try {
+      await api.put(`/admin/comments/${id}/reject`);
+      setPendingComments(prev => prev.filter(c => c._id !== id));
+      showNotification({ title: 'Отклонено', message: 'Комментарий отклонён', type: 'info' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось отклонить комментарий', type: 'error' });
+    }
+  };
+
+  const approveReview = async (id) => {
+    try {
+      await api.put(`/admin/reviews/${id}/approve`);
+      setPendingReviews(prev => prev.filter(r => r._id !== id));
+      showNotification({ title: 'Одобрено', message: 'Рецензия опубликована', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось одобрить рецензию', type: 'error' });
+    }
+  };
+
+  const rejectReview = async (id) => {
+    try {
+      await api.put(`/admin/reviews/${id}/reject`);
+      setPendingReviews(prev => prev.filter(r => r._id !== id));
+      showNotification({ title: 'Отклонено', message: 'Рецензия отклонена', type: 'info' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось отклонить рецензию', type: 'error' });
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+
+  return (
+    <div className="container admin-panel">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+      <h1 className="admin-title">🛡️ Админ-панель</h1>
+      <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
+
+      <div className="admin-section glass-card">
+        <h2>💬 Комментарии на модерации ({pendingComments.length})</h2>
+        {pendingComments.length === 0 ? (
+          <p className="admin-empty">Нет комментариев для проверки</p>
+        ) : (
+          <div className="admin-list">
+            {pendingComments.map(c => (
+              <div key={c._id} className="admin-item">
+                <div className="admin-item-header">
+                  <span className="admin-item-author">👤 {c.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film">🎬 {c.filmId?.title || 'Фильм'}</span>
+                </div>
+                <p className="admin-item-text">{c.text}</p>
+                <div className="admin-item-actions">
+                  <button className="btn-approve" onClick={() => approveComment(c._id)}>✅ Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectComment(c._id)}>❌ Отклонить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="admin-section glass-card">
+        <h2>📝 Рецензии на модерации ({pendingReviews.length})</h2>
+        {pendingReviews.length === 0 ? (
+          <p className="admin-empty">Нет рецензий для проверки</p>
+        ) : (
+          <div className="admin-list">
+            {pendingReviews.map(r => (
+              <div key={r._id} className="admin-item">
+                <div className="admin-item-header">
+                  <span className="admin-item-author">👤 {r.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film">🎬 {r.filmId?.title || 'Фильм'}</span>
+                </div>
+                <h4 className="admin-item-title">{r.title}</h4>
+                <p className="admin-item-text">{r.text}</p>
+                <div className="admin-item-actions">
+                  <button className="btn-approve" onClick={() => approveReview(r._id)}>✅ Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectReview(r._id)}>❌ Отклонить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HomePage() {
+  const [films, setFilms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [user, setUser] = useState(null);
+  const [searchError, setSearchError] = useState('');
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+
+  const { events, loading: eventsLoading, addEvent, refresh: refreshEvents } = useActivityEvents();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    api.get('/auth/me')
+      .then(res => setUser(res.data))
+      .catch(err => {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+        console.warn('Не удалось загрузить пользователя:', err?.message || err);
+      });
+  }, []);
+
+  const loadFilms = useCallback(async (pageNum = 1) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.get(`/films?page=${pageNum}&limit=20`);
+      if (response.data && Array.isArray(response.data.films)) {
+        if (pageNum === 1) {
+          setFilms(response.data.films);
+        } else {
+          setFilms(prev => {
+            const existingIds = new Set(prev.map(f => f._id));
+            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+            return [...prev, ...newFilms];
+          });
+        }
+        setTotalPages(response.data.totalPages || 1);
+      } else {
+        setFilms([]);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки фильмов:', err);
+      setError('Не удалось загрузить фильмы. Попробуйте позже.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFilms(page);
+  }, [page, loadFilms]);
+
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
+
+  const loadMore = useCallback(() => {
+    if (page < totalPages) {
+      setPage(prev => prev + 1);
+    }
+  }, [page, totalPages]);
+
+  const handleSearch = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchError('Введите название фильма');
+      return;
+    }
+
+    setSearchError('');
+    setShowSearch(false);
+
+    try {
+      const response = await api.get('/tmdb/search', { params: { query } });
+      setSearchResults(response.data.results || []);
+      setShowSearch(true);
+    } catch (err) {
+      console.error('Ошибка поиска:', err);
+      setSearchError(err.response?.data?.error || 'Не удалось найти фильмы');
+      showNotification({
+        title: 'Ошибка поиска',
+        message: err.response?.data?.error || 'Не удалось найти фильмы',
+        type: 'error'
+      });
+    }
+  }, [searchQuery, showNotification]);
+
+  const importFilm = useCallback(async (tmdbId, filmTitle) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы добавлять фильмы', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+
+    if (isImporting) return;
+    setIsImporting(true);
+
+    try {
+      const response = await api.post('/films/import', { tmdbId });
+
+      if (response.data.alreadyExists) {
+        showNotification({ title: 'Уже в каталоге', message: `Фильм "${response.data.film.title}" уже есть. Переход...`, type: 'info' });
+        setTimeout(() => navigate(`/film/${response.data.film._id}`), 1000);
+        setIsImporting(false);
+        return;
+      }
+
+      setShowSearch(false);
+      setSearchQuery('');
+      setSearchResults([]);
+
+      if (user) {
+        try {
+          await addEvent({
+            type: 'film_add',
+            user: user.nickname,
+            film: filmTitle || 'Новый фильм',
+            filmId: response.data.film._id
+          });
+        } catch (eventErr) {
+          console.warn('Не удалось сохранить событие, но фильм добавлен:', eventErr?.message || eventErr);
+        }
+      }
+
+      setPage(1);
+
+      showNotification({ title: 'Фильм добавлен!', message: 'Фильм успешно добавлен в каталог', type: 'success' });
+
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить фильм', type: 'error' });
+    } finally {
+      setIsImporting(false);
+    }
+  }, [isImporting, user, addEvent, navigate, showNotification]);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/');
+    showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });
+  }, [navigate, showNotification]);
+
+  if (loading && page === 1) return <div className="loading">Загрузка...</div>;
+
+  const topFilms = [...films].filter(f => f.averageRating > 0).sort((a, b) => b.averageRating - a.averageRating).slice(0, 5);
+
+  return (
+    <div className="container">
+      <Header user={user} onLogout={handleLogout} />
+
+      <div className="hero glass-card">
+        <h2>Храм честного кино — 20 критериев для подробной оценки</h2>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Найти фильм в TMDB..."
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setSearchError(''); }}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <button onClick={handleSearch}>🔍 Найти</button>
+        </div>
+        {searchError && <div className="error-msg">{searchError}</div>}
+      </div>
+
+      {error && <div className="error-msg">{error}</div>}
+
+      {showSearch && searchResults.length > 0 && (
+        <div className="search-results glass-card">
+          <h3>Результаты поиска:</h3>
+          <div className="films-grid">
+            {searchResults.map((film) => (
+              <div key={film.id} className="film-card">
+                <img src={film.poster_path ? `https://image.tmdb.org/t/p/w200${film.poster_path}` : '/no-poster.jpg'} alt={film.title} />
+                <div className="film-info">
+                  <h4>{film.title}</h4>
+                  <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
+                  <button onClick={() => importFilm(film.id, film.title)} disabled={isImporting} className="btn-add">
+                    {isImporting ? 'Добавление...' : '➕ Добавить'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {topFilms.length > 0 && (
+        <div className="top-films-netflix">
+          <div className="top-header-netflix">
+            <h3>🏆 Топ-5 сообщества</h3>
+          </div>
+          <div className="top-scroll-container">
+            <div className="top-scroll-wrapper">
+              {topFilms.map((film, i) => (
+                <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
+                  <div className="top-card-poster-wrapper">
+                    <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
+                    <div className="top-card-rank">
+                      {i === 0 && '👑'}
+                      {i === 1 && '🥇'}
+                      {i === 2 && '🥈'}
+                      {i === 3 && '🥉'}
+                      {i >= 4 && `#${i + 1}`}
+                    </div>
+                    <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
+                      {film.averageRating?.toFixed(1)}
+                    </div>
+                  </div>
+                  <div className="top-card-info">
+                    <span className="top-card-title">{film.title}</span>
+                    <span className="top-card-year">{film.year}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ActivityFeed events={events} loading={eventsLoading} />
+
+      {films.length === 0 ? (
+        <div className="no-films glass-card">Нет добавленных фильмов. Найдите и добавьте первый!</div>
+      ) : (
+        <>
+          <div className="films-grid">
+            {films.map((film) => (
+              <Link to={`/film/${film._id}`} key={film._id} className="film-card-link">
+                <div className="film-card">
+                  <img src={film.poster || '/no-poster.jpg'} alt={film.title} />
+                  <div className="film-info">
+                    <h3>{film.title}</h3>
+                    <p>{film.year}</p>
+                    <div className="rating-badge" style={{ color: getScoreColor(film.averageRating) }}>
+                      {film.averageRating ? `${film.averageRating.toFixed(1)}` : 'Нет оценок'}
+                    </div>
+                    <span className="votes-count">👥 {film.votesCount || 0}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {page < totalPages && (
+            <div className="load-more">
+              <button onClick={loadMore} className="load-more-btn">Загрузить ещё</button>
+              <span className="page-info">{page} / {totalPages}</span>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function FilmPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [film, setFilm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userRating, setUserRating] = useState(null);
+  const [isRatingMode, setIsRatingMode] = useState(false);
+  const [filmUsers, setFilmUsers] = useState([]);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentError, setCommentError] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ title: '', text: '' });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const { showNotification } = useNotification();
+  const { addEvent } = useActivityEvents();
+  const [showUsersModal, setShowUsersModal] = useState(false);
+
+  const [base1, setBase1] = useState([5,5,5,5,5]);
+  const [base2, setBase2] = useState([5,5,5,5,5]);
+  const [base3, setBase3] = useState([5,5,5,5,5]);
+  const [base4, setBase4] = useState([5,5,5,5,5]);
+  const [subjectiveM, setSubjectiveM] = useState(5);
+  const [textReview, setTextReview] = useState('');
+
+  useEffect(() => {
+    loadFilm();
+    loadFilmUsers();
+    loadComments();
+    loadReviews();
+    loadCurrentUser();
+    
+  }, [id]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isRatingMode && !isSaving) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isRatingMode, isSaving]);
+
+  const loadCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await api.get('/auth/me');
+        setCurrentUser(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    }
+  };
+
+  const loadFilm = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/films/${id}`);
+      setFilm(response.data);
+      if (response.data?.userRating) {
+        const ur = response.data.userRating;
+        setUserRating(ur);
+        setBase1(ur.base1 || [5,5,5,5,5]);
+        setBase2(ur.base2 || [5,5,5,5,5]);
+        setBase3(ur.base3 || [5,5,5,5,5]);
+        setBase4(ur.base4 || [5,5,5,5,5]);
+        setSubjectiveM(ur.subjectiveM || 5);
+        setTextReview(ur.textReview || '');
+      } else {
+        setBase1([5,5,5,5,5]);
+        setBase2([5,5,5,5,5]);
+        setBase3([5,5,5,5,5]);
+        setBase4([5,5,5,5,5]);
+        setSubjectiveM(5);
+        setTextReview('');
+        setUserRating(null);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки фильма:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFilmUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const response = await api.get(`/films/${id}/users`);
+      setFilmUsers(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки пользователей:', err);
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const loadComments = async () => {
+    try {
+      const response = await api.get(`/comments/${id}`);
+      setComments(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки комментариев:', err);
+    }
+  };
+
+  const loadReviews = async () => {
+    try {
+      const response = await api.get(`/reviews/${id}`);
+      setReviews(response.data || []);
+    } catch (err) {
+      console.error('Ошибка загрузки рецензий:', err);
+    }
+  };
+
+  const handleRatingChange = useCallback((baseIndex, criterionIndex, value) => {
+    const setters = [setBase1, setBase2, setBase3, setBase4];
+    const setter = setters[baseIndex];
+    setter(prev => {
+      const newArr = [...prev];
+      newArr[criterionIndex] = Number(value);
+      return newArr;
+    });
+  }, []);
+
+  const calculatePreview = useCallback(() => {
+    const avg1 = base1.reduce((a,b)=>a+b,0)/5;
+    const avg2 = base2.reduce((a,b)=>a+b,0)/5;
+    const avg3 = base3.reduce((a,b)=>a+b,0)/5;
+    const avg4 = base4.reduce((a,b)=>a+b,0)/5;
+    const sum = avg1 + avg2 + avg3 + avg4;
+    const T = sum * TECHNICAL_MULTIPLIER;
+    const vibeMultiplier = 1 + (subjectiveM - 1) * VIBE_STEP;
+    const finalRaw = T * vibeMultiplier;
+    return Math.min(MAX_SCORE, Math.max(MIN_SCORE, Math.round(finalRaw)));
+  }, [base1, base2, base3, base4, subjectiveM]);
+
+  const saveRating = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы оценивать фильмы', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+
+    if (isSaving) return;
+    setIsSaving(true);
+
+    try {
+      const response = await api.post('/ratings', {
+        filmId: id,
+        base1,
+        base2,
+        base3,
+        base4,
+        subjectiveM,
+        textReview
+      });
+
+      setUserRating(response.data.rating);
+      await loadFilm();
+      await loadFilmUsers();
+      setIsRatingMode(false);
+
+      if (currentUser && film) {
+        await addEvent({
+          type: 'rating',
+          user: currentUser.nickname,
+          film: film.title,
+          filmId: film._id,
+          score: response.data.rating.finalScore
+        });
+      }
+
+      showNotification({ title: 'Оценка сохранена!', message: 'Ваша оценка успешно добавлена', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось сохранить оценку', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const openRatingDetails = async (ratingData) => {
+    try {
+      if (ratingData.base1 && ratingData.base1.length === 5) {
+        setSelectedRating(ratingData);
+        return;
+      }
+      const response = await api.get(`/ratings/${ratingData._id}/details`);
+      setSelectedRating(response.data);
+    } catch (err) {
+      console.error('Ошибка загрузки деталей оценки:', err);
+      showNotification({ title: 'Ошибка', message: 'Не удалось загрузить детали оценки', type: 'error' });
+    }
+  };
+
+    const openUsersModal = () => {
+    setShowUsersModal(true);
+  };
+
+  const toggleRatingMode = () => {
+    setIsRatingMode(prev => !prev);
+  };
+   
+  const addComment = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы комментировать', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+
+    const trimmedText = commentText.trim();
+    if (!trimmedText) {
+      setCommentError('Введите текст комментария');
+      return;
+    }
+
+    if (trimmedText.length < 2) {
+      setCommentError('Комментарий должен содержать минимум 2 символа');
+      return;
+    }
+
+    setCommentError('');
+
+    try {
+      await api.post('/comments', { filmId: id, text: trimmedText });
+      setCommentText('');
+      await loadComments();
+
+      if (currentUser && film) {
+        await addEvent({
+          type: 'comment',
+          user: currentUser.nickname,
+          film: film.title,
+          filmId: film._id
+        });
+      }
+
+      showNotification({ title: 'Комментарий добавлен', message: 'Ваш комментарий опубликован', type: 'success' });
+    } catch (err) {
+      setCommentError(err.response?.data?.error || 'Не удалось добавить комментарий');
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить комментарий', type: 'error' });
+    }
+  };
+
+  const likeComment = async (commentId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/comments/${commentId}/like`);
+      await loadComments();
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+    }
+  };
+
+  const addReview = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы написать рецензию', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    if (!userRating) {
+      showNotification({ title: 'Сначала оцените фильм', message: 'Чтобы написать рецензию, нужно оценить фильм', type: 'warning' });
+      return;
+    }
+
+    const trimmedTitle = newReview.title.trim();
+    const trimmedText = newReview.text.trim();
+
+    if (!trimmedTitle || !trimmedText) {
+      showNotification({ title: 'Заполните все поля', message: 'Заголовок и текст рецензии обязательны', type: 'warning' });
+      return;
+    }
+
+    try {
+      await api.post('/reviews', {
+        filmId: id,
+        ratingId: userRating._id,
+        title: trimmedTitle,
+        text: trimmedText
+      });
+      setNewReview({ title: '', text: '' });
+      setShowReviewForm(false);
+      await loadReviews();
+
+      if (currentUser && film) {
+        await addEvent({
+          type: 'review',
+          user: currentUser.nickname,
+          film: film.title,
+          filmId: film._id
+        });
+      }
+
+      showNotification({ title: 'Рецензия добавлена!', message: 'Ваша рецензия опубликована', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить рецензию', type: 'error' });
+    }
+  };
+
+  const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/reviews/${reviewId}/like`);
+      await loadReviews();
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (!film) return <div className="error">Фильм не найден</div>;
+
+  const previewScore = calculatePreview();
+
+  return (
+    <div className="container">
+      <div className="film-page">
+        <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+
+        <div className="film-header">
+          <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="film-poster-large" />
+          <div className="film-details">
+            <h1>{film.title}</h1>
+            <p className="film-year">{film.year}</p>
+            <p className="film-description">{film.description}</p>
+            <p><strong>Режиссёр:</strong> {film.director}</p>
+            <p><strong>Актёры:</strong> {film.actors?.join(', ') || 'Нет данных'}</p>
+            <div className="film-genres">
+              {film.genres?.map((g,i) => <span key={i} className="genre-tag">{g}</span>)}
+            </div>
+
+            <div className="film-rating-stats">
+              <div className="avg-rating" style={{ color: getScoreColor(film.averageRating) }}>
+                {film.averageRating ? `${film.averageRating.toFixed(1)}` : 'Нет оценок'}
+              </div>
+              <span>👥 {film.votesCount || 0} оценок</span>
+            </div>
+
+            {userRating && (
+              <div className="your-rating glass-card">
+                <h4>Ваша оценка:</h4>
+                <div className="user-rating-display" style={{ color: getScoreColor(userRating.finalScore) }}>
+                  {userRating.finalScore}
+                </div>
+              </div>
+            )}
+
+            <button className="rate-btn" onClick={toggleRatingMode}>
+              {isRatingMode ? 'Скрыть форму' : (userRating ? '✏️ Изменить оценку' : '⭐ Оценить фильм')}
+            </button>
+          </div>
+        </div>
+
+        <div className="reviews-section glass-card">
+          <div className="reviews-header">
+            <h3>📝 Рецензии ({reviews.length})</h3>
+            {currentUser && (
+              <button className="btn-add-review" onClick={() => setShowReviewForm(prev => !prev)}>
+                {showReviewForm ? 'Отменить' : '+ Написать рецензию'}
+              </button>
+            )}
+          </div>
+
+          {showReviewForm && (
+            <div className="review-form">
+              <input
+                type="text"
+                placeholder="Заголовок рецензии"
+                value={newReview.title}
+                onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+              />
+              <textarea
+                placeholder="Текст рецензии..."
+                value={newReview.text}
+                onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                rows="6"
+              />
+              <button onClick={addReview}>Опубликовать рецензию</button>
+            </div>
+          )}
+
+          <div className="reviews-list">
+            {reviews.map((review) => (
+              <div key={review._id} id={review._id} className="review-card">
+                <div className="review-header">
+                  <div className="review-author">
+                    <span className="review-nickname">{review.userId?.nickname || 'Пользователь'}</span>
+                    {review.userId?.isAdmin && <span className="admin-badge">👑</span>}
+                  </div>
+                  <div className="review-rating">
+                    ⭐ {review.ratingId?.finalScore || 'Нет оценки'}
+                  </div>
+                </div>
+                <h4 className="review-title">{review.title}</h4>
+                <p className="review-text">{review.text}</p>
+                <div className="review-actions">
+                  <button className="like-btn" onClick={() => likeReview(review._id)}>
+                    ❤️ {review.likes?.length || 0}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+               {/* ОЦЕНИЛИ ФИЛЬМ */}
+        <div className="film-users glass-card">
+          <div className="film-users-header">
+            <h3>👥 Оценили фильм: <strong>{filmUsers.length}</strong> человек</h3>
+            {filmUsers.length > 0 && (
+              <button className="btn-show-users" onClick={openUsersModal}>
+                👁️ Подробнее
+              </button>
+            )}
+          </div>
+          
+          {usersLoading ? (
+            <div className="loading-users">Загрузка...</div>
+          ) : filmUsers.length === 0 ? (
+            <p className="no-users">Пока никто не оценил этот фильм. Будьте первым! ⭐</p>
+          ) : (
+            <div className="users-preview">
+              {filmUsers.slice(0, 5).map((item) => (
+                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-preview">
+                  <Link to={`/user/${item.user._id}`} className="user-link">👤 {item.user.nickname || 'Пользователь'}</Link>
+                  <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
+                    {item.rating.finalScore}
+                  </span>
+                </div>
+              ))}
+              {filmUsers.length > 5 && (
+                <div className="more-users">и ещё {filmUsers.length - 5} человек...</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* МОДАЛЬНОЕ ОКНО СО ВСЕМИ ОЦЕНКАМИ */}
+        {showUsersModal && (
+          <div className="modal-overlay" onClick={() => setShowUsersModal(false)}>
+            <div className="modal-content users-modal" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
+              <h2>👥 Все оценки фильма</h2>
+              <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
+              
+              <div className="users-modal-list">
+                {filmUsers.map((item) => (
+                  <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
+                    <div className="user-info">
+                      <Link to={`/user/${item.user._id}`} className="user-link">
+                        👤 {item.user.nickname || 'Пользователь'}
+                      </Link>
+                      {item.user.isAdmin && <span className="admin-badge">👑</span>}
+                    </div>
+                    <div className="rating-info">
+                      <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
+                        {item.rating.finalScore}
+                      </span>
+                      <button className="details-btn" onClick={() => {
+                        setShowUsersModal(false);
+                        openRatingDetails(item.rating);
+                      }}>
+                        🔍 Детали
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isRatingMode && (
+          <div className="rating-form glass-card">
+            <h2>Оценка по 20 критериям</h2>
+            <p className="rating-hint">Оценка от 1 до 10 (1 — ужасно, 10 — идеально)</p>
+
+            {[0,1,2,3].map((baseIndex) => {
+              const bases = [base1, base2, base3, base4];
+              return (
+                <div key={baseIndex} className="rating-base">
+                  <h3>{baseNames[baseIndex]}</h3>
+                  {criteriaNames[baseIndex].map((name, critIndex) => (
+                    <div key={critIndex} className="criterion">
+                      <label>
+                        {name}
+                        <span className="criterion-hint" title={baseDescriptions[baseIndex][critIndex]}>❓</span>
+                      </label>
+                      <div className="slider-container">
+                        <span>1</span>
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          step="1"
+                          value={bases[baseIndex][critIndex]}
+                          onChange={(e) => handleRatingChange(baseIndex, critIndex, e.target.value)}
+                          style={{ ['--fill']: `${((bases[baseIndex][critIndex] - 1) / 9) * 100}%` }}
+                        />
+                        <span>10</span>
+                        <span className="value-display">{bases[baseIndex][critIndex]}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+
+            <div className="subjective-block">
+              <h3>Субъективный множитель «Вайб»</h3>
+              <p>Насколько лично вам понравился фильм, несмотря на технические оценки?</p>
+              <div className="slider-container">
+                <span>1</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  value={subjectiveM}
+                  onChange={(e) => setSubjectiveM(Number(e.target.value))}
+                  style={{ ['--fill']: `${((subjectiveM - 1) / 9) * 100}%` }}
+                />
+                <span>10</span>
+                <span className="value-display">{subjectiveM}</span>
+              </div>
+            </div>
+
+            <div className="text-review">
+              <h3>Текстовый отзыв (необязательно)</h3>
+              <textarea
+                value={textReview}
+                onChange={(e) => setTextReview(e.target.value.slice(0, 1000))}
+                placeholder="Напишите свои впечатления..."
+                rows="4"
+                maxLength={1000}
+              />
+              <div className="char-counter">{textReview.length}/1000</div>
+            </div>
+
+            <div className="rating-preview">
+              <h3>Итоговая оценка:</h3>
+              <div className="preview-score" style={{ color: getScoreColor(previewScore) }}>{previewScore}</div>
+              <div className="score-bar" style={{ width: `${(previewScore - MIN_SCORE) / (MAX_SCORE - MIN_SCORE) * 100}%`, background: 'linear-gradient(to right, #7c3aed, #22d3ee)' }}></div>
+              <div className="score-labels">
+                <span>6 (провал)</span>
+                <span>90 (шедевр)</span>
+              </div>
+              <button onClick={saveRating} className="save-rating-btn" disabled={isSaving}>
+                {isSaving ? 'Сохранение...' : '💾 Сохранить оценку'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="comments-section glass-card">
+          <h3>💬 Комментарии ({comments.length})</h3>
+          <div className="comments-list">
+            {comments.map((comment) => (
+              <div key={comment._id} id={comment._id} className="comment-item">
+                <div className="comment-author">
+                  <span className="comment-nickname">{comment.userId?.nickname || 'Пользователь'}</span>
+                  {comment.userId?.isAdmin && <span className="admin-badge">👑</span>}
+                </div>
+                <p className="comment-text">{comment.text}</p>
+                <div className="comment-actions">
+                  <button className="like-btn" onClick={() => likeComment(comment._id)}>❤️ {comment.likes?.length || 0}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+          {currentUser && (
+            <div className="comment-form">
+              <input
+                type="text"
+                placeholder="Написать комментарий..."
+                value={commentText}
+                onChange={(e) => { setCommentText(e.target.value); setCommentError(''); }}
+                onKeyPress={(e) => e.key === 'Enter' && addComment()}
+              />
+              <button onClick={addComment}>📤</button>
+              {commentError && <div className="error-msg">{commentError}</div>}
+            </div>
+          )}
+        </div>
+
+        {film.trailer && (
+          <div className="trailer glass-card">
+            <h3>Трейлер</h3>
+            <iframe
+              src={film.trailer}
+              title="Трейлер"
+              allowFullScreen
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+              style={{ width: '100%', height: '380px', border: 'none' }}
+            />
+          </div>
+        )}
+      </div>
+
+      <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+    </div>
+  );
+}
+
+function LoginPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    if (!validateEmail(email)) {
+      setError('Введите корректный email');
+      setLoading(false);
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError('Пароль должен содержать минимум 6 символов');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && !validateNickname(nickname)) {
+      setError('Никнейм должен быть от 2 до 20 символов');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const data = isLogin ? { email, password } : { email, password, nickname };
+
+      const response = await api.post(endpoint, data);
+      localStorage.setItem('token', response.data.token);
+      navigate('/');
+      showNotification({ title: isLogin ? 'Добро пожаловать!' : 'Регистрация прошла успешно!', message: isLogin ? 'Вы вошли в аккаунт' : 'Добро пожаловать в Синефилиум!', type: 'success' });
+    } catch (err) {
+      setError(err.response?.data?.error || 'Произошла ошибка');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="container auth-container">
+      <div className="auth-box glass-card">
+        <h1>{isLogin ? 'Вход в Синефилиум' : 'Регистрация'}</h1>
+        {error && <div className="error-msg">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          {!isLogin && (
+            <input type="text" placeholder="Никнейм" value={nickname} onChange={(e) => setNickname(e.target.value)} required minLength={2} maxLength={20} />
+          )}
+          <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+          <button type="submit" disabled={loading}>{loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}</button>
+        </form>
+        <p onClick={() => { setIsLogin(!isLogin); setError(''); }} className="toggle-auth">
+          {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ProfilePage() {
+  const [user, setUser] = useState(null);
+  const [ratings, setRatings] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [adminSecret, setAdminSecret] = useState('');
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminError, setAdminError] = useState('');
+  const [adminSuccess, setAdminSuccess] = useState('');
+  const [achievementProgress, setAchievementProgress] = useState(null);
+  const [activeTab, setActiveTab] = useState('ratings');
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    loadProfile();
+  }, [navigate]);
+
+  const loadAchievementProgress = async (userData) => {
+  try {
+    const response = await api.get('/users/me/achievements');
+    setAchievementProgress(response.data);
+
+    if (response.data?.achievements) {
+      setUser(prev => ({
+        ...prev,
+        achievements: {
+          all: response.data.achievements,
+          active: response.data.active || []
+        },
+        totalPoints: response.data.totalPoints || prev?.totalPoints
+      }));
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки прогресса достижений:', err);
+  }
+};
+
+  const loadProfile = async () => {
+    try {
+      const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
+        api.get('/auth/me'),
+        api.get('/ratings/user'),
+        api.get('/reviews/user')
+      ]);
+      const userData = userResponse.data;
+      setUser(userData);
+      setRatings(ratingsResponse.data || []);
+      setReviews(reviewsResponse.data || []);
+      await loadAchievementProgress(userData);
+    } catch (err) {
+      console.error('Ошибка загрузки профиля:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+    showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });
+  };
+
+  const openRatingDetails = async (rating) => {
+  try {
+    const ratingId = rating._id || rating.id;
+    if (!ratingId) {
+      showNotification({ 
+        title: 'Ошибка', 
+        message: 'ID оценки не найден', 
+        type: 'error' 
+      });
+      return;
+    }
+
+    const response = await api.get(`/ratings/${ratingId}/details`);
+    setSelectedRating(response.data);
+  } catch (err) {
+    console.error('Ошибка загрузки деталей оценки:', err);
+    showNotification({ 
+      title: 'Ошибка', 
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
+      type: 'error' 
+    });
+  }
+};
+
+  const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/reviews/${reviewId}/like`);
+      const response = await api.get('/reviews/user');
+      setReviews(response.data || []);
+      showNotification({ title: 'Лайк поставлен!', message: 'Вы оценили рецензию', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+    }
+  };
+
+  const activateAdmin = async () => {
+    if (!adminSecret.trim()) {
+      setAdminError('Введите секретный ключ');
+      return;
+    }
+    setAdminLoading(true);
+    setAdminError('');
+    setAdminSuccess('');
+    try {
+      const response = await api.post('/admin/make', { secretKey: adminSecret });
+      setAdminSuccess(response.data.message);
+      setUser(prev => ({ ...prev, isAdmin: true, totalPoints: response.data.totalPoints }));
+      setAdminSecret('');
+      showNotification({ title: 'Поздравляем!', message: 'Вы стали администратором! 👑', type: 'success' });
+    } catch (err) {
+      setAdminError(err.response?.data?.error || 'Ошибка активации');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const avgRating = ratings.length ? (ratings.reduce((sum,r)=>sum+r.finalScore,0)/ratings.length).toFixed(1) : 'Нет';
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (!user) return <div className="error">Не удалось загрузить профиль</div>;
+
+       return (
+    <div className="container profile-page">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+
+      <div className="profile-header glass-card">
+        <div className="profile-avatar">
+          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
+        </div>
+        <div className="profile-info">
+          <h1>
+            {user.nickname || 'Пользователь'}
+            {user.isAdmin && <span className="admin-badge"> 👑</span>}
+          </h1>
+          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
+          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
+          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
+          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
+
+          <div className="achievements-section" style={{ marginTop: '15px' }}>
+            <h4>🏅 Достижения</h4>
+            {user.achievements?.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                {user.achievements.map(ach => (
+                  <span key={ach.id || ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {ach.icon || '🏅'} {ach.title || ach}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
+            )}
+          </div>
+        </div>{/* ← ДОБАВЛЕНО: конец profile-info */}
+      </div>{/* ← ДОБАВЛЕНО: конец profile-header */}
+
+      {/* Вкладки */}
+      <div className="profile-tabs glass-card">
+        <div className="tabs-header">
+          <button
+            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ratings')}
+          >
+            ⭐ Оценки ({ratings.length})
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            📝 Рецензии ({reviews.length})
+          </button>
+        </div>
+
+        {/* Вкладка с оценками */}
+        {activeTab === 'ratings' && (
+          <div className="profile-ratings">
+            <h2>Оценки пользователя</h2>
+            {ratings.length === 0 ? (
+              <p>Пользователь еще не оценил ни одного фильма</p>
+            ) : (
+              <div className="ratings-list">
+                {ratings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
+                      <div className="rating-film-info">
+                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
+                        <div>
+                          <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                          <p>{rating.film?.year || rating.filmId?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Вкладка с рецензиями */}
+        {activeTab === 'reviews' && (
+          <div className="profile-reviews">
+            <h2>Рецензии пользователя</h2>
+            {reviews.length === 0 ? (
+              <p>Пользователь еще не написал ни одной рецензии</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => (
+                  <div key={review._id} className="review-item">
+                    <div className="review-header">
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
+                        <h3 className="review-title">{review.title}</h3>
+                        <p className="review-film-name">
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
+                          ({review.film?.year || review.filmId?.year || 'N/A'})
+                        </p>
+                      </Link>
+                      <div className="review-rating">
+                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
+                      </div>
+                    </div>
+
+                    <p className="review-text">{review.text}</p>
+
+                    <div className="review-footer">
+                      <div className="review-actions">
+                        <button
+                          className="like-btn"
+                          onClick={() => likeReview(review._id)}
+                        >
+                          ❤️ {review.likes?.length || 0}
+                        </button>
+                        <span className="review-date">
+                          📅 {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-go-to-film">
+                        🎬 Перейти к фильму
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+    </div>
+  );
+}
+      
+
+
+
+function UserProfilePage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [ratings, setRatings] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [activeTab, setActiveTab] = useState('ratings');
+  const [currentUser, setCurrentUser] = useState(null);
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    loadUserProfile();
+    loadCurrentUser();
+  }, [id]);
+
+  const loadCurrentUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await api.get('/auth/me');
+        setCurrentUser(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+        }
+      }
+    }
+  };
+
+  const loadUserProfile = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/users/${id}`);
+      setUser(response.data.user);
+      setRatings(response.data.ratings || []);
+      setReviews(response.data.reviews || []);
+    } catch (err) {
+      console.error('Ошибка загрузки профиля:', err);
+      if (err.response?.status === 404) {
+        setUser(null);
+      }
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.status === 404 ? 'Пользователь не найден' : 'Не удалось загрузить профиль',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+const openRatingDetails = async (rating) => {
+  try {
+    const ratingId = rating._id || rating.id;
+    if (!ratingId) {
+      showNotification({ 
+        title: 'Ошибка', 
+        message: 'ID оценки не найден', 
+        type: 'error' 
+      });
+      return;
+    }
+
+    const response = await api.get(`/ratings/${ratingId}/details`);
+    setSelectedRating(response.data);
+  } catch (err) {
+    console.error('Ошибка загрузки деталей оценки:', err);
+    showNotification({ 
+      title: 'Ошибка', 
+      message: err.response?.data?.error || 'Не удалось загрузить детали оценки', 
+      type: 'error' 
+    });
+  }
+};
+
+  const likeReview = async (reviewId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post(`/reviews/${reviewId}/like`);
+      // Обновляем список рецензий
+      const response = await api.get(`/users/${id}`);
+      setReviews(response.data.reviews || []);
+      showNotification({ title: 'Лайк поставлен!', message: 'Вы оценили рецензию', type: 'success' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+    }
+  };
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+
+  if (!user) {
+    return (
+      <div className="container">
+        <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+        <div className="error-msg" style={{ textAlign: 'center', padding: '40px' }}>
+          <h2>😕 Пользователь не найден</h2>
+          <p>Возможно, этот пользователь был удалён или вы перешли по неверной ссылке.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isOwnProfile = currentUser?._id === user._id;
+
+  return (
+    <div className="container profile-page">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+
+      <div className="profile-header glass-card">
+        <div className="profile-avatar">
+          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
+        </div>
+        <div className="profile-info">
+          <h1>
+            {user.nickname || 'Пользователь'}
+            {user.isAdmin && <span className="admin-badge"> 👑</span>}
+          </h1>
+          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
+          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
+          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
+          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
+          
+<div className="achievements-section" style={{ marginTop: '15px' }}>
+  <h4>🏅 Достижения</h4>
+  {user.achievements?.length > 0 ? (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+      {user.achievements.map(ach => (
+        <span key={ach.id || ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          {ach.icon || '🏅'} {ach.title || ach}
         </span>
-        <div class="footer-right">
-            <span class="timer" id="timerDisplay">⏱ 0:00:00</span>
-            <span class="hotkeys-hint">
-                <kbd>Ctrl+S</kbd> сохр <kbd>Ctrl+E</kbd> эксп <kbd>Ctrl+T</kbd> тема
-                <kbd>Ctrl+F</kbd> фокус <kbd>Ctrl+H</kbd> поиск
-            </span>
+      ))}
+    </div>
+    ) : (
+    <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
+  )}
+          </div>{/* конец achievements-section */}
+        </div>{/* конец profile-info */}
+      </div>{/* конец profile-header */}
+
+      {/* Вкладки */}
+      <div className="profile-tabs glass-card">
+
+        <div className="tabs-header">
+          <button 
+            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ratings')}
+          >
+            ⭐ Оценки ({ratings.length})
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            📝 Рецензии ({reviews.length})
+          </button>
         </div>
-    </footer>
 
-    <script>
-        (function() {
-            'use strict';
-
-            // ===== CONSTANTS =====
-            const PROJECTS_KEY = 'storyphilium_pro_projects';
-            const CURRENT_PROJECT_KEY = 'storyphilium_pro_current';
-            const THEME_KEY = 'storyphilium_pro_theme';
-            const FOCUS_KEY = 'storyphilium_pro_focus';
-            const SIDEBAR_KEY = 'storyphilium_pro_sidebar';
-            const MAX_HISTORY = 60;
-            const DEBOUNCE_DELAY = 500;
-
-            // ===== DOM REFS =====
-            const textarea = document.getElementById('scriptInput');
-            const charCount = document.getElementById('charCount');
-            const wordCount = document.getElementById('wordCount');
-            const lineCount = document.getElementById('lineCount');
-            const pageCount = document.getElementById('pageCount');
-            const sceneCount = document.getElementById('sceneCount');
-            const charactersCount = document.getElementById('charactersCount');
-            const selCharCount = document.getElementById('selCharCount');
-            const selectionStats = document.getElementById('selectionStats');
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const timerDisplay = document.getElementById('timerDisplay');
-            const exportBtn = document.getElementById('exportBtn');
-            const exportFormat = document.getElementById('exportFormat');
-            const clearBtn = document.getElementById('clearBtn');
-            const themeSelect = document.getElementById('themeSelect');
-            const focusToggle = document.getElementById('focusToggle');
-            const exitFocusBtn = document.getElementById('exitFocusBtn');
-            const findToggle = document.getElementById('findToggle');
-            const findReplaceBar = document.getElementById('findReplaceBar');
-            const findInput = document.getElementById('findInput');
-            const replaceInput = document.getElementById('replaceInput');
-            const findNextBtn = document.getElementById('findNextBtn');
-            const replaceBtn = document.getElementById('replaceBtn');
-            const replaceAllBtn = document.getElementById('replaceAllBtn');
-            const closeFindBtn = document.getElementById('closeFindBtn');
-            const undoBtn = document.getElementById('undoBtn');
-            const redoBtn = document.getElementById('redoBtn');
-            const projectSelect = document.getElementById('projectSelect');
-            const newProjectBtn = document.getElementById('newProjectBtn');
-            const deleteProjectBtn = document.getElementById('deleteProjectBtn');
-            const printContent = document.querySelector('.print-content');
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-            const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-            const sceneList = document.getElementById('sceneList');
-            const characterList = document.getElementById('characterList');
-            const tabButtons = document.querySelectorAll('.sidebar-tabs button');
-            const tabPanes = {
-                scenes: document.getElementById('tab-scenes'),
-                characters: document.getElementById('tab-characters')
-            };
-
-            // ===== STATE =====
-            let saveTimer = null;
-            let timerInterval = null;
-            let startTime = Date.now();
-            let elapsedSeconds = 0;
-            let isFocus = localStorage.getItem(FOCUS_KEY) === 'true';
-            let isSidebarOpen = localStorage.getItem(SIDEBAR_KEY) !== 'closed';
-            let history = [];
-            let historyIndex = -1;
-            let isUndoRedo = false;
-            let currentTheme = localStorage.getItem(THEME_KEY) || 'cosmic';
-
-            // ===== PROJECTS MANAGEMENT =====
-            function getProjects() {
-                try {
-                    const data = localStorage.getItem(PROJECTS_KEY);
-                    return data ? JSON.parse(data) : {};
-                } catch { return {}; }
-            }
-
-            function saveProjects(projects) {
-                localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
-            }
-
-            function getCurrentProject() {
-                return localStorage.getItem(CURRENT_PROJECT_KEY) || 'default';
-            }
-
-            function setCurrentProject(name) {
-                localStorage.setItem(CURRENT_PROJECT_KEY, name);
-            }
-
-            function loadProject(name) {
-                const projects = getProjects();
-                const content = projects[name] || '';
-                textarea.value = content;
-                history = [content];
-                historyIndex = 0;
-                setCurrentProject(name);
-                updateStats();
-                saveScript(false);
-                populateProjectSelect();
-                projectSelect.value = name;
-                statusText.textContent = `📁 ${name}`;
-                setTimeout(() => { statusText.textContent = 'Сохранено'; }, 1500);
-                updateSidebar();
-            }
-
-            function saveCurrentProject() {
-                const name = getCurrentProject();
-                const projects = getProjects();
-                projects[name] = textarea.value;
-                saveProjects(projects);
-            }
-
-            function createProject() {
-                const name = prompt('Введите название нового проекта:', 'Новый сценарий');
-                if (!name || name.trim() === '') return;
-                const cleanName = name.trim();
-                const projects = getProjects();
-                if (projects[cleanName] !== undefined) {
-                    alert('Проект с таким названием уже существует!');
-                    return;
-                }
-                saveCurrentProject();
-                projects[cleanName] = '';
-                saveProjects(projects);
-                loadProject(cleanName);
-            }
-
-            function deleteCurrentProject() {
-                const name = getCurrentProject();
-                if (name === 'default') {
-                    alert('Нельзя удалить проект по умолчанию.');
-                    return;
-                }
-                if (!confirm(`Удалить проект "${name}"? Это действие необратимо.`)) return;
-                saveCurrentProject();
-                const projects = getProjects();
-                delete projects[name];
-                saveProjects(projects);
-                if (projects['default'] === undefined) {
-                    projects['default'] = '';
-                    saveProjects(projects);
-                }
-                loadProject('default');
-            }
-
-            function populateProjectSelect() {
-                const projects = getProjects();
-                const current = getCurrentProject();
-                projectSelect.innerHTML = '';
-                const names = Object.keys(projects);
-                if (names.length === 0) {
-                    projects['default'] = '';
-                    saveProjects(projects);
-                    names.push('default');
-                }
-                names.sort();
-                for (const name of names) {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-                    if (name === current) option.selected = true;
-                    projectSelect.appendChild(option);
-                }
-            }
-
-            // ===== THEME =====
-            function applyTheme(theme) {
-                currentTheme = theme;
-                document.documentElement.setAttribute('data-theme', theme);
-                themeSelect.value = theme;
-                localStorage.setItem(THEME_KEY, theme);
-            }
-            applyTheme(currentTheme);
-            themeSelect.addEventListener('change', function() {
-                applyTheme(this.value);
-            });
-
-            // ===== FOCUS =====
-            function applyFocus(focus) {
-                isFocus = focus;
-                document.body.classList.toggle('focus-mode', focus);
-                focusToggle.textContent = focus ? '◉' : '◎';
-                exitFocusBtn.classList.toggle('visible', focus);
-                localStorage.setItem(FOCUS_KEY, focus ? 'true' : 'false');
-                if (focus) closeSidebar();
-                if (focus) textarea.focus();
-            }
-            applyFocus(isFocus);
-            focusToggle.addEventListener('click', () => applyFocus(!isFocus));
-            exitFocusBtn.addEventListener('click', () => applyFocus(false));
-
-            // ===== SIDEBAR =====
-            function toggleSidebar() {
-                if (isSidebarOpen) {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
-            }
-
-            function openSidebar() {
-                isSidebarOpen = true;
-                sidebar.classList.remove('closed');
-                localStorage.setItem(SIDEBAR_KEY, 'open');
-                updateSidebar();
-            }
-
-            function closeSidebar() {
-                isSidebarOpen = false;
-                sidebar.classList.add('closed');
-                localStorage.setItem(SIDEBAR_KEY, 'closed');
-            }
-
-            toggleSidebarBtn.addEventListener('click', toggleSidebar);
-            closeSidebarBtn.addEventListener('click', closeSidebar);
-
-            if (!isSidebarOpen) {
-                sidebar.classList.add('closed');
-            } else {
-                sidebar.classList.remove('closed');
-            }
-
-            // ===== SIDEBAR TABS =====
-            tabButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    tabButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const tab = this.dataset.tab;
-                    Object.keys(tabPanes).forEach(key => {
-                        tabPanes[key].classList.toggle('active', key === tab);
-                    });
-                });
-            });
-
-            // ===== SIDEBAR CONTENT =====
-            function parseScenes(text) {
-                const lines = text.split('\n');
-                const scenes = [];
-                let sceneNum = 0;
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    const match = line.match(/^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)\s*(.*)/i);
-                    if (match) {
-                        sceneNum++;
-                        const heading = match[2] || '';
-                        let desc = '';
-                        for (let j = i + 1; j < lines.length; j++) {
-                            const next = lines[j].trim();
-                            if (next && !next.match(/^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)/i) && !next.match(
-                                    /^[А-ЯA-Z\s\-']+$/)) {
-                                desc = next.substring(0, 60);
-                                break;
-                            }
-                            if (next && next.match(/^[А-ЯA-Z\s\-']+$/)) break;
-                        }
-                        scenes.push({ num: sceneNum, heading: heading, desc: desc, lineIndex: i });
-                    }
-                }
-                return scenes;
-            }
-
-            function parseCharacters(text) {
-                const lines = text.split('\n');
-                const chars = new Set();
-                for (const line of lines) {
-                    const trimmed = line.trim();
-                    if (trimmed.length > 0 && trimmed === trimmed.toUpperCase() &&
-                        !trimmed.startsWith('НАР.') && !trimmed.startsWith('ИНТ.') && !trimmed.startsWith('ЭКСТ.') &&
-                        !trimmed.startsWith('NAR.') && !trimmed.startsWith('INT.') && !trimmed.startsWith('EXT.') &&
-                        !trimmed.startsWith('(') && !trimmed.startsWith('[') &&
-                        !trimmed.match(/^\d+\./) &&
-                        trimmed.match(/^[А-ЯA-Z\s\-']+$/)) {
-                        chars.add(trimmed);
-                    }
-                }
-                return Array.from(chars).sort();
-            }
-
-            let updateSidebarTimer = null;
-
-            function updateSidebar() {
-                clearTimeout(updateSidebarTimer);
-                updateSidebarTimer = setTimeout(() => {
-                    const text = textarea.value;
-                    const scenes = parseScenes(text);
-                    sceneList.innerHTML = '';
-                    if (scenes.length === 0) {
-                        sceneList.innerHTML = '<div class="sidebar-empty">Нет сцен</div>';
-                    } else {
-                        for (const sc of scenes) {
-                            const div = document.createElement('div');
-                            div.className = 'sidebar-item';
-                            div.innerHTML = `
-                                <span class="item-num">${sc.num}</span>
-                                <span class="item-name">${sc.heading || 'Сцена'}</span>
-                                ${sc.desc ? `<span class="item-desc">${sc.desc}</span>` : ''}
-                            `;
-                            div.addEventListener('click', () => {
-                                const lines = text.split('\n');
-                                let pos = 0;
-                                for (let i = 0; i < sc.lineIndex && i < lines.length; i++) {
-                                    pos += lines[i].length + 1;
-                                }
-                                textarea.focus();
-                                textarea.setSelectionRange(pos, pos);
-                                const computedLH = getComputedStyle(textarea).lineHeight;
-                                let lineHeight = parseFloat(computedLH);
-                                if (isNaN(lineHeight)) lineHeight = 30;
-                                textarea.scrollTop = sc.lineIndex * lineHeight - 100;
-                            });
-                            sceneList.appendChild(div);
-                        }
-                    }
-
-                    const chars = parseCharacters(text);
-                    characterList.innerHTML = '';
-                    if (chars.length === 0) {
-                        characterList.innerHTML = '<div class="sidebar-empty">Нет персонажей</div>';
-                    } else {
-                        for (const ch of chars) {
-                            const div = document.createElement('div');
-                            div.className = 'sidebar-item';
-                            div.innerHTML = `<span class="item-name">${ch}</span>`;
-                            div.addEventListener('click', () => {
-                                const index = text.indexOf(ch);
-                                if (index !== -1) {
-                                    textarea.focus();
-                                    textarea.setSelectionRange(index, index + ch.length);
-                                    const lines = text.substring(0, index).split('\n');
-                                    const computedLH = getComputedStyle(textarea).lineHeight;
-                                    let lineHeight = parseFloat(computedLH);
-                                    if (isNaN(lineHeight)) lineHeight = 30;
-                                    textarea.scrollTop = (lines.length - 1) * lineHeight - 50;
-                                }
-                            });
-                            characterList.appendChild(div);
-                        }
-                    }
-                }, DEBOUNCE_DELAY);
-            }
-
-            // ===== TIMER =====
-            function updateTimer() {
-                const total = Math.floor((Date.now() - startTime) / 1000) + elapsedSeconds;
-                const h = String(Math.floor(total / 3600)).padStart(2, '0');
-                const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
-                const s = String(total % 60).padStart(2, '0');
-                timerDisplay.textContent = `⏱ ${h}:${m}:${s}`;
-            }
-
-            function startTimer() {
-                startTime = Date.now();
-                clearInterval(timerInterval);
-                timerInterval = setInterval(updateTimer, 1000);
-                updateTimer();
-            }
-            startTimer();
-
-            // ===== HISTORY =====
-            function pushHistory() {
-                if (isUndoRedo) return;
-                const current = textarea.value;
-                if (history.length > 0 && history[historyIndex] === current) return;
-                history = history.slice(0, historyIndex + 1);
-                history.push(current);
-                if (history.length > MAX_HISTORY) {
-                    history.shift();
-                }
-                historyIndex = history.length - 1;
-            }
-
-            function undo() {
-                if (historyIndex <= 0) return;
-                isUndoRedo = true;
-                historyIndex--;
-                textarea.value = history[historyIndex];
-                textarea.dispatchEvent(new Event('input'));
-                isUndoRedo = false;
-                updateStats();
-                updateSidebar();
-            }
-
-            function redo() {
-                if (historyIndex >= history.length - 1) return;
-                isUndoRedo = true;
-                historyIndex++;
-                textarea.value = history[historyIndex];
-                textarea.dispatchEvent(new Event('input'));
-                isUndoRedo = false;
-                updateStats();
-                updateSidebar();
-            }
-
-            // ===== STATS =====
-            function updateStats() {
-                const text = textarea.value;
-                const chars = text.length;
-                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-                const lines = text ? text.split('\n').length : 0;
-                const pages = Math.max(1, Math.ceil(chars / 1000));
-                const sceneMatches = text.match(/^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)/gim);
-                const scenes = sceneMatches ? sceneMatches.length : 0;
-                const linesArr = text.split('\n');
-                let charNames = new Set();
-                for (let line of linesArr) {
-                    const trimmed = line.trim();
-                    if (trimmed.length > 0 && trimmed === trimmed.toUpperCase() &&
-                        !trimmed.startsWith('НАР.') && !trimmed.startsWith('ИНТ.') && !trimmed.startsWith('ЭКСТ.') &&
-                        !trimmed.startsWith('NAR.') && !trimmed.startsWith('INT.') && !trimmed.startsWith('EXT.') &&
-                        !trimmed.startsWith('(') && !trimmed.startsWith('[') &&
-                        !trimmed.match(/^\d+\./) &&
-                        trimmed.match(/^[А-ЯA-Z\s\-']+$/)) {
-                        charNames.add(trimmed);
-                    }
-                }
-                charCount.textContent = chars;
-                wordCount.textContent = words;
-                lineCount.textContent = lines;
-                pageCount.textContent = pages;
-                sceneCount.textContent = scenes;
-                charactersCount.textContent = charNames.size;
-
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                if (start !== end) {
-                    const sel = text.substring(start, end);
-                    selCharCount.textContent = sel.length;
-                    selectionStats.style.display = 'inline';
-                } else {
-                    selectionStats.style.display = 'none';
-                }
-            }
-
-            let statsTimer = null;
-
-            function scheduleStatsUpdate() {
-                clearTimeout(statsTimer);
-                statsTimer = setTimeout(() => {
-                    updateStats();
-                    updateSidebar();
-                }, 200);
-            }
-
-            // ===== SAVE =====
-            function saveScript(showFeedback = true) {
-                saveCurrentProject();
-                if (showFeedback) {
-                    statusDot.className = 'status-dot saved';
-                    statusText.textContent = 'Сохранено';
-                    setTimeout(() => {
-                        statusDot.className = 'status-dot saved';
-                    }, 2000);
-                }
-                pushHistory();
-                updateStats();
-                updateSidebar();
-            }
-
-            function triggerAutoSave() {
-                clearTimeout(saveTimer);
-                statusDot.className = 'status-dot saving';
-                statusText.textContent = 'Сохранение…';
-                saveTimer = setTimeout(() => saveScript(true), 1000);
-            }
-
-            // ===== LOAD DEFAULT =====
-            function loadDefaultScript() {
-                return `НАР. КВАРТИРА ИВАНА - ДЕНЬ
-
-        Иван сидит на диване, смотрит в стену. За окном шумят машины.
-
-        ИВАН
-        (вздыхая)
-        Опять этот кошмар. Сколько можно?
-
-        Он встаёт, подходит к окну.
-
-        ИНТ. КАФЕ "У КОФЕЙНИ" - УТРО
-
-        В кафе тихо играет джаз. Ольга и Дмитрий сидят за столиком у окна.
-
-        ОЛЬГА
-        Ты сегодня какой-то задумчивый.
-
-        ДМИТРИЙ
-        Просто мысли. Много мыслей.
-
-        Ольга помешивает кофе, смотрит на Дмитрия.
-
-        ОЛЬГА
-        Рассказывай. Я слушаю.
-
-        ДМИТРИЙ
-        (пауза)
-        Не знаю, с чего начать.
-
-        ИНТ. ОФИС - ДЕНЬ
-
-        Андрей печатает на клавиатуре. Входит Наталья.
-
-        НАТАЛЬЯ
-        Андрей, проект готов?
-
-        АНДРЕЙ
-        Почти. Ещё пара штрихов.
-
-        НАТАЛЬЯ
-        Хорошо. Жду.`;
-            }
-
-            function initProjects() {
-                let projects = getProjects();
-                if (Object.keys(projects).length === 0) {
-                    projects['default'] = loadDefaultScript();
-                    saveProjects(projects);
-                }
-                populateProjectSelect();
-                const current = getCurrentProject();
-                if (!projects[current]) {
-                    setCurrentProject('default');
-                }
-                const content = projects[getCurrentProject()] || '';
-                textarea.value = content;
-                history = [content];
-                historyIndex = 0;
-                updateStats();
-                saveScript(false);
-                projectSelect.value = getCurrentProject();
-                updateSidebar();
-            }
-
-            // ===== EXPORT HTML =====
-            function generateHTML(content, projectName) {
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                const safeProjectName = projectName.replace(/[&<>"]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    if (m === '"') return '&quot;';
-                    return m;
-                });
-                const safeDate = dateStr.replace(/[&<>"]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    if (m === '"') return '&quot;';
-                    return m;
-                });
-
-                const lines = content.split('\n');
-                const htmlLines = [];
-
-                function isSceneHeading(line) {
-                    return /^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)\s*/i.test(line);
-                }
-
-                function isParenthetical(line) {
-                    return /^\([^)]*\)$/.test(line.trim());
-                }
-
-                function isCharacterName(line) {
-                    const trimmed = line.trim();
-                    if (trimmed.length === 0) return false;
-                    if (trimmed !== trimmed.toUpperCase()) return false;
-                    if (/^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)/i.test(trimmed)) return false;
-                    if (/^\([^)]*\)$/.test(trimmed)) return false;
-                    if (/^\d/.test(trimmed)) return false;
-                    if (/^[\(\[\{]/.test(trimmed)) return false;
-                    if (!/^[А-ЯA-Z\s\-']+$/.test(trimmed)) return false;
-                    return true;
-                }
-
-                let state = 'none';
-
-                for (let i = 0; i < lines.length; i++) {
-                    const rawLine = lines[i];
-                    const trimmed = rawLine.trim();
-
-                    if (trimmed.length === 0) {
-                        htmlLines.push('<div class="empty-line"></div>');
-                        state = 'none';
-                        continue;
-                    }
-
-                    const safeTrimmed = trimmed.replace(/[&<>"]/g, function(m) {
-                        if (m === '&') return '&amp;';
-                        if (m === '<') return '&lt;';
-                        if (m === '>') return '&gt;';
-                        if (m === '"') return '&quot;';
-                        return m;
-                    });
-
-                    if (isSceneHeading(trimmed)) {
-                        const match = trimmed.match(/^(НАР\.|ИНТ\.|ЭКСТ\.|NAR\.|INT\.|EXT\.)\s*(.*)/i);
-                        const prefix = match ? match[1].toUpperCase() : '';
-                        const rest = match ? match[2] || '' : trimmed;
-                        const safeRest = rest.replace(/[&<>"]/g, function(m) {
-                            if (m === '&') return '&amp;';
-                            if (m === '<') return '&lt;';
-                            if (m === '>') return '&gt;';
-                            if (m === '"') return '&quot;';
-                            return m;
-                        });
-                        htmlLines.push(`<div class="scene-heading">${prefix} ${safeRest}</div>`);
-                        state = 'none';
-                        continue;
-                    }
-
-                    if (isParenthetical(trimmed)) {
-                        htmlLines.push(`<div class="parenthetical">${safeTrimmed}</div>`);
-                        continue;
-                    }
-
-                    if (isCharacterName(trimmed)) {
-                        htmlLines.push(`<div class="character">${safeTrimmed}</div>`);
-                        state = 'character';
-                        continue;
-                    }
-
-                    if (state === 'character') {
-                        htmlLines.push(`<div class="dialogue">${safeTrimmed}</div>`);
-                        continue;
-                    }
-
-                    htmlLines.push(`<div class="action">${safeTrimmed}</div>`);
-                    state = 'none';
-                }
-
-                return `<!DOCTYPE html>
-        <html lang="ru">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${safeProjectName} — Сценарий</title>
-            <link rel="preconnect" href="https://fonts.googleapis.com">
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body {
-                    font-family: 'Lora', 'Times New Roman', serif;
-                    background: #f8f6f2;
-                    color: #1e1e1e;
-                    padding: 40px 20px;
-                    display: flex;
-                    justify-content: center;
-                    line-height: 1.6;
-                }
-                .script-container {
-                    max-width: 1000px;
-                    width: 100%;
-                    background: #ffffff;
-                    padding: 60px 80px;
-                    box-shadow: 0 8px 48px rgba(0,0,0,0.06);
-                    border-radius: 12px;
-                    position: relative;
-                }
-                .title-block {
-                    text-align: center;
-                    margin-bottom: 50px;
-                    padding-bottom: 30px;
-                    border-bottom: 2px solid #e8e0d6;
-                    position: relative;
-                }
-                .title-block h1 {
-                    font-family: 'Playfair Display', serif;
-                    font-size: 36px;
-                    font-weight: 700;
-                    letter-spacing: 2px;
-                    color: #1a1a1a;
-                    margin-bottom: 6px;
-                }
-                .title-block .subtitle {
-                    font-family: 'Playfair Display', serif;
-                    font-size: 16px;
-                    font-weight: 400;
-                    text-transform: uppercase;
-                    letter-spacing: 4px;
-                    color: #8a7a6a;
-                    margin-top: 4px;
-                }
-                .title-block .date {
-                    font-size: 14px;
-                    color: #b0a090;
-                    margin-top: 10px;
-                    letter-spacing: 1px;
-                }
-                .title-block .decor-line {
-                    width: 80px;
-                    height: 2px;
-                    background: #c0b0a0;
-                    margin: 16px auto 0;
-                }
-
-                .scene-heading {
-                    font-family: 'Playfair Display', serif;
-                    font-weight: 700;
-                    font-size: 16px;
-                    text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                    margin: 32px 0 12px 0;
-                    padding: 6px 0 4px 0;
-                    border-bottom: 1px solid #ece6de;
-                    color: #2c2c2c;
-                }
-                .action {
-                    font-size: 15px;
-                    line-height: 1.7;
-                    margin: 8px 0 8px 0;
-                    color: #2a2a2a;
-                    padding-left: 0;
-                }
-                .character {
-                    font-family: 'Playfair Display', serif;
-                    font-size: 16px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 2px;
-                    margin: 20px 0 4px 0;
-                    color: #1a1a1a;
-                    padding-left: 40%;
-                }
-                .parenthetical {
-                    font-style: italic;
-                    color: #6a5a4a;
-                    font-size: 14px;
-                    margin: 2px 0 4px 0;
-                    padding-left: 30%;
-                }
-                .dialogue {
-                    font-size: 15px;
-                    line-height: 1.8;
-                    margin: 2px 0 2px 0;
-                    padding-left: 30%;
-                    max-width: 70%;
-                    color: #1a1a1a;
-                }
-                .empty-line {
-                    height: 14px;
-                }
-
-                @page { margin: 2.5cm 2cm; }
-                .page-break { page-break-after: always; border-bottom: 1px dashed #ddd; margin: 30px 0; }
-
-                @media print {
-                    body { background: white; padding: 0; }
-                    .script-container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
-                    .title-block { border-bottom-color: #ccc; }
-                    .page-break { border-bottom: none; page-break-after: always; }
-                    .scene-heading { border-bottom-color: #ccc; }
-                }
-
-                @media (max-width: 600px) {
-                    .script-container { padding: 30px 20px; }
-                    .character { padding-left: 20%; }
-                    .parenthetical { padding-left: 15%; }
-                    .dialogue { padding-left: 15%; max-width: 85%; }
-                    .title-block h1 { font-size: 28px; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="script-container">
-                <div class="title-block">
-                    <h1>${safeProjectName}</h1>
-                    <div class="subtitle">СЦЕНАРИЙ</div>
-                    <div class="date">${safeDate}</div>
-                    <div class="decor-line"></div>
-                </div>
-                ${htmlLines.join('\n')}
-            </div>
-        </body>
-        </html>`;
-            }
-
-            function exportHTML() {
-                const content = textarea.value;
-                if (!content.trim()) {
-                    alert('Сценарий пуст.');
-                    return;
-                }
-                const projectName = getCurrentProject();
-                const now = new Date();
-                const dateStr =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-                const html = generateHTML(content, projectName);
-                const blob = new Blob(['\uFEFF' + html], { type: 'text/html;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${projectName}_${dateStr}.html`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-                statusText.textContent = '✅ HTML экспортирован!';
-                setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-            }
-
-            // ===== EXPORT =====
-            function getExportContent() {
-                return textarea.value;
-            }
-
-            function addBOM(content) {
-                return '\uFEFF' + content;
-            }
-
-            function downloadFile(content, filename, mimeType) {
-                const isText = mimeType.includes('text/plain') || mimeType.includes('application/json') || mimeType.includes(
-                    'text/html');
-                const finalContent = isText ? addBOM(content) : content;
-                const blob = new Blob([finalContent], { type: mimeType });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-            }
-
-            function exportTXT() {
-                const content = getExportContent();
-                if (!content.trim()) { alert('Сценарий пуст.'); return; }
-                const projectName = getCurrentProject();
-                const now = new Date();
-                const dateStr =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-                downloadFile(content, `${projectName}_${dateStr}.txt`, 'text/plain;charset=utf-8');
-                statusText.textContent = '✅ TXT экспортирован!';
-                setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-            }
-
-            function exportFountain() {
-                const content = getExportContent();
-                if (!content.trim()) { alert('Сценарий пуст.'); return; }
-                const projectName = getCurrentProject();
-                const now = new Date();
-                const dateStr =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-                const fountainContent = `Title: ${projectName}\nCredit: Storyphilium\nDate: ${dateStr}\n\n` + content;
-                downloadFile(fountainContent, `${projectName}_${dateStr}.fountain`, 'text/plain;charset=utf-8');
-                statusText.textContent = '✅ Fountain экспортирован!';
-                setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-            }
-
-            function exportJSON() {
-                const content = getExportContent();
-                const projectName = getCurrentProject();
-                const now = new Date();
-                const data = { project: projectName, content: content, exportedAt: now.toISOString(), version: '1.0',
-                    format: 'storyphilium' };
-                const json = JSON.stringify(data, null, 2);
-                const dateStr =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-                downloadFile(json, `${projectName}_${dateStr}.json`, 'application/json;charset=utf-8');
-                statusText.textContent = '✅ JSON экспортирован!';
-                setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-            }
-
-            function exportPDF() {
-                const content = getExportContent();
-                if (!content.trim()) { alert('Сценарий пуст.'); return; }
-                printContent.textContent = content;
-                window.print();
-            }
-
-            window.addEventListener('afterprint', function() {
-                if (printContent.textContent) {
-                    printContent.textContent = '';
-                    statusText.textContent = '✅ PDF отправлен на печать';
-                    setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-                }
-            });
-
-            function handleExport() {
-                const format = exportFormat.value;
-                switch (format) {
-                    case 'txt':
-                        exportTXT();
-                        break;
-                    case 'fountain':
-                        exportFountain();
-                        break;
-                    case 'json':
-                        exportJSON();
-                        break;
-                    case 'pdf':
-                        exportPDF();
-                        break;
-                    case 'html':
-                        exportHTML();
-                        break;
-                    default:
-                        alert('Неизвестный формат');
-                }
-            }
-            exportBtn.addEventListener('click', handleExport);
-
-            // ===== CLEAR =====
-            function clearScript() {
-                if (textarea.value.trim() === '') return;
-                if (!confirm('Удалить весь текст сценария?')) return;
-                textarea.value = '';
-                saveScript(true);
-                textarea.focus();
-                updateStats();
-                updateSidebar();
-            }
-            clearBtn.addEventListener('click', clearScript);
-
-            // ===== FIND / REPLACE =====
-            let lastFindIndex = -1;
-
-            function findNext() {
-                const query = findInput.value;
-                if (!query) return;
-                const text = textarea.value;
-                const start = textarea.selectionEnd;
-                let idx = text.indexOf(query, start);
-                if (idx === -1) idx = text.indexOf(query);
-                if (idx === -1) {
-                    statusText.textContent = '❌ Не найдено';
-                    setTimeout(() => { statusText.textContent = 'Сохранено'; }, 1500);
-                    return;
-                }
-                textarea.setSelectionRange(idx, idx + query.length);
-                textarea.focus();
-                lastFindIndex = idx;
-            }
-
-            function replaceCurrent() {
-                const query = findInput.value;
-                const replacement = replaceInput.value;
-                if (!query) return;
-                const text = textarea.value;
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                if (start === end || text.substring(start, end) !== query) { findNext(); return; }
-                const before = text.substring(0, start);
-                const after = text.substring(end);
-                textarea.value = before + replacement + after;
-                const newPos = start + replacement.length;
-                textarea.setSelectionRange(newPos, newPos);
-                textarea.dispatchEvent(new Event('input'));
-                triggerAutoSave();
-                updateStats();
-                updateSidebar();
-            }
-
-            function replaceAll() {
-                const query = findInput.value;
-                const replacement = replaceInput.value;
-                if (!query) return;
-                const text = textarea.value;
-                const newText = text.split(query).join(replacement);
-                if (newText !== text) {
-                    textarea.value = newText;
-                    textarea.dispatchEvent(new Event('input'));
-                    triggerAutoSave();
-                    updateStats();
-                    updateSidebar();
-                    const count = text.split(query).length - 1;
-                    statusText.textContent = `✅ Заменено ${count}`;
-                    setTimeout(() => { statusText.textContent = 'Сохранено'; }, 2000);
-                } else {
-                    statusText.textContent = '❌ Ничего не найдено';
-                    setTimeout(() => { statusText.textContent = 'Сохранено'; }, 1500);
-                }
-            }
-
-            findToggle.addEventListener('click', () => {
-                findReplaceBar.classList.toggle('open');
-                if (findReplaceBar.classList.contains('open')) findInput.focus();
-            });
-            closeFindBtn.addEventListener('click', () => findReplaceBar.classList.remove('open'));
-            findNextBtn.addEventListener('click', findNext);
-            replaceBtn.addEventListener('click', replaceCurrent);
-            replaceAllBtn.addEventListener('click', replaceAll);
-            findInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
-                    findNext(); } });
-            replaceInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault();
-                    replaceCurrent(); } });
-
-            // ===== INSERT ELEMENTS =====
-            function insertElement(type) {
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                const text = textarea.value;
-                const before = text.substring(0, start);
-                const after = text.substring(end);
-                let insert = '';
-                let cursorOffset = 0;
-                switch (type) {
-                    case 'НАР':
-                        insert = 'НАР.  - ДЕНЬ\n\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'ИНТ':
-                        insert = 'ИНТ.  - ДЕНЬ\n\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'ЭКСТ':
-                        insert = 'ЭКСТ.  - ДЕНЬ\n\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'ПЕРС':
-                        insert = '\n\nПЕРСОНАЖ\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'ДИАЛ':
-                        insert = '\n(диалог)\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'РЕМ':
-                        insert = '\n(ремарка)\n';
-                        cursorOffset = insert.length;
-                        break;
-                    case 'СЦЕНА':
-                        const sceneNum = (textarea.value.match(/^(\d+)\./gm) || []).length + 1;
-                        insert = `\n${sceneNum}.  \n\n`;
-                        cursorOffset = insert.length;
-                        break;
-                    default:
-                        return;
-                }
-                textarea.value = before + insert + after;
-                const newPos = start + cursorOffset;
-                textarea.setSelectionRange(newPos, newPos);
-                textarea.focus();
-                textarea.dispatchEvent(new Event('input'));
-                triggerAutoSave();
-                updateStats();
-                updateSidebar();
-            }
-
-            document.querySelectorAll('[data-insert]').forEach(btn => {
-                btn.addEventListener('click', () => insertElement(btn.dataset.insert));
-            });
-
-            // ===== PROJECT EVENTS =====
-            projectSelect.addEventListener('change', function() {
-                const name = this.value;
-                if (name) {
-                    saveCurrentProject();
-                    loadProject(name);
-                }
-            });
-            newProjectBtn.addEventListener('click', createProject);
-            deleteProjectBtn.addEventListener('click', deleteCurrentProject);
-
-            // ===== UNDO / REDO =====
-            undoBtn.addEventListener('click', undo);
-            redoBtn.addEventListener('click', redo);
-
-            // ===== KEYBOARD SHORTCUTS =====
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    saveScript(true);
-                    statusText.textContent = '✅ Сохранено!';
-                    setTimeout(() => { statusText.textContent = 'Сохранено'; }, 1500);
-                    return;
-                }
-                if (e.ctrlKey && e.key === 'e') {
-                    e.preventDefault();
-                    handleExport();
-                    return;
-                }
-                if (e.ctrlKey && e.key === 't') {
-                    e.preventDefault();
-                    const themes = ['cosmic', 'espresso', 'neural-white', 'emerald', 'neural-blue'];
-                    let idx = themes.indexOf(currentTheme);
-                    idx = (idx + 1) % themes.length;
-                    applyTheme(themes[idx]);
-                    return;
-                }
-                if (e.ctrlKey && e.key === 'f') {
-                    e.preventDefault();
-                    applyFocus(!isFocus);
-                    return;
-                }
-                if (e.ctrlKey && e.key === 'h') {
-                    e.preventDefault();
-                    findReplaceBar.classList.toggle('open');
-                    if (findReplaceBar.classList.contains('open')) { findInput.focus();
-                        findInput.select(); }
-                    return;
-                }
-                if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
-                    e.preventDefault();
-                    undo();
-                    return;
-                }
-                if (e.ctrlKey && e.key === 'y') {
-                    e.preventDefault();
-                    redo();
-                    return;
-                }
-                if (e.ctrlKey && e.shiftKey && e.key === 'Z') {
-                    e.preventDefault();
-                    redo();
-                    return;
-                }
-                if (e.ctrlKey && !e.shiftKey && e.key >= '1' && e.key <= '7') {
-                    e.preventDefault();
-                    const map = { '1': 'НАР', '2': 'ИНТ', '3': 'ЭКСТ', '4': 'ПЕРС', '5': 'ДИАЛ', '6': 'РЕМ', '7': 'СЦЕНА' };
-                    insertElement(map[e.key]);
-                    return;
-                }
-            });
-
-            // ===== EVENTS ON TEXTAREA =====
-            textarea.addEventListener('input', function() {
-                triggerAutoSave();
-                scheduleStatsUpdate();
-            });
-            textarea.addEventListener('blur', function() {
-                clearTimeout(saveTimer);
-                saveScript(true);
-            });
-            textarea.addEventListener('select', updateStats);
-            textarea.addEventListener('click', updateStats);
-
-            // ===== INIT =====
-            initProjects();
-
-            window.addEventListener('beforeunload', function() {
-                saveCurrentProject();
-            });
-
-            console.log('📝 Storyphilium Pro — сценарный редактор');
-            console.log('☕ Темы: Космос, Эспрессо, Neural White, Изумруд, Neural Blue');
-            console.log('🎨 Улучшенный HTML-экспорт с красивой вёрсткой и исправленными диалогами!');
-            console.log('⌨️  Ctrl+1..7 — вставка элементов');
-            console.log('🔲 Кнопка выхода из фокус-режима появляется в правом верхнем углу');
-
-        })();
-    </script>
-
-</body>
-</html>
+        {/* Вкладка с оценками */}
+        {activeTab === 'ratings' && (
+          <div className="profile-ratings">
+            <h2>Оценки пользователя</h2>
+            {ratings.length === 0 ? (
+              <p>Пользователь еще не оценил ни одного фильма</p>
+            ) : (
+              <div className="ratings-list">
+                {ratings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
+                      <div className="rating-film-info">
+                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
+                        <div>
+                          <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                          <p>{rating.film?.year || rating.filmId?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Вкладка с рецензиями */}
+        {activeTab === 'reviews' && (
+          <div className="profile-reviews">
+            <h2>Рецензии пользователя</h2>
+            {reviews.length === 0 ? (
+              <p>Пользователь еще не написал ни одной рецензии</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => (
+                  <div key={review._id} className="review-item">
+                    <div className="review-header">
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
+                        <h3 className="review-title">{review.title}</h3>
+                        <p className="review-film-name">
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          ({review.film?.year || review.filmId?.year || 'N/A'})
+                        </p>
+                      </Link>
+                      <div className="review-rating">
+                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
+                      </div>
+                    </div>
+                    
+                    <p className="review-text">{review.text}</p>
+                    
+                    <div className="review-footer">
+                      <div className="review-actions">
+                        <button 
+                          className="like-btn" 
+                          onClick={() => likeReview(review._id)}
+                        >
+                          ❤️ {review.likes?.length || 0}
+                        </button>
+                        <span className="review-date">
+                          📅 {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-go-to-film">
+                        🎬 Перейти к фильму
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+    </div>
+  );
+}
+
+// ============================================================
+// MAIN APP
+// ============================================================
+
+function App() {
+  const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });
+
+  const showNotification = useCallback(({ title, message, type = 'success' }) => {
+    setNotification({ isOpen: true, title, message, type });
+    // Auto-close after 5s
+    setTimeout(() => setNotification(prev => ({ ...prev, isOpen: false })), 5000);
+  }, []);
+
+  const closeNotification = useCallback(() => {
+    setNotification(prev => ({ ...prev, isOpen: false }));
+  }, []);
+
+  return (
+    <NotificationContext.Provider value={{ showNotification }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/top" element={<TopUsersPage />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/film/:id" element={<FilmPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/user/:id" element={<UserProfilePage />} />
+        </Routes>
+      </Router>
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={closeNotification}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+      />
+    </NotificationContext.Provider>
+  );
+}
+
+export default App;
