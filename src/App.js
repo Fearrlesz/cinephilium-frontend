@@ -1739,88 +1739,63 @@ const saveRating = async () => {
             </div>
           </div>
         )}
+/* === БЛОК C3: JSX формы === */
+<div className="genre-block glass-card">
+  <h3>⚙️ Жанр и веса блоков</h3>
+  <select value={genrePreset} onChange={e=>handleGenreChange(e.target.value)}>
+    <option value="">Без жанра (базовые веса 30/25/20/15/10)</option>
+    {Object.entries(GENRE_LABELS).map(([k,l]) => <option key={k} value={k}>{l}</option>)}
+  </select>
+  {blockWeights.map((w,i)=>(
+    <div key={i} className="weight-slider">
+      <label>{BLOCK_NAMES[i]}</label>
+      <input type="range" min="0" max="100" step="1" value={w}
+        disabled={genrePreset!=='hybrid'}
+        onChange={e=>handleWeightChange(i,e.target.value)}
+        style={{['--fill']:`${w}%`}} />
+      <span className="value-display">{w}%</span>
+    </div>
+  ))}
+  <div className={`weights-sum ${weightsValid?'valid':'invalid'}`}>
+    Σ = {weightsSum}% {weightsValid?'✓':'— нужно 100%'}
+  </div>
+</div>
 
-        {isRatingMode && (
-          <div className="rating-form glass-card">
-            <h2>Оценка по 20 критериям</h2>
-            <p className="rating-hint">Оценка от 1 до 10 (1 — ужасно, 10 — идеально)</p>
+{CRITERIA_CONFIG.map(block => (
+  <div key={block.key} className="criteria-block">
+    <h4>{block.name}</h4>
+    {block.criteria.map(crit => (
+      <div key={crit.key} className="criterion-slider">
+        <label title={crit.hint}>
+          {crit.name} <span className="hint-icon">❓</span>
+        </label>
+        <input type="range" min="1" max="10" step="1"
+          value={scores[block.key][crit.key]}
+          onChange={e=>handleRatingChange(block.key, crit.key, e.target.value)}
+          style={{['--fill']:`${(scores[block.key][crit.key]-1)*10}%`}} />
+        <span className="value-display">{scores[block.key][crit.key]}</span>
+      </div>
+    ))}
+  </div>
+))}
 
-            {[0,1,2,3].map((baseIndex) => {
-              const bases = [base1, base2, base3, base4];
-              return (
-                <div key={baseIndex} className="rating-base">
-                  <h3>{baseNames[baseIndex]}</h3>
-                  {criteriaNames[baseIndex].map((name, critIndex) => (
-                    <div key={critIndex} className="criterion">
-                      <label>
-                        {name}
-                        <span className="criterion-hint" title={baseDescriptions[baseIndex][critIndex]}>❓</span>
-                      </label>
-                      <div className="slider-container">
-                        <span>1</span>
-                        <input
-                          type="range"
-                          min="1"
-                          max="10"
-                          step="1"
-                          value={bases[baseIndex][critIndex]}
-                          onChange={(e) => handleRatingChange(baseIndex, critIndex, e.target.value)}
-                          style={{ ['--fill']: `${((bases[baseIndex][critIndex] - 1) / 9) * 100}%` }}
-                        />
-                        <span>10</span>
-                        <span className="value-display">{bases[baseIndex][critIndex]}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+<div className="vibe-block">
+  <label>💫 Вайб — субъективное впечатление. Не влияет на технический балл.</label>
+  <input type="range" min="1" max="10" step="1" value={vibe}
+    onChange={e=>setVibe(Number(e.target.value))}
+    style={{['--fill']:`${(vibe-1)*10}%`}} />
+  <span className="value-display">{vibe}</span>
+</div>
 
-            <div className="subjective-block">
-              <h3>Субъективный множитель «Вайб»</h3>
-              <p>Насколько лично вам понравился фильм, несмотря на технические оценки?</p>
-              <div className="slider-container">
-                <span>1</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  step="1"
-                  value={subjectiveM}
-                  onChange={(e) => setSubjectiveM(Number(e.target.value))}
-                  style={{ ['--fill']: `${((subjectiveM - 1) / 9) * 100}%` }}
-                />
-                <span>10</span>
-                <span className="value-display">{subjectiveM}</span>
-              </div>
-            </div>
+<div className="preview">
+  <div>Технический балл: <strong>{calculatePreview().tech.toFixed(1)}</strong></div>
+  <div>💫 Вайб: <strong>{vibe.toFixed(1)}</strong></div>
+  <div>Комбинированный: <strong>{calculatePreview().combined.toFixed(1)}</strong></div>
+</div>
 
-            <div className="text-review">
-              <h3>Текстовый отзыв (необязательно)</h3>
-              <textarea
-                value={textReview}
-                onChange={(e) => setTextReview(e.target.value.slice(0, 1000))}
-                placeholder="Напишите свои впечатления..."
-                rows="4"
-                maxLength={1000}
-              />
-              <div className="char-counter">{textReview.length}/1000</div>
-            </div>
-
-            <div className="rating-preview">
-              <h3>Итоговая оценка:</h3>
-              <div className="preview-score" style={{ color: getScoreColor(previewScore) }}>{previewScore}</div>
-              <div className="score-bar" style={{ width: `${(previewScore - MIN_SCORE) / (MAX_SCORE - MIN_SCORE) * 100}%`, background: 'linear-gradient(to right, #7c3aed, #22d3ee)' }}></div>
-              <div className="score-labels">
-                <span>6 (провал)</span>
-                <span>90 (шедевр)</span>
-              </div>
-              <button onClick={saveRating} className="save-rating-btn" disabled={isSaving}>
-                {isSaving ? 'Сохранение...' : '💾 Сохранить оценку'}
-              </button>
-            </div>
-          </div>
-        )}
+<button disabled={isSaving || !weightsValid} onClick={saveRating}>
+  Сохранить оценку
+</button>
 
         <div className="comments-section glass-card">
           <h3>💬 Комментарии ({comments.length})</h3>
