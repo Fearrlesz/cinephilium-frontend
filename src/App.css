@@ -4908,3 +4908,626 @@ textarea {
   border-color: rgba(34, 211, 238, 0.3);
   transform: translateY(-2px);
 }
+
+/* ============================================================
+   НОВЫЕ СТИЛИ ДЛЯ СИСТЕМЫ ОЦЕНИВАНИЯ 6.0
+   ============================================================ */
+
+/* ============================================================
+   ПАНЕЛЬ ЖАНРА И ВЕСОВ
+   ============================================================ */
+.genre-block {
+  margin-bottom: 28px;
+  padding: 24px 28px 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.4s ease;
+}
+
+.genre-block:hover {
+  border-color: var(--glass-border-hover);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.genre-block h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.genre-block h3::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.genre-block select {
+  width: 100%;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  margin-bottom: 18px;
+}
+
+.genre-block select:hover {
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.genre-block select:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.04);
+}
+
+.genre-block select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* Веса блоков */
+.weight-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.weight-slider:last-child {
+  border-bottom: none;
+}
+
+.weight-slider label {
+  min-width: 90px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.weight-slider input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--neon-purple) 0%,
+    var(--neon-purple) var(--fill, 50%),
+    rgba(255, 255, 255, 0.06) var(--fill, 50%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  transition: all 0.3s ease;
+}
+
+.weight-slider input[type="range"]:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.weight-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow:
+    0 4px 15px rgba(124, 58, 237, 0.25),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.weight-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 25px rgba(124, 58, 237, 0.4);
+}
+
+.weight-slider input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(124, 58, 237, 0.9) 40%,
+    rgba(124, 58, 237, 0.6) 80%,
+    rgba(60, 20, 120, 0.8) 100%
+  );
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+}
+
+.weight-slider .value-display {
+  min-width: 44px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--neon-purple);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(124, 58, 237, 0.04);
+  border: 1px solid rgba(124, 58, 237, 0.06);
+}
+
+/* Сумма весов */
+.weights-sum {
+  margin-top: 14px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.weights-sum.valid {
+  color: var(--neon-cyan);
+  background: rgba(34, 211, 238, 0.04);
+  border: 1px solid rgba(34, 211, 238, 0.08);
+}
+
+.weights-sum.invalid {
+  color: var(--neon-pink);
+  background: rgba(236, 72, 153, 0.04);
+  border: 1px solid rgba(236, 72, 153, 0.08);
+  animation: shakeWarning 0.4s ease;
+}
+
+@keyframes shakeWarning {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* ============================================================
+   ПРЕВЬЮ ТРЁХ БАЛЛОВ
+   ============================================================ */
+.rating-preview-triple {
+  margin-top: 24px;
+  padding: 24px 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  text-align: center;
+}
+
+.rating-preview-triple h3 {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.preview-scores-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.preview-score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.preview-score-item .score-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.preview-score-item .score-value {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 32px;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.preview-score-item .score-value.technical {
+  color: var(--neon-cyan);
+}
+
+.preview-score-item .score-value.vibe {
+  color: var(--neon-purple);
+}
+
+.preview-score-item .score-value.combined {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   КРИТЕРИИ С ХИНТАМИ
+   ============================================================ */
+.criterion .criterion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.criterion .criterion-name {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.criterion .criterion-hint-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+.criterion .criterion-hint-btn:hover {
+  background: rgba(34, 211, 238, 0.08);
+  color: var(--neon-cyan);
+  border-color: rgba(34, 211, 238, 0.1);
+  transform: scale(1.1);
+}
+
+.criterion .criterion-hint-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  margin-top: 2px;
+  border-left: 2px solid var(--neon-cyan);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  line-height: 1.4;
+}
+
+.criterion:hover .criterion-hint-text {
+  opacity: 1;
+}
+
+/* ============================================================
+   ВАЙБ — ОТДЕЛЬНЫЙ БЛОК
+   ============================================================ */
+.vibe-block {
+  margin: 24px 0 28px;
+  padding: 20px 24px 24px;
+  background: rgba(124, 58, 237, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.08);
+  transition: all 0.4s ease;
+}
+
+.vibe-block:hover {
+  border-color: rgba(124, 58, 237, 0.15);
+  background: rgba(124, 58, 237, 0.04);
+}
+
+.vibe-block h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--neon-purple);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.vibe-block .vibe-description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.vibe-block .vibe-description .highlight {
+  color: var(--neon-purple);
+  font-weight: 600;
+}
+
+/* ============================================================
+   БЕЙДЖИ НА СТРАНИЦЕ ФИЛЬМА
+   ============================================================ */
+.film-rating-stats .rating-badges {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.film-rating-stats .rating-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.film-rating-stats .rating-badge-item .badge-icon {
+  font-size: 14px;
+}
+
+.film-rating-stats .rating-badge-item .badge-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.film-rating-stats .rating-badge-item.technical {
+  border-color: rgba(34, 211, 238, 0.15);
+}
+
+.film-rating-stats .rating-badge-item.technical .badge-value {
+  color: var(--neon-cyan);
+}
+
+.film-rating-stats .rating-badge-item.vibe {
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.film-rating-stats .rating-badge-item.vibe .badge-value {
+  color: var(--neon-purple);
+}
+
+.film-rating-stats .rating-badge-item.combined {
+  border-color: rgba(34, 211, 238, 0.1);
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.03), rgba(124, 58, 237, 0.03));
+}
+
+.film-rating-stats .rating-badge-item.combined .badge-value {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   ТОПЫ — ПЕРЕКЛЮЧАТЕЛЬ
+   ============================================================ */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  flex-wrap: wrap;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 24px;
+}
+
+.sort-controls .sort-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.sort-controls .sort-select {
+  padding: 8px 18px;
+  padding-right: 36px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238888bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all 0.3s ease;
+}
+
+.sort-controls .sort-select:hover {
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.sort-controls .sort-select:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.sort-controls .sort-select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+.sort-controls .sort-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ============================================================
+   ПРОФИЛЬ — НОВЫЕ ПОЛЯ ОЦЕНОК
+   ============================================================ */
+.rating-item .rating-scores {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-item .rating-scores .score-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+}
+
+.rating-item .rating-scores .score-tag.technical {
+  color: var(--neon-cyan);
+  border-color: rgba(34, 211, 238, 0.1);
+}
+
+.rating-item .rating-scores .score-tag.vibe {
+  color: var(--neon-purple);
+  border-color: rgba(124, 58, 237, 0.1);
+}
+
+.rating-item .rating-scores .score-tag.combined {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.04), rgba(124, 58, 237, 0.04));
+  border-color: rgba(34, 211, 238, 0.08);
+}
+
+.rating-item .rating-scores .score-tag.combined .tag-value {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .genre-block {
+    padding: 18px 16px 20px;
+  }
+
+  .weight-slider {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .weight-slider label {
+    min-width: 70px;
+    font-size: 13px;
+  }
+
+  .preview-scores-row {
+    gap: 20px;
+  }
+
+  .preview-score-item .score-value {
+    font-size: 26px;
+  }
+
+  .film-rating-stats .rating-badges {
+    gap: 10px;
+  }
+
+  .film-rating-stats .rating-badge-item {
+    font-size: 12px;
+    padding: 2px 10px;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sort-controls .sort-select {
+    width: 100%;
+  }
+
+  .rating-item .rating-scores {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .rating-item .rating-scores .score-tag {
+    font-size: 11px;
+    padding: 1px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .genre-block {
+    padding: 14px 12px 16px;
+  }
+
+  .genre-block h3 {
+    font-size: 16px;
+  }
+
+  .weight-slider label {
+    min-width: 60px;
+    font-size: 12px;
+  }
+
+  .weight-slider .value-display {
+    font-size: 15px;
+    min-width: 34px;
+  }
+
+  .preview-scores-row {
+    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .preview-score-item .score-value {
+    font-size: 24px;
+  }
+
+  .film-rating-stats .rating-badges {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vibe-block {
+    padding: 16px 14px 18px;
+  }
+
+  .vibe-block h3 {
+    font-size: 16px;
+  }
+}
