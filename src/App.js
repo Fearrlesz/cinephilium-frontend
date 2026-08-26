@@ -111,14 +111,6 @@ export function useNotification() {
 // UTILITIES
 // ============================================================
 
-export function getScoreColor(score) {
-  if (score === undefined || score === null || isNaN(score)) return '#666';
-  const clampedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, score));
-  const normalized = (clampedScore - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
-  const hue = normalized * 120;
-  return `hsl(${hue}, 85%, ${45 + normalized * 15}%)`;
-}
-
 export function formatDate(date) {
   if (!date) return 'Неизвестно';
   try {
