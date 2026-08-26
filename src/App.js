@@ -1127,173 +1127,271 @@ function FilmPage() {
   const { addEvent } = useActivityEvents();
   const [showUsersModal, setShowUsersModal] = useState(false);
 
-  const [base1, setBase1] = useState([5,5,5,5,5]);
-  const [base2, setBase2] = useState([5,5,5,5,5]);
-  const [base3, setBase3] = useState([5,5,5,5,5]);
-  const [base4, setBase4] = useState([5,5,5,5,5]);
-  const [subjectiveM, setSubjectiveM] = useState(5);
-  const [textReview, setTextReview] = useState('');
 
-  useEffect(() => {
-    loadFilm();
-    loadFilmUsers();
-    loadComments();
-    loadReviews();
-    loadCurrentUser();
-    
-  }, [id]);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (isRatingMode && !isSaving) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isRatingMode, isSaving]);
+   /* === БЛОК C2: Состояние FilmPage (замена base1-base4, subjectiveM, handleRatingChange, calculatePreview) === */
 
-  const loadCurrentUser = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await api.get('/auth/me');
-        setCurrentUser(response.data);
-      } catch (err) {
-        if (err.response?.status === 401) {
-          localStorage.removeItem('token');
-        }
-      }
+// Конфиг критериев (вынесите в отдельный файл или оставьте здесь)
+const CRITERIA_CONFIG = [
+  { key:'scenario', name:'📋 Сценарий и драматургия', criteria:[
+    { key:'plot', name:'Сюжетная архитектура', hint:'Логика событий, завязка-развязка, причинно-следственные связи' },
+    { key:'ideas', name:'Идейная нагрузка', hint:'Понятность целей героев, развитие темы' },
+    { key:'dialogue', name:'Диалоги и подтекст', hint:'Естественность речи, скрытые смыслы, многослойность' }
+  ]},
+  { key:'characters', name:'👥 Персонажи и актёрская игра', criteria:[
+    { key:'depth', name:'Глубина и эволюция', hint:'Внутренние конфликты, трансформация под давлением' },
+    { key:'chemistry', name:'Химия и органика', hint:'Мимика, паузы, взгляды, естественность взаимодействия' },
+    { key:'functionality', name:'Функциональность', hint:'Каждый персонаж важен для сюжета, нет лишних' }
+  ]},
+  { key:'visual', name:'🎥 Режиссура и визуальный язык', criteria:[
+    { key:'composition', name:'Композиция и символизм', hint:'Продуманность кадра, визуальные метафоры' },
+    { key:'cinematography', name:'Операторская работа и монтаж', hint:'Движение камеры, ритм склеек работают на смысл' },
+    { key:'pacing', name:'Темп и ритм', hint:'Динамика, удержание внимания, соответствие жанру' },
+    { key:'tone', name:'Эмоциональная целостность', hint:'Фильм держит единое настроение или разваливается' }
+  ]},
+  { key:'sound', name:'🔊 Звук и атмосфера', criteria:[
+    { key:'music', name:'Музыка и тишина', hint:'Передача эмоций, тишина как приём' },
+    { key:'design', name:'Звуковой дизайн', hint:'Работа шумов для погружения, соответствие эпохе' },
+    { key:'narrative', name:'Нарративный звук', hint:'Вклад звука в историю: масштаб, тревога, интимность' }
+  ]},
+  { key:'style', name:'✍️ Авторский стиль', criteria:[
+    { key:'originality', name:'Индивидуальность', hint:'Уникальный голос режиссёра, авторский почерк' },
+    { key:'boldness', name:'Художественная смелость', hint:'Риск формой, жанром, нарративом' }
+  ]}
+];
+
+const GENRE_LABELS = {
+  drama:'Драма / Арт-хаус', action:'Экшн / Блокбастер', comedy:'Комедия',
+  horror:'Хоррор / Триллер', scifi_block:'Sci-Fi / Фэнтези (блокбастер)',
+  scifi_author:'Sci-Fi / Фэнтези (авторский)', musical:'Мюзикл',
+  biopic:'Байопик', hybrid:'🎛 Свои веса'
+};
+
+const PRESET_WEIGHTS = {
+  drama:[25,20,20,15,20], action:[20,20,30,20,10], comedy:[30,30,15,15,10],
+  horror:[25,20,20,25,10], scifi_block:[25,20,25,20,10], scifi_author:[20,20,25,15,20],
+  musical:[20,20,20,30,10], biopic:[30,30,20,15,5]
+};
+const BLOCK_NAMES = ['Сценарий','Персонажи','Визуал','Звук','Стиль'];
+
+// Функция для создания пустых оценок (все по 5)
+const createEmptyScores = () => Object.fromEntries(
+  CRITERIA_CONFIG.map(b => [b.key, Object.fromEntries(b.criteria.map(c => [c.key, 5]))])
+);
+
+// ----- СОСТОЯНИЯ -----
+const [scores, setScores] = useState(createEmptyScores);
+const [vibe, setVibe] = useState(5);
+const [genrePreset, setGenrePreset] = useState('');
+const [blockWeights, setBlockWeights] = useState([30,25,20,15,10]);
+const [textReview, setTextReview] = useState('');
+
+useEffect(() => {
+  loadFilm();
+  loadFilmUsers();
+  loadComments();
+  loadReviews();
+  loadCurrentUser();
+}, [id]);
+
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (isRatingMode && !isSaving) {
+      e.preventDefault();
+      e.returnValue = '';
     }
   };
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+}, [isRatingMode, isSaving]);
 
-  const loadFilm = async () => {
-    setLoading(true);
+const loadCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (token) {
     try {
-      const response = await api.get(`/films/${id}`);
-      setFilm(response.data);
-      if (response.data?.userRating) {
-        const ur = response.data.userRating;
-        setUserRating(ur);
-        setBase1(ur.base1 || [5,5,5,5,5]);
-        setBase2(ur.base2 || [5,5,5,5,5]);
-        setBase3(ur.base3 || [5,5,5,5,5]);
-        setBase4(ur.base4 || [5,5,5,5,5]);
-        setSubjectiveM(ur.subjectiveM || 5);
-        setTextReview(ur.textReview || '');
+      const response = await api.get('/auth/me');
+      setCurrentUser(response.data);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+      }
+    }
+  }
+};
+
+const loadFilm = async () => {
+  setLoading(true);
+  try {
+    const response = await api.get(`/films/${id}`);
+    setFilm(response.data);
+    if (response.data?.userRating) {
+      const ur = response.data.userRating;
+      setUserRating(ur);
+      // Загружаем сохранённые оценки
+      if (ur.scores) {
+        setScores(ur.scores);
       } else {
-        setBase1([5,5,5,5,5]);
-        setBase2([5,5,5,5,5]);
-        setBase3([5,5,5,5,5]);
-        setBase4([5,5,5,5,5]);
-        setSubjectiveM(5);
-        setTextReview('');
-        setUserRating(null);
+        setScores(createEmptyScores());
       }
-    } catch (err) {
-      console.error('Ошибка загрузки фильма:', err);
-    } finally {
-      setLoading(false);
+      setVibe(ur.vibe || 5);
+      setGenrePreset(ur.genrePreset || '');
+      if (ur.blockWeights) {
+        const weights = [
+          ur.blockWeights.scenario || 30,
+          ur.blockWeights.characters || 25,
+          ur.blockWeights.visual || 20,
+          ur.blockWeights.sound || 15,
+          ur.blockWeights.style || 10
+        ];
+        setBlockWeights(weights);
+      } else {
+        setBlockWeights([30,25,20,15,10]);
+      }
+      setTextReview(ur.textReview || '');
+    } else {
+      setScores(createEmptyScores());
+      setVibe(5);
+      setGenrePreset('');
+      setBlockWeights([30,25,20,15,10]);
+      setTextReview('');
+      setUserRating(null);
     }
-  };
+  } catch (err) {
+    console.error('Ошибка загрузки фильма:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const loadFilmUsers = async () => {
-    setUsersLoading(true);
-    try {
-      const response = await api.get(`/films/${id}/users`);
-      setFilmUsers(response.data || []);
-    } catch (err) {
-      console.error('Ошибка загрузки пользователей:', err);
-    } finally {
-      setUsersLoading(false);
+const loadFilmUsers = async () => {
+  setUsersLoading(true);
+  try {
+    const response = await api.get(`/films/${id}/users`);
+    setFilmUsers(response.data || []);
+  } catch (err) {
+    console.error('Ошибка загрузки пользователей:', err);
+  } finally {
+    setUsersLoading(false);
+  }
+};
+
+const loadComments = async () => {
+  try {
+    const response = await api.get(`/comments/${id}`);
+    setComments(response.data || []);
+  } catch (err) {
+    console.error('Ошибка загрузки комментариев:', err);
+  }
+};
+
+const loadReviews = async () => {
+  try {
+    const response = await api.get(`/reviews/${id}`);
+    setReviews(response.data || []);
+  } catch (err) {
+    console.error('Ошибка загрузки рецензий:', err);
+  }
+};
+
+// ----- ОБРАБОТЧИКИ ДЛЯ НОВОЙ СИСТЕМЫ -----
+const handleGenreChange = (key) => {
+  setGenrePreset(key);
+  if (key === '') {
+    setBlockWeights([30,25,20,15,10]);
+  } else if (key === 'hybrid') {
+    setBlockWeights([20,20,20,20,20]);
+  } else {
+    setBlockWeights(PRESET_WEIGHTS[key] || [30,25,20,15,10]);
+  }
+};
+
+const handleWeightChange = (i, value) => {
+  setGenrePreset('hybrid');
+  setBlockWeights(prev => prev.map((w,j) => j === i ? Number(value) : w));
+};
+
+const handleRatingChange = (blockKey, critKey, value) => {
+  setScores(prev => ({
+    ...prev,
+    [blockKey]: {
+      ...prev[blockKey],
+      [critKey]: Number(value)
     }
-  };
+  }));
+};
 
-  const loadComments = async () => {
-    try {
-      const response = await api.get(`/comments/${id}`);
-      setComments(response.data || []);
-    } catch (err) {
-      console.error('Ошибка загрузки комментариев:', err);
-    }
+const calculatePreview = useCallback(() => {
+  const s = scores;
+  // Средние по блокам
+  const avgs = {
+    scenario: s.scenario.plot * 0.35 + s.scenario.ideas * 0.35 + s.scenario.dialogue * 0.30,
+    characters: s.characters.depth * 0.40 + s.characters.chemistry * 0.35 + s.characters.functionality * 0.25,
+    visual: (s.visual.composition + s.visual.cinematography + s.visual.pacing + s.visual.tone) / 4,
+    sound: s.sound.music * 0.40 + s.sound.design * 0.35 + s.sound.narrative * 0.25,
+    style: (s.style.originality + s.style.boldness) / 2
   };
+  
+  const tech = Math.round(
+    (avgs.scenario * blockWeights[0] +
+     avgs.characters * blockWeights[1] +
+     avgs.visual * blockWeights[2] +
+     avgs.sound * blockWeights[3] +
+     avgs.style * blockWeights[4]) * 10
+  ) / 10;
+  
+  const combined = Math.round((tech * 0.7 + vibe * 3) * 10) / 10;
+  
+  return { tech, vibe, combined };
+}, [scores, vibe, blockWeights]);
 
-  const loadReviews = async () => {
-    try {
-      const response = await api.get(`/reviews/${id}`);
-      setReviews(response.data || []);
-    } catch (err) {
-      console.error('Ошибка загрузки рецензий:', err);
-    }
-  };
+const weightsSum = blockWeights.reduce((a,b) => a + b, 0);
+const weightsValid = weightsSum === 100;
 
-  const handleRatingChange = useCallback((baseIndex, criterionIndex, value) => {
-    const setters = [setBase1, setBase2, setBase3, setBase4];
-    const setter = setters[baseIndex];
-    setter(prev => {
-      const newArr = [...prev];
-      newArr[criterionIndex] = Number(value);
-      return newArr;
+// ----- СОХРАНЕНИЕ ОЦЕНКИ -----
+const saveRating = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы оценивать фильмы', type: 'warning' });
+    navigate('/login');
+    return;
+  }
+
+  if (isSaving) return;
+  setIsSaving(true);
+
+  try {
+    const response = await api.post('/ratings', {
+      filmId: id,
+      scores,
+      vibe,
+      genrePreset: genrePreset || null,
+      blockWeights,
+      textReview
     });
-  }, []);
 
-  const calculatePreview = useCallback(() => {
-    const avg1 = base1.reduce((a,b)=>a+b,0)/5;
-    const avg2 = base2.reduce((a,b)=>a+b,0)/5;
-    const avg3 = base3.reduce((a,b)=>a+b,0)/5;
-    const avg4 = base4.reduce((a,b)=>a+b,0)/5;
-    const sum = avg1 + avg2 + avg3 + avg4;
-    const T = sum * TECHNICAL_MULTIPLIER;
-    const vibeMultiplier = 1 + (subjectiveM - 1) * VIBE_STEP;
-    const finalRaw = T * vibeMultiplier;
-    return Math.min(MAX_SCORE, Math.max(MIN_SCORE, Math.round(finalRaw)));
-  }, [base1, base2, base3, base4, subjectiveM]);
+    setUserRating(response.data.rating);
+    await loadFilm();
+    await loadFilmUsers();
+    setIsRatingMode(false);
 
-  const saveRating = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы оценивать фильмы', type: 'warning' });
-      navigate('/login');
-      return;
-    }
-
-    if (isSaving) return;
-    setIsSaving(true);
-
-    try {
-      const response = await api.post('/ratings', {
-        filmId: id,
-        base1,
-        base2,
-        base3,
-        base4,
-        subjectiveM,
-        textReview
+    // Создаём событие с combinedScore
+    if (currentUser && film) {
+      await addEvent({
+        type: 'rating',
+        user: currentUser.nickname,
+        film: film.title,
+        filmId: film._id,
+        score: response.data.combinedScore // ВАЖНО: combinedScore вместо finalScore
       });
-
-      setUserRating(response.data.rating);
-      await loadFilm();
-      await loadFilmUsers();
-      setIsRatingMode(false);
-
-      if (currentUser && film) {
-        await addEvent({
-          type: 'rating',
-          user: currentUser.nickname,
-          film: film.title,
-          filmId: film._id,
-          score: response.data.rating.finalScore
-        });
-      }
-
-      showNotification({ title: 'Оценка сохранена!', message: 'Ваша оценка успешно добавлена', type: 'success' });
-    } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось сохранить оценку', type: 'error' });
-    } finally {
-      setIsSaving(false);
     }
-  };
+
+    showNotification({ title: 'Оценка сохранена!', message: 'Ваша оценка успешно добавлена', type: 'success' });
+  } catch (err) {
+    showNotification({ title: 'Ошибка', message: err.response?.data?.message || 'Не удалось сохранить оценку', type: 'error' });
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const openRatingDetails = async (ratingData) => {
     try {
