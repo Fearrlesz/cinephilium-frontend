@@ -1173,7 +1173,7 @@ function FilmPage() {
 
 
 
-   /* === БЛОК C2: Состояние FilmPage (замена base1-base4, subjectiveM, handleRatingChange, calculatePreview) === */
+/* === БЛОК C2: Состояние FilmPage (замена base1-base4, subjectiveM, handleRatingChange, calculatePreview) === */
 
 // Конфиг критериев (вынесите в отдельный файл или оставьте здесь)
 const CRITERIA_CONFIG = [
