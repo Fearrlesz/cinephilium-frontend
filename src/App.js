@@ -399,15 +399,18 @@ function NotificationModal({ isOpen, onClose, title, message, type = 'success' }
   );
 }
 
+/* === БЛОК C7 (замена RatingDetailsModal): Модальное окно с деталями оценки === */
 function RatingDetailsModal({ rating, onClose }) {
   if (!rating) return null;
 
-  const bases = [rating.base1 || [], rating.base2 || [], rating.base3 || [], rating.base4 || []];
-  const baseAverages = bases.map(base =>
-    (Array.isArray(base) && base.length === 5)
-      ? (base.reduce((a, b) => a + b, 0) / 5).toFixed(1)
-      : '0.0'
-  );
+  // Получаем веса блоков
+  const weights = rating.blockWeights || {
+    scenario: 30, characters: 25, visual: 20, sound: 15, style: 10
+  };
+  const weightValues = [
+    weights.scenario, weights.characters, weights.visual, 
+    weights.sound, weights.style
+  ];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -416,10 +419,48 @@ function RatingDetailsModal({ rating, onClose }) {
 
         <div className="modal-header">
           <h2>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h2>
-          <p>Оценка: <span style={{ color: getScoreColor(rating.finalScore), fontSize: '28px', fontWeight: 'bold' }}>{rating.finalScore}</span></p>
-          <p className="modal-user">👤 {rating.userId?.nickname || 'Пользователь'}</p>
-          <p>Субъективный множитель «Вайб»: <strong>{rating.subjectiveM}</strong></p>
-          <p>Технический балл (T): <strong>{rating.technicalScore}</strong></p>
+          
+          {/* Основные баллы */}
+          <div className="modal-scores">
+            <div className="modal-score-item">
+              <label>Технический балл:</label>
+              <span style={{ color: getScoreColor(rating.technicalScore), fontSize: '28px', fontWeight: 'bold' }}>
+                {rating.technicalScore?.toFixed(1) || '0.0'}
+              </span>
+            </div>
+            <div className="modal-score-item">
+              <label>💫 Вайб:</label>
+              <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                {rating.vibe || 0}
+              </span>
+            </div>
+            <div className="modal-score-item">
+              <label>Комбинированный:</label>
+              <span style={{ color: getScoreColor(rating.combinedScore), fontSize: '24px', fontWeight: 'bold' }}>
+                {rating.combinedScore?.toFixed(1) || '0.0'}
+              </span>
+            </div>
+          </div>
+
+          <p className="modal-user">👤 {rating.userId?.nickname || rating.userName || 'Пользователь'}</p>
+          
+          {/* Жанровый пресет */}
+          {rating.genrePreset && (
+            <p>Жанровый пресет: <strong>{GENRE_LABELS[rating.genrePreset] || rating.genrePreset}</strong></p>
+          )}
+          
+          {/* Веса блоков */}
+          <div className="modal-weights">
+            <h4>Веса блоков:</h4>
+            {['Сценарий', 'Персонажи', 'Визуал', 'Звук', 'Стиль'].map((name, i) => (
+              <div key={i} className="modal-weight-item">
+                <span>{name}:</span>
+                <span>{weightValues[i] || 0}%</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Отзыв */}
           {rating.textReview && (
             <div className="modal-review">
               <p><strong>Отзыв:</strong> {rating.textReview}</p>
@@ -427,15 +468,18 @@ function RatingDetailsModal({ rating, onClose }) {
           )}
         </div>
 
-        <div className="modal-bases">
-          {[0, 1, 2, 3].map(baseIndex => (
-            <div key={baseIndex} className="modal-base">
-              <h4>{baseNames[baseIndex]} <span className="modal-base-avg">(среднее: {baseAverages[baseIndex]})</span></h4>
-              <div className="modal-criteria">
-                {criteriaNames[baseIndex].map((name, critIndex) => (
-                  <div key={critIndex} className="modal-criterion">
-                    <span>{name}</span>
-                    <span className="modal-criterion-score">{bases[baseIndex]?.[critIndex] || 0}</span>
+        {/* Критерии */}
+        <div className="modal-criteria-blocks">
+          {CRITERIA_CONFIG.map(block => (
+            <div key={block.key} className="modal-criteria-block">
+              <h4>{block.name}</h4>
+              <div className="modal-criteria-list">
+                {block.criteria.map(crit => (
+                  <div key={crit.key} className="modal-criterion">
+                    <span title={crit.hint}>{crit.name}</span>
+                    <span className="modal-criterion-score">
+                      {rating.scores?.[block.key]?.[crit.key] || 0}/10
+                    </span>
                   </div>
                 ))}
               </div>
