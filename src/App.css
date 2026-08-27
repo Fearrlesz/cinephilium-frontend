@@ -5103,3 +5103,103 @@ button:disabled {
     padding: 12px 16px;
   }
 }
+
+
+/* ============================================================
+   ВЕРТИКАЛЬНАЯ СЕТКА ДЛЯ МОБИЛЬНЫХ (все исправления)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* 1. Основная сетка фильмов */
+  .films-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    flex-wrap: wrap !important;
+    scroll-snap-type: none !important;
+    padding: 20px 8px 30px 8px !important;
+    margin: 0 !important;
+  }
+
+  .films-grid .film-card-link {
+    flex: none !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    scroll-snap-align: none !important;
+  }
+
+  .films-grid .film-card {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .films-grid::after {
+    display: none !important;
+  }
+
+  /* 2. Результаты поиска */
+  .search-results .films-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    flex-wrap: wrap !important;
+    scroll-snap-type: none !important;
+    padding: 10px 0 20px 0 !important;
+    margin: 0 !important;
+  }
+
+  .search-results .films-grid .film-card {
+    flex: none !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    scroll-snap-align: none !important;
+  }
+
+  /* 3. ТОП-5 Netflix */
+  .top-scroll-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    padding: 8px 0 16px 0 !important;
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+
+  .top-card-netflix {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  /* 4. Базовые настройки */
+  body {
+    overflow-x: hidden;
+    padding: 8px 4px;
+  }
+
+  .app {
+    max-width: 100% !important;
+    padding: 0 8px;
+    overflow-x: hidden;
+  }
+}
+
+/* Для больших телефонов — 3 колонки */
+@media (min-width: 420px) and (max-width: 768px) {
+  .films-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .search-results .films-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .top-scroll-wrapper {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
