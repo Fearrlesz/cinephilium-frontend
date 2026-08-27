@@ -4426,3 +4426,263 @@ textarea {
   border-color: rgba(34, 211, 238, 0.3);
   transform: translateY(-2px);
 }
+
+
+/* ===== ОБЩАЯ ЦВЕТОВАЯ ПАЛИТРА ===== */
+:root {
+  --dark-purple: #1a0a2e;
+  --medium-purple: #2d1b4e;
+  --soft-purple: #4a2b6b;
+  --light-blue: #4fc3f7;
+  --bright-blue: #29b6f6;
+  --glow-blue: rgba(41, 182, 246, 0.25);
+  --glass-bg: rgba(26, 10, 46, 0.65);
+  --glass-border: rgba(79, 195, 247, 0.2);
+  --text-light: #e0e8f0;
+  --text-muted: #a0b4c8;
+}
+
+/* ===== СТЕКЛЯННЫЕ КАРТЫ ===== */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(79, 195, 247, 0.08);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  color: var(--text-light);
+}
+
+.glass-card:hover {
+  border-color: rgba(79, 195, 247, 0.4);
+  box-shadow: 0 16px 48px rgba(41, 182, 246, 0.15), inset 0 0 0 1px rgba(79, 195, 247, 0.15);
+}
+
+/* ===== ЗАГОЛОВКИ ===== */
+.glass-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 18px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+  letter-spacing: 0.3px;
+}
+
+.glass-card h3 .icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 6px rgba(79, 195, 247, 0.4));
+}
+
+/* ===== СЕЛЕКТ (выбор жанра) ===== */
+.genre-block select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(45, 27, 78, 0.7);
+  border: 1px solid rgba(79, 195, 247, 0.25);
+  border-radius: 12px;
+  color: var(--text-light);
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234fc3f7' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.genre-block select:focus {
+  border-color: var(--bright-blue);
+  box-shadow: 0 0 0 3px var(--glow-blue);
+}
+
+.genre-block select option {
+  background: var(--dark-purple);
+  color: var(--text-light);
+}
+
+/* ===== СЕТКА СЛАЙДЕРОВ ВЕСОВ ===== */
+.weights-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 20px 0 16px;
+}
+
+.weight-slider {
+  display: grid;
+  grid-template-columns: 100px 1fr 50px;
+  align-items: center;
+  gap: 14px;
+}
+
+.weight-slider label {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ===== КАСТОМНЫЙ РЕЙНДЖ ===== */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--bright-blue) var(--fill, 0%), rgba(79, 195, 247, 0.2) var(--fill, 0%));
+  outline: none;
+  transition: background 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--light-blue), var(--bright-blue));
+  cursor: pointer;
+  box-shadow: 0 0 16px var(--glow-blue), 0 0 4px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--light-blue), var(--bright-blue));
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+input[type="range"]:disabled {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+
+.value-display {
+  font-weight: 600;
+  color: var(--light-blue);
+  text-align: right;
+  font-size: 0.95rem;
+  min-width: 44px;
+}
+
+/* ===== СУММА ВЕСОВ ===== */
+.weights-sum {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.weights-sum .sum-icon {
+  font-size: 1.2rem;
+}
+
+.weights-sum.valid {
+  color: #81c784;
+  border-left: 3px solid #81c784;
+}
+
+.weights-sum.invalid {
+  color: #ffb74d;
+  border-left: 3px solid #ffb74d;
+}
+
+/* ===== ПРЕВЬЮ ОЦЕНОК ===== */
+.scores-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.score-item {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.score-item:hover {
+  border-color: rgba(79, 195, 247, 0.3);
+  background: rgba(41, 182, 246, 0.05);
+}
+
+.score-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.score-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--light-blue);
+  text-shadow: 0 0 24px rgba(79, 195, 247, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* ===== БЛОК ВАЙБА ===== */
+.vibe-controls {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.15);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px dashed rgba(79, 195, 247, 0.15);
+}
+
+.vibe-placeholder {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+/* ===== РАЗДЕЛЕНИЕ БЛОКОВ (друг от друга) ===== */
+.genre-block,
+.preview-block,
+.vibe-block {
+  margin-bottom: 28px; /* отступ между карточками */
+}
+
+/* дополнительный визуальный разделитель (опционально) */
+.glass-card + .glass-card {
+  margin-top: 8px;
+}
+
+/* ===== АДАПТИВ ===== */
+@media (max-width: 700px) {
+  .weight-slider {
+    grid-template-columns: 80px 1fr 40px;
+    gap: 10px;
+  }
+  .scores-preview {
+    grid-template-columns: 1fr;
+  }
+  .glass-card {
+    padding: 18px 16px;
+  }
+}
