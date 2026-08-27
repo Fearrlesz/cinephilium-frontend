@@ -4426,3 +4426,455 @@ textarea {
   border-color: rgba(34, 211, 238, 0.3);
   transform: translateY(-2px);
 }
+
+
+/* ============================================================
+   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (CSS Custom Properties)
+   ============================================================ */
+:root {
+  /* Базовые цвета */
+  --bg-deep: #0a0a12;
+  --bg-glass: rgba(20, 20, 40, 0.55);
+  --bg-glass-hover: rgba(30, 30, 60, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-blur: 24px;
+
+  /* Текст */
+  --text-primary: #f0f0ff;
+  --text-secondary: rgba(200, 200, 240, 0.6);
+  --text-muted: rgba(200, 200, 240, 0.35);
+
+  /* Неоновые акценты */
+  --neon-purple: #7c3aed;
+  --neon-cyan: #22d3ee;
+  --neon-pink: #ec4899;
+
+  /* Свечения */
+  --glow-purple: rgba(124, 58, 237, 0.15);
+  --glow-cyan: rgba(34, 211, 238, 0.1);
+
+  /* Шрифты */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Радиусы */
+  --radius-card: 16px;
+  --radius-button: 40px;
+  --radius-input: 8px;
+}
+
+/* ============================================================
+   ОБЩИЕ СТИЛИ
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 24px;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* ============================================================
+   СТЕКЛЯННАЯ КАРТОЧКА (glass-card)
+   ============================================================ */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 30px var(--glow-purple);
+}
+
+/* ============================================================
+   ЗАГОЛОВКИ В КАРТОЧКАХ
+   ============================================================ */
+.glass-card h3 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  position: relative;
+  display: inline-block;
+}
+
+/* Голографический эффект для заголовков (опционально) */
+.glass-card h3::after {
+  content: '.';
+  color: var(--neon-cyan);
+  margin-left: 2px;
+}
+
+/* ============================================================
+   SELECT (выпадающий список)
+   ============================================================ */
+select {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2322d3ee' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+
+select:hover {
+  border-color: var(--glass-border-hover);
+  background-color: var(--bg-glass-hover);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 0 3px var(--glow-purple);
+}
+
+select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   ПОЛЗУНКИ ВЕСОВ (weight-slider)
+   ============================================================ */
+.weight-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.weight-slider:last-of-type {
+  border-bottom: none;
+}
+
+.weight-slider label {
+  flex: 0 0 80px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Кастомный input[type="range"] */
+input[type="range"] {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--glass-border);
+  border-radius: 4px;
+  outline: none;
+  transition: background 0.2s;
+  background: linear-gradient(to right, var(--neon-cyan) 0%, var(--neon-cyan) var(--fill), var(--glass-border) var(--fill), var(--glass-border) 100%);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 12px var(--glow-cyan), 0 0 24px rgba(34, 211, 238, 0.2);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: var(--neon-purple);
+  box-shadow: 0 0 20px var(--glow-purple);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 12px var(--glow-cyan);
+  cursor: pointer;
+}
+
+input[type="range"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+.value-display {
+  flex: 0 0 48px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+}
+
+/* ============================================================
+   СУММА ВЕСОВ (weights-sum)
+   ============================================================ */
+.weights-sum {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: var(--radius-input);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+  background: var(--bg-glass);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.weights-sum.valid {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 20px var(--glow-cyan);
+}
+
+.weights-sum.invalid {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.15);
+}
+
+/* ============================================================
+   ПРЕВЬЮ ОЦЕНОК (preview-block)
+   ============================================================ */
+.scores-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.score-item {
+  flex: 1 1 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  padding: 12px 8px;
+  transition: all 0.3s ease;
+}
+
+.score-item:hover {
+  border-color: var(--neon-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.score-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.score-value {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 20px var(--glow-cyan);
+}
+
+/* ============================================================
+   ВАЙБ БЛОК (vibe-block)
+   ============================================================ */
+.vibe-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Элементы управления вайбом — пример (можно добавить кнопки или слайдеры) */
+.vibe-controls button {
+  padding: 8px 20px;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.vibe-controls button:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px var(--glow-cyan), 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.vibe-controls button:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   ДОПОЛНИТЕЛЬНО: сетка / отступы для блоков
+   ============================================================ */
+.genre-block,
+.preview-block,
+.vibe-block {
+  margin-bottom: 24px;
+}
+
+/* Для мобильной адаптации */
+@media (max-width: 768px) {
+  .weight-slider {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .weight-slider label {
+    flex: 0 0 100%;
+  }
+  .value-display {
+    flex: 0 0 60px;
+  }
+  .score-item {
+    flex: 1 1 80px;
+  }
+}
+
+/* ============================================================
+   АНИМАЦИИ (для голографических эффектов и свечений)
+   ============================================================ */
+@keyframes holographicShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Применение к заголовкам с классом .holographic (если добавите) */
+.holographic {
+  background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan), var(--neon-purple));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: holographicShift 5s ease-in-out infinite;
+}
+
+/* ============================================================
+   СТИЛИ ДЛЯ ПЛАВАЮЩИХ НЕОНОВЫХ ШАРОВ (декоративный фон)
+   Используйте в JSX как отдельные элементы с этими классами
+   ============================================================ */
+.floating-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.orb-purple {
+  width: 300px;
+  height: 300px;
+  background: rgba(124, 58, 237, 0.2);
+  top: -100px;
+  left: -100px;
+}
+
+.orb-cyan {
+  width: 250px;
+  height: 250px;
+  background: rgba(34, 211, 238, 0.15);
+  bottom: -80px;
+  right: -80px;
+}
+
+.orb-pink {
+  width: 200px;
+  height: 200px;
+  background: rgba(236, 72, 153, 0.1);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============================================================
+   ДОПОЛНИТЕЛЬНО: скроллбар в стиле киберпанк
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
