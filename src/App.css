@@ -4426,3 +4426,653 @@ textarea {
   border-color: rgba(34, 211, 238, 0.3);
   transform: translateY(-2px);
 }
+
+
+/* ============================================
+   ROOT ПЕРЕМЕННЫЕ (цветовая палитра)
+   ============================================ */
+:root {
+  /* Фоны */
+  --bg-deep: #0a0a12;
+  --bg-glass: rgba(20, 20, 40, 0.55);
+  --bg-glass-hover: rgba(30, 30, 60, 0.7);
+
+  /* Текст */
+  --text-primary: #f0f0ff;
+  --text-secondary: rgba(200, 200, 240, 0.6);
+  --text-muted: rgba(200, 200, 240, 0.35);
+
+  /* Неоновые акценты */
+  --neon-purple: #7c3aed;
+  --neon-cyan: #22d3ee;
+  --neon-pink: #ec4899;
+
+  /* Стекло */
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-blur: 24px;
+
+  /* Шрифты */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Размеры */
+  --radius: 16px;
+  --spacing: 20px;
+  --transition: 0.25s ease;
+}
+
+/* ============================================
+   ГЛОБАЛЬНЫЕ СТИЛИ
+   ============================================ */
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Общий контейнер (если у вас есть, но можно обойтись) */
+.app {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ============================================
+   СТЕКЛЯННАЯ КАРТОЧКА
+   ============================================ */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--bg-glass-hover);
+}
+
+/* ============================================
+   ОБЩИЕ БЛОКИ (жанр, критерии, вайб, превью)
+   ============================================ */
+.genre-block,
+.criteria-block,
+.vibe-block,
+.preview {
+  composes: glass-card; /* если используете CSS-модули, иначе просто продублируйте классы */
+}
+
+/* Если не используете composes, добавьте эти классы к элементам вручную */
+.genre-block,
+.criteria-block,
+.vibe-block,
+.preview {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.genre-block:hover,
+.criteria-block:hover,
+.vibe-block:hover,
+.preview:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--bg-glass-hover);
+}
+
+/* Заголовки блоков */
+.genre-block h3,
+.criteria-block h4 {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan), var(--neon-purple));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: holographicShift 6s ease-in-out infinite;
+}
+
+@keyframes holographicShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   SELECT (жанр)
+   ============================================ */
+.genre-block select {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23f0f0ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+  transition: border-color var(--transition);
+  margin-bottom: 16px;
+}
+
+.genre-block select:focus {
+  outline: none;
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.genre-block select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   СЛАЙДЕРЫ ВЕСОВ (blockWeights)
+   ============================================ */
+.weight-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.weight-slider label {
+  flex: 0 0 auto;
+  min-width: 90px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.weight-slider input[type="range"] {
+  flex: 1;
+  min-width: 0; /* чтобы не вылезал */
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  outline: none;
+  transition: opacity 0.2s;
+}
+
+/* Кастомный ползунок для WebKit */
+.weight-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+  border: 2px solid var(--bg-deep);
+  transition: 0.15s;
+}
+
+.weight-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: var(--neon-purple);
+}
+
+/* Для Firefox */
+.weight-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  cursor: pointer;
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+}
+
+.weight-slider input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+
+/* Заполнение (для отображения прогресса) – используем псевдо-элемент или background-size */
+/* Можно реализовать через background: linear-gradient(to right, neon-cyan 0%, neon-cyan var(--fill), transparent var(--fill), transparent 100%) */
+.weight-slider input[type="range"] {
+  background: linear-gradient(to right, var(--neon-cyan) 0%, var(--neon-cyan) var(--fill, 0%), rgba(255,255,255,0.08) var(--fill, 0%), rgba(255,255,255,0.08) 100%);
+}
+
+.weight-slider .value-display {
+  flex: 0 0 44px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.04);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+}
+
+/* Отключённые слайдеры (когда жанр не hybrid) */
+.weight-slider input[type="range"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.weight-slider input[type="range"]:disabled::-webkit-slider-thumb {
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+.weight-slider input[type="range"]:disabled::-moz-range-thumb {
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+/* ============================================
+   СУММА ВЕСОВ
+   ============================================ */
+.weights-sum {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  text-align: right;
+  padding: 6px 12px;
+  border-radius: 40px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--glass-border);
+  display: inline-block;
+  float: right;
+}
+
+.weights-sum.valid {
+  color: var(--neon-cyan);
+  border-color: rgba(34, 211, 238, 0.2);
+}
+
+.weights-sum.invalid {
+  color: var(--neon-pink);
+  border-color: rgba(236, 72, 153, 0.2);
+}
+
+/* ============================================
+   СЛАЙДЕРЫ КРИТЕРИЕВ (внутри criteria-block)
+   ============================================ */
+.criterion-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* для маленьких экранов */
+}
+
+.criterion-slider label {
+  flex: 0 1 160px; /* чтобы текст не сжимался слишком сильно */
+  min-width: 120px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: help;
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+.criterion-slider .hint-icon {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.criterion-slider label:hover .hint-icon {
+  opacity: 1;
+}
+
+.criterion-slider input[type="range"] {
+  flex: 1;
+  min-width: 60px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, var(--neon-purple) 0%, var(--neon-purple) var(--fill, 0%), rgba(255,255,255,0.08) var(--fill, 0%), rgba(255,255,255,0.08) 100%);
+  border-radius: 3px;
+  outline: none;
+}
+
+.criterion-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--neon-purple);
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+  border: 2px solid var(--bg-deep);
+  transition: 0.15s;
+}
+
+.criterion-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: var(--neon-cyan);
+}
+
+.criterion-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--neon-purple);
+  cursor: pointer;
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+}
+
+.criterion-slider input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: transparent;
+}
+
+.criterion-slider .value-display {
+  flex: 0 0 34px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--neon-cyan);
+  background: rgba(34, 211, 238, 0.08);
+  padding: 2px 6px;
+  border-radius: 20px;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+}
+
+/* ============================================
+   ВАЙБ БЛОК
+   ============================================ */
+.vibe-block label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.vibe-block input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, var(--neon-pink) 0%, var(--neon-pink) var(--fill, 0%), rgba(255,255,255,0.08) var(--fill, 0%), rgba(255,255,255,0.08) 100%);
+  border-radius: 3px;
+  outline: none;
+}
+
+.vibe-block input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--neon-pink);
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.5);
+  border: 2px solid var(--bg-deep);
+  transition: 0.15s;
+}
+
+.vibe-block input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.vibe-block input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--neon-pink);
+  cursor: pointer;
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.5);
+}
+
+.vibe-block .value-display {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: var(--neon-pink);
+  background: rgba(236, 72, 153, 0.08);
+  padding: 4px 16px;
+  border-radius: 40px;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+/* ============================================
+   ПРЕВЬЮ (баллы)
+   ============================================ */
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 12px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.preview > div {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+}
+
+.preview strong {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--neon-cyan);
+}
+
+.preview div:last-child strong {
+  color: var(--neon-pink);
+}
+
+/* ============================================
+   КНОПКА СОХРАНЕНИЯ
+   ============================================ */
+button {
+  display: inline-block;
+  padding: 12px 32px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 40px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(34, 211, 238, 0.08));
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  width: 100%;
+  margin-top: 8px;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--neon-purple);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(34, 211, 238, 0.15));
+  box-shadow: 0 6px 28px rgba(124, 58, 237, 0.25);
+  transform: translateY(-2px);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   ============================================ */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  .glass-card,
+  .genre-block,
+  .criteria-block,
+  .vibe-block,
+  .preview {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  /* Уменьшаем шрифт */
+  body {
+    font-size: 14px;
+  }
+
+  .genre-block h3,
+  .criteria-block h4 {
+    font-size: 1rem;
+  }
+
+  /* Слайдеры весов - перестраиваем в колонку для узких экранов */
+  .weight-slider {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .weight-slider label {
+    flex: 0 0 100%;
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+
+  .weight-slider input[type="range"] {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .weight-slider .value-display {
+    flex: 0 0 auto;
+    order: 3;
+    margin-left: auto;
+    font-size: 0.8rem;
+    padding: 2px 12px;
+  }
+
+  /* Слайдеры критериев */
+  .criterion-slider {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .criterion-slider label {
+    flex: 0 0 100%;
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+
+  .criterion-slider input[type="range"] {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .criterion-slider .value-display {
+    flex: 0 0 auto;
+    order: 3;
+    margin-left: auto;
+    font-size: 0.85rem;
+    padding: 2px 10px;
+  }
+
+  /* Сумма весов */
+  .weights-sum {
+    float: none;
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  /* Вайб */
+  .vibe-block label {
+    font-size: 0.85rem;
+  }
+
+  .vibe-block .value-display {
+    font-size: 1rem;
+    padding: 2px 14px;
+  }
+
+  /* Превью */
+  .preview {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview > div {
+    flex: 1 1 auto;
+    min-width: auto;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  /* Кнопка */
+  button {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Для очень маленьких экранов (до 400px) */
+@media (max-width: 400px) {
+  body {
+    padding: 6px;
+  }
+
+  .glass-card,
+  .genre-block,
+  .criteria-block,
+  .vibe-block,
+  .preview {
+    padding: 10px;
+  }
+
+  .criterion-slider label {
+    font-size: 0.8rem;
+  }
+
+  .weight-slider label {
+    font-size: 0.8rem;
+  }
+}
