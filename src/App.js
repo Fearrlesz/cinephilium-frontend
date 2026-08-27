@@ -1739,7 +1739,10 @@ const saveRating = async () => {
             </div>
           </div>
         )}
-/* === БЛОК C3: JSX формы === */
+
+           
+             
+{/* БЛОК C3: Форма с настройками жанра и весов */}
 <div className="genre-block glass-card">
   <h3>⚙️ Жанр и веса блоков</h3>
   <select value={genrePreset} onChange={e=>handleGenreChange(e.target.value)}>
