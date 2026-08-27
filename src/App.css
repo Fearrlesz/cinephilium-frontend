@@ -5430,3 +5430,144 @@ button:disabled {
       0 0 80px rgba(0, 198, 255, 0.35);
   }
 }
+
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  margin: 0 auto 30px;
+  padding: 14px 28px;
+  border-radius: 20px;
+
+  width: calc(100% - 40px);
+  max-width: 1400px;
+
+  background: linear-gradient(135deg,
+    rgba(15, 15, 35, 0.85) 0%,
+    rgba(35, 15, 60, 0.75) 50%,
+    rgba(10, 25, 50, 0.85) 100%
+  );
+  background-size: 200% 200%;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  animation:
+    headerSlideDown 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    liquidShift 20s ease-in-out infinite;
+
+  transition:
+    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  overflow: visible;
+}
+
+@keyframes liquidShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes headerSlideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   🔥 НЕОНОВОЕ СВЕЧЕНИЕ
+   ============================================================ */
+
+.header::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 23px;
+  z-index: -1;
+
+  background: linear-gradient(90deg,
+    #ff00cc,
+    #7b2ff7,
+    #00c6ff,
+    #00ffa3,
+    #ffe600,
+    #ff4d00,
+    #ff00cc
+  );
+  background-size: 400% 400%;
+
+  filter: blur(18px);
+  opacity: 0.7;
+
+  animation:
+    neonGlow 8s linear infinite,
+    neonPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 21.5px;
+  z-index: -1;
+
+  background: linear-gradient(90deg,
+    #ff00cc,
+    #7b2ff7,
+    #00c6ff,
+    #00ffa3,
+    #ffe600,
+    #ff00cc
+  );
+  background-size: 300% 300%;
+
+  opacity: 0.9;
+
+  animation:
+    neonGlow 8s linear infinite reverse,
+    neonPulse 3s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes neonGlow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Свечение через box-shadow на самом хеддере — надёжнее чем на ::before/::after */
+.header {
+  box-shadow:
+    0 0 20px rgba(123, 47, 247, 0.4),
+    0 0 60px rgba(255, 0, 204, 0.15);
+  animation:
+    headerSlideDown 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    liquidShift 20s ease-in-out infinite,
+    neonPulse 3s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(123, 47, 247, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(255, 0, 204, 0.5),
+      0 0 80px rgba(0, 198, 255, 0.35);
+  }
+}
