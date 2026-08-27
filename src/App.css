@@ -2894,12 +2894,6 @@ body {
   }
 }
 
-
-
-
-
-
-
 /* ============================================================
    FIREFOX
    ============================================================ */
@@ -5054,25 +5048,3 @@ button:disabled {
   }
 }
 
-/* Для очень маленьких экранов (до 400px) */
-@media (max-width: 400px) {
-  body {
-    padding: 6px;
-  }
-
-  .glass-card,
-  .genre-block,
-  .criteria-block,
-  .vibe-block,
-  .preview {
-    padding: 10px;
-  }
-
-  .criterion-slider label {
-    font-size: 0.8rem;
-  }
-
-  .weight-slider label {
-    font-size: 0.8rem;
-  }
-}
