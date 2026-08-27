@@ -5203,3 +5203,258 @@ button:disabled {
     grid-template-columns: repeat(3, 1fr) !important;
   }
 }
+
+
+/* ============================================================
+   ХЕДДЕР, СЛЕДУЮЩИЙ ЗА ПОЛЬЗОВАТЕЛЕМ (sticky + анимация)
+   ============================================================ */
+
+/* Основные стили хедера */
+.header {
+  position: sticky;
+  top: 12px;
+  z-index: 1000;
+  margin: 0 20px 30px;
+  padding: 14px 28px;
+  border-radius: 20px;
+  
+  background: linear-gradient(135deg,
+    rgba(20, 20, 40, 0.85) 0%,
+    rgba(40, 20, 60, 0.75) 50%,
+    rgba(20, 30, 50, 0.85) 100%
+  );
+  background-size: 200% 200%;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  
+  box-shadow: 
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: liquidShift 20s ease-in-out infinite;
+  
+  /* Плавное появление/исчезновение */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 🔥 Гарантируем, что хеддер всегда виден */
+  width: auto;
+  max-width: calc(100% - 40px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Анимация фона */
+@keyframes liquidShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ
+   ============================================================ */
+@media (max-width: 1024px) {
+  .header {
+    top: 10px;
+    padding: 12px 24px;
+    max-width: calc(100% - 30px);
+    margin: 0 15px 25px;
+    border-radius: 18px;
+  }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .header {
+    position: sticky;
+    top: 8px;
+    margin: 0 10px 20px;
+    padding: 12px 16px;
+    max-width: calc(100% - 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    border-radius: 16px;
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+  }
+  
+  .header-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ ДЛЯ МАЛЕНЬКИХ ТЕЛЕФОНОВ
+   ============================================================ */
+@media (max-width: 480px) {
+  .header {
+    top: 4px;
+    margin: 0 6px 16px;
+    padding: 10px 14px;
+    max-width: calc(100% - 12px);
+    border-radius: 14px;
+  }
+  
+  .header h1 {
+    font-size: 17px;
+    text-align: center;
+  }
+  
+  .header-actions {
+    gap: 6px;
+  }
+  
+  .btn-profile,
+  .btn-login,
+  .btn-about,
+  .btn-top,
+  .btn-admin,
+  .btn-logout {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   СУПЕР-МАЛЕНЬКИЕ ЭКРАНЫ (до 360px)
+   ============================================================ */
+@media (max-width: 360px) {
+  .header {
+    top: 2px;
+    margin: 0 4px 12px;
+    padding: 8px 12px;
+    max-width: calc(100% - 8px);
+    border-radius: 12px;
+  }
+  
+  .header h1 {
+    font-size: 15px;
+  }
+  
+  .header-actions {
+    gap: 4px;
+  }
+  
+  .btn-profile,
+  .btn-login,
+  .btn-about,
+  .btn-top,
+  .btn-admin,
+  .btn-logout {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+}
+
+/* ============================================================
+   ЭФФЕКТ СЖАТИЯ ПРИ ПРОКРУТКЕ (дополнительная опция)
+   ============================================================ */
+/* 
+   Если хотите, чтобы хеддер становился меньше при скролле вниз,
+   используйте JavaScript для добавления класса 'scrolled'
+*/
+
+.header.scrolled {
+  padding: 10px 24px;
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .header.scrolled {
+    padding: 8px 14px;
+    top: 4px;
+  }
+  
+  .header.scrolled .header h1 {
+    font-size: 17px;
+  }
+}
+
+/* ============================================================
+   ДОПОЛНИТЕЛЬНО: ПЛАВНОЕ ПОЯВЛЕНИЕ ХЕДДЕРА ПРИ ЗАГРУЗКЕ
+   ============================================================ */
+.header {
+  animation: headerSlideDown 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), liquidShift 20s ease-in-out infinite;
+}
+
+@keyframes headerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ============================================================
+   ДЛЯ FIREFOX (поддержка)
+   ============================================================ */
+@-moz-document url-prefix() {
+  .header {
+    background: linear-gradient(135deg,
+      rgba(20, 20, 40, 0.9) 0%,
+      rgba(40, 20, 60, 0.8) 50%,
+      rgba(20, 30, 50, 0.9) 100%
+    );
+  }
+}
+
+/* ============================================================
+   УБИРАЕМ outline ПРИ ФОКУСЕ
+   ============================================================ */
+.header:focus-visible {
+  outline: none;
+}
+
+/* ============================================================
+   КОНТЕЙНЕР ДЛЯ КОНТЕНТА (чтобы не перекрывался хеддером)
+   ============================================================ */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  /* Не добавляем padding-top, так как хеддер sticky, а не fixed */
+}
+
+/* Для фиксированного хеддера (если решите использовать) */
+/*
+.container {
+  padding-top: 90px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-top: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-top: 70px;
+  }
+}
+*/
