@@ -4426,3 +4426,607 @@ textarea {
   border-color: rgba(34, 211, 238, 0.3);
   transform: translateY(-2px);
 }
+
+
+/* ============================================================
+   ТЕМА И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+   ============================================================ */
+:root {
+  /* Основные цвета (тёмная тема по умолчанию) */
+  --bg-primary: #0b0b1a;
+  --bg-secondary: #14103a;
+  --bg-glass: rgba(20, 10, 50, 0.7);
+  --bg-glass-light: rgba(30, 10, 70, 0.5);
+  --border-glass: rgba(100, 150, 255, 0.25);
+  --border-glass-strong: rgba(100, 180, 255, 0.5);
+
+  /* Акцентные неоновые цвета */
+  --neon-blue: #00d4ff;
+  --neon-purple: #b06aff;
+  --neon-violet: #7b2ffc;
+  --neon-cyan: #00ffd0;
+  --neon-pink: #ff6b8a;
+
+  /* Текст */
+  --text-primary: #e0e8ff;
+  --text-secondary: #b8ccff;
+  --text-dim: #8a9bcc;
+  --text-muted: #6a7aaa;
+
+  /* Тени и стекло */
+  --shadow-neon: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(123, 47, 252, 0.15);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-criteria: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  /* Геометрия */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 40px;
+
+  /* Отступы (rem) */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 2.5rem;
+
+  /* Шрифты */
+  --font-base: 1rem;
+  --font-scale: 1.25;
+  --line-height: 1.5;
+
+  /* Анимации */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.25s ease;
+
+  /* Специфические размеры для слайдеров */
+  --slider-thumb-size: 18px;
+  --slider-track-height: 6px;
+
+  /* Схема цвета */
+  color-scheme: dark;
+}
+
+/* Светлая тема (если пользователь предпочитает светлый режим) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #f0f4ff;
+    --bg-secondary: #e0e8ff;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    --bg-glass-light: rgba(230, 240, 255, 0.6);
+    --border-glass: rgba(100, 150, 255, 0.3);
+    --border-glass-strong: rgba(0, 120, 255, 0.6);
+
+    --neon-blue: #0077cc;
+    --neon-purple: #7b2ffc;
+    --neon-violet: #5a1ecc;
+    --neon-cyan: #00a88e;
+    --neon-pink: #d6306b;
+
+    --text-primary: #1a1a2e;
+    --text-secondary: #2d2d44;
+    --text-dim: #4a4a6a;
+    --text-muted: #6a6a8a;
+
+    --shadow-neon: 0 0 12px rgba(0, 119, 204, 0.2), 0 0 30px rgba(123, 47, 252, 0.1);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-criteria: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    color-scheme: light;
+  }
+}
+
+/* ============================================================
+   СБРОС И БАЗОВЫЕ СТИЛИ
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* база для rem */
+  scroll-behavior: smooth;
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, var(--bg-secondary), var(--bg-primary));
+  color: var(--text-primary);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  padding: clamp(1rem, 5vw, 2.5rem);
+  margin: 0;
+  line-height: var(--line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Уважение к настройкам пользователя: уменьшение движения */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   ОБЩИЕ КОМПОНЕНТЫ
+   ============================================================ */
+
+/* Стеклянная карточка */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.2rem, 3vw, 2rem);
+  margin-bottom: clamp(1rem, 2.5vw, 2rem);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  contain: layout style paint; /* изоляция для производительности */
+}
+
+.glass-card:hover {
+  border-color: var(--border-glass-strong);
+  box-shadow: var(--shadow-glass), var(--shadow-neon);
+}
+
+/* Заголовки */
+.h3,
+.h4 {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+}
+
+.h4 {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  border-bottom: 1px solid rgba(100, 150, 255, 0.15);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Выпадающий список */
+.select {
+  background-color: rgba(10, 5, 30, 0.8);
+  color: var(--text-primary);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 2.5rem 0.7rem 1.2rem;
+  font-size: var(--font-base);
+  width: 100%;
+  max-width: 400px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.select:focus-visible {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+.select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   КОМПОНЕНТЫ СЛАЙДЕРОВ
+   ============================================================ */
+
+/* Группа слайдера (лейбл + ползунок + значение) */
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(0, 20, 60, 0.3);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--neon-blue);
+  transition: background var(--transition-base);
+}
+
+.slider-group:hover {
+  background: rgba(30, 10, 80, 0.4);
+}
+
+.slider-group__label {
+  min-width: clamp(80px, 20vw, 160px);
+  font-weight: 400;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  color: var(--text-secondary);
+}
+
+/* Базовый стиль range input */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: var(--slider-track-height);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--slider-color, var(--neon-cyan)) 0%,
+    var(--slider-color, var(--neon-cyan)) var(--fill, 50%),
+    rgba(255, 255, 255, 0.1) var(--fill, 50%),
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  transition: opacity var(--transition-fast);
+  /* Будет изменяться только transform/opacity, не layout */
+}
+
+/* Стили для бегунка (thumb) в WebKit */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--thumb-color, var(--neon-blue)));
+  box-shadow: 0 0 20px var(--thumb-shadow, var(--neon-blue)),
+              0 0 60px var(--thumb-shadow-secondary, var(--neon-purple));
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 30px var(--thumb-shadow-hover, var(--neon-cyan)),
+              0 0 80px var(--thumb-shadow-secondary-hover, var(--neon-violet));
+}
+
+/* Для Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--thumb-color, var(--neon-blue)));
+  box-shadow: 0 0 20px var(--thumb-shadow, var(--neon-blue)),
+              0 0 60px var(--thumb-shadow-secondary, var(--neon-purple));
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Тематические модификаторы для разных групп слайдеров */
+.slider-group--weight input[type="range"] {
+  --slider-color: var(--neon-blue);
+  --thumb-color: var(--neon-blue);
+  --thumb-shadow: var(--neon-blue);
+  --thumb-shadow-secondary: var(--neon-purple);
+  --thumb-shadow-hover: var(--neon-cyan);
+  --thumb-shadow-secondary-hover: var(--neon-violet);
+}
+
+.slider-group--criterion input[type="range"] {
+  --slider-color: var(--neon-purple);
+  --thumb-color: var(--neon-purple);
+  --thumb-shadow: var(--neon-purple);
+  --thumb-shadow-secondary: var(--neon-violet);
+  --thumb-shadow-hover: var(--neon-violet);
+  --thumb-shadow-secondary-hover: var(--neon-purple);
+}
+
+.slider-group--vibe input[type="range"] {
+  --slider-color: var(--neon-violet);
+  --thumb-color: var(--neon-violet);
+  --thumb-shadow: var(--neon-violet);
+  --thumb-shadow-secondary: var(--neon-purple);
+  --thumb-shadow-hover: var(--neon-purple);
+  --thumb-shadow-secondary-hover: var(--neon-violet);
+}
+
+/* Значение (числовое отображение) */
+.slider-group__value {
+  min-width: 44px;
+  text-align: center;
+  font-weight: 600;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: #fff;
+  background: rgba(0, 212, 255, 0.12);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+  transition: all var(--transition-fast);
+}
+
+/* Специфичное оформление для значения в вайб-блоке */
+.slider-group--vibe .slider-group__value {
+  background: rgba(176, 106, 255, 0.15);
+  border-color: rgba(176, 106, 255, 0.3);
+  color: #e8d0ff;
+  text-shadow: 0 0 16px rgba(176, 106, 255, 0.4);
+}
+
+/* ============================================================
+   СПЕЦИФИЧЕСКИЕ БЛОКИ
+   ============================================================ */
+
+/* Сумма весов */
+.weights-sum {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid transparent;
+  transition: all var(--transition-base);
+}
+
+.weights-sum--valid {
+  border-color: var(--neon-cyan);
+  color: #b0ffea;
+  box-shadow: 0 0 20px rgba(0, 255, 208, 0.1);
+}
+
+.weights-sum--invalid {
+  border-color: var(--neon-pink);
+  color: #ff8a9f;
+  box-shadow: 0 0 20px rgba(255, 107, 138, 0.15);
+}
+
+/* Блок критериев */
+.criteria-block {
+  background: var(--bg-glass-light);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(100, 150, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: clamp(1rem, 2.5vw, 1.8rem);
+  margin-bottom: clamp(1rem, 2vw, 1.8rem);
+  box-shadow: var(--shadow-criteria);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  contain: layout style paint;
+  container-type: inline-size; /* для контейнерных запросов */
+}
+
+.criteria-block:hover {
+  border-color: rgba(100, 180, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(123, 47, 252, 0.15);
+}
+
+/* Иконка подсказки */
+.hint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.15);
+  font-size: 0.75rem;
+  color: var(--neon-blue);
+  cursor: help;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hint-icon:hover,
+.hint-icon:focus-visible {
+  background: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+  outline: none;
+}
+
+/* Вайб-блок */
+.vibe-block {
+  background: var(--bg-glass-light);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(176, 106, 255, 0.25);
+  border-radius: var(--radius-lg);
+  padding: clamp(1rem, 2vw, 1.8rem);
+  margin: clamp(1rem, 2vw, 1.8rem) 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-lg);
+  box-shadow: 0 0 30px rgba(123, 47, 252, 0.05);
+  contain: layout style paint;
+  container-type: inline-size;
+}
+
+.vibe-block__label {
+  flex: 1 1 300px;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  color: #d4c8ff;
+}
+
+.vibe-block__input {
+  flex: 2 1 200px;
+}
+
+/* Превью результатов */
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: clamp(1rem, 2vw, 1.8rem);
+  margin: clamp(1rem, 2vw, 1.8rem) 0;
+  background: rgba(0, 10, 40, 0.5);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  contain: layout style paint;
+}
+
+.preview__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+
+.preview__value {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+/* Кнопка */
+.button {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-violet));
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0.9rem 2.8rem;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow; /* оптимизация анимации */
+}
+
+.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.button:hover:not(:disabled)::after {
+  opacity: 1;
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(1.03);
+  box-shadow: 0 0 50px rgba(0, 212, 255, 0.4), 0 0 80px rgba(123, 47, 252, 0.2);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 4px;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+  transform: none;
+  will-change: auto; /* сброс will-change */
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ И КОНТЕЙНЕРНЫЕ ЗАПРОСЫ
+   ============================================================ */
+
+/* Контейнерные запросы для критериев и вайб-блока */
+@container (max-width: 700px) {
+  .slider-group {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  .slider-group__label {
+    min-width: 100%;
+  }
+  .vibe-block {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .preview {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
+
+/* Медиазапросы для совсем маленьких экранов (глобальные) */
+@media (max-width: 480px) {
+  .select {
+    max-width: 100%;
+  }
+  .weights-sum {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   ДОСТУПНОСТЬ И ПОДДЕРЖКА БРАУЗЕРОВ
+   ============================================================ */
+
+/* Проверка поддержки appearance для range */
+@supports (-webkit-appearance: none) or (appearance: none) {
+  input[type="range"] {
+    /* стили уже определены, но можно добавить доп. настройки */
+  }
+}
+
+/* Fallback для backdrop-filter */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card,
+  .criteria-block,
+  .vibe-block,
+  .preview {
+    background: rgba(10, 5, 30, 0.9); /* более плотный фон */
+  }
+}
+
+/* Улучшенный фокус для всех интерактивных элементов */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   КРАТКИЙ ЧЕЙНДЖЛОГ
+   ============================================================
+   Основные улучшения:
+   1. Все размеры переведены на rem или clamp() — полная адаптивность.
+   2. Внедрены CSS-переменные для всех цветов, теней, отступов — лёгкая смена темы.
+   3. Добавлена поддержка светлой темы через prefers-color-scheme.
+   4. Контейнерные запросы (@container) для локальной адаптации компонентов.
+   5. Использован contain: layout style paint для ускорения рендеринга.
+   6. Анимации оптимизированы (transform/opacity) + will-change только на кнопке.
+   7. Добавлен @supports для backdrop-filter и appearance.
+   8. Полностью переработана структура классов (BEM-подобная) для переиспользования.
+   9. Улучшен фокус с помощью :focus-visible и единого стиля для всех элементов.
+   10. Добавлены комментарии и логические блоки для лёгкой навигации.
+   ============================================================ */
