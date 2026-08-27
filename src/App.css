@@ -4424,8 +4424,10 @@ textarea {
 
 
 
+
+
 /* ============================================
-   ROOT ПЕРЕМЕННЫЕ — изысканная неон-палитра
+   ROOT ПЕРЕМЕННЫЕ — приглушённая неон-палитра
    ============================================ */
 :root {
   /* Глубокий фон с лёгким градиентом */
@@ -4433,10 +4435,10 @@ textarea {
   --bg-gradient: radial-gradient(circle at 20% 30%, #141428, #0a0a12 80%);
 
   /* Стекло — более прозрачное и с благородным отливом */
-  --bg-glass: rgba(18, 18, 40, 0.50);
-  --bg-glass-hover: rgba(28, 28, 60, 0.70);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-border-hover: rgba(180, 140, 255, 0.15);
+  --bg-glass: rgba(18, 18, 40, 0.55);
+  --bg-glass-hover: rgba(28, 28, 60, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(160, 130, 255, 0.2);
   --glass-blur: 28px;
 
   /* Текст — мягкий белый с голубоватым оттенком */
@@ -4444,17 +4446,17 @@ textarea {
   --text-secondary: rgba(200, 200, 245, 0.6);
   --text-muted: rgba(180, 180, 220, 0.35);
 
-  /* Неоновые акценты — приглушённо-благородные */
-  --neon-purple: #8b5cf6;      /* мягкий фиолетовый */
-  --neon-cyan: #22d3ee;        /* яркий, но не кричащий */
+  /* Приглушённые неоновые акценты — менее вырвиглазные */
+  --neon-purple: #7c3aed;      /* мягкий фиолетовый */
+  --neon-cyan: #38bdf8;        /* спокойный голубой */
   --neon-pink: #f472b6;        /* нежно-розовый */
-  --neon-gold: #fbbf24;        /* тёплый акцент (для разнообразия) */
+  --neon-gold: #fbbf24;        /* тёплый акцент */
 
-  /* Тени для 3D-подушек */
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(139, 92, 246, 0.08);
-  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(139, 92, 246, 0.15);
-  --shadow-inset-light: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-inset-dark: inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+  /* Тени для 3D-подушек — объёмнее и глубже */
+  --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(124, 58, 237, 0.12);
+  --shadow-card-hover: 0 16px 48px rgba(0, 0, 0, 0.8), 0 6px 24px rgba(124, 58, 237, 0.2);
+  --shadow-inset-light: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-inset-dark: inset 0 -4px 12px rgba(0, 0, 0, 0.4);
 
   /* Скругления */
   --radius: 20px;
@@ -4505,7 +4507,9 @@ body {
 /* ============================================
    УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА (подушка)
    ============================================ */
-.glass-card {
+.glass-card,
+.criteria-block,
+.vibe-block {
   background: var(--bg-glass);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -4517,10 +4521,14 @@ body {
   box-shadow: var(--shadow-card), var(--shadow-inset-light);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
-/* Лёгкое неоновое свечение по краям (приправа) */
-.glass-card::before {
+/* Лёгкое свечение по краям (менее агрессивное) */
+.glass-card::before,
+.criteria-block::before,
+.vibe-block::before {
   content: '';
   position: absolute;
   inset: -1px;
@@ -4530,37 +4538,53 @@ body {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.15;
+  opacity: 0.08;
   transition: opacity var(--transition);
   pointer-events: none;
 }
 
-.glass-card:hover::before {
-  opacity: 0.35;
+.glass-card:hover::before,
+.criteria-block:hover::before,
+.vibe-block:hover::before {
+  opacity: 0.25;
 }
 
-.glass-card:hover {
+.glass-card:hover,
+.criteria-block:hover,
+.vibe-block:hover {
   border-color: var(--glass-border-hover);
   background: var(--bg-glass-hover);
   box-shadow: var(--shadow-card-hover), var(--shadow-inset-light);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
-/* Разделитель между блоками (неоновая линия) */
+/* Усиленная 3D-подушка: дополнительная внутренняя тень и градиент фона */
+.glass-card,
+.criteria-block,
+.vibe-block {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(18, 18, 40, 0.6));
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.7),
+    0 4px 12px rgba(124, 58, 237, 0.08),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Разделитель между блоками (неоновая линия, но приглушённая) */
 .block-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--neon-purple), var(--neon-cyan), transparent);
-  opacity: 0.2;
+  opacity: 0.15;
   margin: calc(var(--spacing) * 0.5) 0 calc(var(--spacing) * 0.8) 0;
   border: none;
 }
 
 /* ============================================
-   ЗАГОЛОВКИ БЛОКОВ (живой неон)
+   ЗАГОЛОВКИ БЛОКОВ (менее кричащий неон)
    ============================================ */
 .genre-block h3,
 .criteria-block h4,
-.vibe-block h4 {
+.vibe-block label {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-weight: 600;
   font-size: 1.15rem;
@@ -4572,20 +4596,15 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holographicShift 8s ease-in-out infinite;
+  animation: holographicShift 12s ease-in-out infinite;
   display: inline-block;
   padding-bottom: 4px;
-  border-bottom: 2px solid rgba(139, 92, 246, 0.15);
+  border-bottom: 2px solid rgba(124, 58, 237, 0.12);
 }
 
 @keyframes holographicShift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* ============================================
@@ -4593,6 +4612,7 @@ body {
    ============================================ */
 .genre-block select {
   width: 100%;
+  max-width: 100%;
   padding: 14px 18px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
@@ -4602,18 +4622,18 @@ body {
   font-size: 1rem;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%238b5cf6' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%237c3aed' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 20px center;
   cursor: pointer;
   transition: border-color var(--transition), box-shadow var(--transition);
-  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.05);
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.05);
 }
 
 .genre-block select:focus {
   outline: none;
   border-color: var(--neon-purple);
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), 0 0 20px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12), 0 0 20px rgba(124, 58, 237, 0.06);
 }
 
 .genre-block select option {
@@ -4622,7 +4642,7 @@ body {
 }
 
 /* ============================================
-   3D-СЛАЙДЕРЫ (крупные, объёмные)
+   3D-СЛАЙДЕРЫ (крупные, объёмные, не вылезают)
    ============================================ */
 input[type="range"] {
   -webkit-appearance: none;
@@ -4634,6 +4654,8 @@ input[type="range"] {
   transition: background 0.2s;
   cursor: pointer;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+  width: 100%;
 }
 
 /* Общий стиль для бегунка (thumb) — крупный, 3D */
@@ -4643,27 +4665,27 @@ input[type="range"]::-webkit-slider-thumb {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
   transition: all 0.15s;
-  margin-top: -10px; /* центрирование относительно трека */
+  margin-top: -10px;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.7), 0 0 30px rgba(139, 92, 246, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.15);
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 input[type="range"]::-moz-range-track {
@@ -4678,19 +4700,19 @@ input[type="range"] {
   background: linear-gradient(to right, var(--neon-purple) 0%, var(--neon-purple) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
-/* Для слайдеров весов (неон-циан) */
+/* Для слайдеров весов (неон-циан, приглушённый) */
 .weight-slider input[type="range"] {
   background: linear-gradient(to right, var(--neon-cyan) 0%, var(--neon-cyan) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .weight-slider input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-cyan));
-  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.5), 0 0 20px rgba(34, 211, 238, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4), 0 0 20px rgba(56, 189, 248, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .weight-slider input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-cyan));
-  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.5), 0 0 20px rgba(34, 211, 238, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4), 0 0 20px rgba(56, 189, 248, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Для слайдеров критериев (неон-фиолетовый) */
@@ -4700,27 +4722,27 @@ input[type="range"] {
 
 .criterion-slider input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .criterion-slider input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Для слайдера вайба (неон-розовый) */
+/* Для слайдера вайба (неон-розовый, приглушённый) */
 .vibe-block input[type="range"] {
   background: linear-gradient(to right, var(--neon-pink) 0%, var(--neon-pink) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .vibe-block input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-pink));
-  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.5), 0 0 20px rgba(244, 114, 182, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4), 0 0 20px rgba(244, 114, 182, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .vibe-block input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-pink));
-  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.5), 0 0 20px rgba(244, 114, 182, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4), 0 0 20px rgba(244, 114, 182, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Отключённые слайдеры */
@@ -4742,7 +4764,7 @@ input[type="range"]:disabled::-moz-range-thumb {
 }
 
 /* ============================================
-   КОНТЕЙНЕРЫ ДЛЯ СЛАЙДЕРОВ
+   КОНТЕЙНЕРЫ ДЛЯ СЛАЙДЕРОВ — адаптивные, не разлетаются
    ============================================ */
 .weight-slider,
 .criterion-slider {
@@ -4751,6 +4773,8 @@ input[type="range"]:disabled::-moz-range-thumb {
   gap: 14px;
   margin-bottom: 14px;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
 }
 
 .weight-slider label,
@@ -4782,6 +4806,7 @@ input[type="range"]:disabled::-moz-range-thumb {
 .criterion-slider input[type="range"] {
   flex: 1;
   min-width: 60px;
+  max-width: 100%;
 }
 
 .weight-slider .value-display,
@@ -4820,14 +4845,14 @@ input[type="range"]:disabled::-moz-range-thumb {
 
 .weights-sum.valid {
   color: var(--neon-cyan);
-  border-color: rgba(34, 211, 238, 0.25);
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.05);
+  border-color: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.04);
 }
 
 .weights-sum.invalid {
   color: var(--neon-pink);
   border-color: rgba(244, 114, 182, 0.25);
-  box-shadow: 0 0 20px rgba(244, 114, 182, 0.05);
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.04);
 }
 
 /* ============================================
@@ -4840,6 +4865,7 @@ input[type="range"]:disabled::-moz-range-thumb {
   gap: 12px;
   text-align: center;
   font-size: 1rem;
+  width: 100%;
 }
 
 .preview > div {
@@ -4870,31 +4896,31 @@ input[type="range"]:disabled::-moz-range-thumb {
 }
 
 /* ============================================
-   КНОПКА СОХРАНЕНИЯ (с неоновым свечением)
+   КНОПКА СОХРАНЕНИЯ (приглушённое свечение)
    ============================================ */
 button {
   display: inline-block;
   padding: 16px 32px;
   border: none;
   border-radius: 60px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(34, 211, 238, 0.08));
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(56, 189, 248, 0.06));
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   font-size: 1.05rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition);
-  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   width: 100%;
+  max-width: 100%;
   margin-top: 8px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.08);
   position: relative;
   overflow: hidden;
 }
 
-/* Неоновая подсветка кнопки */
 button::after {
   content: '';
   position: absolute;
@@ -4911,13 +4937,13 @@ button::after {
 }
 
 button:hover:not(:disabled)::after {
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
 button:hover:not(:disabled) {
   border-color: var(--neon-purple);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(34, 211, 238, 0.15));
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.1);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(56, 189, 248, 0.1));
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15), 0 0 40px rgba(124, 58, 237, 0.06);
   transform: translateY(-3px);
 }
 
@@ -4933,7 +4959,7 @@ button:disabled {
 }
 
 /* ============================================
-   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ
+   АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ — ничего не разлетается
    ============================================ */
 @media (max-width: 640px) {
   body {
@@ -4944,10 +4970,14 @@ button:disabled {
     padding: 0;
   }
 
-  .glass-card {
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
     padding: 18px 16px;
     border-radius: 16px;
     margin-bottom: 16px;
+    width: 100%;
+    max-width: 100%;
   }
 
   .block-divider {
@@ -4956,7 +4986,7 @@ button:disabled {
 
   .genre-block h3,
   .criteria-block h4,
-  .vibe-block h4 {
+  .vibe-block label {
     font-size: 1rem;
   }
 
@@ -4964,6 +4994,7 @@ button:disabled {
   .criterion-slider {
     gap: 8px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
   }
 
   .weight-slider label,
@@ -4977,6 +5008,7 @@ button:disabled {
   .criterion-slider input[type="range"] {
     flex: 1 1 100%;
     order: 2;
+    max-width: 100%;
   }
 
   .weight-slider .value-display,
@@ -4996,6 +5028,8 @@ button:disabled {
     margin-top: 14px;
     font-size: 0.85rem;
     padding: 6px 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .vibe-block label {
@@ -5017,11 +5051,15 @@ button:disabled {
     min-width: auto;
     padding: 8px 14px;
     font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   button {
     padding: 14px 20px;
     font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Увеличиваем размер бегунков для удобства на таче */
@@ -5041,7 +5079,9 @@ button:disabled {
   body {
     padding: 4px;
   }
-  .glass-card {
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
     padding: 14px 12px;
     border-radius: 14px;
   }
