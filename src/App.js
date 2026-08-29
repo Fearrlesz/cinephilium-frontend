@@ -944,7 +944,7 @@ function HomePage() {
             return [...prev, ...newFilms];
           });
         }
-        setTotalPages(response.data.totalPages || 1);
+         setTotalPages(response.data.pagination?.pages || 1);
       } else {
         setFilms([]);
       }
