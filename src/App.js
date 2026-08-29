@@ -929,38 +929,57 @@ function HomePage() {
       });
   }, []);
 
- const loadFilms = useCallback(async (pageNum = 1) => {
-  setLoading(true);
-  setError('');
-  try {
-    const response = await api.get(`/films?page=${pageNum}&limit=20`);
-    if (response.data && Array.isArray(response.data.films)) {
-      if (pageNum === 1) {
-        setFilms(response.data.films);
+  const loadFilms = useCallback(async (pageNum = 1) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.get(`/films?page=${pageNum}&limit=20`);
+      if (response.data && Array.isArray(response.data.films)) {
+        if (pageNum === 1) {
+          setFilms(response.data.films);
+        } else {
+          setFilms(prev => {
+            const existingIds = new Set(prev.map(f => f._id));
+            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+            return [...prev, ...newFilms];
+          });
+        }
+        setTotalPages(response.data.totalPages || 1);
       } else {
-        setFilms(prev => {
-          const existingIds = new Set(prev.map(f => f._id));
-          const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-          return [...prev, ...newFilms];
-        });
+        setFilms([]);
       }
-      // Поддержка обоих форматов: totalPages (старый) и pagination.pages (новый)
-      setTotalPages(response.data.totalPages || response.data.pagination?.pages || 1);
-    } else {
-      setFilms([]);
-      setTotalPages(1);
+    } catch (err) {
+      console.error('Ошибка загрузки фильмов:', err);
+      setError('Не удалось загрузить фильмы. Попробуйте позже.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Ошибка загрузки фильмов:', err);
-    setError('Не удалось загрузить фильмы. Попробуйте позже.');
-  } finally {
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
-useEffect(() => {
-  loadFilms(page);
-}, [page]);
+  useEffect(() => {
+    loadFilms(page);
+  }, [page, loadFilms]);
+
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
+
+  const loadMore = useCallback(() => {
+    if (page < totalPages) {
+      setPage(prev => prev + 1);
+    }
+  }, [page, totalPages]);
+
+  const handleSearch = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchError('Введите название фильма');
+      return;
+    }
+
+    setSearchError('');
+    setShowSearch(false);
+
     try {
       const response = await api.get('/tmdb/search', { params: { query } });
       setSearchResults(response.data.results || []);
