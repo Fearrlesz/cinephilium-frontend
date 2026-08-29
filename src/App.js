@@ -70,7 +70,7 @@ const VALID_FILM_TYPES = ['view', 'like', 'rating', 'comment', 'share', 'favorit
 
 const api = axios.create({
   baseURL: 'https://cinephilium-backend.onrender.com/api',
-  timeout: 25000
+  timeout: 60000
 });
 
 api.interceptors.response.use(
