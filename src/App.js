@@ -1060,7 +1060,7 @@ function HomePage() {
       <Header user={user} onLogout={handleLogout} />
 
       <div className="hero glass-card">
-        <h2>Храм честного кино — 20 критериев для подробной оценки</h2>
+        <h2>Храм честного кино — 15 критериев для подробной оценки</h2>
         <div className="search-box">
           <input
             type="text"
@@ -1551,7 +1551,8 @@ const saveRating = async () => {
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!film) return <div className="error">Фильм не найден</div>;
 
-  const previewScore = calculatePreview();
+const weightsSum = blockWeights.reduce((a, b) => a + b, 0);
+const weightsValid = weightsSum === 100;
 
   return (
     <div className="container">
