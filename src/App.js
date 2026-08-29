@@ -1174,52 +1174,6 @@ function FilmPage() {
   const [showUsersModal, setShowUsersModal] = useState(false);
 
 
-
-/* === БЛОК C2: Состояние FilmPage (замена base1-base4, subjectiveM, handleRatingChange, calculatePreview) === */
-
-// Конфиг критериев (вынесите в отдельный файл или оставьте здесь)
-const CRITERIA_CONFIG = [
-  { key:'scenario', name:'📋 Сценарий и драматургия', criteria:[
-    { key:'plot', name:'Сюжетная архитектура', hint:'Логика событий, завязка-развязка, причинно-следственные связи' },
-    { key:'ideas', name:'Идейная нагрузка', hint:'Понятность целей героев, развитие темы' },
-    { key:'dialogue', name:'Диалоги и подтекст', hint:'Естественность речи, скрытые смыслы, многослойность' }
-  ]},
-  { key:'characters', name:'👥 Персонажи и актёрская игра', criteria:[
-    { key:'depth', name:'Глубина и эволюция', hint:'Внутренние конфликты, трансформация под давлением' },
-    { key:'chemistry', name:'Химия и органика', hint:'Мимика, паузы, взгляды, естественность взаимодействия' },
-    { key:'functionality', name:'Функциональность', hint:'Каждый персонаж важен для сюжета, нет лишних' }
-  ]},
-  { key:'visual', name:'🎥 Режиссура и визуальный язык', criteria:[
-    { key:'composition', name:'Композиция и символизм', hint:'Продуманность кадра, визуальные метафоры' },
-    { key:'cinematography', name:'Операторская работа и монтаж', hint:'Движение камеры, ритм склеек работают на смысл' },
-    { key:'pacing', name:'Темп и ритм', hint:'Динамика, удержание внимания, соответствие жанру' },
-    { key:'tone', name:'Эмоциональная целостность', hint:'Фильм держит единое настроение или разваливается' }
-  ]},
-  { key:'sound', name:'🔊 Звук и атмосфера', criteria:[
-    { key:'music', name:'Музыка и тишина', hint:'Передача эмоций, тишина как приём' },
-    { key:'design', name:'Звуковой дизайн', hint:'Работа шумов для погружения, соответствие эпохе' },
-    { key:'narrative', name:'Нарративный звук', hint:'Вклад звука в историю: масштаб, тревога, интимность' }
-  ]},
-  { key:'style', name:'✍️ Авторский стиль', criteria:[
-    { key:'originality', name:'Индивидуальность', hint:'Уникальный голос режиссёра, авторский почерк' },
-    { key:'boldness', name:'Художественная смелость', hint:'Риск формой, жанром, нарративом' }
-  ]}
-];
-
-const GENRE_LABELS = {
-  drama:'Драма / Арт-хаус', action:'Экшн / Блокбастер', comedy:'Комедия',
-  horror:'Хоррор / Триллер', scifi_block:'Sci-Fi / Фэнтези (блокбастер)',
-  scifi_author:'Sci-Fi / Фэнтези (авторский)', musical:'Мюзикл',
-  biopic:'Байопик', hybrid:'🎛 Свои веса'
-};
-
-const PRESET_WEIGHTS = {
-  drama:[25,20,20,15,20], action:[20,20,30,20,10], comedy:[30,30,15,15,10],
-  horror:[25,20,20,25,10], scifi_block:[25,20,25,20,10], scifi_author:[20,20,25,15,20],
-  musical:[20,20,20,30,10], biopic:[30,30,20,15,5]
-};
-const BLOCK_NAMES = ['Сценарий','Персонажи','Визуал','Звук','Стиль'];
-
 // Функция для создания пустых оценок (все по 5)
 const createEmptyScores = () => Object.fromEntries(
   CRITERIA_CONFIG.map(b => [b.key, Object.fromEntries(b.criteria.map(c => [c.key, 5]))])
