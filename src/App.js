@@ -1335,7 +1335,7 @@ const handleRatingChange = (blockKey, critKey, value) => {
 
 const calculatePreview = useCallback(() => {
   const s = scores;
-  // Средние по блокам
+  
   const avgs = {
     scenario: s.scenario.plot * 0.35 + s.scenario.ideas * 0.35 + s.scenario.dialogue * 0.30,
     characters: s.characters.depth * 0.40 + s.characters.chemistry * 0.35 + s.characters.functionality * 0.25,
@@ -1344,21 +1344,23 @@ const calculatePreview = useCallback(() => {
     style: (s.style.originality + s.style.boldness) / 2
   };
   
-  const tech = Math.round(
-    (avgs.scenario * blockWeights[0] +
-     avgs.characters * blockWeights[1] +
-     avgs.visual * blockWeights[2] +
-     avgs.sound * blockWeights[3] +
-     avgs.style * blockWeights[4]) * 10
-  ) / 10;
+  // Технический балл (10–100) с точностью до десятых
+  const rawTech = 
+    avgs.scenario * blockWeights[0] +
+    avgs.characters * blockWeights[1] +
+    avgs.visual * blockWeights[2] +
+    avgs.sound * blockWeights[3] +
+    avgs.style * blockWeights[4];
   
-  const combined = Math.round((tech * 0.7 + vibe * 3) * 10) / 10;
+  const tech = Number((rawTech / 100 * 10).toFixed(1));
+  
+  // Комбинированный балл (10–100)
+  // tech уже в шкале 10–100, vibe переводим в 10–100 (×10) и берём 30%
+  const combined = Number((tech * 0.7 + vibe * 3).toFixed(1));
+  // vibe * 3 = (vibe * 10) * 0.3 = vibe * 3
   
   return { tech, vibe, combined };
 }, [scores, vibe, blockWeights]);
-
-const weightsSum = blockWeights.reduce((a,b) => a + b, 0);
-const weightsValid = weightsSum === 100;
 
 // ----- СОХРАНЕНИЕ ОЦЕНКИ -----
 const saveRating = async () => {
