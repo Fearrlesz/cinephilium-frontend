@@ -49,6 +49,20 @@ export const GENRE_LABELS = {
   biopic:'Байопик', hybrid:'🎛 Свои веса'
 };
 
+export const BLOCK_NAMES = ['Сценарий', 'Персонажи', 'Визуал', 'Звук', 'Стиль'];
+
+export const PRESET_WEIGHTS = {
+  drama:      [35, 30, 15, 10, 10],
+  action:     [15, 20, 35, 20, 10],
+  comedy:     [25, 30, 20, 15, 10],
+  horror:     [20, 25, 25, 20, 10],
+  scifi_block:[20, 20, 30, 20, 10],
+  scifi_author:[25, 20, 25, 15, 15],
+  musical:    [20, 25, 20, 25, 10],
+  biopic:     [30, 30, 15, 15, 10],
+  hybrid:     [20, 20, 20, 20, 20] // для собственных весов
+};
+
 export const MIN_SCORE = 10;
 export const MAX_SCORE = 100;
 export const TECHNICAL_MULTIPLIER = 0.7;   // вес технического балла
