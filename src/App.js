@@ -51,6 +51,8 @@ export const GENRE_LABELS = {
 
 export const MIN_SCORE = 10;
 export const MAX_SCORE = 100;
+export const TECHNICAL_MULTIPLIER = 0.7;   // вес технического балла
+export const VIBE_STEP = 0.3;              // шаг для вайб-множителя
 
 export function getScoreColor(score) {
   const ratio = (score - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
@@ -621,23 +623,23 @@ function AboutPage() {
 
       <div className="about-intro glass-card">
         <p className="neon-text">
-          Мы оцениваем фильмы по <strong>20 критериям</strong>, разбитым на 4 блока.
+          Мы оцениваем фильмы по <strong>15 критериям</strong>, разбитым на 5 блоков.
           Каждый критерий оценивается от <strong>1 до 10</strong>.
         </p>
         <p>
-          Также немаловажную роль играет ваше личное восприятие фильма в виде множителя <strong>«Вайб»</strong>.
+          Вашу итоговая оценка составляет Технический Балл, а также ваше личное восприятие в виде критерия Вайб, который не учитывается в Техническом Балле, но составляет общий - комбинированный балл фильма! <strong>«Вайб»</strong>.
         </p>
       </div>
 
       <div className="about-blocks">
-        {[0, 1, 2, 3].map(blockIndex => (
-          <div key={blockIndex} className="about-block glass-card">
-            <h2 className="about-block-title neon-text">{baseNames[blockIndex]}</h2>
+        {CRITERIA_CONFIG.map((block, idx) => (
+          <div key={block.key} className="about-block glass-card">
+            <h2 className="about-block-title neon-text">{block.name}</h2>
             <div className="about-criteria">
-              {criteriaNames[blockIndex].map((name, critIndex) => (
-                <div key={critIndex} className="about-criterion">
-                  <div className="about-criterion-name">{name}</div>
-                  <div className="about-criterion-desc">{baseDescriptions[blockIndex][critIndex]}</div>
+              {block.criteria.map(crit => (
+                <div key={crit.key} className="about-criterion">
+                  <div className="about-criterion-name">{crit.name}</div>
+                  <div className="about-criterion-desc">{crit.hint}</div>
                 </div>
               ))}
             </div>
@@ -650,11 +652,11 @@ function AboutPage() {
         <div className="formula-steps">
           <div className="formula-step">
             <span className="step-number">1.</span>
-            <span>По каждой базе считается среднее арифметическое (сумма 5 оценок ÷ 5)</span>
+            <span>По каждому блоку считается среднее арифметическое его критериев</span>
           </div>
           <div className="formula-step">
             <span className="step-number">2.</span>
-            <span>Технический балл (T) = (Средняя1 + Средняя2 + Средняя3 + Средняя4) × {TECHNICAL_MULTIPLIER}</span>
+            <span>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) × {TECHNICAL_MULTIPLIER}</span>
           </div>
           <div className="formula-step">
             <span className="step-number">3.</span>
@@ -666,7 +668,7 @@ function AboutPage() {
           </div>
           <div className="formula-step">
             <span className="step-number">5.</span>
-            <span>Итог = T × Вайб-множитель</span>
+            <span>Комбинированный балл = T × Вайб-множитель</span>
           </div>
         </div>
         <div className="formula-result">
