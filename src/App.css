@@ -6434,127 +6434,7 @@ button:disabled::before {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* 🎭 ЖАНРОВЫЕ ВЕСА — НОВЫЙ БЛОК */
-.modal-genre-weights {
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-}
 
-.modal-genre-weights:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  background: rgba(168, 133, 64, 0.02);
-}
-
-.modal-genre-weights .genre-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.modal-genre-weights .genre-weight-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.modal-genre-weights .genre-weight-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: rgba(168, 133, 64, 0.04);
-  border-radius: 16px;
-  border: 1px solid rgba(168, 133, 64, 0.08);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: all 0.3s ease;
-}
-
-.modal-genre-weights .genre-weight-tag:hover {
-  border-color: var(--gold);
-  background: rgba(168, 133, 64, 0.06);
-  transform: translateY(-1px);
-}
-
-.modal-genre-weights .genre-weight-tag .genre-name {
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.modal-genre-weights .genre-weight-tag .genre-value {
-  color: var(--gold-bright);
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-}
-
-/* 🎭 Альтернативный вариант — жанровые веса в виде прогресс-баров */
-.modal-genre-bars {
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 20px;
-}
-
-.modal-genre-bars .genre-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.modal-genre-bars .genre-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.modal-genre-bars .genre-bar-name {
-  font-size: 12px;
-  color: var(--text-secondary);
-  min-width: 80px;
-  font-weight: 400;
-}
-
-.modal-genre-bars .genre-bar-track {
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.modal-genre-bars .genre-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
-  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 12px rgba(168, 133, 64, 0.1);
-}
-
-.modal-genre-bars .genre-bar-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--gold-bright);
-  font-weight: 600;
-  min-width: 36px;
-  text-align: right;
-}
 
 /* 💬 Комментарий */
 .modal-comment {
@@ -6744,259 +6624,314 @@ button:disabled::before {
 
 
 /* ============================================
-   ЖАНРОВЫЙ ПРЕСЕТ И ВЕСА БЛОКОВ
+   МОДАЛКА ДЕТАЛЕЙ ОЦЕНКИ — ПРЕМИУМ
    ============================================ */
 
-/* 🎭 Жанровый пресет */
-.modal-genre-preset {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  background: rgba(168, 133, 64, 0.04);
-  border-radius: 12px;
+/* ... все предыдущие стили остаются ... */
+
+/* 🎭 ЖАНРОВЫЕ ВЕСА — ЭКСКЛЮЗИВНЫЙ ДИЗАЙН */
+.modal-genre-weights {
+  padding: 18px 22px;
+  background: linear-gradient(145deg, 
+    rgba(168, 133, 64, 0.04) 0%,
+    rgba(20, 20, 40, 0.6) 50%,
+    rgba(168, 133, 64, 0.02) 100%
+  );
+  border-radius: 16px;
   border: 1px solid rgba(168, 133, 64, 0.08);
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.modal-genre-preset:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-  background: rgba(168, 133, 64, 0.06);
+/* ✨ Золотая рамка при ховере */
+.modal-genre-weights::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    var(--gold) 15%,
+    var(--gold-bright) 30%,
+    transparent 50%,
+    var(--gold) 70%,
+    var(--gold-bright) 85%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  animation: borderSpin 8s linear infinite;
 }
 
-.modal-genre-preset .preset-icon {
-  font-size: 20px;
-  line-height: 1;
+.modal-genre-weights:hover::before {
+  opacity: 0.3;
 }
 
-.modal-genre-preset .preset-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 400;
+/* ✨ Золотая полоса сверху */
+.modal-genre-weights::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.15;
+  transition: opacity 0.4s ease;
 }
 
-.modal-genre-preset .preset-value {
+.modal-genre-weights:hover::after {
+  opacity: 0.4;
+}
+
+.modal-genre-weights:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: linear-gradient(145deg, 
+    rgba(168, 133, 64, 0.06) 0%,
+    rgba(20, 20, 40, 0.7) 50%,
+    rgba(168, 133, 64, 0.04) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
+}
+
+/* 🎭 Заголовок блока */
+.modal-genre-weights .genre-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 14px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.modal-genre-weights .genre-label::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
+  border-radius: 2px;
+}
+
+.modal-genre-weights .genre-label .genre-icon {
+  margin-right: 8px;
   font-size: 14px;
-  font-weight: 700;
-  color: var(--gold-bright);
-  font-family: var(--font-sans);
-  letter-spacing: 0.02em;
-  padding: 2px 14px;
-  background: rgba(168, 133, 64, 0.08);
-  border-radius: 20px;
-  border: 1px solid rgba(168, 133, 64, 0.1);
 }
 
-/* 📊 Веса блоков — обновлённый стиль */
-.modal-weights {
+/* 🎭 Список жанров */
+.modal-genre-weights .genre-weight-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 20px;
 }
 
-.modal-weights .weights-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.modal-weights .weight-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-  transition: all 0.3s ease;
-}
-
-.modal-weights .weight-item:last-child {
-  border-bottom: none;
-}
-
-.modal-weights .weight-item:hover {
-  padding-left: 6px;
-  background: rgba(168, 133, 64, 0.02);
-  border-radius: 6px;
-}
-
-.modal-weights .weight-name {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 400;
-}
-
-.modal-weights .weight-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  font-size: 15px;
-  font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
-  min-width: 48px;
-  text-align: right;
-}
-
-/* 🎨 Альтернативный вариант — прогресс-бары для весов */
-.modal-weights-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 20px;
-}
-
-.modal-weights-bars .weights-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.modal-weights-bars .weight-bar-row {
-  display: flex;
+/* 🎭 Тег жанра — ЭКСКЛЮЗИВНЫЙ СТИЛЬ */
+.modal-genre-weights .genre-weight-tag {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 3px 0;
-}
-
-.modal-weights-bars .weight-bar-name {
+  padding: 6px 16px 6px 18px;
+  background: rgba(168, 133, 64, 0.05);
+  border-radius: 40px;
+  border: 1px solid rgba(168, 133, 64, 0.06);
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
-  min-width: 80px;
-  font-weight: 400;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  cursor: default;
+  backdrop-filter: blur(4px);
 }
 
-.modal-weights-bars .weight-bar-track {
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 4px;
-  overflow: hidden;
+/* ✨ Свечение вокруг тега */
+.modal-genre-weights .genre-weight-tag::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 40px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    var(--gold) 20%,
+    transparent 40%,
+    var(--gold-bright) 60%,
+    transparent 80%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  animation: borderSpin 6s linear infinite;
 }
 
-.modal-weights-bars .weight-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
-  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 12px rgba(168, 133, 64, 0.1);
+.modal-genre-weights .genre-weight-tag:hover::before {
+  opacity: 0.4;
 }
 
-.modal-weights-bars .weight-bar-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--gold-bright);
+.modal-genre-weights .genre-weight-tag:hover {
+  border-color: var(--gold);
+  background: rgba(168, 133, 64, 0.08);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.06),
+    0 0 30px rgba(168, 133, 64, 0.02);
+}
+
+.modal-genre-weights .genre-weight-tag .genre-name {
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  min-width: 40px;
-  text-align: right;
+  color: var(--text-primary);
+  font-size: 12px;
+  letter-spacing: 0.02em;
 }
+
+.modal-genre-weights .genre-weight-tag .genre-value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-size: 13px;
+  background: rgba(168, 133, 64, 0.06);
+  padding: 1px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(168, 133, 64, 0.04);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
+  transition: all 0.3s ease;
+}
+
+.modal-genre-weights .genre-weight-tag:hover .genre-value {
+  background: rgba(168, 133, 64, 0.10);
+  border-color: rgba(168, 133, 64, 0.08);
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
+}
+
+
 
 /* ============================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ
    ============================================ */
 @media (max-width: 768px) {
-  .modal-genre-preset {
-    padding: 10px 14px;
-    flex-wrap: wrap;
-    gap: 8px;
+  /* ... предыдущие адаптивные стили ... */
+
+  .modal-genre-weights {
+    padding: 14px 18px;
   }
 
-  .modal-genre-preset .preset-value {
-    font-size: 13px;
-    padding: 2px 12px;
+  .modal-genre-weights .genre-weight-list {
+    gap: 6px;
   }
 
-  .modal-weights {
-    padding: 14px 16px;
+  .modal-genre-weights .genre-weight-tag {
+    padding: 5px 12px 5px 14px;
+    font-size: 11px;
   }
 
-  .modal-weights .weight-item {
-    padding: 5px 0;
+  .modal-genre-weights .genre-weight-tag .genre-name {
+    font-size: 11px;
   }
 
-  .modal-weights .weight-name {
-    font-size: 12px;
+  .modal-genre-weights .genre-weight-tag .genre-value {
+    font-size: 11px;
+    padding: 1px 10px;
   }
 
-  .modal-weights .weight-value {
-    font-size: 14px;
-    min-width: 40px;
+  .modal-genre-bars {
+    padding: 14px 18px;
   }
 
-  .modal-weights-bars {
-    padding: 14px 16px;
-  }
-
-  .modal-weights-bars .weight-bar-name {
+  .modal-genre-bars .genre-bar-name {
     min-width: 60px;
     font-size: 11px;
   }
 
-  .modal-weights-bars .weight-bar-value {
+  .modal-genre-bars .genre-bar-track {
+    height: 5px;
+  }
+
+  .modal-genre-bars .genre-bar-value {
     font-size: 11px;
     min-width: 34px;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-genre-preset {
-    padding: 8px 12px;
+  /* ... предыдущие адаптивные стили ... */
+
+  .modal-genre-weights {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .modal-genre-weights .genre-label {
+    font-size: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+
+  .modal-genre-weights .genre-weight-list {
+    gap: 4px;
+  }
+
+  .modal-genre-weights .genre-weight-tag {
+    padding: 4px 10px 4px 12px;
+    font-size: 10px;
     gap: 6px;
+    border-radius: 30px;
   }
 
-  .modal-genre-preset .preset-icon {
-    font-size: 16px;
+  .modal-genre-weights .genre-weight-tag .genre-name {
+    font-size: 10px;
   }
 
-  .modal-genre-preset .preset-label {
-    font-size: 12px;
+  .modal-genre-weights .genre-weight-tag .genre-value {
+    font-size: 10px;
+    padding: 1px 8px;
   }
 
-  .modal-genre-preset .preset-value {
-    font-size: 12px;
-    padding: 1px 10px;
+  .modal-genre-bars {
+    padding: 12px 14px;
+    border-radius: 12px;
   }
 
-  .modal-weights {
-    padding: 10px 12px;
+  .modal-genre-bars .genre-label {
+    font-size: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
   }
 
-  .modal-weights .weight-name {
-    font-size: 11px;
+  .modal-genre-bars .genre-bar-row {
+    padding: 4px 0;
+    gap: 8px;
   }
 
-  .modal-weights .weight-value {
-    font-size: 13px;
-    min-width: 36px;
-  }
-
-  .modal-weights-bars {
-    padding: 10px 12px;
-  }
-
-  .modal-weights-bars .weight-bar-name {
+  .modal-genre-bars .genre-bar-name {
     min-width: 50px;
     font-size: 10px;
   }
 
-  .modal-weights-bars .weight-bar-value {
+  .modal-genre-bars .genre-bar-track {
+    height: 4px;
+  }
+
+  .modal-genre-bars .genre-bar-value {
     font-size: 10px;
     min-width: 30px;
   }
