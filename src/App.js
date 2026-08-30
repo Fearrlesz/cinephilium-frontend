@@ -1170,11 +1170,30 @@ const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
                   <div className="film-info">
                     <h3>{film.title}</h3>
                     <p>{film.year}</p>
-                    <div className="rating-badge" style={{ color: getScoreColor(film.averageRating) }}>
-                      {film.averageRating ? `${film.averageRating.toFixed(1)}` : 'Нет оценок'}
-                    </div>
-                    <span className="votes-count">👥 {film.votesCount || 0}</span>
-                  </div>
+               {/* 👇 НОВЫЙ БЛОК С ТРЕМЯ РЕЙТИНГАМИ */}
+  <div className="film-ratings">
+    <div className="rating-row">
+      <span className="rating-label">🎯 Тех.:</span>
+      <span className="rating-value" style={{ color: getScoreColor(film.averageRating) }}>
+        {film.averageRating?.toFixed(1) || '—'}
+      </span>
+    </div>
+    <div className="rating-row">
+      <span className="rating-label">💫 Вайб:</span>
+      <span className="rating-value" style={{ color: getScoreColor(film.averageVibe) }}>
+        {film.averageVibe?.toFixed(1) || '—'}
+      </span>
+    </div>
+    <div className="rating-row">
+      <span className="rating-label">⭐ Общий:</span>
+      <span className="rating-value" style={{ color: getScoreColor(film.averageCombined) }}>
+        {film.averageCombined?.toFixed(1) || '—'}
+      </span>
+    </div>
+  </div>
+  
+  <span className="votes-count">👥 {film.votesCount || 0} оценок</span>
+</div>
                 </div>
               </Link>
             ))}
