@@ -1076,6 +1076,31 @@ const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
         {searchError && <div className="error-msg">{searchError}</div>}
       </div>
 
+         {/* 👇 ВСТАВЬ ЭТОТ БЛОК ТУТ (ПОСЛЕ hero, ПЕРЕД топ-5) */}
+    <div className="sort-panel glass-card">
+      <div className="sort-controls">
+        <label>Сортировать по:</label>
+        <select 
+          value={sortType} 
+          onChange={(e) => {
+            setSortType(e.target.value);
+            setPage(1);
+          }}
+          className="sort-select"
+        >
+          <option value="technical">🎯 Техническая оценка</option>
+          <option value="vibe">💫 Вайб</option>
+          <option value="combined">⭐ Общая оценка</option>
+        </select>
+      </div>
+      <div className="sort-info">
+        {films.length > 0 && (
+          <span>Показано {films.length} фильмов</span>
+        )}
+      </div>
+    </div>
+    {/* 👆 КОНЕЦ ВСТАВКИ */}
+
       {error && <div className="error-msg">{error}</div>}
 
       {showSearch && searchResults.length > 0 && (
