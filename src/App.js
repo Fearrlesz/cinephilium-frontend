@@ -910,6 +910,7 @@ function HomePage() {
   const [totalPages, setTotalPages] = useState(1);
   const [user, setUser] = useState(null);
   const [searchError, setSearchError] = useState('');
+  const [sortType, setSortType] = useState('technical');
   const navigate = useNavigate();
   const { showNotification } = useNotification();
 
@@ -929,32 +930,33 @@ function HomePage() {
       });
   }, []);
 
-  const loadFilms = useCallback(async (pageNum = 1) => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.get(`/films?page=${pageNum}&limit=20`);
-      if (response.data && Array.isArray(response.data.films)) {
-        if (pageNum === 1) {
-          setFilms(response.data.films);
-        } else {
-          setFilms(prev => {
-            const existingIds = new Set(prev.map(f => f._id));
-            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-            return [...prev, ...newFilms];
-          });
-        }
-         setTotalPages(response.data.pagination?.pages || 1);
+const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
+  setLoading(true);
+  setError('');
+  try {
+    // 👇 ГЛАВНОЕ: /films → /api/films  и добавили sort=
+    const response = await api.get(`/api/films?page=${pageNum}&limit=20&sort=${sort}`);
+    if (response.data && Array.isArray(response.data.films)) {
+      if (pageNum === 1) {
+        setFilms(response.data.films);
       } else {
-        setFilms([]);
+        setFilms(prev => {
+          const existingIds = new Set(prev.map(f => f._id));
+          const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+          return [...prev, ...newFilms];
+        });
       }
-    } catch (err) {
-      console.error('Ошибка загрузки фильмов:', err);
-      setError('Не удалось загрузить фильмы. Попробуйте позже.');
-    } finally {
-      setLoading(false);
+      setTotalPages(response.data.pagination?.pages || 1);
+    } else {
+      setFilms([]);
     }
-  }, []);
+  } catch (err) {
+    console.error('Ошибка загрузки фильмов:', err);
+    setError('Не удалось загрузить фильмы. Попробуйте позже.');
+  } finally {
+    setLoading(false);
+  }
+}, [sortType]); // 👈 И добавили sortType в зависимости
 
   useEffect(() => {
     loadFilms(page);
