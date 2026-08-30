@@ -5975,49 +5975,109 @@ button:disabled::before {
 }
 
 /* ============================================
-   ТОП-5 — НОВЫЙ ДИЗАЙН РЕЙТИНГА
+   ТОП-5 — ПРЕМИУМ ДИЗАЙН
    ============================================ */
 
-/* 🏆 Рейтинг в ТОП-5 — уникальный цвет (янтарный) */
-.top-card-score {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 800;
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 4px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  color: #ffb347;
+.top-films-netflix {
+  margin: 30px 0 20px;
+  padding: 20px 0 12px;
+  position: relative;
+}
+
+.top-header-netflix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px 16px 4px;
+}
+
+.top-header-netflix h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.top-header-netflix h3::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.top-scroll-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.top-scroll-wrapper {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px 16px 4px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--gold), var(--neon-purple));
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, var(--gold-bright), var(--neon-cyan));
+}
+
+.top-card-netflix {
+  flex: 0 0 160px;
+  text-decoration: none;
+  color: inherit;
   transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.top-card-netflix:hover .top-card-score {
+.top-card-netflix:hover {
   transform: scale(1.05);
-  text-shadow: 0 0 40px rgba(255, 179, 71, 0.3);
+  z-index: 10;
 }
 
-/* 📊 Разные цвета рейтинга в ТОП-5 в зависимости от значения */
-.top-card-score.high {
-  color: #ffd700;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+.top-card-netflix:hover .top-card-poster {
+  box-shadow: 0 8px 40px rgba(168, 133, 64, 0.15);
 }
 
-.top-card-score.medium {
-  color: #ffb347;
-  text-shadow: 0 0 30px rgba(255, 179, 71, 0.15);
+.top-card-poster-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.top-card-score.low {
-  color: #ff6b6b;
-  text-shadow: 0 0 30px rgba(255, 107, 107, 0.1);
+.top-card-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+  transition: all 0.3s ease;
+  background: var(--bg-deep);
 }
 
-/* 👑 Ранги в ТОП-5 с цветами */
+/* 👑 Ранги */
 .top-card-rank {
   position: absolute;
   top: 8px;
@@ -6038,56 +6098,59 @@ button:disabled::before {
   color: var(--gold-bright);
 }
 
-/* ✨ Особые ранги */
-.top-card-rank.rank-gold {
-  background: rgba(168, 133, 64, 0.15);
-  border-color: var(--gold);
-  color: var(--gold-bright);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.05);
+/* 🏆 Рейтинг в ТОП-5 — цвет через getScoreColor */
+.top-card-score {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
 }
 
-.top-card-rank.rank-silver {
-  background: rgba(192, 192, 192, 0.1);
-  border-color: rgba(192, 192, 192, 0.2);
-  color: #c0c0c0;
+.top-card-netflix:hover .top-card-score {
+  transform: scale(1.05);
 }
 
-.top-card-rank.rank-bronze {
-  background: rgba(205, 127, 50, 0.1);
-  border-color: rgba(205, 127, 50, 0.2);
-  color: #cd7f32;
+/* 📝 Информация под постером */
+.top-card-info {
+  padding: 10px 4px 4px;
+}
+
+.top-card-title {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-card-year {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
 }
 
 /* ============================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ
    ============================================ */
 @media (max-width: 768px) {
-  .film-ratings {
-    padding: 8px 10px 10px;
-    gap: 4px;
-  }
-
-  .rating-row {
-    font-size: 0.8rem;
-  }
-
-  .rating-label {
-    font-size: 0.75rem;
-  }
-
-  .rating-value {
-    font-size: 0.85rem;
-    min-width: 28px;
-  }
-
-  .votes-count {
-    font-size: 0.7rem;
-    padding: 3px 10px;
-  }
-
-  .top-card-score {
-    font-size: 15px;
-    padding: 3px 12px;
+  .top-card-netflix {
+    flex: 0 0 130px;
   }
 
   .top-card-rank {
@@ -6097,34 +6160,26 @@ button:disabled::before {
     top: 6px;
     left: 6px;
   }
+
+  .top-card-score {
+    font-size: 15px;
+    padding: 3px 12px;
+    bottom: 6px;
+    right: 6px;
+  }
+
+  .top-card-title {
+    font-size: 13px;
+  }
+
+  .top-header-netflix h3 {
+    font-size: 20px;
+  }
 }
 
 @media (max-width: 480px) {
-  .film-ratings {
-    padding: 6px 8px 8px;
-  }
-
-  .rating-row {
-    font-size: 0.7rem;
-  }
-
-  .rating-label {
-    font-size: 0.7rem;
-  }
-
-  .rating-value {
-    font-size: 0.75rem;
-    min-width: 24px;
-  }
-
-  .votes-count {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-  }
-
-  .top-card-score {
-    font-size: 13px;
-    padding: 2px 10px;
+  .top-card-netflix {
+    flex: 0 0 110px;
   }
 
   .top-card-rank {
@@ -6132,170 +6187,17 @@ button:disabled::before {
     height: 26px;
     font-size: 12px;
   }
-}
 
-
-/* ============================================
-   SELECT СОРТИРОВКИ — ПРЕМИУМ (исправление серого фона)
-   ============================================ */
-
-.sort-select {
-  padding: 10px 48px 10px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 60px;
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 
-    0 2px 12px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 18px center;
-  background-size: 14px 10px;
-  min-width: 200px;
-  position: relative;
-}
-
-.sort-select:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sort-select:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 
-    0 0 0 4px rgba(168, 133, 64, 0.08),
-    0 0 30px rgba(168, 133, 64, 0.04),
-    0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* ============================================
-   ВЫПАДАЮЩИЙ СПИСОК (OPTIONS) — ИСПРАВЛЕНИЕ
-   ============================================ */
-
-/* 🎯 ГЛАВНОЕ — убираем серый фон! */
-.sort-select option {
-  background: var(--bg-deep) !important;
-  color: var(--text-primary) !important;
-  padding: 12px 20px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 400;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* 🔥 Стили для option при наведении (в некоторых браузерах) */
-.sort-select option:hover,
-.sort-select option:focus,
-.sort-select option:checked {
-  background: rgba(168, 133, 64, 0.12) !important;
-  color: var(--gold-bright) !important;
-}
-
-/* ============================================
-   ДЛЯ FIREFOX (убираем серый фон)
-   ============================================ */
-.sort-select:-moz-focusring {
-  color: transparent;
-  text-shadow: 0 0 0 var(--text-primary);
-}
-
-.sort-select::-moz-focus-inner {
-  border: none;
-}
-
-/* ============================================
-   ДЛЯ CHROME/EDGE (кастомизация выпадашки)
-   ============================================ */
-/* Убираем стандартный серый фон у select в Chrome */
-.sort-select:focus-visible {
-  outline: none;
-}
-
-/* Стилизация выпадающего списка в Chrome через ::-webkit-scrollbar */
-.sort-select::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sort-select::-webkit-scrollbar-track {
-  background: var(--bg-deep);
-  border-radius: 4px;
-}
-
-.sort-select::-webkit-scrollbar-thumb {
-  background: var(--gold);
-  border-radius: 4px;
-}
-
-.sort-select::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-bright);
-}
-
-/* ============================================
-   АЛЬТЕРНАТИВНЫЙ ВАРИАНТ — если option не работают
-   ============================================ */
-/* Стили для select в состоянии expanded (раскрытом) */
-.sort-select:focus {
-  border-color: var(--gold);
-}
-
-/* Стили для самого выпадающего списка (работает не во всех браузерах) */
-.sort-select[multiple],
-.sort-select[size] {
-  background: var(--bg-deep);
-  border-color: var(--gold);
-  border-radius: 12px;
-}
-
-.sort-select[multiple] option,
-.sort-select[size] option {
-  background: var(--bg-deep);
-  color: var(--text-primary);
-  padding: 10px 16px;
-}
-
-.sort-select[multiple] option:checked,
-.sort-select[size] option:checked {
-  background: rgba(168, 133, 64, 0.15) !important;
-  color: var(--gold-bright) !important;
-}
-
-/* ============================================
-   ДЛЯ ANDROID/МОБИЛЬНЫХ БРАУЗЕРОВ
-   ============================================ */
-@media (max-width: 768px) {
-  .sort-select {
-    font-size: 16px !important; /* предотвращает зум в iOS */
-    padding: 12px 48px 12px 18px;
-    min-width: unset;
-    width: 100%;
+  .top-card-score {
+    font-size: 13px;
+    padding: 2px 10px;
   }
 
-  .sort-select option {
-    font-size: 0.85rem;
-    padding: 14px 18px;
+  .top-card-title {
+    font-size: 12px;
   }
-}
 
-/* ============================================
-   ДОПОЛНИТЕЛЬНО: БЛОК С ТЕКСТОМ
-   ============================================ */
-.sort-controls label {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 13px;
+  .top-header-netflix h3 {
+    font-size: 18px;
+  }
 }
