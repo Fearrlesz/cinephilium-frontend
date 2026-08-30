@@ -844,13 +844,14 @@ input[type="range"]::-moz-range-thumb {
 
 
 /* ============================================================
-   КОММЕНТАРИИ
+   КОММЕНТАРИИ — золото
    ============================================================ */
 .comments-section {
   margin: 30px 0;
   padding: 20px 24px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 16px;
   border: 1px solid var(--glass-border);
 }
@@ -874,7 +875,12 @@ input[type="range"]::-moz-range-thumb {
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
-  border-left: 3px solid var(--neon-cyan);
+  border-left: 3px solid var(--gold);
+  transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+  background: rgba(168, 133, 64, 0.03);
 }
 
 .comment-author {
@@ -888,7 +894,7 @@ input[type="range"]::-moz-range-thumb {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 14px;
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .comment-text {
@@ -934,10 +940,12 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
+  transition: all 0.3s;
 }
 .comment-form input:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.2);
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
 }
 
 .comment-form button {
@@ -951,18 +959,19 @@ input[type="range"]::-moz-range-thumb {
   transition: all 0.3s;
 }
 .comment-form button:hover {
-  border-color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.05);
+  border-color: var(--gold);
+  background: rgba(168, 133, 64, 0.05);
 }
 
 /* ============================================================
-   РЕЦЕНЗИИ
+   РЕЦЕНЗИИ — золото
    ============================================================ */
 .reviews-section {
   margin: 30px 0;
   padding: 20px 24px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 16px;
   border: 1px solid var(--glass-border);
 }
@@ -980,8 +989,14 @@ input[type="range"]::-moz-range-thumb {
   padding: 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
-  border-left: 3px solid var(--neon-purple);
+  border-left: 3px solid var(--gold);
   margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  background: rgba(168, 133, 64, 0.03);
+  border-left-color: var(--gold-bright);
 }
 
 .review-header {
@@ -1002,7 +1017,7 @@ input[type="range"]::-moz-range-thumb {
 .review-nickname {
   font-family: var(--font-sans);
   font-weight: 600;
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .review-rating {
@@ -1031,13 +1046,14 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   ПОЛЬЗОВАТЕЛИ, ОЦЕНИВШИЕ ФИЛЬМ
+   ПОЛЬЗОВАТЕЛИ, ОЦЕНИВШИЕ ФИЛЬМ — золото
    ============================================================ */
 .film-users {
   margin: 30px 0;
   padding: 20px 24px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 16px;
   border: 1px solid var(--glass-border);
 }
@@ -1065,17 +1081,24 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
   border-left: 3px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.user-rating-item:hover {
+  border-left-color: var(--gold);
+  background: rgba(168, 133, 64, 0.02);
 }
 
 .user-link {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  transition: color 0.3s;
+  transition: all 0.3s;
 }
 .user-link:hover {
-  color: var(--text-primary);
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
 }
 
 .user-rating-score {
@@ -1083,6 +1106,7 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 700;
   font-size: 18px;
   font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
 }
 
 .details-btn {
@@ -1097,12 +1121,12 @@ input[type="range"]::-moz-range-thumb {
   font-family: var(--font-sans);
 }
 .details-btn:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
+  border-color: var(--gold);
+  color: var(--gold-bright);
 }
 
 /* ============================================================
-   ПРОФИЛЬ
+   ПРОФИЛЬ — золото
    ============================================================ */
 .profile-page {
   max-width: 900px;
@@ -1115,28 +1139,50 @@ input[type="range"]::-moz-range-thumb {
   gap: 30px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 28px 32px;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
   margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✨ Золотая полоса сверху */
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.3;
 }
 
 .profile-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.1);
+  background: rgba(168, 133, 64, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(124, 58, 237, 0.2);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.1);
 }
 
 .avatar-placeholder {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 32px;
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .profile-info h1 {
@@ -1163,7 +1209,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-secondary);
 }
 .profile-stats strong {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .logout-btn {
@@ -1185,6 +1231,7 @@ input[type="range"]::-moz-range-thumb {
 .profile-ratings {
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 24px 28px;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
@@ -1212,6 +1259,12 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
   border-left: 3px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.rating-item:hover {
+  border-left-color: var(--gold);
+  background: rgba(168, 133, 64, 0.02);
 }
 
 .rating-film-info {
@@ -1227,6 +1280,11 @@ input[type="range"]::-moz-range-thumb {
   height: 60px;
   object-fit: cover;
   border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.rating-poster-small:hover {
+  border-color: var(--gold);
 }
 
 .rating-film-info h4 {
@@ -1245,10 +1303,11 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 700;
   font-size: 20px;
   font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
 }
 
 /* ============================================================
-   ТОП ПОЛЬЗОВАТЕЛЕЙ
+   ТОП ПОЛЬЗОВАТЕЛЕЙ — золото
    ============================================================ */
 .top-page {
   max-width: 900px;
@@ -1263,6 +1322,10 @@ input[type="range"]::-moz-range-thumb {
   text-align: center;
   margin: 20px 0 24px;
   letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--gold-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .top-users-list {
@@ -1278,15 +1341,17 @@ input[type="range"]::-moz-range-thumb {
   padding: 14px 20px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 14px;
   border: 1px solid var(--glass-border);
   text-decoration: none;
   color: inherit;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 .top-user-item:hover {
-  border-color: rgba(124, 58, 237, 0.2);
+  border-color: var(--gold);
   transform: translateX(4px);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
 }
 
 .top-user-rank {
@@ -1294,25 +1359,30 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 700;
   font-size: 20px;
   min-width: 44px;
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .top-user-avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.08);
+  background: rgba(168, 133, 64, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.top-user-item:hover .top-user-avatar {
+  border-color: var(--gold);
 }
 
 .avatar-placeholder-small {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 18px;
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .top-user-info {
@@ -1339,7 +1409,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-secondary);
 }
 .top-user-stats span:first-child {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
   font-weight: 600;
 }
 
