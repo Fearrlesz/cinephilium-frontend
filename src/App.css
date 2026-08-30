@@ -6066,3 +6066,261 @@ button:disabled::before {
     min-width: 140px;
   }
 }
+
+/* ============================================
+   БЛОК С ТРЕМЯ РЕЙТИНГАМИ — РАЗНЫЕ ЦВЕТА
+   ============================================ */
+
+.film-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 10px 12px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.film-card:hover .film-ratings {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(168, 133, 64, 0.02);
+}
+
+.rating-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  font-size: 0.85rem;
+}
+
+.rating-label {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.rating-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.3s ease;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* 🎯 Технический рейтинг — ЗОЛОТО */
+.rating-technical {
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
+}
+
+.rating-technical:hover {
+  text-shadow: 0 0 30px rgba(168, 133, 64, 0.2);
+}
+
+/* 💫 Вайб — НЕОН-РОЗОВЫЙ (экспрессивный) */
+.rating-vibe {
+  color: var(--neon-pink);
+  text-shadow: 0 0 20px rgba(236, 72, 153, 0.08);
+}
+
+.rating-vibe:hover {
+  text-shadow: 0 0 30px rgba(236, 72, 153, 0.15);
+}
+
+/* ⭐ Общий — НЕОН-ЦИАН (сбалансированный) */
+.rating-combined {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.06);
+}
+
+.rating-combined:hover {
+  text-shadow: 0 0 30px rgba(34, 211, 238, 0.12);
+}
+
+/* 👥 Количество оценок */
+.votes-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.film-card:hover .votes-count {
+  border-color: rgba(168, 133, 64, 0.1);
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   ТОП-5 — НОВЫЙ ДИЗАЙН РЕЙТИНГА
+   ============================================ */
+
+/* 🏆 Рейтинг в ТОП-5 — уникальный цвет (янтарный) */
+.top-card-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  color: #ffb347;
+  transition: all 0.3s ease;
+}
+
+.top-card-netflix:hover .top-card-score {
+  transform: scale(1.05);
+  text-shadow: 0 0 40px rgba(255, 179, 71, 0.3);
+}
+
+/* 📊 Разные цвета рейтинга в ТОП-5 в зависимости от значения */
+.top-card-score.high {
+  color: #ffd700;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.top-card-score.medium {
+  color: #ffb347;
+  text-shadow: 0 0 30px rgba(255, 179, 71, 0.15);
+}
+
+.top-card-score.low {
+  color: #ff6b6b;
+  text-shadow: 0 0 30px rgba(255, 107, 107, 0.1);
+}
+
+/* 👑 Ранги в ТОП-5 с цветами */
+.top-card-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 20px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid rgba(168, 133, 64, 0.15);
+  color: var(--gold-bright);
+}
+
+/* ✨ Особые ранги */
+.top-card-rank.rank-gold {
+  background: rgba(168, 133, 64, 0.15);
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.05);
+}
+
+.top-card-rank.rank-silver {
+  background: rgba(192, 192, 192, 0.1);
+  border-color: rgba(192, 192, 192, 0.2);
+  color: #c0c0c0;
+}
+
+.top-card-rank.rank-bronze {
+  background: rgba(205, 127, 50, 0.1);
+  border-color: rgba(205, 127, 50, 0.2);
+  color: #cd7f32;
+}
+
+/* ============================================
+   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+@media (max-width: 768px) {
+  .film-ratings {
+    padding: 8px 10px 10px;
+    gap: 4px;
+  }
+
+  .rating-row {
+    font-size: 0.8rem;
+  }
+
+  .rating-label {
+    font-size: 0.75rem;
+  }
+
+  .rating-value {
+    font-size: 0.85rem;
+    min-width: 28px;
+  }
+
+  .votes-count {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+
+  .top-card-score {
+    font-size: 15px;
+    padding: 3px 12px;
+  }
+
+  .top-card-rank {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    top: 6px;
+    left: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .film-ratings {
+    padding: 6px 8px 8px;
+  }
+
+  .rating-row {
+    font-size: 0.7rem;
+  }
+
+  .rating-label {
+    font-size: 0.7rem;
+  }
+
+  .rating-value {
+    font-size: 0.75rem;
+    min-width: 24px;
+  }
+
+  .votes-count {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  .top-card-score {
+    font-size: 13px;
+    padding: 2px 10px;
+  }
+
+  .top-card-rank {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
