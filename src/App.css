@@ -2026,7 +2026,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   ОБЩИЕ СОСТОЯНИЯ
+   ОБЩИЕ СОСТОЯНИЯ — золото
    ============================================================ */
 .loading {
   text-align: center;
@@ -2041,7 +2041,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .admin-badge {
-  color: var(--neon-purple);
+  color: var(--gold-bright);
   font-size: 16px;
 }
 
@@ -2051,6 +2051,7 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
   margin-top: 4px;
 }
+
 
 /* ============================================================
    АДАПТИВНОСТЬ
@@ -2166,7 +2167,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   СТЕКЛЯННЫЕ КАРТОЧКИ (glass-card)
+   СТЕКЛЯННЫЕ КАРТОЧКИ (glass-card) — золото
    ============================================================ */
 .glass-card {
   background: var(--bg-glass);
@@ -2179,56 +2180,29 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .glass-card:hover {
-  border-color: var(--glass-border-hover);
+  border-color: var(--gold);
   background: var(--bg-glass-hover);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
 }
 
 /* ============================================================
-   НЕОНОВЫЙ ТЕКСТ (neon-text)
+   ЗОЛОТОЙ ТЕКСТ (gold-text) — вместо neon-text
    ============================================================ */
+.gold-text {
+  color: var(--gold-bright);
+}
+
+.gold-text strong {
+  color: var(--text-primary);
+}
+
+/* ⚠️ СОВМЕСТИМОСТЬ — сохраняем старый класс для обратной совместимости */
 .neon-text {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .neon-text strong {
   color: var(--text-primary);
-}
-
-/* ============================================================
-   СТРАНИЦА "О СИСТЕМЕ" (исправленная)
-   ============================================================ */
-.about-page .glass-card {
-  margin-bottom: 24px;
-}
-
-.about-page .about-block {
-  margin-bottom: 16px;
-}
-
-.about-page .about-criterion {
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  border-left: 3px solid var(--neon-cyan);
-  margin-bottom: 8px;
-}
-
-.about-page .about-criterion-name {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.about-page .about-criterion-desc {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-top: 2px;
-}
-
-.about-page .about-block-title {
-  color: var(--neon-cyan);
-  font-weight: 700;
-  font-size: 20px;
-  margin-bottom: 12px;
 }
 
 /* ============================================================
@@ -2370,8 +2344,10 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
 }
+
+
 /* ============================================================
-   СТРАНИЦА "О СИСТЕМЕ" (полный дизайн)
+   СТРАНИЦА "О СИСТЕМЕ" (полный дизайн) — золото
    ============================================================ */
 .about-page .glass-card {
   background: var(--bg-glass);
@@ -2382,11 +2358,26 @@ input[type="range"]::-moz-range-thumb {
   padding: 24px 28px;
   margin-bottom: 24px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✨ Золотая полоса сверху у карточек */
+.about-page .glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.2;
 }
 
 .about-page .glass-card:hover {
-  border-color: var(--glass-border-hover);
+  border-color: var(--gold);
   background: var(--bg-glass-hover);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
 }
 
 .about-page .about-block {
@@ -2397,14 +2388,15 @@ input[type="range"]::-moz-range-thumb {
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
-  border-left: 3px solid var(--neon-cyan);
+  border-left: 3px solid var(--gold);
   margin-bottom: 10px;
   transition: all 0.3s ease;
 }
 
 .about-page .about-criterion:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-left-color: var(--neon-purple);
+  background: rgba(168, 133, 64, 0.03);
+  border-left-color: var(--gold-bright);
+  transform: translateX(2px);
 }
 
 .about-page .about-criterion-name {
@@ -2421,7 +2413,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .about-page .about-block-title {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
   font-weight: 700;
   font-size: 20px;
   margin-bottom: 14px;
@@ -2435,7 +2427,7 @@ input[type="range"]::-moz-range-thumb {
   text-align: center;
   margin: 20px 0 30px;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--text-primary) 40%, var(--neon-cyan));
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--gold-bright));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2448,7 +2440,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .about-page .about-intro .neon-text {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .about-page .about-intro strong {
@@ -2476,7 +2468,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .about-page .formula-step:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(168, 133, 64, 0.03);
 }
 
 .about-page .step-number {
@@ -2485,13 +2477,14 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   min-width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+  background: linear-gradient(135deg, var(--gold), var(--neon-purple));
   color: #0a0a12;
   font-weight: 700;
   border-radius: 50%;
   font-size: 14px;
   flex-shrink: 0;
   font-family: var(--font-mono);
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
 }
 
 .about-page .formula-step span:last-child {
@@ -2501,16 +2494,22 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .about-page .formula-step strong {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .about-page .formula-result {
   margin-top: 20px;
   padding: 16px 20px;
-  background: rgba(34, 211, 238, 0.04);
+  background: rgba(168, 133, 64, 0.04);
   border-radius: 10px;
   text-align: center;
-  border: 1px solid rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  transition: all 0.3s ease;
+}
+
+.about-page .formula-result:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
 }
 
 .about-page .formula-result p {
@@ -2519,7 +2518,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .about-page .formula-result strong {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .about-page .about-version {
@@ -2534,15 +2533,15 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО (для уведомлений)
+   УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО (для уведомлений) — золото
    ============================================================ */
 .modal-glass {
   max-width: 420px;
   width: 100%;
   padding: 32px 36px 36px;
   background: linear-gradient(135deg,
-    rgba(20, 20, 40, 0.9),
-    rgba(40, 20, 60, 0.75)
+    rgba(16, 16, 26, 0.95),
+    rgba(26, 16, 36, 0.8)
   );
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
@@ -2554,6 +2553,18 @@ input[type="range"]::-moz-range-thumb {
   position: relative;
 }
 
+/* ✨ Золотая полоса сверху */
+.modal-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.3;
+}
+
 .modal-glass .modal-close {
   position: absolute;
   top: 16px;
@@ -2563,10 +2574,11 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-muted);
   font-size: 24px;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: all 0.3s;
 }
 .modal-glass .modal-close:hover {
   color: var(--text-primary);
+  transform: rotate(90deg);
 }
 
 .modal-glass .modal-icon {
@@ -2581,11 +2593,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .modal-glass .modal-icon.success {
-  background: rgba(34, 211, 238, 0.06);
-  box-shadow: 0 0 40px rgba(34, 211, 238, 0.05);
+  background: rgba(168, 133, 64, 0.06);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
 }
 .modal-glass .modal-icon.success span {
-  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.3));
+  filter: drop-shadow(0 0 10px rgba(168, 133, 64, 0.3));
 }
 
 .modal-glass .modal-icon.error {
@@ -2597,11 +2609,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .modal-glass .modal-icon.info {
-  background: rgba(124, 58, 237, 0.06);
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
+  background: rgba(168, 133, 64, 0.04);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
 }
 .modal-glass .modal-icon.info span {
-  filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.3));
+  filter: drop-shadow(0 0 10px rgba(168, 133, 64, 0.2));
 }
 
 .modal-glass .modal-icon.warning {
@@ -2640,18 +2652,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .modal-glass .btn-modal.btn-primary {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(34, 211, 238, 0.1));
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.06));
   color: var(--text-primary);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(168, 133, 64, 0.15);
 }
 .modal-glass .btn-modal.btn-primary:hover {
-  border-color: rgba(124, 58, 237, 0.3);
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
   transform: translateY(-1px);
 }
 
 /* ============================================================
-   ТОП-5 В СТИЛЕ NETFLIX
+   ТОП-5 В СТИЛЕ NETFLIX — золото
    ============================================================ */
 .top-films-netflix {
   margin: 30px 0 20px;
@@ -2680,7 +2692,7 @@ input[type="range"]::-moz-range-thumb {
   display: block;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
   margin-top: 4px;
   border-radius: 2px;
 }
@@ -2691,15 +2703,16 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s;
   padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid transparent;
 }
 
 .top-all-link-netflix:hover {
-  color: var(--text-primary);
-  border-color: var(--glass-border);
+  color: var(--gold-bright);
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(168, 133, 64, 0.03);
 }
 
 .top-scroll-container {
@@ -2726,9 +2739,13 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .top-scroll-wrapper::-webkit-scrollbar-thumb {
-  background: var(--neon-cyan);
+  background: linear-gradient(90deg, var(--gold), var(--neon-purple));
   border-radius: 4px;
-  box-shadow: 0 0 20px var(--neon-cyan-glow);
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
+}
+
+.top-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, var(--gold-bright), var(--neon-cyan));
 }
 
 .top-card-netflix {
@@ -2746,7 +2763,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .top-card-netflix:hover .top-card-poster {
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 40px rgba(168, 133, 64, 0.15);
 }
 
 .top-card-poster-wrapper {
@@ -2761,19 +2778,20 @@ input[type="range"]::-moz-range-thumb {
   aspect-ratio: 2/3;
   object-fit: cover;
   display: block;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
   background: var(--bg-deep);
 }
 
-/* Ранг на постере */
+/* Ранг на постере — золото */
 .top-card-rank {
   position: absolute;
   top: 8px;
   left: 8px;
   font-size: 20px;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -2781,10 +2799,11 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(168, 133, 64, 0.2);
+  color: var(--gold-bright);
 }
 
-/* Оценка на постере (как на Netflix) */
+/* Оценка на постере — золото */
 .top-card-score {
   position: absolute;
   bottom: 8px;
@@ -2795,11 +2814,13 @@ input[type="range"]::-moz-range-thumb {
   font-variant-numeric: tabular-nums;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 4px 12px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(168, 133, 64, 0.15);
   letter-spacing: 0.5px;
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  color: var(--gold-bright);
 }
 
 /* Информация под постером */
@@ -2874,7 +2895,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   ЛЕНТА СОБЫТИЙ (ActivityFeed)
+   ЛЕНТА СОБЫТИЙ (ActivityFeed) — золото
    ============================================================ */
 .activity-feed {
   margin: 30px 0;
@@ -2888,7 +2909,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .activity-feed:hover {
-  border-color: var(--glass-border-hover);
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
 }
 
 .activity-feed h3 {
@@ -2905,7 +2927,7 @@ input[type="range"]::-moz-range-thumb {
   display: block;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
   margin-top: 4px;
   border-radius: 2px;
 }
@@ -2928,8 +2950,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .feed-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-left-color: var(--neon-cyan);
+  background: rgba(168, 133, 64, 0.03);
+  border-left-color: var(--gold);
   transform: translateX(4px);
 }
 
@@ -2953,7 +2975,13 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .feed-text .highlight-cyan {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+
+/* ⚠️ Сохраняем обратную совместимость */
+.feed-text .highlight-gold {
+  color: var(--gold-bright);
   font-weight: 600;
 }
 
@@ -3007,9 +3035,8 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
-
 /* ============================================================
-   ПУЛЬСИРУЮЩАЯ КНОПКА ДЛЯ МОБИЛЬНЫХ
+   ПУЛЬСИРУЮЩАЯ КНОПКА ДЛЯ МОБИЛЬНЫХ — золото
    ============================================================ */
 @media (max-width: 768px) {
   .rate-btn {
@@ -3019,10 +3046,10 @@ input[type="range"]::-moz-range-thumb {
 
   @keyframes mobilePulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+      box-shadow: 0 0 0 0 rgba(168, 133, 64, 0);
     }
     50% {
-      box-shadow: 0 0 30px 4px rgba(124, 58, 237, 0.15);
+      box-shadow: 0 0 30px 4px rgba(168, 133, 64, 0.12);
     }
   }
 
@@ -3033,7 +3060,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   МОБИЛЬНЫЙ ПОИСК С АНИМАЦИЕЙ
+   МОБИЛЬНЫЙ ПОИСК С АНИМАЦИЕЙ — золото
    ============================================================ */
 @media (max-width: 768px) {
   .search-box {
@@ -3049,8 +3076,8 @@ input[type="range"]::-moz-range-thumb {
 
   .search-box input:focus {
     transform: scale(1.02);
-    border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 40px rgba(34, 211, 238, 0.06) !important;
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 40px rgba(168, 133, 64, 0.04) !important;
   }
 
   .search-box button {
@@ -3101,7 +3128,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   ГОЛОГРАФИЧЕСКАЯ АНИМАЦИЯ
+   ГОЛОГРАФИЧЕСКАЯ АНИМАЦИЯ — золото + неон
    ============================================================ */
 
 .hero h2 {
@@ -3112,9 +3139,11 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 24px;
   background: linear-gradient(135deg, 
     var(--text-primary) 20%, 
-    var(--neon-cyan) 40%, 
+    var(--gold-bright) 35%,
+    var(--gold) 45%,
     var(--neon-purple) 60%, 
-    var(--neon-cyan) 80%, 
+    var(--neon-cyan) 75%, 
+    var(--gold-bright) 85%,
     var(--text-primary) 100%
   );
   background-size: 300% 300%;
@@ -3125,7 +3154,7 @@ input[type="range"]::-moz-range-thumb {
   animation: holographic 4s ease-in-out infinite;
   position: relative;
   display: inline-block;
-  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.1));
+  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.08));
 }
 
 @keyframes holographic {
@@ -3134,14 +3163,14 @@ input[type="range"]::-moz-range-thumb {
   100% { background-position: 0% 50%; }
 }
 
-/* Добавляем мерцание поверх */
+/* Добавляем мерцание поверх — золотое */
 .hero h2::before {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
     circle at 30% 50%,
-    rgba(34, 211, 238, 0.05),
+    rgba(168, 133, 64, 0.04),
     transparent 60%
   );
   pointer-events: none;
@@ -3166,52 +3195,6 @@ input[type="range"]::-moz-range-thumb {
     font-size: 16px;
   }
 }
-
-/* ============================================================
-   FIREFOX
-   ============================================================ */
-.slider-container input[type="range"]::-moz-range-track {
-  height: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.slider-container input[type="range"]::-moz-range-thumb {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(34, 211, 238, 0.9) 40%,
-    rgba(34, 211, 238, 0.6) 80%,
-    rgba(0, 100, 120, 0.8) 100%
-  );
-  box-shadow: 
-    0 4px 15px rgba(34, 211, 238, 0.25),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 4px 8px rgba(255, 255, 255, 0.3);
-}
-
-.subjective-block .slider-container input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(124, 58, 237, 0.9) 40%,
-    rgba(124, 58, 237, 0.6) 80%,
-    rgba(60, 20, 120, 0.8) 100%
-  );
-  box-shadow: 
-    0 4px 15px rgba(124, 58, 237, 0.25),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 4px 8px rgba(255, 255, 255, 0.3);
-}
-
 
 /* ============================================================
    ТЕКСТОВЫЙ ОТЗЫВ — НОВЫЙ ДИЗАЙН
@@ -3437,18 +3420,39 @@ input[type="range"]::-moz-range-thumb {
   }
 } 
 /* ============================================================
-   ФИШКА 1: 3D-ФОН С ПАРЯЩИМИ НЕОНОВЫМИ ШАРАМИ
+   ФИШКА 1: 3D-ФОН С ПАРЯЩИМИ ЗОЛОТЫМИ И НЕОНОВЫМИ ШАРАМИ
    ============================================================ */
+
+/* Фиксим фон — делаем body позиционированным */
+body {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.06), transparent),
+    radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.05), transparent),
+    radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1.5px 1.5px at 20% 50%, rgba(255,255,255,0.07), transparent),
+    radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.06), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.09), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Фоновые шары — фиксим позиционирование */
 body::before,
 body::after {
   content: '';
   position: fixed;
   border-radius: 50%;
   filter: blur(120px);
-  opacity: 0.25;
-  z-index: -1;
+  opacity: 0.2;
+  z-index: 0;
   animation: floatBalls 25s ease-in-out infinite alternate;
   pointer-events: none;
+  will-change: transform;
 }
 
 body::before {
@@ -3456,7 +3460,7 @@ body::before {
   height: 600px;
   top: -150px;
   right: -150px;
-  background: radial-gradient(circle, var(--neon-purple), transparent 70%);
+  background: radial-gradient(circle, var(--gold), transparent 70%);
   animation-duration: 30s;
 }
 
@@ -3465,20 +3469,12 @@ body::after {
   height: 500px;
   bottom: -150px;
   left: -150px;
-  background: radial-gradient(circle, var(--neon-cyan), transparent 70%);
+  background: radial-gradient(circle, var(--neon-purple), transparent 70%);
   animation-duration: 22s;
   animation-delay: 2s;
 }
 
-@keyframes floatBalls {
-  0% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(60px, -40px) scale(1.1); }
-  50% { transform: translate(-30px, 50px) scale(0.9); }
-  75% { transform: translate(40px, -30px) scale(1.05); }
-  100% { transform: translate(-50px, 40px) scale(1); }
-}
-
-/* Звёздная пыль */
+/* Добавляем третий шар — циановый для баланса */
 body {
   background-image: 
     radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.08), transparent),
@@ -3493,15 +3489,48 @@ body {
   background-repeat: no-repeat;
 }
 
+/* Третий шар через отдельный псевдоэлемент */
+body {
+  position: relative;
+}
+
+/* Используем #root или обёртку для третьего шара */
+#root::before {
+  content: '';
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(150px);
+  opacity: 0.08;
+  z-index: 0;
+  background: radial-gradient(circle, var(--neon-cyan), transparent 70%);
+  pointer-events: none;
+  animation: floatBalls 35s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes floatBalls {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(60px, -40px) scale(1.1); }
+  50% { transform: translate(-30px, 50px) scale(0.9); }
+  75% { transform: translate(40px, -30px) scale(1.05); }
+  100% { transform: translate(-50px, 40px) scale(1); }
+}
+
 /* ============================================================
-   ФИШКА 3: НЕОНОВЫЙ БОРДЮР У КАРТОЧЕК (бегущая рамка)
+   ФИШКА 3: ЗОЛОТО-НЕОНОВЫЙ БОРДЮР У КАРТОЧЕК (бегущая рамка)
    ============================================================ */
 .film-card {
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
-/* Бегущая рамка */
+/* Бегущая рамка — золото + неон */
 .film-card::before {
   content: '';
   position: absolute;
@@ -3511,11 +3540,11 @@ body {
   background: conic-gradient(
     from var(--angle, 0deg),
     transparent 0%,
-    var(--neon-cyan) 15%,
+    var(--gold) 15%,
     var(--neon-purple) 30%,
     transparent 50%,
-    var(--neon-cyan) 70%,
-    var(--neon-purple) 85%,
+    var(--gold-bright) 65%,
+    var(--neon-cyan) 80%,
     transparent 100%
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -3544,32 +3573,32 @@ body {
 }
 
 /* ============================================================
-   ФИШКА 4: ПАРЯЩАЯ КНОПКА "ОЦЕНИТЬ"
+   ФИШКА 4: ПАРЯЩАЯ КНОПКА "ОЦЕНИТЬ" — золото
    ============================================================ */
 .rate-btn {
   position: relative;
   animation: floatButton 3s ease-in-out infinite;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   box-shadow: 
-    0 4px 20px rgba(124, 58, 237, 0.1),
+    0 4px 20px rgba(168, 133, 64, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 @keyframes floatButton {
   0%, 100% {
     transform: translateY(0) scale(1);
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+    box-shadow: 0 4px 20px rgba(168, 133, 64, 0.08);
   }
   50% {
     transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.15), 0 0 60px rgba(34, 211, 238, 0.03);
+    box-shadow: 0 12px 40px rgba(168, 133, 64, 0.12), 0 0 60px rgba(34, 211, 238, 0.02);
   }
 }
 
 .rate-btn:hover {
   animation-play-state: paused;
   transform: translateY(-8px) scale(1.04);
-  box-shadow: 0 16px 60px rgba(124, 58, 237, 0.2), 0 0 80px rgba(34, 211, 238, 0.05);
+  box-shadow: 0 16px 60px rgba(168, 133, 64, 0.15), 0 0 80px rgba(34, 211, 238, 0.03);
 }
 
 /* Для мобильных — уменьшаем анимацию, чтобы не мешала */
@@ -3577,10 +3606,11 @@ body {
   .rate-btn {
     animation-duration: 2.5s;
   }
-} 
+}
+
 
 /* ============================================================
-   МОБИЛЬНЫЕ КАРТОЧКИ — ИДЕАЛЬНЫЙ ДИЗАЙН
+   МОБИЛЬНЫЕ КАРТОЧКИ — ИДЕАЛЬНЫЙ ДИЗАЙН (золото)
    ============================================================ */
 
 /* ----- УБИРАЕМ БРАУЗЕРНОЕ СВЕЧЕНИЕ (outline) ----- */
@@ -3597,7 +3627,7 @@ body {
 /* ----- КАРТОЧКИ ОДИНАКОВОГО РАЗМЕРА ----- */
 @media (max-width: 768px) {
   .films-grid .film-card-link {
-    flex: 0 0 160px; /* фиксированная ширина */
+    flex: 0 0 160px;
     max-width: 160px;
     min-width: 160px;
     height: auto;
@@ -3641,6 +3671,7 @@ body {
 
   .films-grid .rating-badge {
     font-size: 14px;
+    color: var(--gold-bright);
   }
 
   .films-grid .votes-count {
@@ -3655,22 +3686,20 @@ body {
     touch-action: manipulation;
   }
 
-  /* НАКЛОН ПРИ НАЖАТИИ */
   .film-card-link:active .film-card {
     transform: perspective(800px) rotateX(2deg) rotateY(4deg) scale(1.03) translateY(-4px);
     transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
-    border-color: var(--neon-cyan);
+    border-color: var(--gold);
   }
 
-  /* ГРАДИЕНТ ПРИ НАЖАТИИ (вместо синего свечения) */
   .film-card-link:active .film-card::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: 14px;
     background: linear-gradient(135deg,
-      rgba(34, 211, 238, 0.15) 0%,
-      rgba(124, 58, 237, 0.15) 50%,
+      rgba(168, 133, 64, 0.15) 0%,
+      rgba(124, 58, 237, 0.10) 50%,
       rgba(236, 72, 153, 0.05) 100%
     );
     z-index: 2;
@@ -3684,15 +3713,13 @@ body {
     100% { opacity: 0.8; }
   }
 
-  /* ДОПОЛНИТЕЛЬНО: красивая тень при нажатии */
   .film-card-link:active .film-card {
     box-shadow:
-      0 8px 30px rgba(34, 211, 238, 0.15),
-      0 4px 15px rgba(124, 58, 237, 0.1),
+      0 8px 30px rgba(168, 133, 64, 0.12),
+      0 4px 15px rgba(124, 58, 237, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
-  /* ОТРАЖЕНИЕ ПРИ НАЖАТИИ */
   .film-card-link:active .film-card::after {
     opacity: 0.4;
     height: 24px;
@@ -3705,21 +3732,18 @@ body {
    ДОПОЛНИТЕЛЬНО: УЛУЧШЕННЫЙ СВАЙП (без синего свечения)
    ============================================================ */
 @media (max-width: 768px) {
-  /* Убираем всё свечение у ссылок */
   .film-card-link,
   .film-card-link * {
     -webkit-tap-highlight-color: transparent !important;
     outline: none !important;
   }
 
-  /* Плавный скролл */
   .films-grid {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
 
-  /* Отступы для равномерного расположения */
   .films-grid {
     gap: 14px;
     padding: 20px 8px 40px 8px;
@@ -3746,13 +3770,12 @@ textarea {
   -webkit-touch-callout: none !important;
 }
 
-/* Убираем outline при фокусе */
 .film-card-link:focus-visible {
   outline: none !important;
 }
 
 /* ============================================================
-   НОВЫЙ ДИЗАЙН КАРТОЧЕК — АТМОСФЕРА И РАЗНООБРАЗИЕ
+   НОВЫЙ ДИЗАЙН КАРТОЧЕК — АТМОСФЕРА И РАЗНООБРАЗИЕ (золото)
    ============================================================ */
 
 /* ----- 1. УБИРАЕМ БРАУЗЕРНОЕ СВЕЧЕНИЕ ----- */
@@ -3781,7 +3804,7 @@ textarea {
     position: relative;
   }
 
-  /* Полка снизу */
+  /* Полка снизу — золото */
   .films-grid::after {
     content: '';
     position: absolute;
@@ -3789,7 +3812,7 @@ textarea {
     left: 10%;
     width: 80%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
     opacity: 0.3;
   }
 
@@ -3818,7 +3841,7 @@ textarea {
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   }
 
-  /* Цветовая подсветка карточки (цвет от постера) */
+  /* Цветовая подсветка карточки — золото */
   .films-grid .film-card::before {
     content: '';
     position: absolute;
@@ -3826,7 +3849,7 @@ textarea {
     border-radius: 16px;
     background: linear-gradient(
       135deg,
-      rgba(34, 211, 238, 0.03) 0%,
+      rgba(168, 133, 64, 0.03) 0%,
       rgba(124, 58, 237, 0.03) 50%,
       rgba(236, 72, 153, 0.02) 100%
     );
@@ -3834,7 +3857,7 @@ textarea {
     pointer-events: none;
   }
 
-  /* Неоновое свечение по краям */
+  /* Золото-неоновое свечение по краям */
   .films-grid .film-card::after {
     content: '';
     position: absolute;
@@ -3843,7 +3866,8 @@ textarea {
     background: conic-gradient(
       from 0deg,
       transparent 0%,
-      rgba(34, 211, 238, 0.05) 25%,
+      rgba(168, 133, 64, 0.06) 20%,
+      rgba(168, 133, 64, 0.03) 30%,
       transparent 50%,
       rgba(124, 58, 237, 0.05) 75%,
       transparent 100%
@@ -3880,8 +3904,8 @@ textarea {
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      rgba(10, 10, 18, 0.4) 30%,
-      rgba(10, 10, 18, 0.7) 100%
+      rgba(7, 7, 10, 0.4) 30%,
+      rgba(7, 7, 10, 0.7) 100%
     );
   }
 
@@ -3912,7 +3936,7 @@ textarea {
     align-self: flex-start;
   }
 
-  /* Рейтинг — крупный и яркий */
+  /* Рейтинг — крупный и яркий, золотой */
   .films-grid .rating-badge {
     font-size: 18px;
     font-weight: 800;
@@ -3921,6 +3945,7 @@ textarea {
     margin-top: 6px;
     letter-spacing: -0.02em;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    color: var(--gold-bright);
   }
 
   /* Количество оценок */
@@ -3942,28 +3967,28 @@ textarea {
   .film-card-link:active .film-card {
     transform: perspective(800px) rotateX(2deg) rotateY(4deg) scale(1.03) translateY(-4px);
     transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
-    border-color: var(--neon-cyan);
+    border-color: var(--gold);
     box-shadow:
-      0 8px 32px rgba(34, 211, 238, 0.12),
-      0 4px 16px rgba(124, 58, 237, 0.08),
+      0 8px 32px rgba(168, 133, 64, 0.10),
+      0 4px 16px rgba(124, 58, 237, 0.06),
       0 12px 48px rgba(0, 0, 0, 0.4);
   }
 
-  /* ГРАДИЕНТ ПРИ НАЖАТИИ */
+  /* ГРАДИЕНТ ПРИ НАЖАТИИ — золото */
   .film-card-link:active .film-card .film-info {
     background: linear-gradient(
       to bottom,
-      rgba(34, 211, 238, 0.02) 0%,
-      rgba(34, 211, 238, 0.04) 30%,
-      rgba(124, 58, 237, 0.08) 100%
+      rgba(168, 133, 64, 0.02) 0%,
+      rgba(168, 133, 64, 0.04) 30%,
+      rgba(124, 58, 237, 0.06) 100%
     );
   }
 
   .film-card-link:active .film-card .film-info h3 {
-    color: var(--neon-cyan);
+    color: var(--gold-bright);
   }
 
-  /* ----- СКРОЛЛБАР ----- */
+  /* ----- СКРОЛЛБАР — золото ----- */
   .films-grid::-webkit-scrollbar {
     height: 3px;
   }
@@ -3972,18 +3997,20 @@ textarea {
     border-radius: 4px;
   }
   .films-grid::-webkit-scrollbar-thumb {
-    background: var(--neon-cyan);
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
     border-radius: 4px;
+  }
+  .films-grid::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, var(--gold-bright), var(--neon-purple));
   }
 }
 
 /* ============================================================
    ДОПОЛНИТЕЛЬНО: РАЗНЫЕ ЦВЕТА ДЛЯ РАЗНЫХ КАРТОЧЕК
    ============================================================ */
-/* Добавляем случайный цветной отлив каждой карточке */
 @media (max-width: 768px) {
   .films-grid .film-card-link:nth-child(3n+1) .film-card::before {
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.04), rgba(34, 211, 238, 0.01));
+    background: linear-gradient(135deg, rgba(168, 133, 64, 0.04), rgba(168, 133, 64, 0.01));
   }
   .films-grid .film-card-link:nth-child(3n+2) .film-card::before {
     background: linear-gradient(135deg, rgba(124, 58, 237, 0.04), rgba(124, 58, 237, 0.01));
@@ -3992,6 +4019,7 @@ textarea {
     background: linear-gradient(135deg, rgba(236, 72, 153, 0.04), rgba(236, 72, 153, 0.01));
   }
 }
+
 
 /* ============================================================
    УБИРАЕМ outline НА ВСЕХ ЭЛЕМЕНТАХ
@@ -4011,7 +4039,7 @@ textarea {
 }
 
 /* ============================================================
-   ДОСТИЖЕНИЯ (ACHIEVEMENTS)
+   ДОСТИЖЕНИЯ (ACHIEVEMENTS) — золото
    ============================================================ */
 .achievements-section {
   background: rgba(255, 255, 255, 0.02);
@@ -4022,8 +4050,9 @@ textarea {
 }
 
 .achievements-section:hover {
-  border-color: var(--glass-border-hover);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--gold);
+  background: rgba(168, 133, 64, 0.03);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
 }
 
 .achievements-section h3,
@@ -4043,7 +4072,7 @@ textarea {
 }
 
 /* ============================================================
-   ПРОФИЛЬ - ВКЛАДКИ И РЕЦЕНЗИИ (НОВЫЙ ДИЗАЙН)
+   ПРОФИЛЬ - ВКЛАДКИ И РЕЦЕНЗИИ (НОВЫЙ ДИЗАЙН) — золото
    ============================================================ */
 
 /* Вкладки профиля */
@@ -4060,7 +4089,8 @@ textarea {
 }
 
 .profile-tabs:hover {
-  border-color: var(--glass-border-hover);
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
 }
 
 .tabs-header {
@@ -4088,13 +4118,13 @@ textarea {
 
 .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(168, 133, 64, 0.02);
 }
 
 .tab-btn.active {
-  color: var(--neon-cyan);
-  border-bottom-color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.04);
+  color: var(--gold-bright);
+  border-bottom-color: var(--gold);
+  background: rgba(168, 133, 64, 0.04);
 }
 
 .tab-btn .tab-count {
@@ -4110,8 +4140,8 @@ textarea {
 }
 
 .tab-btn.active .tab-count {
-  color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.08);
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.08);
 }
 
 .profile-ratings,
@@ -4135,12 +4165,12 @@ textarea {
   display: block;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
   margin-top: 4px;
   border-radius: 2px;
 }
 
-/* Карточка рецензии в профиле */
+/* Карточка рецензии в профиле — золото */
 .review-item {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--glass-border);
@@ -4152,7 +4182,7 @@ textarea {
   overflow: hidden;
 }
 
-/* Декоративная линия слева */
+/* Декоративная линия слева — золото */
 .review-item::before {
   content: '';
   position: absolute;
@@ -4160,7 +4190,7 @@ textarea {
   left: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(to bottom, var(--neon-cyan), var(--neon-purple));
+  background: linear-gradient(to bottom, var(--gold), var(--gold-bright), var(--neon-purple));
   opacity: 0.3;
   transition: opacity 0.3s ease;
 }
@@ -4170,10 +4200,10 @@ textarea {
 }
 
 .review-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--glass-border-hover);
+  background: rgba(168, 133, 64, 0.02);
+  border-color: var(--gold);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
 }
 
 .review-header {
@@ -4192,7 +4222,7 @@ textarea {
 }
 
 .review-film-link:hover .review-title {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 
 .review-title {
@@ -4220,12 +4250,12 @@ textarea {
 .review-rating {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--gold-bright);
   white-space: nowrap;
   padding: 4px 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(168, 133, 64, 0.04);
   border-radius: 20px;
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(168, 133, 64, 0.08);
   font-family: var(--font-mono);
 }
 
@@ -4303,9 +4333,9 @@ textarea {
   align-items: center;
   gap: 8px;
   padding: 6px 20px;
-  background: rgba(34, 211, 238, 0.06);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(34, 211, 238, 0.12);
+  background: rgba(168, 133, 64, 0.06);
+  color: var(--gold-bright);
+  border: 1px solid rgba(168, 133, 64, 0.12);
   border-radius: 20px;
   text-decoration: none;
   font-size: 14px;
@@ -4315,19 +4345,19 @@ textarea {
 }
 
 .review-go-to-film:hover {
-  background: rgba(34, 211, 238, 0.12);
-  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(168, 133, 64, 0.12);
+  border-color: rgba(168, 133, 64, 0.25);
   transform: scale(1.04);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.04);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
 }
 
-/* Кнопка редактирования профиля */
+/* Кнопка редактирования профиля — золото */
 .btn-edit-profile {
   display: inline-block;
   padding: 8px 24px;
-  background: rgba(34, 211, 238, 0.06);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(34, 211, 238, 0.12);
+  background: rgba(168, 133, 64, 0.06);
+  color: var(--gold-bright);
+  border: 1px solid rgba(168, 133, 64, 0.12);
   border-radius: 20px;
   text-decoration: none;
   font-size: 14px;
@@ -4338,10 +4368,10 @@ textarea {
 }
 
 .btn-edit-profile:hover {
-  background: rgba(34, 211, 238, 0.12);
-  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(168, 133, 64, 0.12);
+  border-color: rgba(168, 133, 64, 0.25);
   transform: scale(1.04);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.04);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
 }
 
 /* Пустое состояние */
@@ -4364,6 +4394,7 @@ textarea {
 .profile-reviews .empty-state p {
   font-size: 15px;
 }
+
 
 /* ============================================================
    АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ
@@ -4477,155 +4508,7 @@ textarea {
   }
 }
 
-/* ============================================================
-   ОЦЕНИЛИ ФИЛЬМ
-   ============================================================ */
 
-.film-users-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.film-users-header h3 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.film-users-header h3 strong {
-  color: var(--neon-cyan);
-  font-size: 22px;
-}
-
-.btn-show-users {
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: 1px solid var(--glass-border);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.btn-show-users:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.04);
-}
-
-.loading-users {
-  color: var(--text-secondary);
-  padding: 10px 0;
-}
-
-.no-users {
-  color: var(--text-muted);
-  padding: 10px 0;
-  font-style: italic;
-}
-
-.users-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.user-rating-item-preview {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-}
-
-.more-users {
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 4px 12px;
-  font-style: italic;
-}
-
-/* ===== МОДАЛЬНОЕ ОКНО ===== */
-.users-modal {
-  max-width: 600px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.users-modal h2 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--text-primary);
-  margin: 0 0 4px;
-}
-
-.users-modal .modal-subtitle {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin: 0 0 16px;
-}
-
-.users-modal .modal-subtitle strong {
-  color: var(--neon-cyan);
-}
-
-.users-modal-list {
-  overflow-y: auto;
-  flex: 1;
-  padding-right: 4px;
-}
-
-.users-modal-list::-webkit-scrollbar {
-  width: 4px;
-}
-.users-modal-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 4px;
-}
-.users-modal-list::-webkit-scrollbar-thumb {
-  background: var(--neon-cyan);
-  border-radius: 4px;
-}
-
-.user-rating-item-full {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-}
-
-.user-rating-item-full:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 2px solid var(--neon-cyan);
-}
-
-.user-rating-item-full .user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-rating-item-full .rating-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
 /* Адаптив */
 @media (max-width: 768px) {
@@ -4695,87 +4578,6 @@ textarea {
 }
 
 
-
-
-
-
-/* ============================================
-   ROOT ПЕРЕМЕННЫЕ — приглушённая неон-палитра
-   ============================================ */
-:root {
-  /* Глубокий фон с лёгким градиентом */
-  --bg-deep: #0b0b14;
-  --bg-gradient: radial-gradient(circle at 20% 30%, #141428, #0a0a12 80%);
-
-  /* Стекло — более прозрачное и с благородным отливом */
-  --bg-glass: rgba(18, 18, 40, 0.55);
-  --bg-glass-hover: rgba(28, 28, 60, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-border-hover: rgba(160, 130, 255, 0.2);
-  --glass-blur: 28px;
-
-  /* Текст — мягкий белый с голубоватым оттенком */
-  --text-primary: #eaeaff;
-  --text-secondary: rgba(200, 200, 245, 0.6);
-  --text-muted: rgba(180, 180, 220, 0.35);
-
-  /* Приглушённые неоновые акценты — менее вырвиглазные */
-  --neon-purple: #7c3aed;      /* мягкий фиолетовый */
-  --neon-cyan: #38bdf8;        /* спокойный голубой */
-  --neon-pink: #f472b6;        /* нежно-розовый */
-  --neon-gold: #fbbf24;        /* тёплый акцент */
-
-  /* Тени для 3D-подушек — объёмнее и глубже */
-  --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(124, 58, 237, 0.12);
-  --shadow-card-hover: 0 16px 48px rgba(0, 0, 0, 0.8), 0 6px 24px rgba(124, 58, 237, 0.2);
-  --shadow-inset-light: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow-inset-dark: inset 0 -4px 12px rgba(0, 0, 0, 0.4);
-
-  /* Скругления */
-  --radius: 20px;
-  --radius-sm: 12px;
-
-  /* Отступы */
-  --spacing: 24px;
-  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============================================
-   ГЛОБАЛЬНЫЕ СТИЛИ
-   ============================================ */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  overflow-x: hidden;
-}
-
-body {
-  background: var(--bg-deep);
-  background-image: var(--bg-gradient);
-  color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0;
-  padding: 12px;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  overflow-x: hidden;
-}
-
-/* Общий контейнер — строгое ограничение ширины */
-.app {
-  max-width: 720px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 4px;
-}
 
 /* ============================================
    УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА (подушка)
