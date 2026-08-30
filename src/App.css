@@ -6741,3 +6741,263 @@ button:disabled::before {
     right: 12px;
   }
 }
+
+
+/* ============================================
+   ЖАНРОВЫЙ ПРЕСЕТ И ВЕСА БЛОКОВ
+   ============================================ */
+
+/* 🎭 Жанровый пресет */
+.modal-genre-preset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: rgba(168, 133, 64, 0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.modal-genre-preset:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background: rgba(168, 133, 64, 0.06);
+}
+
+.modal-genre-preset .preset-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.modal-genre-preset .preset-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.modal-genre-preset .preset-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  padding: 2px 14px;
+  background: rgba(168, 133, 64, 0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(168, 133, 64, 0.1);
+}
+
+/* 📊 Веса блоков — обновлённый стиль */
+.modal-weights {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 20px;
+}
+
+.modal-weights .weights-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.modal-weights .weight-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.modal-weights .weight-item:last-child {
+  border-bottom: none;
+}
+
+.modal-weights .weight-item:hover {
+  padding-left: 6px;
+  background: rgba(168, 133, 64, 0.02);
+  border-radius: 6px;
+}
+
+.modal-weights .weight-name {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.modal-weights .weight-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
+  min-width: 48px;
+  text-align: right;
+}
+
+/* 🎨 Альтернативный вариант — прогресс-бары для весов */
+.modal-weights-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 20px;
+}
+
+.modal-weights-bars .weights-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modal-weights-bars .weight-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.modal-weights-bars .weight-bar-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 80px;
+  font-weight: 400;
+}
+
+.modal-weights-bars .weight-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.modal-weights-bars .weight-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 12px rgba(168, 133, 64, 0.1);
+}
+
+.modal-weights-bars .weight-bar-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--gold-bright);
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ============================================
+   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+@media (max-width: 768px) {
+  .modal-genre-preset {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .modal-genre-preset .preset-value {
+    font-size: 13px;
+    padding: 2px 12px;
+  }
+
+  .modal-weights {
+    padding: 14px 16px;
+  }
+
+  .modal-weights .weight-item {
+    padding: 5px 0;
+  }
+
+  .modal-weights .weight-name {
+    font-size: 12px;
+  }
+
+  .modal-weights .weight-value {
+    font-size: 14px;
+    min-width: 40px;
+  }
+
+  .modal-weights-bars {
+    padding: 14px 16px;
+  }
+
+  .modal-weights-bars .weight-bar-name {
+    min-width: 60px;
+    font-size: 11px;
+  }
+
+  .modal-weights-bars .weight-bar-value {
+    font-size: 11px;
+    min-width: 34px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-genre-preset {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .modal-genre-preset .preset-icon {
+    font-size: 16px;
+  }
+
+  .modal-genre-preset .preset-label {
+    font-size: 12px;
+  }
+
+  .modal-genre-preset .preset-value {
+    font-size: 12px;
+    padding: 1px 10px;
+  }
+
+  .modal-weights {
+    padding: 10px 12px;
+  }
+
+  .modal-weights .weight-name {
+    font-size: 11px;
+  }
+
+  .modal-weights .weight-value {
+    font-size: 13px;
+    min-width: 36px;
+  }
+
+  .modal-weights-bars {
+    padding: 10px 12px;
+  }
+
+  .modal-weights-bars .weight-bar-name {
+    min-width: 50px;
+    font-size: 10px;
+  }
+
+  .modal-weights-bars .weight-bar-value {
+    font-size: 10px;
+    min-width: 30px;
+  }
+}
