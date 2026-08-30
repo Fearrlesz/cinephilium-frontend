@@ -935,7 +935,7 @@ const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
   setError('');
   try {
     // 👇 ГЛАВНОЕ: /films → /api/films  и добавили sort=
-    const response = await api.get(`/api/films?page=${pageNum}&limit=20&sort=${sort}`);
+    const response = await api.get(`/films?page=${pageNum}&limit=20&sort=${sort}`);
     if (response.data && Array.isArray(response.data.films)) {
       if (pageNum === 1) {
         setFilms(response.data.films);
