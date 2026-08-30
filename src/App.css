@@ -1,16 +1,66 @@
+/* ============================================================
+   ROOT VARIABLES — стекло + золото + неон (гибрид)
+   ============================================================ */
+:root {
+  /* Dark base (от первой темы) */
+  --bg-deep: #07070a;
+  --bg-glass: rgba(16, 16, 26, 0.6);
+  --bg-glass-hover: rgba(24, 24, 42, 0.7);
+  
+  /* Text (от первой темы) */
+  --text-primary: #e8e4dd;
+  --text-secondary: rgba(200, 200, 200, 0.5);
+  --text-muted: rgba(200, 200, 200, 0.3);
+  
+  /* ✨ ЗОЛОТО (из первой темы) */
+  --gold: #a88540;
+  --gold-bright: #c9a355;
+  --gold-dim: #4a3a1a;
+  --gold-glow: rgba(168, 133, 64, 0.15);
+  
+  /* 🌟 НЕОН (из второй темы) */
+  --neon-purple: #7c3aed;
+  --neon-cyan: #22d3ee;
+  --neon-pink: #ec4899;
+  --neon-glow: rgba(124, 58, 237, 0.12);
+  --cyan-glow: rgba(34, 211, 238, 0.08);
+  
+  /* Glass */
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-border-hover: rgba(255, 255, 255, 0.1);
+  --glass-blur: 24px;
+  
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ============================================================
+   GLOBAL RESET & BASE
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html, body, #root {
   height: 100%;
 }
 
 body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
   font-family: var(--font-sans);
-  background-color: #07070a;
-  color: #e8e4dd;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-/* ✨ Film grain — совместимость с киберпанком */
+/* ✨ Film grain (из первой темы) */
 body::after {
   content: '';
   position: fixed;
@@ -22,98 +72,27 @@ body::after {
   background-repeat: repeat;
 }
 
-/* 🎯 Ползунки — золото + неон */
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 2px;
-  background: linear-gradient(90deg, var(--color-gold-dim), var(--color-gold));
-  border-radius: 0;
-  outline: none;
-  cursor: pointer;
+/* ============================================================
+   SCROLLBAR — золото + неон
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, var(--color-gold-bright), var(--color-gold));
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
 }
-
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.25);
-  box-shadow: 0 0 24px rgba(168, 133, 64, 0.5), 0 0 60px rgba(124, 58, 237, 0.15);
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold), var(--neon-purple));
+  border-radius: 10px;
 }
-
-input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--color-gold);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
-}
-
-/* 📜 Скроллы — неон */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-neon-purple) transparent;
-}
-*::-webkit-scrollbar { width: 4px; height: 4px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: var(--color-neon-purple); border-radius: 10px; }
-*::-webkit-scrollbar-thumb:hover { background: var(--color-neon-cyan); }
-
-/* ✨ Выделение — золото */
-::selection {
-  background: rgba(168, 133, 64, 0.2);
-  color: #e8e4dd;
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--gold-bright), var(--neon-cyan));
 }
 
 /* ============================================================
-   🥃 СТЕКЛЯННЫЙ КОНТЕЙНЕР (общий класс)
+   CONTAINER
    ============================================================ */
-.glass {
-  background: var(--color-surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--color-glass-border);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.glass:hover {
-  border-color: var(--color-glass-border-hover);
-  background: rgba(25, 25, 50, 0.6);
-}
-
-/* 🎨 Анимация перелива для заголовков */
-.holographic {
-  background: linear-gradient(135deg, 
-    #e8e4dd 20%, 
-    var(--color-neon-cyan) 35%, 
-    var(--color-neon-purple) 55%, 
-    var(--color-gold-bright) 75%, 
-    #e8e4dd 90%
-  );
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: holographicShift 6s ease-in-out infinite;
-}
-
-@keyframes holographicShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* 📦 Базовый контейнер */
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -121,7 +100,101 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   КНОПКИ
+   HEADER — стеклянный (гибрид)
+   ============================================================ */
+.header {
+  position: sticky;
+  top: 12px;
+  z-index: 100;
+  margin: 0 20px 40px;
+  padding: 14px 28px;
+  border-radius: 20px;
+  
+  background: linear-gradient(135deg,
+    rgba(16, 16, 26, 0.7) 0%,
+    rgba(26, 16, 36, 0.5) 50%,
+    rgba(16, 20, 30, 0.7) 100%
+  );
+  background-size: 200% 200%;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  
+  box-shadow: 
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: liquidShift 20s ease-in-out infinite;
+}
+
+@keyframes liquidShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== ЗАГОЛОВОК — золото + неон ===== */
+.header h1 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  
+  /* ✨ ГОЛОГРАФИЧЕСКИЙ ПЕРЕЛИВ (золото + неон) */
+  background: linear-gradient(135deg, 
+    var(--text-primary) 20%, 
+    var(--gold-bright) 35%, 
+    var(--neon-purple) 55%, 
+    var(--neon-cyan) 75%, 
+    var(--text-primary) 90%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: holographicTitle 5s ease-in-out infinite;
+  
+  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.1));
+}
+
+@keyframes holographicTitle {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.header h1::after {
+  content: '•';
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold-bright), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: dotBlink 1.5s ease-in-out infinite;
+  margin-left: 6px;
+  font-size: 26px;
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   КНОПКИ — золото + неон
    ============================================================ */
 .btn-profile,
 .btn-login,
@@ -144,20 +217,21 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .btn-profile {
-  color: var(--neon-cyan);
+  color: var(--gold-bright);
 }
 .btn-profile:hover {
-  background: rgba(34, 211, 238, 0.08);
+  background: rgba(168, 133, 64, 0.08);
+  color: var(--gold-bright);
 }
 
 .btn-login {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(34, 211, 238, 0.1));
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.08));
   color: var(--text-primary);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(168, 133, 64, 0.15);
 }
 .btn-login:hover {
-  border-color: rgba(124, 58, 237, 0.3);
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
   transform: translateY(-1px);
 }
 
@@ -182,7 +256,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================================
-   ГЕРОЙ
+   ГЕРОЙ — стекло + золотой акцент
    ============================================================ */
 .hero {
   text-align: center;
@@ -193,6 +267,20 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 20px;
   border: 1px solid var(--glass-border);
   margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✨ Золотая полоса сверху */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--gold), transparent);
+  opacity: 0.4;
 }
 
 .hero h2 {
@@ -201,14 +289,14 @@ input[type="range"]::-moz-range-thumb {
   font-size: 28px;
   letter-spacing: -0.02em;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, var(--text-primary) 40%, var(--neon-cyan));
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--gold-bright));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 /* ============================================================
-   ПОИСК
+   ПОИСК — золотой акцент
    ============================================================ */
 .search-box {
   display: flex;
@@ -234,15 +322,15 @@ input[type="range"]::-moz-range-thumb {
 }
 .search-box input:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.2);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.03);
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
 }
 
 .search-box button {
   padding: 12px 28px;
   border-radius: 40px;
-  border: 1px solid rgba(124, 58, 237, 0.15);
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(34, 211, 238, 0.08));
+  border: 1px solid rgba(168, 133, 64, 0.15);
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.06));
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-weight: 500;
@@ -251,12 +339,12 @@ input[type="range"]::-moz-range-thumb {
   transition: all 0.3s;
 }
 .search-box button:hover {
-  border-color: rgba(124, 58, 237, 0.3);
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.05);
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
 }
 
 /* ============================================================
-   СТЕКЛЯННАЯ ПОЛКА (ВАРИАНТ 5)
+   СТЕКЛЯННАЯ ПОЛКА — золото + неон
    ============================================================ */
 .films-grid {
   display: grid;
@@ -266,15 +354,15 @@ input[type="range"]::-moz-range-thumb {
   position: relative;
 }
 
-/* Полка снизу */
+/* ✨ Полка снизу — золото + неон */
 .films-grid::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 10%;
-  width: 80%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  left: 5%;
+  width: 90%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--neon-cyan), var(--gold), transparent);
   opacity: 0.2;
 }
 
@@ -316,7 +404,7 @@ input[type="range"]::-moz-range-thumb {
 .film-card:nth-child(11) { animation-delay: 0.55s; }
 .film-card:nth-child(12) { animation-delay: 0.60s; }
 
-/* Отражение снизу */
+/* ✨ Отражение снизу — золотое */
 .film-card::after {
   content: '';
   position: absolute;
@@ -324,20 +412,20 @@ input[type="range"]::-moz-range-thumb {
   left: 5%;
   width: 90%;
   height: 20px;
-  background: linear-gradient(to bottom, var(--glass-border), transparent);
+  background: linear-gradient(to bottom, rgba(168, 133, 64, 0.2), transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
   filter: blur(8px);
 }
 
 .film-card:hover::after {
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
 .film-card:hover {
   transform: perspective(800px) rotateX(2deg) translateY(-8px);
-  border-color: var(--neon-cyan);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-color: var(--gold);
+  box-shadow: 0 20px 60px rgba(168, 133, 64, 0.1);
 }
 
 .film-card img {
@@ -368,18 +456,20 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
 }
 
-/* ===== РЕЙТИНГ В КАРТОЧКЕ ===== */
+/* ===== РЕЙТИНГ В КАРТОЧКЕ — золото ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
   font-variant-numeric: tabular-nums;
   margin-top: 6px;
   padding: 0;
   background: none;
   border-radius: 0;
   letter-spacing: -0.02em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
 }
 
 .votes-count {
@@ -389,6 +479,52 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* ============================================================
+   🎯 ПОЛЗУНКИ (оценки) — золото
+   ============================================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold));
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 24px rgba(168, 133, 64, 0.5), 0 0 60px rgba(124, 58, 237, 0.1);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
+}
+
+/* ✨ Выделение текста — золото */
+::selection {
+  background: rgba(168, 133, 64, 0.2);
+  color: var(--text-primary);
 }
 
 
