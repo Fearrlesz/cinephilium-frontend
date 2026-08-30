@@ -1,176 +1,123 @@
-/* ============================================================
-   ROOT VARIABLES — стекло + киберпанк
-   ============================================================ */
-:root {
-  /* Dark base */
-  --bg-deep: #0a0a12;
-  --bg-glass: rgba(20, 20, 40, 0.55);
-  --bg-glass-hover: rgba(30, 30, 60, 0.7);
-  
-  /* Text */
-  --text-primary: #f0f0ff;
-  --text-secondary: rgba(200, 200, 240, 0.6);
-  --text-muted: rgba(200, 200, 240, 0.35);
-  
-  /* Neon accents */
-  --neon-purple: #7c3aed;
-  --neon-cyan: #22d3ee;
-  --neon-pink: #ec4899;
-  --neon-glow: rgba(124, 58, 237, 0.15);
-  --neon-cyan-glow: rgba(34, 211, 238, 0.1);
-  
-  /* Glass */
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-border-hover: rgba(255, 255, 255, 0.12);
-  --glass-blur: 24px;
-  
-  /* Fonts */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-}
-
-/* ============================================================
-   GLOBAL RESET & BASE
-   ============================================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+html, body, #root {
+  height: 100%;
 }
 
 body {
-  background: var(--bg-deep);
-  color: var(--text-primary);
   font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 1.6;
+  background-color: #07070a;
+  color: #e8e4dd;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ✨ Film grain — совместимость с киберпанком */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-deep);
+
+/* 🎯 Ползунки — золото + неон */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-dim), var(--color-gold));
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--neon-purple);
-  border-radius: 10px;
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--color-gold-bright), var(--color-gold));
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-cyan);
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 24px rgba(168, 133, 64, 0.5), 0 0 60px rgba(124, 58, 237, 0.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 12px rgba(168, 133, 64, 0.3);
+}
+
+/* 📜 Скроллы — неон */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neon-purple) transparent;
+}
+*::-webkit-scrollbar { width: 4px; height: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--color-neon-purple); border-radius: 10px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--color-neon-cyan); }
+
+/* ✨ Выделение — золото */
+::selection {
+  background: rgba(168, 133, 64, 0.2);
+  color: #e8e4dd;
 }
 
 /* ============================================================
-   CONTAINER
+   🥃 СТЕКЛЯННЫЙ КОНТЕЙНЕР (общий класс)
    ============================================================ */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
+.glass {
+  background: var(--color-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* ============================================================
-   HEADER — стеклянный
-   ============================================================ */
-.header {
-  position: sticky;
-  top: 12px;
-  z-index: 100;
-  margin: 0 20px 40px;
-  padding: 14px 28px;
-  border-radius: 20px;
-  
-  background: linear-gradient(135deg,
-    rgba(20, 20, 40, 0.6) 0%,
-    rgba(40, 20, 60, 0.4) 50%,
-    rgba(20, 30, 50, 0.6) 100%
-  );
-  background-size: 200% 200%;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  
-  box-shadow: 
-    0 8px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  animation: liquidShift 20s ease-in-out infinite;
+.glass:hover {
+  border-color: var(--color-glass-border-hover);
+  background: rgba(25, 25, 50, 0.6);
 }
 
-@keyframes liquidShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* ===== ЗАГОЛОВОК (ОБЪЕДИНЁННЫЙ, БЕЗ КОНФЛИКТОВ) ===== */
-.header h1 {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin: 0;
-  
-  /* ✨ ГОЛОГРАФИЧЕСКИЙ ПЕРЕЛИВ */
+/* 🎨 Анимация перелива для заголовков */
+.holographic {
   background: linear-gradient(135deg, 
-    var(--text-primary) 20%, 
-    var(--neon-cyan) 35%, 
-    var(--neon-purple) 55%, 
-    var(--neon-cyan) 75%, 
-    var(--text-primary) 90%
+    #e8e4dd 20%, 
+    var(--color-neon-cyan) 35%, 
+    var(--color-neon-purple) 55%, 
+    var(--color-gold-bright) 75%, 
+    #e8e4dd 90%
   );
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holographicTitle 5s ease-in-out infinite;
-  
-  /* ✨ СВЕЧЕНИЕ */
-  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.1));
+  animation: holographicShift 6s ease-in-out infinite;
 }
 
-@keyframes holographicTitle {
-  0% { background-position: 0% 50%; }
+@keyframes holographicShift {
+  0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
-/* ✨ ТОЧКА ПОСЛЕ НАЗВАНИЯ */
-.header h1::after {
-  content: '•';
-  display: inline-block;
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: dotBlink 1.5s ease-in-out infinite;
-  margin-left: 6px;
-  font-size: 26px;
-}
-
-@keyframes dotBlink {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+/* 📦 Базовый контейнер */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 /* ============================================================
