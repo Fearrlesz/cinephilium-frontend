@@ -4580,101 +4580,181 @@ textarea {
 
 
 /* ============================================
-   УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА (подушка)
+   УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА (подушка) — ПРЕМИУМ
    ============================================ */
+
+/* Базовые переменные для карточек */
+:root {
+  --radius-xl: 20px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --spacing-lg: 28px;
+  --spacing-md: 20px;
+  --spacing-sm: 16px;
+  --transition-smooth: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --shadow-deep: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-card-3d: 0 12px 40px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-inset-3d: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
 .glass-card,
 .criteria-block,
 .vibe-block {
-  background: var(--bg-glass);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: linear-gradient(160deg, 
+    rgba(20, 20, 40, 0.75) 0%,
+    rgba(12, 12, 30, 0.85) 40%,
+    rgba(8, 8, 20, 0.9) 100%
+  );
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  padding: var(--spacing);
-  margin-bottom: var(--spacing);
-  transition: all var(--transition);
-  box-shadow: var(--shadow-card), var(--shadow-inset-light);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  transition: all var(--transition-smooth);
+  box-shadow: 
+    var(--shadow-card-3d),
+    var(--shadow-inset-3d),
+    0 0 40px rgba(168, 133, 64, 0.02);
   position: relative;
   overflow: hidden;
   width: 100%;
   max-width: 100%;
+  transform: perspective(1200px) rotateX(0deg) rotateY(0deg);
+  transform-style: preserve-3d;
 }
 
-/* Лёгкое свечение по краям (менее агрессивное) */
+/* ✨ Золотая полоса сверху */
+.glass-card::after,
+.criteria-block::after,
+.vibe-block::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.15;
+  transition: opacity var(--transition-smooth);
+}
+
+.glass-card:hover::after,
+.criteria-block:hover::after,
+.vibe-block:hover::after {
+  opacity: 0.4;
+}
+
+/* 🌟 Свечение по краям — золото + неон */
 .glass-card::before,
 .criteria-block::before,
 .vibe-block::before {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: var(--radius);
-  padding: 1px;
-  background: conic-gradient(from 0deg, transparent, var(--neon-purple), transparent, var(--neon-cyan), transparent);
+  border-radius: var(--radius-xl);
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    var(--gold) 10%,
+    var(--gold-bright) 20%,
+    var(--neon-purple) 35%,
+    transparent 50%,
+    var(--neon-cyan) 65%,
+    var(--gold) 80%,
+    transparent 100%
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.08;
-  transition: opacity var(--transition);
+  opacity: 0.06;
+  transition: all var(--transition-smooth);
   pointer-events: none;
+  animation: borderGlow 8s linear infinite;
+}
+
+@keyframes borderGlow {
+  to { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
 
 .glass-card:hover::before,
 .criteria-block:hover::before,
 .vibe-block:hover::before {
-  opacity: 0.25;
+  opacity: 0.35;
 }
 
+/* 🎯 3D-эффект при ховере */
 .glass-card:hover,
 .criteria-block:hover,
 .vibe-block:hover {
-  border-color: var(--glass-border-hover);
-  background: var(--bg-glass-hover);
-  box-shadow: var(--shadow-card-hover), var(--shadow-inset-light);
-  transform: translateY(-3px);
-}
-
-/* Усиленная 3D-подушка: дополнительная внутренняя тень и градиент фона */
-.glass-card,
-.criteria-block,
-.vibe-block {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(18, 18, 40, 0.6));
+  border-color: var(--gold);
+  background: linear-gradient(160deg, 
+    rgba(25, 25, 50, 0.8) 0%,
+    rgba(16, 16, 35, 0.85) 40%,
+    rgba(10, 10, 22, 0.9) 100%
+  );
   box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.7),
-    0 4px 12px rgba(124, 58, 237, 0.08),
-    inset 0 2px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -4px 12px rgba(0, 0, 0, 0.4);
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    0 8px 32px rgba(168, 133, 64, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -4px 24px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(168, 133, 64, 0.02);
+  transform: perspective(1200px) rotateX(2deg) rotateY(1deg) translateY(-4px) scale(1.005);
 }
 
-/* Разделитель между блоками (неоновая линия, но приглушённая) */
+/* Внутренняя подсветка при ховере */
+.glass-card:hover .block-inner,
+.criteria-block:hover .block-inner,
+.vibe-block:hover .block-inner {
+  background: radial-gradient(ellipse at 30% 20%, rgba(168, 133, 64, 0.03), transparent 60%);
+}
+
+/* Разделитель между блоками — золото */
 .block-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-purple), var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--neon-purple), var(--gold), transparent);
   opacity: 0.15;
-  margin: calc(var(--spacing) * 0.5) 0 calc(var(--spacing) * 0.8) 0;
+  margin: calc(var(--spacing-lg) * 0.4) 0 calc(var(--spacing-lg) * 0.6) 0;
   border: none;
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.03);
 }
 
 /* ============================================
-   ЗАГОЛОВКИ БЛОКОВ (менее кричащий неон)
+   ЗАГОЛОВКИ БЛОКОВ — голографические, золото
    ============================================ */
 .genre-block h3,
 .criteria-block h4,
 .vibe-block label {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-weight: 600;
-  font-size: 1.15rem;
+  font-weight: 700;
+  font-size: 1.2rem;
   margin: 0 0 0.75rem 0;
   color: var(--text-primary);
   letter-spacing: -0.01em;
-  background: linear-gradient(135deg, #f0f0ff, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+  background: linear-gradient(135deg, 
+    var(--text-primary) 10%,
+    var(--gold) 30%,
+    var(--gold-bright) 45%,
+    var(--neon-purple) 65%,
+    var(--neon-cyan) 80%,
+    var(--text-primary) 100%
+  );
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holographicShift 12s ease-in-out infinite;
+  animation: holographicShift 10s ease-in-out infinite;
   display: inline-block;
-  padding-bottom: 4px;
-  border-bottom: 2px solid rgba(124, 58, 237, 0.12);
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(168, 133, 64, 0.12);
+  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.04));
 }
 
 @keyframes holographicShift {
@@ -4683,12 +4763,12 @@ textarea {
 }
 
 /* ============================================
-   SELECT (жанр)
+   SELECT (жанр) — премиум
    ============================================ */
 .genre-block select {
   width: 100%;
   max-width: 100%;
-  padding: 14px 18px;
+  padding: 16px 22px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
   border-radius: 60px;
@@ -4697,145 +4777,233 @@ textarea {
   font-size: 1rem;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%237c3aed' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 20px center;
+  background-position: right 22px center;
   cursor: pointer;
-  transition: border-color var(--transition), box-shadow var(--transition);
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.05);
+  transition: all var(--transition-smooth);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.genre-block select:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .genre-block select:focus {
   outline: none;
-  border-color: var(--neon-purple);
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12), 0 0 20px rgba(124, 58, 237, 0.06);
+  border-color: var(--gold);
+  box-shadow: 
+    0 0 0 4px rgba(168, 133, 64, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.04),
+    0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .genre-block select option {
   background: var(--bg-deep);
   color: var(--text-primary);
+  padding: 12px;
 }
 
 /* ============================================
-   3D-СЛАЙДЕРЫ (крупные, объёмные, не вылезают)
+   3D-СЛАЙДЕРЫ — крупные, объёмные, премиум
    ============================================ */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 8px;
+  height: 6px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.06);
   outline: none;
-  transition: background 0.2s;
+  transition: all 0.2s;
   cursor: pointer;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
   max-width: 100%;
   width: 100%;
 }
 
-/* Общий стиль для бегунка (thumb) — крупный, 3D */
+/* Общий стиль для бегунка (thumb) — крупный, 3D, золотой */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
   transition: all 0.15s;
-  margin-top: -10px;
+  margin-top: -12px;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.15);
+  transform: scale(1.15);
+  box-shadow: 
+    0 6px 30px rgba(168, 133, 64, 0.5),
+    0 0 40px rgba(168, 133, 64, 0.15),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(255, 255, 255, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.95);
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 input[type="range"]::-moz-range-track {
-  height: 8px;
-  border-radius: 8px;
+  height: 6px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Заполнение трека через градиент (управляется JS) */
+/* Заполнение трека через градиент — золото */
 input[type="range"] {
-  background: linear-gradient(to right, var(--neon-purple) 0%, var(--neon-purple) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
-/* Для слайдеров весов (неон-циан, приглушённый) */
+/* Для слайдеров весов — золото-циан */
 .weight-slider input[type="range"] {
-  background: linear-gradient(to right, var(--neon-cyan) 0%, var(--neon-cyan) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .weight-slider input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-cyan));
-  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4), 0 0 20px rgba(56, 189, 248, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .weight-slider input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-cyan));
-  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4), 0 0 20px rgba(56, 189, 248, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-/* Для слайдеров критериев (неон-фиолетовый) */
+/* Для слайдеров критериев — золото-пурпур */
 .criterion-slider input[type="range"] {
-  background: linear-gradient(to right, var(--neon-purple) 0%, var(--neon-purple) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .criterion-slider input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .criterion-slider input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-purple));
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-/* Для слайдера вайба (неон-розовый, приглушённый) */
+/* Для слайдера вайба — золото-розовый */
 .vibe-block input[type="range"] {
-  background: linear-gradient(to right, var(--neon-pink) 0%, var(--neon-pink) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .vibe-block input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-pink));
-  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4), 0 0 20px rgba(244, 114, 182, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .vibe-block input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 30% 30%, #ffffff, var(--neon-pink));
-  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4), 0 0 20px rgba(244, 114, 182, 0.1), inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow: 
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 /* Отключённые слайдеры */
 input[type="range"]:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
 input[type="range"]:disabled::-webkit-slider-thumb {
-  background: #555;
+  background: radial-gradient(circle at 35% 30%, #666, #444);
   box-shadow: none;
   border-color: #333;
 }
 
 input[type="range"]:disabled::-moz-range-thumb {
-  background: #555;
+  background: radial-gradient(circle at 35% 30%, #666, #444);
   box-shadow: none;
   border-color: #333;
+}
+
+/* ============================================
+   ДОПОЛНИТЕЛЬНО: АДАПТИВ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+@media (max-width: 768px) {
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .glass-card::before,
+  .criteria-block::before,
+  .vibe-block::before {
+    border-radius: var(--radius-lg);
+  }
+  
+  .genre-block select {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
 }
 
 /* ============================================
