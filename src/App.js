@@ -2509,10 +2509,25 @@ function App() {
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });
 
   const showNotification = useCallback(({ title, message, type = 'success' }) => {
-    setNotification({ isOpen: true, title, message, type });
-    // Auto-close after 5s
-    setTimeout(() => setNotification(prev => ({ ...prev, isOpen: false })), 5000);
-  }, []);
+  // Если уже открыто — обновляем данные, но не создаём новое окно
+  setNotification(prev => {
+    if (prev.isOpen) {
+      return { ...prev, title, message, type };
+    }
+    return { isOpen: true, title, message, type };
+  });
+  
+  // Очищаем старый таймер
+  if (window.notificationTimer) {
+    clearTimeout(window.notificationTimer);
+  }
+  
+  // Устанавливаем новый таймер
+  window.notificationTimer = setTimeout(() => {
+    setNotification(prev => ({ ...prev, isOpen: false }));
+    window.notificationTimer = null;
+  }, 5000);
+}, []);
 
   const closeNotification = useCallback(() => {
     setNotification(prev => ({ ...prev, isOpen: false }));
