@@ -6532,13 +6532,13 @@ button:disabled::before {
 
 /* 🎯 Веса блоков — НОВЫЙ СТИЛЬ */
 .modal-weights {
-  padding: 16px 20px;
+  padding: 18px 20px;
   background: linear-gradient(145deg, 
     rgba(168, 133, 64, 0.03) 0%,
     rgba(20, 20, 40, 0.5) 50%,
     rgba(168, 133, 64, 0.02) 100%
   );
-  border-radius: 14px;
+  border-radius: 18px;
   border: 1px solid rgba(168, 133, 64, 0.06);
   margin: 12px 0 16px;
   transition: all 0.3s ease;
@@ -6555,7 +6555,7 @@ button:disabled::before {
 
 .modal-weights h4 {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -6706,6 +6706,289 @@ button:disabled::before {
   border-color: rgba(168, 133, 64, 0.08);
 }
 
+/* ============================================
+   ПАНЕЛЬ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
+   ============================================ */
+
+.sort-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding: 18px 28px;
+  background: linear-gradient(160deg, 
+    rgba(20, 20, 40, 0.8) 0%,
+    rgba(12, 12, 30, 0.85) 40%,
+    rgba(8, 8, 20, 0.9) 100%
+  );
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  margin-bottom: 24px;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✨ Золотая полоса сверху */
+.sort-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.15;
+  transition: opacity 0.4s ease;
+}
+
+.sort-panel:hover::before {
+  opacity: 0.4;
+}
+
+/* 🌟 Свечение по краям */
+.sort-panel::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    var(--gold) 10%,
+    var(--gold-bright) 20%,
+    var(--neon-purple) 35%,
+    transparent 50%,
+    var(--neon-cyan) 65%,
+    var(--gold) 80%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  animation: borderSpin 8s linear infinite;
+}
+
+.sort-panel:hover::after {
+  opacity: 0.2;
+}
+
+@keyframes borderSpin {
+  to { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ============================================
+   КОНТРОЛЫ СОРТИРОВКИ
+   ============================================ */
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sort-controls label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* 🎯 Селект — премиум */
+.sort-select {
+  padding: 10px 52px 10px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 
+    0 2px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 14px 10px;
+  min-width: 200px;
+  position: relative;
+}
+
+.sort-select:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 
+    0 0 0 4px rgba(168, 133, 64, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.04),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 🎨 Опции селекта */
+.sort-select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+}
+
+.sort-select option:checked {
+  background: rgba(168, 133, 64, 0.15);
+  color: var(--gold-bright);
+}
+
+.sort-select option:hover {
+  background: rgba(168, 133, 64, 0.05);
+}
+
+/* ============================================
+   ИНФОРМАЦИЯ О КОЛИЧЕСТВЕ
+   ============================================ */
+
+.sort-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  padding: 6px 18px;
+  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.sort-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-info span::before {
+  content: '🎬';
+  font-size: 14px;
+}
+
+.sort-info .count-number {
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+}
+
+.sort-info:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(168, 133, 64, 0.02);
+}
+
+/* ============================================
+   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+
+@media (max-width: 768px) {
+  .sort-panel {
+    padding: 16px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    border-radius: 16px;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sort-controls label {
+    font-size: 12px;
+  }
+
+  .sort-select {
+    padding: 12px 52px 12px 18px;
+    font-size: 14px;
+    min-width: unset;
+    width: 100%;
+    background-position: right 18px center;
+  }
+
+  .sort-info {
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .sort-info .count-number {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sort-panel {
+    padding: 14px 16px;
+    border-radius: 14px;
+    gap: 12px;
+  }
+
+  .sort-controls label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .sort-select {
+    padding: 10px 44px 10px 16px;
+    font-size: 13px;
+    background-position: right 14px center;
+    background-size: 12px 8px;
+  }
+
+  .sort-info {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .sort-info .count-number {
+    font-size: 13px;
+  }
+
+  .sort-info span::before {
+    font-size: 12px;
+  }
+}
 /* ============================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ
    ============================================ */
