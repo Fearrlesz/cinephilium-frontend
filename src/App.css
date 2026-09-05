@@ -7573,16 +7573,6 @@ button:disabled::before {
 }
 
 
-/* ============================================
-   ДЕКОРАТИВНЫЙ CSS ДЛЯ САЙТА ОЦЕНКИ ФИЛЬМОВ
-   Эффекты: кинематографичная атмосфера, 
-   неон, голографика, кинолента, звёзды
-   ============================================ */
-
-/* ---------- ИМПОРТ ШРИФТОВ ---------- */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
-
-
 
 /* ---------- КИНОПЛЁНКА (декоративный верхний край) ---------- */
 body::before {
@@ -7638,37 +7628,6 @@ body::before {
 
 
 
-/* ---------- ЗВЁЗДНЫЙ РЕЙТИНГ (декоративный) ---------- */
-.stars-deco {
-  display: flex;
-  gap: 0.25rem;
-  font-size: 2rem;
-  letter-spacing: 0.3rem;
-  position: relative;
-}
-
-.stars-deco .star {
-  color: rgba(255, 215, 0, 0.2);
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.stars-deco .star.filled {
-  color: #ffd700;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-  animation: starPulse 2s ease-in-out infinite;
-}
-
-.stars-deco .star:nth-child(1) { animation-delay: 0s; }
-.stars-deco .star:nth-child(2) { animation-delay: 0.2s; }
-.stars-deco .star:nth-child(3) { animation-delay: 0.4s; }
-.stars-deco .star:nth-child(4) { animation-delay: 0.6s; }
-.stars-deco .star:nth-child(5) { animation-delay: 0.8s; }
-
-@keyframes starPulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)); }
-  50% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)); }
-}
 
 /* ---------- ДЕКОРАТИВНЫЙ ЛАЗЕРНЫЙ ЛУЧ ---------- */
 .laser-beam {
@@ -7787,34 +7746,6 @@ body::before {
 }
 
 
-
-/* ---------- ДЕКОРАТИВНЫЙ РАЗДЕЛИТЕЛЬ ---------- */
-.divider-cinema {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 2rem 0;
-  opacity: 0.4;
-}
-
-.divider-cinema::before,
-.divider-cinema::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
-}
-
-.divider-cinema .icon {
-  font-size: 1.2rem;
-  color: rgba(255, 215, 0, 0.3);
-  animation: spinSlow 10s linear infinite;
-}
-
-@keyframes spinSlow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
 /* ---------- АДАПТИВНОСТЬ ---------- */
 @media (max-width: 768px) {
