@@ -2546,7 +2546,7 @@ input[type="range"]::-moz-range-thumb {
   );
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border-radius: 20px;
+  border-radius: 15px;
   border: 1px solid var(--glass-border);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
   animation: modalSlide 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -3815,20 +3815,7 @@ textarea {
   }
 }
 
-/* ============================================================
-   ДОПОЛНИТЕЛЬНО: РАЗНЫЕ ЦВЕТА ДЛЯ РАЗНЫХ КАРТОЧЕК
-   ============================================================ */
-@media (max-width: 768px) {
-  .films-grid .film-card-link:nth-child(3n+1) .film-card::before {
-    background: linear-gradient(135deg, rgba(168, 133, 64, 0.04), rgba(168, 133, 64, 0.01));
-  }
-  .films-grid .film-card-link:nth-child(3n+2) .film-card::before {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.04), rgba(124, 58, 237, 0.01));
-  }
-  .films-grid .film-card-link:nth-child(3n+3) .film-card::before {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.04), rgba(236, 72, 153, 0.01));
-  }
-}
+
 
 
 /* ============================================================
@@ -5327,112 +5314,8 @@ button:disabled::before {
 }
 
 
-/* ============================================
-   ПАНЕЛЬ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
-   ============================================ */
 
-.sort-panel {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px 24px;
-  padding: 18px 28px;
-  background: linear-gradient(160deg, 
-    rgba(20, 20, 40, 0.8) 0%,
-    rgba(12, 12, 30, 0.85) 40%,
-    rgba(8, 8, 20, 0.9) 100%
-  );
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  margin-bottom: 24px;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 -4px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-/* ✨ Золотая полоса сверху */
-.sort-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 15%;
-  width: 70%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.15;
-  transition: opacity 0.4s ease;
-}
-
-.sort-panel:hover::before {
-  opacity: 0.4;
-}
-
-/* 🌟 Свечение по краям */
-.sort-panel::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 20px;
-  padding: 1.5px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0%,
-    var(--gold) 10%,
-    var(--gold-bright) 20%,
-    var(--neon-purple) 35%,
-    transparent 50%,
-    var(--neon-cyan) 65%,
-    var(--gold) 80%,
-    transparent 100%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-  animation: borderSpin 8s linear infinite;
-}
-
-.sort-panel:hover::after {
-  opacity: 0.2;
-}
-
-@keyframes borderSpin {
-  to { --angle: 360deg; }
-}
-
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-/* Сортировка — контейнер */
-.sort-controls {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.sort-controls label {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 13px;
-}
-
+  
 /* Селект сортировки — премиум */
 .sort-select {
   padding: 10px 48px 10px 20px;
