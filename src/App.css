@@ -7571,3 +7571,261 @@ button:disabled::before {
     background: #666;
     box-shadow: none;
 }
+
+
+/* ============================================
+   ДЕКОРАТИВНЫЙ CSS ДЛЯ САЙТА ОЦЕНКИ ФИЛЬМОВ
+   Эффекты: кинематографичная атмосфера, 
+   неон, голографика, кинолента, звёзды
+   ============================================ */
+
+/* ---------- ИМПОРТ ШРИФТОВ ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+
+
+
+/* ---------- КИНОПЛЁНКА (декоративный верхний край) ---------- */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #1a1a2e 0px,
+    #1a1a2e 20px,
+    #2d2d44 20px,
+    #2d2d44 24px,
+    #1a1a2e 24px,
+    #1a1a2e 40px,
+    #ffd700 40px,
+    #ffd700 44px,
+    #1a1a2e 44px,
+    #1a1a2e 60px
+  );
+  z-index: 999;
+  box-shadow: 0 2px 30px rgba(255, 215, 0, 0.15);
+  animation: filmPerforation 4s linear infinite;
+}
+
+@keyframes filmPerforation {
+  0% { background-position: 0 0; }
+  100% { background-position: 60px 0; }
+}
+
+
+
+/* ---------- ДЕКОРАТИВНЫЙ ПРОЖЕКТОР (световое пятно) ---------- */
+.projector-spot {
+  position: fixed;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 60vh;
+  background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: projectorPulse 8s ease-in-out infinite;
+}
+
+@keyframes projectorPulse {
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+}
+
+
+
+/* ---------- ЗВЁЗДНЫЙ РЕЙТИНГ (декоративный) ---------- */
+.stars-deco {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 2rem;
+  letter-spacing: 0.3rem;
+  position: relative;
+}
+
+.stars-deco .star {
+  color: rgba(255, 215, 0, 0.2);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.stars-deco .star.filled {
+  color: #ffd700;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  animation: starPulse 2s ease-in-out infinite;
+}
+
+.stars-deco .star:nth-child(1) { animation-delay: 0s; }
+.stars-deco .star:nth-child(2) { animation-delay: 0.2s; }
+.stars-deco .star:nth-child(3) { animation-delay: 0.4s; }
+.stars-deco .star:nth-child(4) { animation-delay: 0.6s; }
+.stars-deco .star:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes starPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)); }
+}
+
+/* ---------- ДЕКОРАТИВНЫЙ ЛАЗЕРНЫЙ ЛУЧ ---------- */
+.laser-beam {
+  position: fixed;
+  bottom: 20%;
+  right: -10%;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 100, 0.6), rgba(255, 215, 0, 0.3));
+  transform: rotate(-25deg);
+  filter: blur(2px);
+  animation: laserSweep 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.laser-beam::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8), transparent);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+@keyframes laserSweep {
+  0%, 100% { transform: rotate(-25deg) translateX(0); opacity: 0.3; }
+  50% { transform: rotate(-15deg) translateX(-100px); opacity: 0.8; }
+}
+
+/* ---------- КИНОКАДР (рамка с углами) ---------- */
+.film-frame {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 215, 0, 0.08);
+  border-radius: 16px;
+}
+
+.film-frame::before,
+.film-frame::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-color: rgba(255, 215, 0, 0.25);
+  border-style: solid;
+  border-width: 0;
+  transition: all 0.4s ease;
+}
+
+.film-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.film-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}
+
+.film-frame:hover::before,
+.film-frame:hover::after {
+  border-color: rgba(255, 215, 0, 0.6);
+  width: 50px;
+  height: 50px;
+}
+
+
+
+/* ---------- ДЕКОРАТИВНАЯ ПЫЛЬЦА (частицы) ---------- */
+.dust-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.dust-particles span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
+  animation: dustFloat 20s linear infinite;
+}
+
+.dust-particles span:nth-child(1) { left: 10%; animation-duration: 18s; animation-delay: 0s; }
+.dust-particles span:nth-child(2) { left: 25%; animation-duration: 22s; animation-delay: 2s; width: 5px; height: 5px; }
+.dust-particles span:nth-child(3) { left: 45%; animation-duration: 16s; animation-delay: 4s; }
+.dust-particles span:nth-child(4) { left: 65%; animation-duration: 24s; animation-delay: 1s; width: 4px; height: 4px; }
+.dust-particles span:nth-child(5) { left: 80%; animation-duration: 20s; animation-delay: 3s; }
+.dust-particles span:nth-child(6) { left: 90%; animation-duration: 19s; animation-delay: 5s; width: 2px; height: 2px; }
+
+@keyframes dustFloat {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+}
+
+/* ---------- ВИНЬЕТКА (края затемнены) ---------- */
+.vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.5) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+
+/* ---------- ДЕКОРАТИВНЫЙ РАЗДЕЛИТЕЛЬ ---------- */
+.divider-cinema {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  opacity: 0.4;
+}
+
+.divider-cinema::before,
+.divider-cinema::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+}
+
+.divider-cinema .icon {
+  font-size: 1.2rem;
+  color: rgba(255, 215, 0, 0.3);
+  animation: spinSlow 10s linear infinite;
+}
+
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ---------- АДАПТИВНОСТЬ ---------- */
+@media (max-width: 768px) {
+  .rating-neon {
+    font-size: 2.5rem;
+  }
+  .stars-deco {
+    font-size: 1.5rem;
+  }
+  .projector-spot {
+    width: 100vw;
+    height: 40vh;
+  }
+}
