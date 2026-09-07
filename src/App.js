@@ -1787,7 +1787,7 @@ const weightsValid = weightsSum === 100;
     {block.criteria.map(crit => (
       <div key={crit.key} className="criterion-slider">
         <label title={crit.hint}>
-          {crit.name} <span className="hint-icon">❓</span>
+          {crit.name} <span className="hint-icon"> </span>
         </label>
         <input type="range" min="1" max="10" step="1"
           value={scores[block.key][crit.key]}
