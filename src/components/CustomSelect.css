@@ -250,21 +250,81 @@
   }
 }
 
+
 /* ============================================================
-   ДОПОЛНИТЕЛЬНО: УБИРАЕМ СИНЕЕ СВЕЧЕНИЕ
+   УБИРАЕМ СИНЕЕ СВЕЧЕНИЕ ПРИ КЛИКЕ/ФОКУСЕ
    ============================================================ */
+
+/* Полностью убираем у всех элементов */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Убираем синее свечение у табов */
+.sort-tab {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
 
 .sort-tab:focus {
   outline: none !important;
   box-shadow: none !important;
 }
 
+.sort-tab:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Убираем у всех кликабельных элементов */
+button:focus,
+button:active,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+div[role="button"]:focus,
+div[role="button"]:active,
+div[role="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для всех элементов с табиндаксом */
+[tabindex]:focus,
+[tabindex]:active,
+[tabindex]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для select и input */
+select:focus,
+select:active,
+input:focus,
+input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для всего документа */
+body {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Оставляем только кастомный фокус для клавиатуры (accessibility) */
 .sort-tab:focus-visible {
   outline: 2px solid var(--gold) !important;
   outline-offset: 2px !important;
   border-radius: 8px !important;
-}
-
-.sort-tabs:focus {
-  outline: none !important;
 }
