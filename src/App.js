@@ -742,6 +742,7 @@ function AboutPage() {
           <div className="formula-step">
             <span className="step-number">2.</span>
             <span>Технический балл (T) = (среднее_блока1 × (вес1/100) + … + среднее_блока5 × (вес5/100)) × {TECHNICAL_MULTIPLIER}</span>
+           </div>
           <div className="formula-step">
             <span className="step-number">3.</span>
             <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
