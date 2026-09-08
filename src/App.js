@@ -659,9 +659,9 @@ function AboutPage() {
         </p>
         
         <div className="genre-weights-grid">
-          {Object.entries(GENRE_LABELS).map(([key, label]) => {
-            const weights = PRESET_WEIGHTS[key as keyof typeof PRESET_WEIGHTS];
-            const isHybrid = key === 'hybrid';
+  {Object.entries(GENRE_LABELS).map(([key, label]) => {
+    const weights = PRESET_WEIGHTS[key as keyof typeof PRESET_WEIGHTS];
+    const isHybrid = key === 'hybrid';
             
             return (
               <div key={key} className={`genre-weight-item ${isHybrid ? 'hybrid-item' : ''}`}>
