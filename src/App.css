@@ -7772,20 +7772,77 @@ button:disabled::before {
 }
 
 /* ============================================================
-   БЛОК РУЧНОЙ НАСТРОЙКИ
+   ★ БЛОК РУЧНОЙ НАСТРОЙКИ — УНИКАЛЬНОЕ ВЫДЕЛЕНИЕ ★
    ============================================================ */
 
 .about-genre-weights .hybrid-note {
-  padding: 16px 22px;
+  position: relative;
+  padding: 20px 28px;
   background: rgba(34, 211, 238, 0.02);
   border-radius: 14px;
   border: 1px dashed rgba(34, 211, 238, 0.06);
   transition: all 0.3s ease;
+
+  /* Уникальный акцент: двойная рамка и имитация свечения */
+  box-shadow: 
+    0 0 0 1px rgba(34, 211, 238, 0.02),
+    0 8px 24px rgba(34, 211, 238, 0.02);
+}
+
+/* Декоративный уголок — фирменный знак блока */
+.about-genre-weights .hybrid-note::before {
+  content: "⚙";
+  position: absolute;
+  top: -10px;
+  right: 18px;
+  font-size: 18px;
+  color: rgba(34, 211, 238, 0.15);
+  transition: all 0.4s ease;
+  transform: rotate(0deg);
+  filter: blur(0.5px);
+}
+
+/* Левый акцентный бордер */
+.about-genre-weights .hybrid-note::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: -1px;
+  bottom: 12px;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(34, 211, 238, 0.0),
+    rgba(34, 211, 238, 0.25),
+    rgba(34, 211, 238, 0.0)
+  );
+  border-radius: 0 3px 3px 0;
+  transition: all 0.4s ease;
 }
 
 .about-genre-weights .hybrid-note:hover {
-  border-color: rgba(34, 211, 238, 0.10);
+  border-color: rgba(34, 211, 238, 0.15);
   background: rgba(34, 211, 238, 0.03);
+  
+  box-shadow: 
+    0 0 0 1px rgba(34, 211, 238, 0.06),
+    0 8px 32px rgba(34, 211, 238, 0.04),
+    inset 0 0 40px rgba(34, 211, 238, 0.01);
+}
+
+.about-genre-weights .hybrid-note:hover::before {
+  color: rgba(34, 211, 238, 0.30);
+  transform: rotate(60deg) scale(1.05);
+}
+
+.about-genre-weights .hybrid-note:hover::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(34, 211, 238, 0.0),
+    rgba(34, 211, 238, 0.50),
+    rgba(34, 211, 238, 0.0)
+  );
+  width: 4px;
 }
 
 .about-genre-weights .hybrid-note p {
@@ -7794,11 +7851,17 @@ button:disabled::before {
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.6;
+  
+  /* Небольшой отступ от левого бордера */
+  padding-left: 4px;
 }
 
 .about-genre-weights .hybrid-note p strong {
   color: var(--neon-cyan);
   font-weight: 600;
+  
+  /* Дополнительное притяжение взгляда */
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.08);
 }
 
 /* ============================================================
