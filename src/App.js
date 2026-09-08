@@ -667,6 +667,56 @@ function AboutPage() {
             <span className="step-number">1.</span>
             <span>По каждому блоку считается среднее арифметическое его критериев</span>
           </div>
+
+                 {/* === НОВЫЙ БЛОК: ЖАНРОВЫЕ ВЕСА === */}
+      <div className="about-genre-weights glass-card">
+        <h2>⚖️ Жанровые веса</h2>
+        <p>
+          В системе предусмотрены <strong>жанровые пресеты</strong>, которые автоматически распределяют веса между пятью блоками оценки.
+          Это позволяет учитывать особенности жанра: например, в мюзикле звук важнее визуала, а в байопике сценарий и персонажи выходят на первый план.
+        </p>
+
+        <div className="preset-list">
+          {Object.entries(GENRE_LABELS).map(([key, label]) => {
+            if (key === 'hybrid') return null; // обработаем отдельно
+            const weights = PRESET_WEIGHTS[key] || [];
+            const total = weights.reduce((a, b) => a + b, 0);
+            return (
+              <div key={key} className="preset-item">
+                <div className="preset-header">
+                  <span className="preset-name">{label}</span>
+                  <span className="preset-total">{total}%</span>
+                </div>
+                <div className="preset-bars">
+                  {weights.map((w, idx) => (
+                    <div
+                      key={idx}
+                      className="preset-bar-row"
+                      title={`${BLOCK_NAMES[idx]}: ${w}%`}
+                    >
+                      <span className="preset-bar-label">{BLOCK_NAMES[idx]}</span>
+                      <div className="preset-bar-container">
+                        <div
+                          className="preset-bar"
+                          style={{ width: `${w}%` }}
+                        />
+                      </div>
+                      <span className="preset-bar-value">{w}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="hybrid-note">
+          <p>
+            <strong>🎛 Свои веса</strong> — вы можете вручную задать распределение весов под конкретный фильм, если ни один из жанровых пресетов не подходит.
+          </p>
+        </div>
+      </div>
+           
           <div className="formula-step">
             <span className="step-number">2.</span>
             <span>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) × {TECHNICAL_MULTIPLIER}</span>
