@@ -627,7 +627,18 @@ function Header({ user, onLogout }) {
 // Due to length, pages are implemented with cleaned syntax and the original logic preserved.
 // ============================================================
 
+import { Link } from 'react-router-dom';
+import { CRITERIA_CONFIG } from '../constants/criteria';
+import { TECHNICAL_MULTIPLIER, VIBE_STEP, MIN_SCORE, MAX_SCORE } from '../constants/scoring';
+import { GENRE_LABELS, PRESET_WEIGHTS } from '../constants/genreWeights';
+
 function AboutPage() {
+  // Helper to format weight arrays
+  const formatWeights = (weights: number[] | null) => {
+    if (!weights) return '🎛 Индивидуальная настройка';
+    return weights.map(w => `${w}%`).join(' · ');
+  };
+
   return (
     <div className="container about-page">
       <Link to="/" className="back-btn">← На главную</Link>
@@ -644,10 +655,76 @@ function AboutPage() {
         </p>
       </div>
 
+      {/* Genre Weights Section */}
+      <div className="about-genre-weights glass-card">
+        <h2>🎭 Жанровые пресеты весов</h2>
+        <p className="about-genre-desc">
+          Для каждого жанра мы предлагаем оптимальное распределение весов между блоками критериев.
+          Вы можете выбрать пресет или настроить веса вручную в режиме <strong>«Свои веса»</strong>.
+        </p>
+        
+        <div className="genre-weights-grid">
+          {Object.entries(GENRE_LABELS).map(([key, label]) => {
+            const weights = PRESET_WEIGHTS[key as keyof typeof PRESET_WEIGHTS];
+            const isHybrid = key === 'hybrid';
+            
+            return (
+              <div key={key} className={`genre-weight-item ${isHybrid ? 'hybrid-item' : ''}`}>
+                <div className="genre-weight-label">{label}</div>
+                <div className="genre-weight-values">
+                  {isHybrid ? (
+                    <span className="hybrid-badge">🎛 Индивидуальные веса</span>
+                  ) : (
+                    <div className="weight-bars">
+                      {weights?.map((weight, idx) => (
+                        <div key={idx} className="weight-bar-wrapper">
+                          <div 
+                            className="weight-bar" 
+                            style={{ height: `${weight}%` }}
+                            title={`Блок ${idx + 1}: ${weight}%`}
+                          />
+                          <span className="weight-value">{weight}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="weight-blocks-legend">
+                  <span>Сценарий</span>
+                  <span>Актёры</span>
+                  <span>Визуал</span>
+                  <span>Звук</span>
+                  <span>Атмосфера</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="genre-weights-note">
+          <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '16px' }}>
+            💡 <strong>Драма</strong> и <strong>Авторское фэнтези</strong> делают упор на сценарий и персонажей.
+            <br />
+            <strong>Экшн</strong> и <strong>Блокбастерное фэнтези</strong> — на визуальный ряд.
+            <br />
+            <strong>Хоррор</strong> балансирует между сюжетом и звуковым оформлением.
+            <br />
+            <strong>Мюзикл</strong> — звук превыше всего.
+            <br />
+            <strong>Байопик</strong> — история и актёрская игра.
+          </p>
+        </div>
+      </div>
+
       <div className="about-blocks">
         {CRITERIA_CONFIG.map((block, idx) => (
           <div key={block.key} className="about-block glass-card">
-            <h2 className="about-block-title neon-text">{block.name}</h2>
+            <h2 className="about-block-title neon-text">
+              {block.name}
+              <span className="block-weight-hint">
+                Вес: {PRESET_WEIGHTS.drama[idx]}% (в драме)
+              </span>
+            </h2>
             <div className="about-criteria">
               {block.criteria.map(crit => (
                 <div key={crit.key} className="about-criterion">
@@ -694,6 +771,8 @@ function AboutPage() {
     </div>
   );
 }
+
+export default AboutPage;
 
 function TopUsersPage() {
   const [users, setUsers] = useState([]);
