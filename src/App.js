@@ -627,7 +627,7 @@ function Header({ user, onLogout }) {
 // Due to length, pages are implemented with cleaned syntax and the original logic preserved.
 // ============================================================
 
-import { Link } from 'react-router-dom';
+
 import { CRITERIA_CONFIG } from '../constants/criteria';
 import { TECHNICAL_MULTIPLIER, VIBE_STEP, MIN_SCORE, MAX_SCORE } from '../constants/scoring';
 import { GENRE_LABELS, PRESET_WEIGHTS } from '../constants/genreWeights';
