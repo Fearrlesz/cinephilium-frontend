@@ -19,6 +19,8 @@ import axios from 'axios';
 import './App.css';
 import CustomSelect from './components/CustomSelect'; // 👈 НОВЫЙ ИМПОРТ
 import './App.css';
+
+
 /* === БЛОК C1: Конфиг критериев (полная замена старых констант) === */
 export const CRITERIA_CONFIG = [
   { key:'scenario', name:'📋 Сценарий и драматургия', criteria:[
@@ -1146,27 +1148,27 @@ const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
         {searchError && <div className="error-msg">{searchError}</div>}
       </div>
 
-         <div className="sort-panel glass-card">
-  <div className="sort-controls">
-    <label>Сортировать по:</label>
-    <CustomSelect
-      value={sortType}
-      onChange={(newSort) => {
-        setSortType(newSort);
-        setPage(1);
-      }}
-      options={[
-        { value: 'technical', label: '🎯 Техническая оценка' },
-        { value: 'vibe', label: '💫 Вайб' },
-        { value: 'combined', label: '⭐ Общая оценка' },
-      ]}
-      placeholder="Выберите сортировку"
-    />
+         <div className="sort-tabs">
+  <div 
+    className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`}
+    onClick={() => { setSortType('technical'); setPage(1); }}
+  >
+    <span className="tab-icon">🎯</span>
+    <span className="tab-label">Техническая</span>
   </div>
-  <div className="sort-info">
-    {films.length > 0 && (
-      <span>Показано {films.length} фильмов</span>
-    )}
+  <div 
+    className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`}
+    onClick={() => { setSortType('vibe'); setPage(1); }}
+  >
+    <span className="tab-icon">💫</span>
+    <span className="tab-label">Вайб</span>
+  </div>
+  <div 
+    className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`}
+    onClick={() => { setSortType('combined'); setPage(1); }}
+  >
+    <span className="tab-icon">⭐</span>
+    <span className="tab-label">Общая</span>
   </div>
 </div>
 
