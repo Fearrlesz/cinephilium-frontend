@@ -17,7 +17,7 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
-
+import CustomSelect from './CustomSelect';
 /* === БЛОК C1: Конфиг критериев (полная замена старых констант) === */
 export const CRITERIA_CONFIG = [
   { key:'scenario', name:'📋 Сценарий и драматургия', criteria:[
@@ -660,7 +660,7 @@ function AboutPage() {
         ))}
       </div>
 
-           {/* ============================================================
+     {/* ============================================================
      БЛОК: ЖАНРОВЫЕ ВЕСА
      ============================================================ */}
 <div className="about-genre-weights glass-card">
@@ -978,7 +978,7 @@ function HomePage() {
   const [totalPages, setTotalPages] = useState(1);
   const [user, setUser] = useState(null);
   const [searchError, setSearchError] = useState('');
-  const [sortType, setSortType] = useState('technical');
+  const [sortType, setSortType] = useState('technical'); 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
 
@@ -1144,30 +1144,29 @@ const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
         {searchError && <div className="error-msg">{searchError}</div>}
       </div>
 
-         {/* 👇 ВСТАВЬ ЭТОТ БЛОК ТУТ (ПОСЛЕ hero, ПЕРЕД топ-5) */}
-    <div className="sort-panel glass-card">
-      <div className="sort-controls">
-        <label>Сортировать по:</label>
-        <select 
-          value={sortType} 
-          onChange={(e) => {
-            setSortType(e.target.value);
-            setPage(1);
-          }}
-          className="sort-select"
-        >
-          <option value="technical">🎯 Техническая оценка</option>
-          <option value="vibe">💫 Вайб</option>
-          <option value="combined">⭐ Общая оценка</option>
-        </select>
-      </div>
-      <div className="sort-info">
-        {films.length > 0 && (
-          <span>Показано {films.length} фильмов</span>
-        )}
-      </div>
-    </div>
-    {/* 👆 КОНЕЦ ВСТАВКИ */}
+         <div className="sort-panel glass-card">
+  <div className="sort-controls">
+    <label>Сортировать по:</label>
+    <CustomSelect
+      value={sortType}
+      onChange={(newSort) => {
+        setSortType(newSort);
+        setPage(1);
+      }}
+      options={[
+        { value: 'technical', label: '🎯 Техническая оценка' },
+        { value: 'vibe', label: '💫 Вайб' },
+        { value: 'combined', label: '⭐ Общая оценка' },
+      ]}
+      placeholder="Выберите сортировку"
+    />
+  </div>
+  <div className="sort-info">
+    {films.length > 0 && (
+      <span>Показано {films.length} фильмов</span>
+    )}
+  </div>
+</div>
 
       {error && <div className="error-msg">{error}</div>}
 
