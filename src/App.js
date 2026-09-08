@@ -658,43 +658,43 @@ function AboutPage() {
           Вы можете выбрать пресет или настроить веса вручную в режиме <strong>«Свои веса»</strong>.
         </p>
         
-        <div className="genre-weights-grid">
+<div className="genre-weights-grid">
   {Object.entries(GENRE_LABELS).map(([key, label]) => {
     const weights = PRESET_WEIGHTS[key];
     const isHybrid = key === 'hybrid';
-            
-            return (
-              <div key={key} className={`genre-weight-item ${isHybrid ? 'hybrid-item' : ''}`}>
-                <div className="genre-weight-label">{label}</div>
-                <div className="genre-weight-values">
-                  {isHybrid ? (
-                    <span className="hybrid-badge">🎛 Индивидуальные веса</span>
-                  ) : (
-                    <div className="weight-bars">
-                      {weights?.map((weight, idx) => (
-                        <div key={idx} className="weight-bar-wrapper">
-                          <div 
-                            className="weight-bar" 
-                            style={{ height: `${weight}%` }}
-                            title={`Блок ${idx + 1}: ${weight}%`}
-                          />
-                          <span className="weight-value">{weight}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+    
+    return (
+      <div key={key} className={`genre-weight-item ${isHybrid ? 'hybrid-item' : ''}`}>
+        <div className="genre-weight-label">{label}</div>
+        <div className="genre-weight-values">
+          {isHybrid ? (
+            <span className="hybrid-badge">🎛 Индивидуальные веса</span>
+          ) : (
+            <div className="weight-bars">
+              {weights?.map((weight, idx) => (
+                <div key={idx} className="weight-bar-wrapper">
+                  <div 
+                    className="weight-bar" 
+                    style={{ height: `${weight}%` }}
+                    title={`Блок ${idx + 1}: ${weight}%`}
+                  />
+                  <span className="weight-value">{weight}%</span>
                 </div>
-               <div className="weight-blocks-legend">
-  <span>Сценарий</span>
-  <span>Актёры</span>
-  <span>Визуал</span>
-  <span>Звук</span>
-  <span>Стиль</span> 
-</div> 
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          )}
         </div>
+        <div className="weight-blocks-legend">
+          <span>Сценарий</span>
+          <span>Актёры</span>
+          <span>Визуал</span>
+          <span>Звук</span>
+          <span>Стиль</span>
+        </div>
+      </div>
+    );
+  })}
+</div>
         
         <div className="genre-weights-note">
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '16px' }}>
