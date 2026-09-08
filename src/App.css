@@ -7772,225 +7772,98 @@ button:disabled::before {
 }
 
 /* ============================================================
-   ★ БЛОК РУЧНОЙ НАСТРОЙКИ — САМОСТОЯТЕЛЬНЫЙ ★
+   ★ БЛОК РУЧНОЙ НАСТРОЙКИ — УНИКАЛЬНОЕ ВЫДЕЛЕНИЕ ★
    ============================================================ */
 
-.hybrid-note-block {
+.about-genre-weights .hybrid-note {
   position: relative;
-  padding: 24px 32px;
-  margin-top: 28px;
-  background: linear-gradient(145deg, 
-    rgba(34, 211, 238, 0.02) 0%,
-    rgba(20, 20, 40, 0.4) 40%,
-    rgba(34, 211, 238, 0.01) 100%
-  );
-  border-radius: 18px;
-  border: 1px solid rgba(34, 211, 238, 0.06);
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding: 20px 28px;
+  background: rgba(34, 211, 238, 0.02);
+  border-radius: 14px;
+  border: 1px dashed rgba(34, 211, 238, 0.06);
+  transition: all 0.3s ease;
+
+  /* Уникальный акцент: двойная рамка и имитация свечения */
   box-shadow: 
     0 0 0 1px rgba(34, 211, 238, 0.02),
-    0 8px 30px rgba(34, 211, 238, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  overflow: hidden;
+    0 8px 24px rgba(34, 211, 238, 0.02);
 }
 
-/* ✨ Золотая полоса сверху */
-.hybrid-note-block::before {
-  content: '';
+/* Декоративный уголок — фирменный знак блока */
+.about-genre-weights .hybrid-note::before {
+  content: "⚙";
   position: absolute;
-  top: 0;
-  left: 10%;
-  width: 80%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.12;
-  transition: opacity 0.4s ease;
-}
-
-.hybrid-note-block:hover::before {
-  opacity: 0.30;
-}
-
-/* ⚙️ Декоративный уголок */
-.hybrid-note-block .hybrid-icon {
-  position: absolute;
-  top: -8px;
-  right: 20px;
-  font-size: 22px;
-  color: rgba(34, 211, 238, 0.08);
-  transition: all 0.5s ease;
+  top: -10px;
+  right: 18px;
+  font-size: 18px;
+  color: rgba(34, 211, 238, 0.15);
+  transition: all 0.4s ease;
   transform: rotate(0deg);
-  pointer-events: none;
+  filter: blur(0.5px);
 }
 
-.hybrid-note-block:hover .hybrid-icon {
-  color: rgba(34, 211, 238, 0.25);
-  transform: rotate(60deg) scale(1.10);
-}
-
-/* 📍 Акцентный бордер слева */
-.hybrid-note-block .hybrid-accent-line {
+/* Левый акцентный бордер */
+.about-genre-weights .hybrid-note::after {
+  content: "";
   position: absolute;
-  top: 16px;
+  top: 12px;
   left: -1px;
-  bottom: 16px;
+  bottom: 12px;
   width: 3px;
   background: linear-gradient(
     to bottom,
     rgba(34, 211, 238, 0.0),
-    rgba(34, 211, 238, 0.20),
-    rgba(168, 133, 64, 0.15),
+    rgba(34, 211, 238, 0.25),
     rgba(34, 211, 238, 0.0)
   );
   border-radius: 0 3px 3px 0;
-  transition: all 0.5s ease;
+  transition: all 0.4s ease;
 }
 
-.hybrid-note-block:hover .hybrid-accent-line {
-  width: 4px;
+.about-genre-weights .hybrid-note:hover {
+  border-color: rgba(34, 211, 238, 0.15);
+  background: rgba(34, 211, 238, 0.03);
+  
+  box-shadow: 
+    0 0 0 1px rgba(34, 211, 238, 0.06),
+    0 8px 32px rgba(34, 211, 238, 0.04),
+    inset 0 0 40px rgba(34, 211, 238, 0.01);
+}
+
+.about-genre-weights .hybrid-note:hover::before {
+  color: rgba(34, 211, 238, 0.30);
+  transform: rotate(60deg) scale(1.05);
+}
+
+.about-genre-weights .hybrid-note:hover::after {
   background: linear-gradient(
     to bottom,
     rgba(34, 211, 238, 0.0),
-    rgba(34, 211, 238, 0.40),
-    rgba(168, 133, 64, 0.25),
+    rgba(34, 211, 238, 0.50),
     rgba(34, 211, 238, 0.0)
   );
+  width: 4px;
 }
 
-/* 🎯 Внутреннее свечение при ховере */
-.hybrid-note-block::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  background: radial-gradient(
-    ellipse at 70% 30%,
-    rgba(34, 211, 238, 0.02),
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-.hybrid-note-block:hover::after {
-  opacity: 1;
-}
-
-.hybrid-note-block:hover {
-  border-color: rgba(34, 211, 238, 0.12);
-  background: linear-gradient(145deg, 
-    rgba(34, 211, 238, 0.04) 0%,
-    rgba(20, 20, 40, 0.5) 40%,
-    rgba(34, 211, 238, 0.02) 100%
-  );
-  box-shadow: 
-    0 0 0 1px rgba(34, 211, 238, 0.04),
-    0 12px 40px rgba(34, 211, 238, 0.04),
-    0 0 60px rgba(34, 211, 238, 0.01),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
-}
-
-/* 📝 Текст */
-.hybrid-note-block p {
+.about-genre-weights .hybrid-note p {
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.7;
-  padding-left: 6px;
-  position: relative;
-  z-index: 1;
+  line-height: 1.6;
+  
+  /* Небольшой отступ от левого бордера */
+  padding-left: 4px;
 }
 
-.hybrid-note-block p strong {
+.about-genre-weights .hybrid-note p strong {
   color: var(--neon-cyan);
   font-weight: 600;
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.06);
-  transition: all 0.3s ease;
-}
-
-.hybrid-note-block:hover p strong {
-  text-shadow: 0 0 30px rgba(34, 211, 238, 0.12);
-}
-
-/* 🎯 Дополнительный акцент: золотая точка */
-.hybrid-note-block .gold-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  margin-right: 8px;
-  box-shadow: 0 0 12px rgba(168, 133, 64, 0.15);
-  vertical-align: middle;
-}
-
-/* ============================================================
-   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
-   ============================================================ */
-
-@media (max-width: 768px) {
-  .hybrid-note-block {
-    padding: 18px 20px;
-    border-radius: 14px;
-    margin-top: 20px;
-  }
-
-  .hybrid-note-block .hybrid-icon {
-    font-size: 18px;
-    top: -6px;
-    right: 14px;
-  }
-
-  .hybrid-note-block p {
-    font-size: 14px;
-    padding-left: 4px;
-  }
-
-  .hybrid-note-block .hybrid-accent-line {
-    top: 12px;
-    bottom: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hybrid-note-block {
-    padding: 14px 16px;
-    border-radius: 12px;
-    margin-top: 16px;
-  }
-
-  .hybrid-note-block .hybrid-icon {
-    font-size: 16px;
-    top: -4px;
-    right: 10px;
-  }
-
-  .hybrid-note-block p {
-    font-size: 13px;
-    line-height: 1.6;
-    padding-left: 2px;
-  }
-
-  .hybrid-note-block .hybrid-accent-line {
-    top: 10px;
-    bottom: 10px;
-    width: 2px;
-  }
-
-  .hybrid-note-block:hover .hybrid-accent-line {
-    width: 3px;
-  }
-
-  .hybrid-note-block .gold-dot {
-    width: 5px;
-    height: 5px;
-    margin-right: 6px;
-  }
-}
   
+  /* Дополнительное притяжение взгляда */
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.08);
+}
+
 /* ============================================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ
    ============================================================ */
