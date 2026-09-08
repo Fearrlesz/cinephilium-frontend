@@ -684,13 +684,13 @@ function AboutPage() {
                     </div>
                   )}
                 </div>
-                <div className="weight-blocks-legend">
-                  <span>Сценарий</span>
-                  <span>Актёры</span>
-                  <span>Визуал</span>
-                  <span>Звук</span>
-                  <span>Атмосфера</span>
-                </div>
+               <div className="weight-blocks-legend">
+  <span>Сценарий</span>
+  <span>Актёры</span>
+  <span>Визуал</span>
+  <span>Звук</span>
+  <span>Стиль</span> 
+</div> 
               </div>
             );
           })}
@@ -741,8 +741,7 @@ function AboutPage() {
           </div>
           <div className="formula-step">
             <span className="step-number">2.</span>
-            <span>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) × {TECHNICAL_MULTIPLIER}</span>
-          </div>
+            <span>Технический балл (T) = (среднее_блока1 × (вес1/100) + … + среднее_блока5 × (вес5/100)) × {TECHNICAL_MULTIPLIER}</span>
           <div className="formula-step">
             <span className="step-number">3.</span>
             <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
