@@ -18,7 +18,6 @@ import {
 import axios from 'axios';
 import './App.css';
 import CustomSelect from './components/CustomSelect'; // 👈 НОВЫЙ ИМПОРТ
-import './App.css';
 import AboutPage from './pages/AboutPage';
 
 
