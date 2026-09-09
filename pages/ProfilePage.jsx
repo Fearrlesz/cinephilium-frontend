@@ -31,34 +31,41 @@ function ProfilePage() {
     loadProfile();
   }, [navigate]);
 
-  const loadAchievementProgress = async (userData) => {
-    try {
-      const response = await api.get('/users/me/achievements');
-      // setAchievementProgress(response.data);
-      if (response.data?.achievements) {
-        const oldAchievements = userData?.achievements || [];
-        const newAchievements = response.data.achievements;
-        const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
-        if (freshAchievements.length > 0) {
-          try {
-            await addEvent({
-              type: 'achievement',
-              user: userData?.nickname || 'Пользователь',
-              film: 'система',
-              filmId: 'system',
-              metadata: { achievements: freshAchievements }
-            });
-          } catch (err) {
-            console.error('Ошибка создания события о достижениях:', err);
-          }
+  const loadAchievementProgress = useCallback(async (userData) => {
+  try {
+    const response = await api.get('/users/me/achievements');
+    if (response.data?.achievements) {
+      const oldAchievements = userData?.achievements || [];
+      const newAchievements = response.data.achievements;
+      const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+      
+      if (freshAchievements.length > 0) {
+        try {
+          await addEvent({
+            type: 'achievement',
+            user: userData?.nickname || 'Пользователь',
+            film: 'система',
+            filmId: 'system',
+            metadata: { achievements: freshAchievements }
+          });
+        } catch (err) {
+          console.error('Ошибка создания события о достижениях:', err);
         }
-        setUser(prev => ({ ...prev, achievements: newAchievements, totalPoints: response.data.totalPoints || prev?.totalPoints }));
       }
-    } catch (err) {
-      console.error('Ошибка загрузки прогресса достижений:', err);
+      
+      // ✅ ИСПРАВЛЕНО: используем userData как основу
+      setUser({
+        ...userData,  // все поля от свежего профиля
+        achievements: newAchievements,
+        totalPoints: response.data.totalPoints || userData?.totalPoints || 0
+      });
     }
-  };
+  } catch (err) {
+    console.error('Ошибка загрузки прогресса достижений:', err);
+  }
+}, [addEvent]);
 
+  
   const loadProfile = async () => {
     try {
       const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
