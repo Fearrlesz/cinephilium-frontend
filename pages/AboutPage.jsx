@@ -32,7 +32,7 @@ function AboutPage() {
             </div>
           </div>
         ))}
-      </div>
+      </div> 
 
       <div className="about-genre-weights glass-card">
         <header className="section-header">
