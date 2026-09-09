@@ -65,30 +65,30 @@ function ProfilePage() {
   }
 }, [addEvent]);
 
-  
-  const loadProfile = async () => {
-    try {
-      const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
-        api.get('/auth/me'),
-        api.get('/ratings/user'),
-        api.get('/reviews/user')
-      ]);
-      const userData = userResponse.data;
-      setUser(userData);
-      setRatings(ratingsResponse.data || []);
-      setReviews(reviewsResponse.data || []);
-      await loadAchievementProgress(userData);
-    } catch (err) {
-      console.error('Ошибка загрузки профиля:', err);
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/login');
-      }
-    } finally {
-      setLoading(false);
+  const loadProfile = useCallback(async () => {
+  setLoading(true);
+  try {
+    const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
+      api.get('/auth/me'),
+      api.get('/ratings/user'),
+      api.get('/reviews/user')
+    ]);
+    const userData = userResponse.data;
+    setUser(userData);
+    setRatings(ratingsResponse.data || []);
+    setReviews(reviewsResponse.data || []);
+    await loadAchievementProgress(userData);
+  } catch (err) {
+    console.error('Ошибка загрузки профиля:', err);
+    if (err.response?.status === 401) {
+      localStorage.removeItem('token');
+      navigate('/login');
     }
-  };
-
+  } finally {
+    setLoading(false);
+  }
+}, [navigate, loadAchievementProgress]);
+  
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
