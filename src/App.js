@@ -18,7 +18,7 @@ import {
 import axios from 'axios';
 import './App.css';                           // 👈 ОДИН РАЗ
 import CustomSelect from './components/CustomSelect';
-import AboutPage from './pages/AboutPage';     // 👈 ТОЛЬКО ЕСЛИ ФАЙЛ СУЩЕСТВУЕТ
+import AboutPage from './pages/AboutPage.jsx';     
 
 
 /* === БЛОК C1: Конфиг критериев (полная замена старых констант) === */
