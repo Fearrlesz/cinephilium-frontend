@@ -16,9 +16,9 @@ import {
   useParams
 } from 'react-router-dom';
 import axios from 'axios';
-import './App.css';
-import CustomSelect from './components/CustomSelect'; // 👈 НОВЫЙ ИМПОРТ
-import AboutPage from './pages/AboutPage';
+import './App.css';                           // 👈 ОДИН РАЗ
+import CustomSelect from './components/CustomSelect';
+import AboutPage from './pages/AboutPage';     // 👈 ТОЛЬКО ЕСЛИ ФАЙЛ СУЩЕСТВУЕТ
 
 
 /* === БЛОК C1: Конфиг критериев (полная замена старых констант) === */
