@@ -19,6 +19,7 @@ import axios from 'axios';
 import './App.css';
 import CustomSelect from './components/CustomSelect'; // 👈 НОВЫЙ ИМПОРТ
 import './App.css';
+import AboutPage from './pages/AboutPage';
 
 
 /* === БЛОК C1: Конфиг критериев (полная замена старых констант) === */
@@ -629,39 +630,6 @@ function Header({ user, onLogout }) {
 // PAGES (About, TopUsers, Admin, Home, Film, Login, Profile, UserProfile)
 // Due to length, pages are implemented with cleaned syntax and the original logic preserved.
 // ============================================================
-
-function AboutPage() {
-  return (
-    <div className="container about-page">
-      <Link to="/" className="back-btn">← На главную</Link>
-
-      <h1 className="about-title">📖 О системе оценки</h1>
-
-      <div className="about-intro glass-card">
-        <p className="neon-text">
-          Мы оцениваем фильмы по <strong>15 критериям</strong>, разбитым на 5 блоков.
-          Каждый критерий оценивается от <strong>1 до 10</strong>.
-        </p>
-        <p>
-          Вашу оценку составляет «Технический Балл», который превращается в «Комбинированную оценку», умножаясь на множитель вашего личного восприятия - <strong>«Вайб»!</strong>.
-        </p>
-      </div>
-
-      <div className="about-blocks">
-        {CRITERIA_CONFIG.map((block, idx) => (
-          <div key={block.key} className="about-block glass-card">
-            <h2 className="about-block-title neon-text">{block.name}</h2>
-            <div className="about-criteria">
-              {block.criteria.map(crit => (
-                <div key={crit.key} className="about-criterion">
-                  <div className="about-criterion-name">{crit.name}</div>
-                  <div className="about-criterion-desc">{crit.hint}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
 
      {/* ============================================================
      БЛОК: ЖАНРОВЫЕ ВЕСА
