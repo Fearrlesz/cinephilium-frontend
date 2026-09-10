@@ -11,7 +11,7 @@ function NotificationModal({ isOpen, onClose, title, message, type = 'success' }
   };
 
   const typeLabels = {
-    success: 'Успешно',
+    success: 'Успешно', 
     error: 'Ошибка',
     info: 'Информация',
     warning: 'Внимание'
