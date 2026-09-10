@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/client';
+import api from '../api/client'; 
 import Header from '../components/Header';
 import ActivityFeed from '../components/ActivityFeed';
 import useActivityEvents from '../hooks/useActivityEvents';
