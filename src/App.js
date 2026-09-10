@@ -7,6 +7,7 @@ import AboutPage from './pages/AboutPage';
 import TopUsersPage from './pages/TopUsersPage';
 import AdminPanel from './pages/AdminPanel';
 import FilmPage from './pages/FilmPage/FilmPage';
+import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
