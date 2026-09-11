@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { CRITERIA_CONFIG, GENRE_LABELS, BLOCK_NAMES } from '../../../utils/constants';
+import './RatingForm.css';
 
 function RatingForm({
   scores = {},
