@@ -6,6 +6,7 @@ import ActivityFeed from '../components/ActivityFeed';
 import useActivityEvents from '../hooks/useActivityEvents';
 import { useNotification } from '../context/NotificationContext';
 import { getScoreColor } from '../utils/constants';
+import './HomePage.css';
 
 function HomePage() {
   const [films, setFilms] = useState([]);
