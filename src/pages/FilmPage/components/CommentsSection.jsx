@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './CommentsSection.css';
 
 function CommentsSection({ comments, currentUser, film, onAddComment, onLikeComment }) {
   const [commentText, setCommentText] = useState('');
