@@ -2,16 +2,17 @@ import React, { useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NotificationContext from './context/NotificationContext';
 import NotificationModal from './components/NotificationModal';
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import TopUsersPage from './pages/TopUsersPage';
-import AdminPanel from './pages/AdminPanel';
-import FilmPage from './pages/FilmPage/FilmPage';
 import CustomSelect from './components/CustomSelect';
-import LoginPage from './pages/LoginPage';
-import ProfilePage from './pages/ProfilePage';
-import UserProfilePage from './pages/UserProfilePage';
 import './App.css';
+
+const HomePage = React.lazy(() => import('./pages/HomePage'));
+const AboutPage = React.lazy(() => import('./pages/AboutPage'));
+const TopUsersPage = React.lazy(() => import('./pages/TopUsersPage'));
+const AdminPanel = React.lazy(() => import('./pages/AdminPanel'));
+const FilmPage = React.lazy(() => import('./pages/FilmPage/FilmPage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const UserProfilePage = React.lazy(() => import('./pages/UserProfilePage'));
 
 function NotificationProvider({ children }) {
   const [notification, setNotification] = useState({
@@ -80,16 +81,18 @@ function App() {
   return (
     <NotificationProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/top" element={<TopUsersPage />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/film/:id" element={<FilmPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/user/:id" element={<UserProfilePage />} />
-        </Routes>
+        <React.Suspense fallback={<div>Загрузка...</div>}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/top" element={<TopUsersPage />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/film/:id" element={<FilmPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/user/:id" element={<UserProfilePage />} />
+          </Routes>
+        </React.Suspense>
       </Router>
     </NotificationProvider>
   );
