@@ -1,0 +1,736 @@
+/* ============================================================
+   ФОРМА ОЦЕНКИ — премиум золото
+   ============================================================ */
+
+/* ============================================================
+   ЗАГОЛОВКИ БЛОКОВ — голографические, золото
+   ============================================================ */
+.genre-block h3,
+.criteria-block h4,
+.vibe-block label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg,
+    var(--text-primary) 10%,
+    var(--gold) 30%,
+    var(--gold-bright) 45%,
+    var(--neon-purple) 65%,
+    var(--neon-cyan) 80%,
+    var(--text-primary) 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: holographicShift 10s ease-in-out infinite;
+  display: inline-block;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(168, 133, 64, 0.12);
+  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.04));
+}
+
+@keyframes holographicShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================================
+   SELECT (жанр) — премиум
+   ============================================================ */
+.genre-block select {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 22px center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.genre-block select:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.genre-block select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.04),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.genre-block select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  padding: 12px;
+}
+
+/* ============================================================
+   3D-СЛАЙДЕРЫ — крупные, объёмные, премиум
+   ============================================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.15s;
+  margin-top: -12px;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 6px 30px rgba(168, 133, 64, 0.5),
+    0 0 40px rgba(168, 133, 64, 0.15),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(255, 255, 255, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+input[type="range"] {
+  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+}
+
+.weight-slider input[type="range"] {
+  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+}
+
+.weight-slider input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.weight-slider input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.criterion-slider input[type="range"] {
+  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+}
+
+.criterion-slider input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.criterion-slider input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.vibe-block input[type="range"] {
+  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
+}
+
+.vibe-block input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.vibe-block input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+input[type="range"]:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #666, #444);
+  box-shadow: none;
+  border-color: #333;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #666, #444);
+  box-shadow: none;
+  border-color: #333;
+}
+
+/* ============================================================
+   КОНТЕЙНЕРЫ ДЛЯ СЛАЙДЕРОВ
+   ============================================================ */
+.weight-slider,
+.criterion-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+.weight-slider label,
+.criterion-slider label {
+  flex: 0 1 180px;
+  min-width: 110px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: help;
+  line-height: 1.3;
+}
+
+.weight-slider label .hint-icon,
+.criterion-slider label .hint-icon {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.weight-slider label:hover .hint-icon,
+.criterion-slider label:hover .hint-icon {
+  opacity: 1;
+}
+
+.weight-slider input[type="range"],
+.criterion-slider input[type="range"] {
+  flex: 1;
+  min-width: 60px;
+  max-width: 100%;
+}
+
+.weight-slider .value-display,
+.criterion-slider .value-display {
+  flex: 0 0 50px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   СУММА ВЕСОВ — золото
+   ============================================================ */
+.weights-sum {
+  margin-top: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  text-align: right;
+  padding: 10px 22px;
+  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  display: inline-block;
+  float: right;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all var(--transition-smooth);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.weights-sum:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+}
+
+.weights-sum.valid {
+  color: var(--gold-bright);
+  border-color: rgba(168, 133, 64, 0.25);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
+}
+
+.weights-sum.invalid {
+  color: var(--neon-pink);
+  border-color: rgba(236, 72, 153, 0.25);
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.04);
+}
+
+/* ============================================================
+   ПРЕВЬЮ (баллы) — золото
+   ============================================================ */
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 12px;
+  text-align: center;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.preview > div {
+  flex: 1 1 120px;
+  min-width: 90px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 60px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-smooth);
+  font-weight: 500;
+}
+
+.preview > div:hover {
+  border-color: var(--gold);
+  background: rgba(168, 133, 64, 0.03);
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.preview strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-size: 1.1rem;
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.06);
+}
+
+.preview div:last-child strong {
+  color: var(--neon-pink);
+  text-shadow: 0 0 20px rgba(236, 72, 153, 0.06);
+}
+
+/* ============================================================
+   ПРЕВЬЮ-СКОР (крупный балл)
+   ============================================================ */
+.preview-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+  text-shadow: 0 0 40px rgba(168, 133, 64, 0.15);
+  line-height: 1;
+}
+
+/* ============================================================
+   ФОРМА ОЦЕНКИ
+   ============================================================ */
+.rating-form {
+  /* базовые стили, дополняются адаптивом */
+}
+
+.rating-form h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.rating-base {
+  /* базовые стили */
+}
+
+.rating-base h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.criterion {
+  margin-bottom: 18px;
+}
+
+.criterion label {
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.slider-container .slider-label {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-width: 16px;
+}
+
+.slider-container .value-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-size: 1.1rem;
+  min-width: 36px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+}
+
+.subjective-block {
+  /* базовые стили */
+}
+
+.subjective-block h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.subjective-block p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* Кнопка сохранения */
+.save-rating-btn {
+  /* использует базовый стиль button */
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .rating-form {
+    padding: 20px 18px;
+  }
+  .rating-form h2 {
+    font-size: 22px;
+  }
+  .rating-base {
+    padding: 14px 16px 18px;
+  }
+  .rating-base h3 {
+    font-size: 16px;
+  }
+  .criterion label {
+    font-size: 14px;
+  }
+  .slider-container {
+    gap: 10px;
+  }
+  .slider-container .value-display {
+    font-size: 18px;
+    min-width: 28px;
+  }
+  .slider-container input[type="range"]::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+  }
+  .subjective-block {
+    padding: 16px 16px 18px;
+  }
+
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .glass-card::before,
+  .criteria-block::before,
+  .vibe-block::before {
+    border-radius: var(--radius-lg);
+  }
+
+  .genre-block select {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  .genre-block h3,
+  .criteria-block h4,
+  .vibe-block label {
+    font-size: 1rem;
+  }
+
+  .preview {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview > div {
+    flex: 1 1 auto;
+    min-width: auto;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .preview-score {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
+    padding: 18px 16px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .weight-slider,
+  .criterion-slider {
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .weight-slider label,
+  .criterion-slider label {
+    flex: 0 0 100%;
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+
+  .weight-slider input[type="range"],
+  .criterion-slider input[type="range"] {
+    flex: 1 1 100%;
+    order: 2;
+    max-width: 100%;
+  }
+
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    flex: 0 0 auto;
+    order: 3;
+    margin-left: auto;
+    font-size: 0.8rem;
+    padding: 2px 14px;
+    min-width: 44px;
+  }
+
+  .weights-sum {
+    float: none;
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vibe-block label {
+    font-size: 0.85rem;
+  }
+
+  .vibe-block .value-display {
+    font-size: 1rem;
+    padding: 2px 16px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+    margin-top: -12px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-form {
+    padding: 14px 12px;
+  }
+  .rating-form h2 {
+    font-size: 18px;
+  }
+  .rating-base {
+    padding: 10px 12px 14px;
+    margin-bottom: 16px;
+  }
+  .rating-base h3 {
+    font-size: 14px;
+  }
+  .criterion {
+    margin-bottom: 14px;
+  }
+  .criterion label {
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .slider-container {
+    gap: 8px;
+  }
+  .slider-container .slider-label {
+    font-size: 11px;
+    min-width: 12px;
+  }
+  .slider-container .value-display {
+    font-size: 16px;
+    min-width: 24px;
+    padding: 0 4px;
+  }
+  .slider-container input[type="range"] {
+    height: 4px;
+  }
+  .slider-container input[type="range"]::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+  }
+  .subjective-block {
+    padding: 12px 12px 16px;
+  }
+  .subjective-block h3 {
+    font-size: 16px;
+  }
+  .subjective-block p {
+    font-size: 12px;
+  }
+
+  .preview-score {
+    font-size: 32px;
+  }
+
+  .weight-slider label,
+  .criterion-slider label {
+    font-size: 0.8rem;
+  }
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    font-size: 0.75rem;
+    padding: 0 10px;
+  }
+  .preview > div {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .glass-card,
+  .criteria-block,
+  .vibe-block {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+}
