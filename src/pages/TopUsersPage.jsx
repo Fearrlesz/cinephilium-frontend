@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
+import './TopUsersPage.css';
 
 function TopUsersPage() {
   const [users, setUsers] = useState([]);
