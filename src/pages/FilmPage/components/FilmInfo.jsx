@@ -1,5 +1,6 @@
 import React from 'react';
 import { getScoreColor } from '../../../utils/constants';
+import './FilmInfo.css';
 
 function FilmInfo({ film, userRating, onToggleRating, isRatingMode }) {
   return (
