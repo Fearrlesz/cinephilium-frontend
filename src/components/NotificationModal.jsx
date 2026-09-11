@@ -1,4 +1,5 @@
 import React from 'react';
+import './NotificationModal.css';
 
 function NotificationModal({ isOpen, onClose, title, message, type = 'success' }) {
   if (!isOpen) return null;
