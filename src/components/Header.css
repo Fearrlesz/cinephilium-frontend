@@ -1,0 +1,208 @@
+/* ============================================================
+   HEADER — стеклянный (гибрид)
+   ============================================================ */
+.header {
+  position: sticky;
+  top: 12px;
+  z-index: 100;
+  margin: 0 20px 40px;
+  padding: 14px 28px;
+  border-radius: 20px;
+
+  background: linear-gradient(135deg,
+    rgba(16, 16, 26, 0.7) 0%,
+    rgba(26, 16, 36, 0.5) 50%,
+    rgba(16, 20, 30, 0.7) 100%
+  );
+  background-size: 200% 200%;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: liquidShift 20s ease-in-out infinite;
+}
+
+@keyframes liquidShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== ЗАГОЛОВОК — золото + неон ===== */
+.header h1 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+
+  background: linear-gradient(135deg,
+    var(--text-primary) 20%,
+    var(--gold-bright) 35%,
+    var(--neon-purple) 55%,
+    var(--neon-cyan) 75%,
+    var(--text-primary) 90%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: holographicTitle 5s ease-in-out infinite;
+
+  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.1));
+}
+
+@keyframes holographicTitle {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.header h1::after {
+  content: '•';
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold-bright), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: dotBlink 1.5s ease-in-out infinite;
+  margin-left: 6px;
+  font-size: 26px;
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   КНОПКИ — золото + неон
+   ============================================================ */
+.btn-profile,
+.btn-login,
+.btn-about,
+.btn-top,
+.btn-admin,
+.btn-logout {
+  padding: 8px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-profile {
+  color: var(--gold-bright);
+}
+.btn-profile:hover {
+  background: rgba(168, 133, 64, 0.08);
+  color: var(--gold-bright);
+}
+
+.btn-login {
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.08));
+  color: var(--text-primary);
+  border: 1px solid rgba(168, 133, 64, 0.15);
+}
+.btn-login:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
+  transform: translateY(-1px);
+}
+
+.btn-about,
+.btn-top,
+.btn-admin {
+  color: var(--text-secondary);
+}
+.btn-about:hover,
+.btn-top:hover,
+.btn-admin:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-logout {
+  color: var(--text-muted);
+}
+.btn-logout:hover {
+  color: var(--neon-pink);
+  background: rgba(236, 72, 153, 0.08);
+}
+
+/* ============================================================
+   КНОПКА TELEGRAM
+   ============================================================ */
+.btn-telegram {
+  padding: 8px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  background: rgba(34, 211, 238, 0.06);
+  color: var(--neon-cyan);
+}
+
+.btn-telegram:hover {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: rgba(34, 211, 238, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 0 10px 24px;
+    padding: 14px 18px;
+  }
+  .header-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 18px;
+  }
+  .btn-profile,
+  .btn-login,
+  .btn-about,
+  .btn-top,
+  .btn-admin {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
