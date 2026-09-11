@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './ReviewsSection.css';
 
 function ReviewsSection({ reviews, currentUser, film, userRating, onAddReview, onLikeReview }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
