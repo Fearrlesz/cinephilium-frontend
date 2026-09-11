@@ -1,0 +1,198 @@
+/* ============================================================
+   АДМИН-ПАНЕЛЬ
+   ============================================================ */
+.admin-panel {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.admin-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 20px 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.admin-welcome {
+  text-align: center;
+  color: var(--neon-cyan);
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-section {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  padding: 20px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 24px;
+}
+
+.admin-section h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.admin-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+.admin-item {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border-left: 3px solid var(--neon-purple);
+  margin-bottom: 10px;
+}
+
+.admin-item-header {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.admin-item-author {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+.admin-item-film {
+  color: var(--text-secondary);
+}
+
+.admin-item-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.admin-item-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 4px 0 8px;
+}
+
+.admin-item-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-approve {
+  padding: 4px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  background: transparent;
+  color: var(--neon-cyan);
+  cursor: pointer;
+  transition: all 0.3s;
+  width: auto;
+  margin-top: 0;
+  font-weight: 400;
+  box-shadow: none;
+}
+.btn-approve:hover {
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.btn-reject {
+  padding: 4px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  background: transparent;
+  color: var(--neon-pink);
+  cursor: pointer;
+  transition: all 0.3s;
+  width: auto;
+  margin-top: 0;
+  font-weight: 400;
+  box-shadow: none;
+}
+.btn-reject:hover {
+  background: rgba(236, 72, 153, 0.08);
+}
+
+/* ============================================================
+   АКТИВАЦИЯ АДМИНА
+   ============================================================ */
+.admin-activation {
+  background: rgba(124, 58, 237, 0.04);
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(124, 58, 237, 0.08);
+  margin: 12px 0;
+}
+
+.admin-activation h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.admin-hint {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.admin-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.admin-form input {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  min-width: 160px;
+}
+.admin-form input:focus {
+  outline: none;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+.admin-form button {
+  padding: 8px 24px;
+  border-radius: 40px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(34, 211, 238, 0.05));
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: auto;
+  margin-top: 0;
+  box-shadow: none;
+}
+.admin-form button:hover {
+  border-color: var(--neon-cyan);
+  background: rgba(34, 211, 238, 0.05);
+}
+.admin-form button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   МОБИЛЬНАЯ ОБРАТНАЯ СВЯЗЬ
+   ============================================================ */
+@media (max-width: 768px) {
+  .admin-item-actions {
+    flex-wrap: wrap;
+  }
+
+  .btn-approve:active,
+  .btn-reject:active {
+    transform: scale(0.92);
+    transition-duration: 0.08s;
+  }
+}
