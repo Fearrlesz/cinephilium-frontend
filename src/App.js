@@ -13,8 +13,15 @@ import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
 import './App.css';
 
-function App() {
-  const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });
+function NotificationProvider({ children }) {
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'success'
+  });
+
+  const timerRef = React.useRef(null);
 
   const showNotification = useCallback(({ title, message, type = 'success' }) => {
     setNotification(prev => {
@@ -23,21 +30,55 @@ function App() {
       }
       return { isOpen: true, title, message, type };
     });
-    if (window.notificationTimer) {
-      clearTimeout(window.notificationTimer);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
     }
-    window.notificationTimer = setTimeout(() => {
+
+    timerRef.current = setTimeout(() => {
       setNotification(prev => ({ ...prev, isOpen: false }));
-      window.notificationTimer = null;
+      timerRef.current = null;
     }, 5000);
   }, []);
 
   const closeNotification = useCallback(() => {
     setNotification(prev => ({ ...prev, isOpen: false }));
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
   }, []);
 
+  React.useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  const contextValue = React.useMemo(
+    () => ({ showNotification }),
+    [showNotification]
+  );
+
   return (
-    <NotificationContext.Provider value={{ showNotification }}>
+    <NotificationContext.Provider value={contextValue}>
+      {children}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={closeNotification}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+      />
+    </NotificationContext.Provider>
+  );
+}
+
+function App() {
+  return (
+    <NotificationProvider>
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -50,14 +91,7 @@ function App() {
           <Route path="/user/:id" element={<UserProfilePage />} />
         </Routes>
       </Router>
-      <NotificationModal
-        isOpen={notification.isOpen}
-        onClose={closeNotification}
-        title={notification.title}
-        message={notification.message}
-        type={notification.type}
-      />
-    </NotificationContext.Provider>
+    </NotificationProvider>
   );
 }
 
