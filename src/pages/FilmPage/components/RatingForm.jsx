@@ -149,7 +149,7 @@ function RatingForm({
       <div className="preview glass-card">
         <h4>📊 Предварительный расчет</h4>
         <div className="preview-row">
-          <span>Технический балл:</span>
+          <span>⚔️ Технический балл:</span>
           <strong>{preview.tech?.toFixed(1) || '0.0'}</strong>
         </div>
         <div className="preview-row">
