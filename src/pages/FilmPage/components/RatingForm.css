@@ -1070,39 +1070,3 @@ input[type="range"]:disabled::-moz-range-thumb {
 
 
 
-/* ============================================================
-   АДАПТИВ
-   ============================================================ */
-
-@media (max-width: 768px) {
-  .genre-block {
-    padding: 20px 20px;
-    border-radius: 16px;
-  }
-
-  .genre-block h3 {
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  .genre-select .select-header {
-    padding: 12px 18px;
-    font-size: 13px;
-    min-height: 48px;
-    border-radius: 12px;
-  }
-
-  .genre-select .options-list {
-    border-radius: 14px;
-    max-height: 280px;
-  }
-
-  .genre-select .options-list .option-item {
-    padding: 10px 14px;
-    font-size: 13px;
-  }
-
-  .genre-select .options-list .option-item:hover {
-    padding-left: 18px;
-  }
-
