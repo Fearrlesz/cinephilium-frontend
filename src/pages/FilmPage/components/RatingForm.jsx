@@ -36,53 +36,138 @@ function RatingForm({
     return blockWeights?.reduce((a, b) => a + b, 0) || 0;
   }, [blockWeights]);
 
-  return (
-    <>
-      <div className="genre-block glass-card">
-        <h3>⚙️ Жанр и веса блоков</h3>
-        <select 
-          value={genrePreset} 
-          onChange={e => onGenreChange(e.target.value)}
-        >
-          <option value="">Без жанра (базовые веса 30/25/20/15/10)</option>
-          {Object.entries(GENRE_LABELS).map(([k, l]) => (
-            <option key={k} value={k}>{l}</option>
-          ))}
-        </select>
-        
-        {BLOCK_NAMES.map((name, i) => {
-          const weight = blockWeights?.[i] ?? 20;
-          const isDisabled = genrePreset !== 'hybrid';
-          return (
-            <div key={i} className="weight-slider">
-              <label>{name}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="100" 
-                step="1" 
-                value={weight}
-                disabled={isDisabled}
-                onChange={e => onWeightChange(i, e.target.value)}
-                style={{ '--fill': `${weight}%` }}
-              />
-              <span className="value-display">{weight}%</span>
-            </div>
-          );
-        })}
-        
-        <div className={`weights-sum ${weightsValid ? 'valid' : 'invalid'}`}>
-          Σ = {totalWeight}% {weightsValid ? '✓' : '— нужно 100%'}
-        </div>
-      </div>
+/* ============================================================
+   SELECT (жанр) — премиум + тёмная тема нативного дропдауна
+   ============================================================ */
 
-      {CRITERIA_CONFIG.map(block => {
-        return (
-          <div key={block.key} className="criteria-block">
-            <h4>{block.name}</h4>
-            {block.criteria.map(crit => {
-              const value = getScore(block.key, crit.key);
-              const hintId = `${block.key}.${crit.key}`;   // 👈 уникальный id
+/* 🌑 Ключевой трюк: заставляет браузер рендерить нативный дропдаун
+   в тёмной теме (Chrome 81+, Edge 81+, Safari 12.1+, Firefox 96+) */
+.genre-block select {
+  color-scheme: dark;
+}
+
+.genre-block select {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 22px center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  /* Заставляем браузер использовать тёмную тему для списка */
+  color-scheme: dark;
+}
+
+.genre-block select:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.genre-block select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.04),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   OPTION — стилизация выпадающего списка
+   ============================================================ */
+
+/* Фон и цвет для опций (работает в Firefox, частично в Chrome/Safari) */
+.genre-block select option {
+  background: #0a0a12 !important;
+  color: #e8e4dd !important;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  border: none;
+}
+
+/* Выбранная (checked) опция */
+.genre-block select option:checked,
+.genre-block select option[selected] {
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.25), rgba(124, 58, 237, 0.15)) !important;
+  color: #c9a355 !important;
+  font-weight: 600;
+}
+
+/* Ховер на опции (в Firefox) */
+.genre-block select option:hover {
+  background: rgba(168, 133, 64, 0.15) !important;
+  color: #e8e4dd !important;
+}
+
+/* Отключённые опции */
+.genre-block select option:disabled {
+  color: rgba(200, 200, 200, 0.3) !important;
+  background: #07070a !important;
+}
+
+/* Группировка опций (если появятся <optgroup>) */
+.genre-block select optgroup {
+  background: #07070a;
+  color: var(--gold-bright);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+}
+
+.genre-block select optgroup option {
+  padding-left: 24px;
+}
+
+/* ============================================================
+   FIREFOX — специальные стили (там <option> реально стилизуется)
+   ============================================================ */
+@-moz-document url-prefix() {
+  .genre-block select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 22px center;
+  }
+
+  .genre-block select option {
+    background: #0a0a12;
+    color: #e8e4dd;
+  }
+
+  .genre-block select option:checked {
+    background: linear-gradient(#a88540, #c9a355) !important;
+    color: #07070a !important;
+    font-weight: 700;
+  }
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .genre-block select {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+  }
+}  
 
               return (
                 <div key={crit.key} className="criterion-slider">
