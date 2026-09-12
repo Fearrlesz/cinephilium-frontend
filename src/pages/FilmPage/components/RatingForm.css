@@ -874,3 +874,84 @@ input[type="range"]:disabled::-moz-range-thumb {
   box-shadow: 0 0 16px rgba(168, 133, 64, 0.06);
 }
 
+
+/* ============================================================
+   REVIEW BLOCK — текстовый отзыв
+   ============================================================ */
+.review-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 18px 20px;
+  margin: 20px 0;
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: 14px;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-block:hover,
+.review-block:focus-within {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.review-block > label {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0a0b0);
+  letter-spacing: 0.01em;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-block:focus-within > label {
+  color: var(--text-primary, #f0f0f5);
+}
+
+/* Текстовая область */
+.review-textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary, #f0f0f5);
+
+  background: rgba(10, 10, 20, 0.5);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md, 12px);
+  outline: none;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-textarea::placeholder {
+  color: var(--text-muted, #606070);
+  font-style: italic;
+}
+
+.review-textarea:hover {
+  border-color: rgba(168, 133, 64, 0.12);
+  background: rgba(10, 10, 20, 0.65);
+}
+
+.review-textarea:focus {
+  border-color: rgba(168, 133, 64, 0.35);
+  background: rgba(10, 10, 20, 0.75);
+  box-shadow:
+    0 0 0 3px rgba(168, 133, 64, 0.06),
+    0 0 24px rgba(168, 133, 64, 0.04);
+}
+
+.review-textarea::-webkit-scrollbar { width: 3px; }
+.review-textarea::-webkit-scrollbar-track { background: transparent; }
+.review-textarea::-webkit-scrollbar-thumb {
+  background: rgba(168, 133, 64, 0.4);
+  border-radius: 4px;
+}
