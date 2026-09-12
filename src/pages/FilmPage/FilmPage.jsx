@@ -5,7 +5,7 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
 import { getScoreColor } from '../../utils/constants';
 import FilmInfo from './components/FilmInfo';
-import RatingForm from './components/RatingForm';
+import RatingForm from './components/RatingForm'; 
 import CommentsSection from './components/CommentsSection';
 import ReviewsSection from './components/ReviewsSection';
 import UsersList from './components/UsersList';
