@@ -18,7 +18,7 @@ function RatingForm({
   onSave = () => {},
   calculatePreview = () => ({ tech: 0, vibe: 0, combined: 0 })
 }) {
-  const [activeHint, setActiveHint] = useState(null);
+  const [activeHint, setActiveHint] = useState(null);   // 👈 ДОБАВЛЕНО
 
   const getScore = (blockKey, critKey) => {
     return scores?.[blockKey]?.[critKey] ?? 5;
@@ -36,110 +36,98 @@ function RatingForm({
     return blockWeights?.reduce((a, b) => a + b, 0) || 0;
   }, [blockWeights]);
 
-  // 👇 Формируем опции для кастомного селекта
-  const genreOptions = useMemo(() => [
-    { value: '', label: '🎬 Без жанра (30/25/20/15/10)' },
-    ...Object.entries(GENRE_LABELS).map(([key, label]) => ({
-      value: key,
-      label: label
-    }))
-  ], []);
-
   return (
     <>
-      {/* ============================================================
-          БЛОК: ЖАНР И ВЕСА
-          ============================================================ */}
       <div className="genre-block glass-card">
         <h3>⚙️ Жанр и веса блоков</h3>
-
-        <CustomSelect
-          value={genrePreset}
-          onChange={onGenreChange}
-          options={genreOptions}
-          placeholder="Выберите жанр"
-          className="genre-select"
-        />
-
-        <div className="weight-sliders">
-          {blockWeights.map((w, i) => (
-            <div key={i} className="weight-slider">
-              <label>{BLOCK_NAMES[i]}</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value={w}
-                disabled={genrePreset !== 'hybrid'}
-                onChange={e => onWeightChange(i, e.target.value)}
-                style={{ '--fill': `${w}%` }}
-              />
-              <span className="value-display">{w}%</span>
-            </div>
+        <select 
+          value={genrePreset} 
+          onChange={e => onGenreChange(e.target.value)}
+        >
+          <option value="">Без жанра (базовые веса 30/25/20/15/10)</option>
+          {Object.entries(GENRE_LABELS).map(([k, l]) => (
+            <option key={k} value={k}>{l}</option>
           ))}
-        </div>
-
+        </select>
+        
+        {BLOCK_NAMES.map((name, i) => {
+          const weight = blockWeights?.[i] ?? 20;
+          const isDisabled = genrePreset !== 'hybrid';
+          return (
+            <div key={i} className="weight-slider">
+              <label>{name}</label>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="1" 
+                value={weight}
+                disabled={isDisabled}
+                onChange={e => onWeightChange(i, e.target.value)}
+                style={{ '--fill': `${weight}%` }}
+              />
+              <span className="value-display">{weight}%</span>
+            </div>
+          );
+        })}
+        
         <div className={`weights-sum ${weightsValid ? 'valid' : 'invalid'}`}>
           Σ = {totalWeight}% {weightsValid ? '✓' : '— нужно 100%'}
         </div>
       </div>
 
-      {/* ============================================================
-          БЛОКИ КРИТЕРИЕВ
-          ============================================================ */}
-      {CRITERIA_CONFIG.map(block => (
-        <div key={block.key} className="criteria-block">
-          <h4>{block.name}</h4>
-          {block.criteria.map(crit => {
-            const value = getScore(block.key, crit.key);
-            const hintId = `${block.key}-${crit.key}`;
-            return (
-              <div key={crit.key} className="criterion-slider">
-                <label>
-                  {crit.name}{' '}
-                  <span className="hint-wrapper">
-                    <button
-                      type="button"
-                      className="hint-icon"
-                      onClick={() => setActiveHint(activeHint === hintId ? null : hintId)}
-                      aria-expanded={activeHint === hintId}
-                    >
-                      ⓘ
-                    </button>
-                    {activeHint === hintId && (
-                      <span className="hint-popup" role="tooltip">
-                        {crit.hint}
-                      </span>
-                    )}
-                  </span>
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  step="1"
-                  value={value}
-                  onChange={e => onScoreChange(block.key, crit.key, e.target.value)}
-                  style={{ '--fill': `${(value - 1) * 10}%` }}
-                />
-                <span className="value-display">{value}</span>
-              </div>
-            );
-          })}
-        </div>
-      ))}
+      {CRITERIA_CONFIG.map(block => {
+        return (
+          <div key={block.key} className="criteria-block">
+            <h4>{block.name}</h4>
+            {block.criteria.map(crit => {
+              const value = getScore(block.key, crit.key);
+              const hintId = `${block.key}.${crit.key}`;   // 👈 уникальный id
 
-      {/* ============================================================
-          ВАЙБ
-          ============================================================ */}
+              return (
+                <div key={crit.key} className="criterion-slider">
+                  <label>
+                    {crit.name}{' '}
+                    <span className="hint-wrapper">
+                      <button
+                        type="button"
+                        className="hint-icon"
+                        onClick={() => setActiveHint(activeHint === hintId ? null : hintId)}
+                        aria-expanded={activeHint === hintId}
+                      >
+                        ⓘ
+                      </button>
+                      {activeHint === hintId && (
+                        <span className="hint-popup" role="tooltip">
+                          {crit.hint}
+                        </span>
+                      )}
+                    </span>
+                  </label>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    step="1"
+                    value={value}
+                    onChange={e => onScoreChange(block.key, crit.key, e.target.value)}
+                    style={{ '--fill': `${(value - 1) * 10}%` }}
+                  />
+                  <span className="value-display">{value}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+
       <div className="vibe-block">
         <label>💫 Вайб — субъективное впечатление. Не влияет на технический балл.</label>
-        <input
-          type="range"
-          min="1"
-          max="10"
-          step="1"
+        <input 
+          type="range" 
+          min="1" 
+          max="10" 
+          step="1" 
           value={vibe}
           onChange={e => onVibeChange(Number(e.target.value))}
           style={{ '--fill': `${(vibe - 1) * 10}%` }}
@@ -147,9 +135,6 @@ function RatingForm({
         <span className="value-display">{vibe}</span>
       </div>
 
-      {/* ============================================================
-          ТЕКСТОВЫЙ ОТЗЫВ
-          ============================================================ */}
       <div className="review-block glass-card">
         <label>📝 Текстовый отзыв (опционально)</label>
         <textarea
@@ -161,9 +146,6 @@ function RatingForm({
         />
       </div>
 
-      {/* ============================================================
-          ПРЕВЬЮ
-          ============================================================ */}
       <div className="preview glass-card">
         <h4>📊 Предварительный расчет</h4>
         <div className="preview-row">
@@ -180,12 +162,9 @@ function RatingForm({
         </div>
       </div>
 
-      {/* ============================================================
-          КНОПКА СОХРАНЕНИЯ
-          ============================================================ */}
-      <button
+      <button 
         className="btn-save-rating"
-        disabled={isSaving || !weightsValid}
+        disabled={isSaving || !weightsValid} 
         onClick={onSave}
       >
         {isSaving ? '⏳ Сохранение...' : '💾 Сохранить оценку'}
