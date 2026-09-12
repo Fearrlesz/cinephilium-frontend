@@ -6,7 +6,6 @@ import { formatDate } from '../utils/ratingUtils';
 import { getScoreColor } from '../utils/constants';
 import RatingDetailsModal from '../components/RatingDetailsModal';
 import './ProfilePage.css';
-import './UserProfilePage.css';
 
 function UserProfilePage() {
   const { id } = useParams();
@@ -142,14 +141,7 @@ function UserProfilePage() {
             )}
           </div>
 
-          {isOwnProfile && (
-            <button onClick={() => navigate('/profile')} className="btn-edit-profile" style={{ marginTop: '15px' }}>
-              ✏️ Редактировать профиль
-            </button>
-          )}
-        </div>
-      </div>
-
+       
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
           <button 
