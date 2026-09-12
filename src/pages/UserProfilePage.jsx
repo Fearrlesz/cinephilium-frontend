@@ -141,8 +141,8 @@ function UserProfilePage() {
               <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
             )}
           </div>
-
-        
+        </div>
+      </div>
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
