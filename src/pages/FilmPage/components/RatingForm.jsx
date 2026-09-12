@@ -153,7 +153,7 @@ function RatingForm({
           <strong>{preview.tech?.toFixed(1) || '0.0'}</strong>
         </div>
         <div className="preview-row">
-          <span>💫 Вайб:</span>
+          <span>🚬 Вайб:</span>
           <strong>{vibe?.toFixed(1) || '0.0'}</strong>
         </div>
         <div className="preview-row">
