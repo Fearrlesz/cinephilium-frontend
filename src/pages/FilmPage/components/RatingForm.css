@@ -85,21 +85,38 @@
   padding: 12px;
 }
 
+
+   
+
 /* ============================================================
-   3D-СЛАЙДЕРЫ — крупные, объёмные, премиум
+   3D-СЛАЙДЕРЫ
    ============================================================ */
+
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
+  width: 100%;
+  max-width: 100%;
+  height: 30px;               /* высота = высоте кружка, чтобы не обрезался */
+  background: transparent;    /* сам input прозрачный, фон рисуем на треке */
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* --- WebKit (Chrome, Safari, Edge) --- */
+
+input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  outline: none;
-  transition: all 0.2s;
-  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--gold) 0,
+    var(--gold) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-  max-width: 100%;
-  width: 100%;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -117,20 +134,24 @@ input[type="range"]::-webkit-slider-thumb {
     inset 0 -3px 8px rgba(0, 0, 0, 0.3),
     inset 0 2px 4px rgba(255, 255, 255, 0.2);
   transition: all 0.15s;
-  margin-top: -12px;
+  margin-top: -12px;          /* выравниваем кружок по треку */
 }
+input[type="range"]::-webkit-slider-thumb:hover  { transform: scale(1.15); }
+input[type="range"]::-webkit-slider-thumb:active { transform: scale(0.95); }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow:
-    0 6px 30px rgba(168, 133, 64, 0.5),
-    0 0 40px rgba(168, 133, 64, 0.15),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 6px rgba(255, 255, 255, 0.3);
-}
+/* --- Firefox --- */
 
-input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(0.95);
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    var(--gold) 0,
+    var(--gold) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -147,99 +168,56 @@ input[type="range"]::-moz-range-thumb {
     inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-input[type="range"]::-moz-range-track {
-  height: 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+/* --- Модификаторы цвета (только цвет золота меняется) --- */
+
+.weight-slider   input[type="range"]::-webkit-slider-runnable-track,
+.vibe-block      input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    var(--gold-bright) 0,
+    var(--gold-bright) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
+}
+.weight-slider   input[type="range"]::-moz-range-track,
+.vibe-block      input[type="range"]::-moz-range-track {
+  background: linear-gradient(
+    to right,
+    var(--gold-bright) 0,
+    var(--gold-bright) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
 }
 
-input[type="range"] {
-  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
-}
-
-.weight-slider input[type="range"] {
-  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
-}
-
-.weight-slider input[type="range"]::-webkit-slider-thumb {
+.weight-slider   input[type="range"]::-webkit-slider-thumb,
+.vibe-block      input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
-
-.weight-slider input[type="range"]::-moz-range-thumb {
+.weight-slider   input[type="range"]::-moz-range-thumb,
+.vibe-block      input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
-}
-
-.criterion-slider input[type="range"] {
-  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
 }
 
 .criterion-slider input[type="range"]::-webkit-slider-thumb {
   background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
-
 .criterion-slider input[type="range"]::-moz-range-thumb {
   background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-.vibe-block input[type="range"] {
-  background: linear-gradient(to right, var(--gold-bright) 0%, var(--gold-bright) var(--fill, 0%), rgba(255, 255, 255, 0.06) var(--fill, 0%), rgba(255, 255, 255, 0.06) 100%);
-}
+/* --- Отключённый --- */
 
-.vibe-block input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
-}
-
-.vibe-block input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright));
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px rgba(168, 133, 64, 0.1),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
-}
-
-input[type="range"]:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-input[type="range"]:disabled::-webkit-slider-thumb {
-  background: radial-gradient(circle at 35% 30%, #666, #444);
-  box-shadow: none;
-  border-color: #333;
-}
-
+input[type="range"]:disabled { opacity: 0.3; cursor: not-allowed; }
+input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-moz-range-thumb {
   background: radial-gradient(circle at 35% 30%, #666, #444);
   box-shadow: none;
   border-color: #333;
 }
+
+
 
 /* ============================================================
    КОНТЕЙНЕРЫ ДЛЯ СЛАЙДЕРОВ
