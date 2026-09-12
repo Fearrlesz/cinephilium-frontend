@@ -42,9 +42,6 @@ function RatingForm({
 
 /* 🌑 Ключевой трюк: заставляет браузер рендерить нативный дропдаун
    в тёмной теме (Chrome 81+, Edge 81+, Safari 12.1+, Firefox 96+) */
-.genre-block select {
-  color-scheme: dark;
-}
 
 .genre-block select {
   width: 100%;
