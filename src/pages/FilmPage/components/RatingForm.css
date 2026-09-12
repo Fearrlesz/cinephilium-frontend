@@ -341,68 +341,6 @@ input[type="range"]:disabled::-moz-range-thumb {
   box-shadow: 0 0 30px rgba(236, 72, 153, 0.04);
 }
 
-/* ============================================================
-   ПРЕВЬЮ (баллы) — золото
-   ============================================================ */
-.preview {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 12px;
-  text-align: center;
-  font-size: 1rem;
-  width: 100%;
-}
-
-.preview > div {
-  flex: 1 1 120px;
-  min-width: 90px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 60px;
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 2px 12px rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-smooth);
-  font-weight: 500;
-}
-
-.preview > div:hover {
-  border-color: var(--gold);
-  background: rgba(168, 133, 64, 0.03);
-  transform: translateY(-2px);
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.preview strong {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  color: var(--gold-bright);
-  font-size: 1.1rem;
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.06);
-}
-
-.preview div:last-child strong {
-  color: var(--neon-pink);
-  text-shadow: 0 0 20px rgba(236, 72, 153, 0.06);
-}
-
-/* ============================================================
-   ПРЕВЬЮ-СКОР (крупный балл)
-   ============================================================ */
-.preview-score {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
-  text-shadow: 0 0 40px rgba(168, 133, 64, 0.15);
-  line-height: 1;
-}
 
 /* ============================================================
    ФОРМА ОЦЕНКИ
@@ -835,5 +773,359 @@ input[type="range"]:disabled::-moz-range-thumb {
 @keyframes hintFadeIn {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+
+/* ============================================================
+   VIBE BLOCK — «Вайб» (субъективное впечатление)
+   ============================================================ */
+.vibe-block {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px 16px;
+
+  padding: 16px 20px;
+  margin: 20px 0;
+
+  background: linear-gradient(145deg,
+    rgba(120, 80, 200, 0.06) 0%,
+    rgba(20, 20, 40, 0.5) 50%,
+    rgba(168, 133, 64, 0.03) 100%
+  );
+  border: 1px solid rgba(120, 80, 200, 0.12);
+  border-radius: 14px;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.vibe-block:hover {
+  border-color: rgba(120, 80, 200, 0.22);
+  background: linear-gradient(145deg,
+    rgba(120, 80, 200, 0.09) 0%,
+    rgba(20, 20, 40, 0.6) 50%,
+    rgba(168, 133, 64, 0.05) 100%
+  );
+  box-shadow: 0 8px 30px rgba(120, 80, 200, 0.06);
+}
+
+.vibe-block > label {
+  grid-column: 1 / -1;
+
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0a0b0);
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.vibe-block:hover > label {
+  color: var(--text-primary, #f0f0f5);
+}
+
+/* Слайдер вайба */
+.vibe-block input[type="range"] {
+  grid-column: 1;
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  height: 4px;
+  margin: 0;
+  padding: 0;
+
+  background: linear-gradient(90deg,
+    rgba(120, 80, 200, 0.8) 0%,
+    rgba(168, 133, 64, 0.9) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) var(--fill, 0%),
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.vibe-block input[type="range"]:hover {
+  height: 5px;
+  box-shadow: 0 0 12px rgba(120, 80, 200, 0.15);
+}
+
+/* Ползунок — WebKit */
+.vibe-block input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 16px;
+  height: 16px;
+
+  background: radial-gradient(circle at 35% 35%,
+    #d9b45f 0%,
+    #a88540 70%
+  );
+  border: 2px solid rgba(16, 16, 26, 0.9);
+  border-radius: 50%;
+  box-shadow:
+    0 0 14px rgba(120, 80, 200, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+
+  cursor: grab;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.vibe-block input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 0 22px rgba(168, 133, 64, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.vibe-block input[type="range"]:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Ползунок — Firefox */
+.vibe-block input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+
+  background: radial-gradient(circle at 35% 35%,
+    #d9b45f 0%,
+    #a88540 70%
+  );
+  border: 2px solid rgba(16, 16, 26, 0.9);
+  border-radius: 50%;
+  box-shadow:
+    0 0 14px rgba(120, 80, 200, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+
+  cursor: grab;
+}
+
+.vibe-block input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+.vibe-block input[type="range"]::-moz-range-progress {
+  height: 4px;
+  background: linear-gradient(90deg, rgba(120, 80, 200, 0.8), rgba(168, 133, 64, 0.9));
+  border-radius: 2px;
+}
+
+.vibe-block input[type="range"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(120, 80, 200, 0.15);
+}
+
+/* Значение вайба */
+.vibe-block .value-display {
+  grid-column: 2;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 40px;
+  padding: 2px 12px;
+
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #d9b45f;
+
+  background: rgba(168, 133, 64, 0.06);
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  border-radius: var(--radius-md, 12px);
+
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.vibe-block:hover .value-display {
+  background: rgba(168, 133, 64, 0.1);
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 0 16px rgba(120, 80, 200, 0.1);
+}
+
+/* ============================================================
+   REVIEW BLOCK — текстовый отзыв
+   ============================================================ */
+.review-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 18px 20px;
+  margin: 20px 0;
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: 14px;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-block:hover,
+.review-block:focus-within {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.review-block > label {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0a0b0);
+  letter-spacing: 0.01em;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-block:focus-within > label {
+  color: var(--text-primary, #f0f0f5);
+}
+
+/* Текстовая область */
+.review-textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary, #f0f0f5);
+
+  background: rgba(10, 10, 20, 0.5);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md, 12px);
+  outline: none;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.review-textarea::placeholder {
+  color: var(--text-muted, #606070);
+  font-style: italic;
+}
+
+.review-textarea:hover {
+  border-color: rgba(168, 133, 64, 0.12);
+  background: rgba(10, 10, 20, 0.65);
+}
+
+.review-textarea:focus {
+  border-color: rgba(168, 133, 64, 0.35);
+  background: rgba(10, 10, 20, 0.75);
+  box-shadow:
+    0 0 0 3px rgba(168, 133, 64, 0.06),
+    0 0 24px rgba(168, 133, 64, 0.04);
+}
+
+.review-textarea::-webkit-scrollbar { width: 3px; }
+.review-textarea::-webkit-scrollbar-track { background: transparent; }
+.review-textarea::-webkit-scrollbar-thumb {
+  background: rgba(168, 133, 64, 0.4);
+  border-radius: 4px;
+}
+
+/* ============================================================
+   PREVIEW — предварительный расчёт
+   ============================================================ */
+.preview {
+  padding: 18px 20px;
+  margin: 20px 0;
+
+  background: linear-gradient(145deg,
+    rgba(168, 133, 64, 0.04) 0%,
+    rgba(20, 20, 40, 0.6) 50%,
+    rgba(168, 133, 64, 0.02) 100%
+  );
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  border-radius: 14px;
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.preview:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
+}
+
+.preview > h4 {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-primary, #f0f0f5);
+
+  border-bottom: 1px solid rgba(168, 133, 64, 0.08);
+}
+
+.preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-secondary, #a0a0b0);
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.preview-row:hover {
+  padding-left: 4px;
+  color: var(--text-primary, #f0f0f5);
+}
+
+.preview-row > span {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.preview-row > strong {
+  min-width: 48px;
+  padding: 1px 12px;
+
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--gold-bright, #d9b45f);
+
+  background: rgba(168, 133, 64, 0.04);
+  border: 1px solid rgba(168, 133, 64, 0.04);
+  border-radius: var(--radius-md, 12px);
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.preview-row:hover > strong {
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.08);
+}
+
+/* Строка "Комбинированный" — визуальный акцент */
+.preview-row:last-child {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(168, 133, 64, 0.1);
+}
+
+.preview-row:last-child > span {
+  font-weight: 600;
+  color: var(--text-primary, #f0f0f5);
+}
+
+.preview-row:last-child > strong {
+  font-size: 15px;
+  color: var(--gold-bright, #d9b45f);
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.12);
+  box-shadow: 0 0 16px rgba(168, 133, 64, 0.06);
 }
 
