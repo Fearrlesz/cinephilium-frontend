@@ -12,6 +12,7 @@ import UsersList from './components/UsersList';
 import useFilmData from './hooks/useFilmData';
 import useRatingForm from './hooks/useRatingForm';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
+import './FilmPage.css';
 
 function FilmPage() {
   const { id } = useParams();
