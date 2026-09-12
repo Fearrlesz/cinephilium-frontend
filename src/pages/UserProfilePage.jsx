@@ -125,33 +125,37 @@ function UserProfilePage() {
           <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
           <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
           <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
-          
-               <div className="achievements-section" style={{ marginTop: '15px' }}>
+
+          <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4>🏅 Достижения</h4>
             {user.achievements?.length > 0 ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
                 {user.achievements.map(ach => (
-                  <span key={ach} style={{ ... }}>🏅 {ach}</span>
+                  <span
+                    key={ach}
+                    className="achievement-badge"
+                    style={{ padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)' }}
+                  >
+                    🏅 {ach}
+                  </span>
                 ))}
               </div>
             ) : (
               <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
             )}
           </div>
-        </div>   {/* ← закрываем .profile-info */}
-      </div>     {/* ← закрываем .profile-header */}
+        </div>
+      </div>
 
       <div className="profile-tabs glass-card">
-       
-      <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -199,7 +203,7 @@ function UserProfilePage() {
                       <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
                           ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
