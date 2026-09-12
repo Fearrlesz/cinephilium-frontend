@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getScoreColor } from '../../../utils/constants';
+import './UsersList.css';
 
 function UsersList({ filmUsers, usersLoading, onShowUsers, onOpenRatingDetails }) {
   return (
