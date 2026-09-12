@@ -193,46 +193,8 @@
 }
 
 
-   
 /* ============================================================
    МОДАЛКА ДЕТАЛЕЙ ОЦЕНКИ — ПРЕМИУМ
-   Улучшенная архитектура: токены, секции, консистентность
-   ============================================================ */
-
-/* ---------- Локальные дизайн-токены модалки ---------- */
-.modal-overlay,
-.modal-content {
-  /* Акцент (золото) — семантические уровни прозрачности */
-  --gold-02: rgba(168, 133, 64, 0.02);
-  --gold-04: rgba(168, 133, 64, 0.04);
-  --gold-06: rgba(168, 133, 64, 0.06);
-  --gold-08: rgba(168, 133, 64, 0.08);
-  --gold-10: rgba(168, 133, 64, 0.10);
-  --gold-12: rgba(168, 133, 64, 0.12);
-  --gold-15: rgba(168, 133, 64, 0.15);
-
-  /* Нейтральные поверхности */
-  --surface-01: rgba(255, 255, 255, 0.02);
-  --surface-02: rgba(255, 255, 255, 0.03);
-
-  /* Радиусы */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-pill: 40px;
-
-  /* Моно-шрифт */
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-  /* Переходы */
-  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --transition-base: all 0.3s ease;
-  --transition-premium: all 0.4s var(--ease-premium);
-}
-
-/* ============================================================
-   1. КОНТЕЙНЕР И ОВЕРЛЕЙ
    ============================================================ */
 .modal-overlay {
   position: fixed;
@@ -241,47 +203,62 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
   background: rgba(7, 7, 10, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  padding: 20px;
   animation: modalFadeIn 0.3s ease-out;
 }
 
 @keyframes modalFadeIn {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
 
-/* ============================================================
-   2. КАРТОЧКА МОДАЛКИ
-   ============================================================ */
 .modal-content {
-  position: relative;
-  width: 100%;
   max-width: 580px;
-  max-height: 90vh;
+  width: 100%;
   padding: 32px 36px 36px;
-  overflow-y: auto;
-
   background: linear-gradient(160deg,
     rgba(16, 16, 26, 0.95) 0%,
     rgba(26, 16, 36, 0.85) 50%,
     rgba(12, 12, 24, 0.95) 100%
   );
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.7),
-    0 0 60px var(--gold-02);
-
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-
-  animation: modalSlideUp 0.35s var(--ease-premium);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(168, 133, 64, 0.02);
+  animation: modalSlideUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-/* Тонкая золотая «искра» сверху */
+.modal-content::-webkit-scrollbar {
+  width: 3px;
+}
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .modal-content::before {
   content: '';
   position: absolute;
@@ -289,82 +266,51 @@
   left: 15%;
   width: 70%;
   height: 2px;
-  background: linear-gradient(90deg,
-    transparent, var(--gold), var(--gold-bright), var(--gold), transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
   opacity: 0.25;
-  pointer-events: none;
 }
 
-/* Скроллбар */
-.modal-content::-webkit-scrollbar { width: 3px; }
-.modal-content::-webkit-scrollbar-track { background: transparent; }
-.modal-content::-webkit-scrollbar-thumb {
-  background: var(--gold);
-  border-radius: 4px;
-}
-
-@keyframes modalSlideUp {
-  from { opacity: 0; transform: translateY(30px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* ============================================================
-   3. КНОПКА ЗАКРЫТИЯ
-   ============================================================ */
 .modal-close {
   position: absolute;
   top: 16px;
   right: 20px;
-  width: auto;
-  margin-top: 0;
-  padding: 4px 8px;
-
   background: none;
   border: none;
-  border-radius: var(--radius-sm);
-
   color: var(--text-muted);
   font-size: 28px;
-  line-height: 1;
   cursor: pointer;
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 8px;
+  width: auto;
+  margin-top: 0;
 }
 
 .modal-close:hover {
   color: var(--text-primary);
-  background: var(--surface-02);
   transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* ============================================================
-   4. ШАПКА МОДАЛКИ
-   ============================================================ */
 .modal-header {
   margin-bottom: 24px;
   padding-right: 32px;
 }
 
 .modal-header h2 {
-  margin: 0 0 12px;
-
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 24px;
-  letter-spacing: -0.02em;
   color: var(--text-primary);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
 }
 
-.modal-header .modal-user,
-.modal-header .modal-genre-preset {
-  margin: 0 0 4px;
+.modal-header .modal-user {
   font-size: 14px;
   color: var(--text-secondary);
-}
-
-.modal-header .modal-genre-preset {
-  font-size: 13px;
-  margin-bottom: 12px;
+  margin: 0 0 4px;
 }
 
 .modal-header .modal-user strong {
@@ -372,14 +318,17 @@
   font-weight: 600;
 }
 
+.modal-header .modal-genre-preset {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
 .modal-header .modal-genre-preset strong {
   color: var(--neon-cyan);
   font-weight: 600;
 }
 
-/* ============================================================
-   5. БЛОК ОЦЕНОК (3 КОЛОНКИ)
-   ============================================================ */
 .modal-scores {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -392,128 +341,113 @@
   flex-direction: column;
   align-items: center;
   padding: 12px 8px;
-
-  background: var(--surface-01);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
 }
 
 .modal-score-item:hover {
-  background: var(--gold-02);
-  border-color: var(--gold-10);
+  border-color: rgba(168, 133, 64, 0.10);
+  background: rgba(168, 133, 64, 0.02);
 }
 
 .modal-score-item label {
-  margin-bottom: 4px;
-
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
 }
 
 .modal-score-item span {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
   font-size: 28px;
-  line-height: 1.2;
   font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
+  line-height: 1.2;
 }
 
-/* ============================================================
-   6. ОБЩИЕ ВЕСА (НЕ ЖАНРОВЫЕ)
-   ============================================================ */
 .modal-weights {
-  margin: 12px 0 16px;
   padding: 16px 20px;
-
   background: linear-gradient(145deg,
-    var(--gold-04) 0%,
+    rgba(168, 133, 64, 0.03) 0%,
     rgba(20, 20, 40, 0.5) 50%,
-    var(--gold-02) 100%
+    rgba(168, 133, 64, 0.02) 100%
   );
-  border: 1px solid var(--gold-06);
   border-radius: 14px;
-  transition: var(--transition-base);
+  border: 1px solid rgba(168, 133, 64, 0.06);
+  margin: 12px 0 16px;
+  transition: all 0.3s ease;
 }
 
 .modal-weights:hover {
+  border-color: rgba(168, 133, 64, 0.12);
   background: linear-gradient(145deg,
-    var(--gold-06) 0%,
+    rgba(168, 133, 64, 0.05) 0%,
     rgba(20, 20, 40, 0.6) 50%,
-    var(--gold-04) 100%
+    rgba(168, 133, 64, 0.03) 100%
   );
-  border-color: var(--gold-12);
 }
 
 .modal-weights h4 {
-  margin: 0 0 12px;
-  padding-bottom: 8px;
-
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--text-muted);
-
-  border-bottom: 1px solid var(--gold-06);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(168, 133, 64, 0.06);
 }
 
 .modal-weight-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 4px 0;
-
   font-size: 13px;
   color: var(--text-secondary);
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
 }
 
 .modal-weight-item:hover {
-  padding-left: 4px;
   color: var(--text-primary);
+  padding-left: 4px;
 }
 
-.modal-weight-item span:first-child { font-weight: 500; }
+.modal-weight-item span:first-child {
+  font-weight: 500;
+}
 
 .modal-weight-item span:last-child {
-  padding: 1px 12px;
-
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   color: var(--gold-bright);
-
-  background: var(--gold-04);
-  border: 1px solid var(--gold-04);
-  border-radius: var(--radius-md);
+  background: rgba(168, 133, 64, 0.04);
+  padding: 1px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid rgba(168, 133, 64, 0.04);
 }
 
-/* ============================================================
-   7. БЛОК РЕЦЕНЗИИ
-   ============================================================ */
 .modal-review {
-  margin: 12px 0 16px;
   padding: 14px 18px;
-
-  background: var(--surface-01);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
   border-left: 3px solid var(--neon-cyan);
-  border-radius: var(--radius-md);
+  margin: 12px 0 16px;
 }
 
 .modal-review p {
-  margin: 0;
-
   font-family: var(--font-sans);
   font-size: 14px;
-  font-style: italic;
-  line-height: 1.6;
   color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
 }
 
 .modal-review p strong {
@@ -521,9 +455,6 @@
   font-style: normal;
 }
 
-/* ============================================================
-   8. БЛОКИ КРИТЕРИЕВ
-   ============================================================ */
 .modal-criteria-blocks {
   display: flex;
   flex-direction: column;
@@ -533,35 +464,33 @@
 
 .modal-criteria-block {
   padding: 16px 18px;
-
-  background: var(--surface-01);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 14px;
-  transition: var(--transition-base);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
 }
 
 .modal-criteria-block:hover {
-  background: var(--surface-02);
-  border-color: var(--gold-08);
+  border-color: rgba(168, 133, 64, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .modal-criteria-block h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   gap: 8px;
-
-  margin: 0 0 10px;
-  padding-bottom: 6px;
-
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-
-  border-bottom: 1px solid var(--glass-border);
 }
 
-.modal-criteria-block h4 .block-icon { font-size: 16px; }
+.modal-criteria-block h4 .block-icon {
+  font-size: 16px;
+}
 
 .modal-criteria-list {
   display: flex;
@@ -571,24 +500,23 @@
 
 .modal-criterion {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 6px 8px 6px 4px;
-
   font-size: 13px;
   color: var(--text-secondary);
   border-radius: 6px;
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
 }
 
 .modal-criterion:hover {
+  background: rgba(255, 255, 255, 0.02);
   padding-left: 8px;
-  background: var(--surface-01);
 }
 
 .modal-criterion span:first-child {
-  position: relative;
   font-weight: 400;
+  position: relative;
 }
 
 .modal-criterion span:first-child[title] {
@@ -597,52 +525,47 @@
 }
 
 .modal-criterion .modal-criterion-score {
-  padding: 1px 14px;
-
-  font-family: var(--font-mono);
-  font-size: 15px;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   color: var(--gold-bright);
-
-  background: var(--gold-04);
-  border: 1px solid var(--gold-04);
-  border-radius: var(--radius-md);
-  transition: var(--transition-base);
+  background: rgba(168, 133, 64, 0.04);
+  padding: 1px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 133, 64, 0.04);
+  transition: all 0.3s ease;
 }
 
 .modal-criterion:hover .modal-criterion-score {
-  background: var(--gold-08);
-  border-color: var(--gold-08);
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.08);
 }
 
 /* ============================================================
-   9. ЖАНРОВЫЕ ВЕСА
+   ЖАНРОВЫЕ ВЕСА В МОДАЛКЕ
    ============================================================ */
 .modal-genre-weights {
+  padding: 18px 22px;
+  background: linear-gradient(145deg,
+    rgba(168, 133, 64, 0.04) 0%,
+    rgba(20, 20, 40, 0.6) 50%,
+    rgba(168, 133, 64, 0.02) 100%
+  );
+  border-radius: 16px;
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  margin-bottom: 20px;
   position: relative;
   overflow: hidden;
-  margin-bottom: 20px;
-  padding: 18px 22px;
-
-  background: linear-gradient(145deg,
-    var(--gold-04) 0%,
-    rgba(20, 20, 40, 0.6) 50%,
-    var(--gold-02) 100%
-  );
-  border: 1px solid var(--gold-08);
-  border-radius: var(--radius-lg);
-  transition: var(--transition-premium);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Анимированный золотой контур по периметру */
 .modal-genre-weights::before {
   content: '';
   position: absolute;
   inset: -1px;
+  border-radius: 16px;
   padding: 1.5px;
-  border-radius: inherit;
-
   background: conic-gradient(
     from var(--angle, 0deg),
     transparent 0%,
@@ -656,16 +579,16 @@
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.4s ease;
+  pointer-events: none;
   animation: borderSpin 8s linear infinite;
 }
 
-.modal-genre-weights:hover::before { opacity: 0.3; }
+.modal-genre-weights:hover::before {
+  opacity: 0.3;
+}
 
-/* Верхняя золотая «искра» */
 .modal-genre-weights::after {
   content: '';
   position: absolute;
@@ -673,41 +596,37 @@
   left: 10%;
   width: 80%;
   height: 2px;
-
-  background: linear-gradient(90deg,
-    transparent, var(--gold), var(--gold-bright), var(--gold), transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
   opacity: 0.15;
-  pointer-events: none;
   transition: opacity 0.4s ease;
 }
 
-.modal-genre-weights:hover::after { opacity: 0.4; }
-
-.modal-genre-weights:hover {
-  background: linear-gradient(145deg,
-    var(--gold-06) 0%,
-    rgba(20, 20, 40, 0.7) 50%,
-    var(--gold-04) 100%
-  );
-  border-color: var(--gold-15);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--gold-04);
+.modal-genre-weights:hover::after {
+  opacity: 0.4;
 }
 
-/* Заголовок жанрового блока */
-.modal-genre-weights .genre-label {
-  position: relative;
-  display: block;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+.modal-genre-weights:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: linear-gradient(145deg,
+    rgba(168, 133, 64, 0.06) 0%,
+    rgba(20, 20, 40, 0.7) 50%,
+    rgba(168, 133, 64, 0.04) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
+}
 
-  font-family: var(--font-mono);
+.modal-genre-weights .genre-label {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 14px;
+  position: relative;
+  padding-bottom: 10px;
 }
 
 .modal-genre-weights .genre-label::after {
@@ -717,8 +636,8 @@
   left: 0;
   width: 40px;
   height: 2px;
-  border-radius: 2px;
   background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
+  border-radius: 2px;
 }
 
 .modal-genre-weights .genre-label .genre-icon {
@@ -726,42 +645,35 @@
   font-size: 14px;
 }
 
-/* Список тегов */
 .modal-genre-weights .genre-weight-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-/* Тег */
 .modal-genre-weights .genre-weight-tag {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 6px 16px 6px 18px;
-
-  background: var(--gold-04);
-  border: 1px solid var(--gold-06);
-  border-radius: var(--radius-pill);
-
+  background: rgba(168, 133, 64, 0.05);
+  border-radius: 40px;
+  border: 1px solid rgba(168, 133, 64, 0.06);
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
   cursor: default;
-
   backdrop-filter: blur(4px);
-  transition: var(--transition-premium);
 }
 
-/* Внутренний анимированный контур тега */
 .modal-genre-weights .genre-weight-tag::before {
   content: '';
   position: absolute;
   inset: -2px;
+  border-radius: 40px;
   padding: 2px;
-  border-radius: inherit;
-
   background: conic-gradient(
     from var(--angle, 0deg),
     transparent 0%,
@@ -774,72 +686,52 @@
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.4s ease;
+  pointer-events: none;
   animation: borderSpin 6s linear infinite;
 }
 
-.modal-genre-weights .genre-weight-tag:hover::before { opacity: 0.4; }
+.modal-genre-weights .genre-weight-tag:hover::before {
+  opacity: 0.4;
+}
 
 .modal-genre-weights .genre-weight-tag:hover {
-  background: var(--gold-08);
   border-color: var(--gold);
+  background: rgba(168, 133, 64, 0.08);
   transform: translateY(-2px) scale(1.02);
   box-shadow:
-    0 4px 20px var(--gold-06),
-    0 0 30px var(--gold-02);
+    0 4px 20px rgba(168, 133, 64, 0.06),
+    0 0 30px rgba(168, 133, 64, 0.02);
 }
 
-/* Название жанра */
 .modal-genre-weights .genre-weight-tag .genre-name {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.02em;
   color: var(--text-primary);
+  font-size: 12px;
+  letter-spacing: 0.02em;
 }
 
-/* Значение веса */
 .modal-genre-weights .genre-weight-tag .genre-value {
-  padding: 1px 12px;
-
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-weight: 700;
   color: var(--gold-bright);
-  text-shadow: 0 0 20px var(--gold-04);
-
-  background: var(--gold-06);
-  border: 1px solid var(--gold-04);
+  font-size: 13px;
+  background: rgba(168, 133, 64, 0.06);
+  padding: 1px 12px;
   border-radius: 20px;
-  transition: var(--transition-base);
+  border: 1px solid rgba(168, 133, 64, 0.04);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
+  transition: all 0.3s ease;
 }
 
 .modal-genre-weights .genre-weight-tag:hover .genre-value {
-  background: var(--gold-10);
-  border-color: var(--gold-08);
-  box-shadow: 0 0 20px var(--gold-04);
+  background: rgba(168, 133, 64, 0.10);
+  border-color: rgba(168, 133, 64, 0.08);
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.04);
 }
 
-/* ============================================================
-   10. ОБЩИЙ KEYFRAME
-   ============================================================ */
-@keyframes borderSpin {
-  to { --angle: 360deg; }
-}
-
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-
-
-
-  
 /* ============================================================
    МОБИЛЬНАЯ ПУЛЬСАЦИЯ КНОПКИ
    ============================================================ */
