@@ -40,50 +40,6 @@ function RatingForm({
    SELECT (жанр) — премиум + тёмная тема нативного дропдауна
    ============================================================ */
 
-/* 🌑 Ключевой трюк: заставляет браузер рендерить нативный дропдаун
-   в тёмной теме (Chrome 81+, Edge 81+, Safari 12.1+, Firefox 96+) */
-
-.genre-block select {
-  width: 100%;
-  max-width: 100%;
-  padding: 16px 22px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 60px;
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 22px center;
-  cursor: pointer;
-  transition: all var(--transition-smooth);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  /* Заставляем браузер использовать тёмную тему для списка */
-  color-scheme: dark;
-}
-
-.genre-block select:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.genre-block select:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow:
-    0 0 0 4px rgba(168, 133, 64, 0.08),
-    0 0 30px rgba(168, 133, 64, 0.04),
-    0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
 /* ============================================================
    OPTION — стилизация выпадающего списка
    ============================================================ */
