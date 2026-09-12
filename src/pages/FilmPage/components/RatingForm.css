@@ -734,3 +734,106 @@ input[type="range"]:disabled::-moz-range-thumb {
     border-radius: 14px;
   }
 }
+
+
+/* ============================================================
+   CRITERION SLIDER — слайдер критерия с подсказкой
+   (добавить в rating-form.css, в секцию критериев)
+   ============================================================ */
+/* ---------- Обёртка иконки подсказки ---------- */
+.hint-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---------- Кнопка-иконка ⓘ ---------- */
+.hint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+
+  background: transparent;
+  border: 1px solid var(--gold-10, rgba(168, 133, 64, 0.10));
+  border-radius: 50%;
+
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  transition: var(--transition-base, all 0.3s ease);
+}
+
+.hint-icon:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-15, rgba(168, 133, 64, 0.15));
+  background: var(--gold-04, rgba(168, 133, 64, 0.04));
+  transform: scale(1.08);
+}
+
+.hint-icon[aria-expanded="true"] {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+  background: var(--gold-06, rgba(168, 133, 64, 0.06));
+  box-shadow: 0 0 12px var(--gold-04, rgba(168, 133, 64, 0.04));
+}
+
+/* ---------- Всплывающая подсказка ---------- */
+.hint-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 50;
+  transform: translateX(-50%);
+
+  width: max-content;
+  max-width: 260px;
+  padding: 10px 14px;
+
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+
+  background: linear-gradient(160deg,
+    rgba(26, 16, 36, 0.98) 0%,
+    rgba(16, 16, 26, 0.98) 100%
+  );
+  border: 1px solid var(--gold-10, rgba(168, 133, 64, 0.10));
+  border-radius: var(--radius-md, 12px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.6),
+    0 0 30px var(--gold-04, rgba(168, 133, 64, 0.04));
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation: hintFadeIn 0.2s var(--ease-premium, cubic-bezier(0.2, 0.8, 0.2, 1));
+  pointer-events: none;
+}
+
+/* Стрелка подсказки */
+.hint-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border: 6px solid transparent;
+  border-top-color: rgba(26, 16, 36, 0.98);
+}
+
+@keyframes hintFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
