@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://cinephilium-backend.onrender.com/api',
-  timeout: 12000
+  timeout: 120000
 });
 
 api.interceptors.response.use(
