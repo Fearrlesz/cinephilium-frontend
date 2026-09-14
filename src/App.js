@@ -11,6 +11,7 @@ import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
+import FilmsCatalogPage from './pages/FilmsCatalogPage/FilmsCatalogPage'; // ← ДОБАВЛЕНО
 import './App.css';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/catalog" element={<FilmsCatalogPage />} /> {/* ← ДОБАВЛЕНО */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/top" element={<TopUsersPage />} />
           <Route path="/admin" element={<AdminPanel />} />
