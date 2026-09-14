@@ -1,1 +1,15 @@
+/* src/pages/FilmsCatalogPage/FilmsCatalogPage.css */
+.catalog-header {
+  padding: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
 
+.catalog-header h2 {
+  margin: 0 0 8px 0;
+}
+
+.catalog-header p {
+  margin: 0;
+  color: #aaa;
+}
