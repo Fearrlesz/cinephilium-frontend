@@ -1,4 +1,3 @@
-// src/components/FilmsCatalog.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
@@ -17,41 +16,46 @@ function FilmsCatalog({
   const [totalPages, setTotalPages] = useState(1);
   const [sortType, setSortType] = useState(initialSort);
 
-  const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.get(`/films?page=${pageNum}&limit=${limit}&sort=${sort}`);
-      if (response.data && Array.isArray(response.data.films)) {
-        if (pageNum === 1) {
-          setFilms(response.data.films);
+  // Загрузка фильмов
+  useEffect(() => {
+    const loadFilms = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const response = await api.get(`/films?page=${page}&limit=${limit}&sort=${sortType}`);
+        if (response.data && Array.isArray(response.data.films)) {
+          if (page === 1) {
+            setFilms(response.data.films);
+          } else {
+            setFilms(prev => {
+              const existingIds = new Set(prev.map(f => f._id));
+              const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
+              return [...prev, ...newFilms];
+            });
+          }
+          setTotalPages(response.data.pagination?.pages || 1);
         } else {
-          setFilms(prev => {
-            const existingIds = new Set(prev.map(f => f._id));
-            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-            return [...prev, ...newFilms];
-          });
+          setFilms([]);
         }
-        setTotalPages(response.data.pagination?.pages || 1);
-      } else {
-        setFilms([]);
+      } catch (err) {
+        console.error('Ошибка загрузки фильмов:', err);
+        setError('Не удалось загрузить фильмы. Попробуйте позже.');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Ошибка загрузки фильмов:', err);
-      setError('Не удалось загрузить фильмы. Попробуйте позже.');
-    } finally {
-      setLoading(false);
-    }
-  }, [sortType, limit]);
+    };
+
+    loadFilms();
+  }, [page, sortType, limit]);
 
   // Сбрасываем на 1-ю страницу при смене сортировки
   useEffect(() => {
     setPage(1);
   }, [sortType]);
 
-  useEffect(() => {
-    loadFilms(page);
-  }, [page, loadFilms]);
+  const handleSortChange = useCallback((newSort) => {
+    setSortType(newSort);
+  }, []);
 
   const loadMore = useCallback(() => {
     if (page < totalPages && !loading) {
@@ -65,21 +69,21 @@ function FilmsCatalog({
         <div className="sort-tabs">
           <div
             className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`}
-            onClick={() => setSortType('technical')}
+            onClick={() => handleSortChange('technical')}
           >
             <span className="tab-icon">⚔️ </span>
             <span className="tab-label">Техническая</span>
           </div>
           <div
             className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`}
-            onClick={() => setSortType('vibe')}
+            onClick={() => handleSortChange('vibe')}
           >
             <span className="tab-icon">🍷 </span>
             <span className="tab-label">Вайб</span>
           </div>
           <div
             className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`}
-            onClick={() => setSortType('combined')}
+            onClick={() => handleSortChange('combined')}
           >
             <span className="tab-icon">🧪 </span>
             <span className="tab-label">Общая</span>
