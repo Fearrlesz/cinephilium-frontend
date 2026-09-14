@@ -69,7 +69,7 @@ return (
       </div>
     ))}
 
-    {/* ⬇️ ИСПРАВЛЕНО: h3 + .vibe-hint вместо label */}
+    
     <div className="vibe-block">
       <h3>💫 Вайб</h3>
       <p className="vibe-hint">Субъективное впечатление. Не влияет на технический балл.</p>
@@ -82,7 +82,7 @@ return (
       <span className="value-display">{vibe}</span>
     </div>
 
-    {/* ⬇️ УБРАН glass-card, чтобы работали свои padding/radius блока */}
+    
     <div className="review-block">
       <label htmlFor="review-text">📝 Текстовый отзыв (опционально)</label>
       <textarea
@@ -95,7 +95,7 @@ return (
       />
     </div>
 
-    {/* ⬇️ УБРАН glass-card */}
+    
     <div className="preview">
       <h4>📊 Предварительный расчет</h4>
       <div className="preview-row">
