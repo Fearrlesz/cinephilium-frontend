@@ -1,26 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/client'; 
+import api from '../api/client';
 import Header from '../components/Header';
 import ActivityFeed from '../components/ActivityFeed';
+import FilmsCatalog from '../components/FilmsCatalog';
 import useActivityEvents from '../hooks/useActivityEvents';
 import { useNotification } from '../context/NotificationContext';
 import { getScoreColor } from '../utils/constants';
 import './HomePage.css';
 
 function HomePage() {
-  const [films, setFilms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [user, setUser] = useState(null);
   const [searchError, setSearchError] = useState('');
-  const [sortType, setSortType] = useState('technical');
+  const [catalogRefreshKey, setCatalogRefreshKey] = useState(0);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { events, loading: eventsLoading, addEvent, refresh: refreshEvents } = useActivityEvents();
@@ -38,46 +34,9 @@ function HomePage() {
       });
   }, []);
 
-  const loadFilms = useCallback(async (pageNum = 1, sort = sortType) => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.get(`/films?page=${pageNum}&limit=20&sort=${sort}`);
-      if (response.data && Array.isArray(response.data.films)) {
-        if (pageNum === 1) {
-          setFilms(response.data.films);
-        } else {
-          setFilms(prev => {
-            const existingIds = new Set(prev.map(f => f._id));
-            const newFilms = response.data.films.filter(f => !existingIds.has(f._id));
-            return [...prev, ...newFilms];
-          });
-        }
-        setTotalPages(response.data.pagination?.pages || 1);
-      } else {
-        setFilms([]);
-      }
-    } catch (err) {
-      console.error('Ошибка загрузки фильмов:', err);
-      setError('Не удалось загрузить фильмы. Попробуйте позже.');
-    } finally {
-      setLoading(false);
-    }
-  }, [sortType]);
-
-  useEffect(() => {
-    loadFilms(page);
-  }, [page, loadFilms]);
-
   useEffect(() => {
     refreshEvents();
   }, [refreshEvents]);
-
-  const loadMore = useCallback(() => {
-    if (page < totalPages) {
-      setPage(prev => prev + 1);
-    }
-  }, [page, totalPages]);
 
   const handleSearch = useCallback(async () => {
     const query = searchQuery.trim();
@@ -131,10 +90,10 @@ function HomePage() {
             filmId: response.data.film._id
           });
         } catch (eventErr) {
-          console.warn('Не удалось сохранить событие, но фильм добавлен:', eventErr?.message || eventErr);
+          console.warn('Не удалось сохранить событие:', eventErr?.message || eventErr);
         }
       }
-      setPage(1);
+      setCatalogRefreshKey(prev => prev + 1);
       showNotification({ title: 'Фильм добавлен!', message: 'Фильм успешно добавлен в каталог', type: 'success' });
     } catch (err) {
       showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить фильм', type: 'error' });
@@ -149,10 +108,6 @@ function HomePage() {
     navigate('/');
     showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });
   }, [navigate, showNotification]);
-
-  if (loading && page === 1) return <div className="loading">Загрузка...</div>;
-
-  const topFilms = [...films].filter(f => f.averageRating > 0).sort((a, b) => b.averageRating - a.averageRating).slice(0, 5);
 
   return (
     <div className="container">
@@ -172,32 +127,6 @@ function HomePage() {
         </div>
         {searchError && <div className="error-msg">{searchError}</div>}
       </div>
-
-      <div className="sort-tabs">
-        <div 
-          className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`}
-          onClick={() => { setSortType('technical'); setPage(1); }}
-        >
-          <span className="tab-icon">🎯</span>
-          <span className="tab-label">Техническая</span>
-        </div>
-        <div 
-          className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`}
-          onClick={() => { setSortType('vibe'); setPage(1); }}
-        >
-          <span className="tab-icon">💫</span>
-          <span className="tab-label">Вайб</span>
-        </div>
-        <div 
-          className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`}
-          onClick={() => { setSortType('combined'); setPage(1); }}
-        >
-          <span className="tab-icon">⭐</span>
-          <span className="tab-label">Общая</span>
-        </div>
-      </div>
-
-      {error && <div className="error-msg">{error}</div>}
 
       {showSearch && searchResults.length > 0 && (
         <div className="search-results glass-card">
@@ -219,42 +148,17 @@ function HomePage() {
         </div>
       )}
 
-      {topFilms.length > 0 && (
-        <div className="top-films-netflix">
-          <div className="top-header-netflix">
-            <h3>🏆 Топ-5 сообщества</h3>
-          </div>
-          <div className="top-scroll-container">
-            <div className="top-scroll-wrapper">
-              {topFilms.map((film, i) => (
-                <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
-                  <div className="top-card-poster-wrapper">
-                    <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
-                    <div className="top-card-rank">
-                      {i === 0 && '👑'}
-                      {i === 1 && '🥇'}
-                      {i === 2 && '🥈'}
-                      {i === 3 && '🥉'}
-                      {i >= 4 && `#${i + 1}`}
-                    </div>
-                    <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
-                      {film.averageRating?.toFixed(1)}
-                    </div>
-                  </div>
-                  <div className="top-card-info">
-                    <span className="top-card-title">{film.title}</span>
-                    <span className="top-card-year">{film.year}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       <ActivityFeed events={events} loading={eventsLoading} />
 
-      
+      <div className="catalog-section">
+        <div className="catalog-section-header">
+          <h3>🎬 Все фильмы</h3>
+          <Link to="/catalog" className="view-all-link">Смотреть весь каталог →</Link>
+        </div>
+        <FilmsCatalog key={catalogRefreshKey} initialSort="technical" limit={20} showSortTabs={true} />
+      </div>
+    </div>
+  );
 }
 
 export default HomePage;
