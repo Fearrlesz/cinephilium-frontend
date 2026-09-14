@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
@@ -5,8 +6,11 @@ import './Header.css';
 function Header({ user, onLogout }) {
   return (
     <header className="header">
-      <h1>🎬 СИНЕФИЛИУМ</h1>
+      <Link to="/" className="header-logo-link">
+        <h1>🎬 СИНЕФИЛИУМ</h1>
+      </Link>
       <div className="header-actions">
+        <Link to="/catalog" className="btn-catalog">🎬 Каталог</Link>
         <Link to="/about" className="btn-about">📖 О системе</Link>
         <Link to="/top" className="btn-top">🏆 Топ</Link>
         <a href="https://t.me/Cinephilium" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
