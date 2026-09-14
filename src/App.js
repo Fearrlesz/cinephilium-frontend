@@ -7,10 +7,10 @@ import AboutPage from './pages/AboutPage';
 import TopUsersPage from './pages/TopUsersPage';
 import AdminPanel from './pages/AdminPanel';
 import FilmPage from './pages/FilmPage/FilmPage';
-import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
+import FilmsCatalogPage from './pages/FilmsCatalogPage/FilmsCatalogPage';
 import './App.css';
 
 function App() {
@@ -23,9 +23,7 @@ function App() {
       }
       return { isOpen: true, title, message, type };
     });
-    if (window.notificationTimer) {
-      clearTimeout(window.notificationTimer);
-    }
+    if (window.notificationTimer) clearTimeout(window.notificationTimer);
     window.notificationTimer = setTimeout(() => {
       setNotification(prev => ({ ...prev, isOpen: false }));
       window.notificationTimer = null;
@@ -41,6 +39,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/catalog" element={<FilmsCatalogPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/top" element={<TopUsersPage />} />
           <Route path="/admin" element={<AdminPanel />} />
