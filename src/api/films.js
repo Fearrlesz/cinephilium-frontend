@@ -1,6 +1,6 @@
 import api from './client';
 
-export const getFilms = (page = 1, limit = 20, sort = 'technical') => {
+export const getFilms = (page = 1, limit = 20, sort = 'technical') => { 
   return api.get(`/films?page=${page}&limit=${limit}&sort=${sort}`);
 };
 
