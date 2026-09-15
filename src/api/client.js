@@ -1,21 +1,34 @@
-import api from './client';
+// ============================================================
+// API CLIENT
+// ============================================================
 
-export const getFilms = (page = 1, limit = 20, sort = 'technical') => {
-  return api.get(`/films?page=${page}&limit=${limit}&sort=${sort}`);
-};
+import axios from 'axios';
 
-export const getFilm = (id) => {
-  return api.get(`/films/${id}`);
-};
+const api = axios.create({
+  baseURL: 'https://cinephilium-backend.onrender.com/api',
+  timeout: 60000
+});
 
-export const importFilm = (tmdbId) => {
-  return api.post('/films/import', { tmdbId });
-};
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
-export const getFilmUsers = (id) => {
-  return api.get(`/films/${id}/users`);
-};
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export const searchTMDB = (query) => {
-  return api.get('/tmdb/search', { params: { query } });
-};
+export default api;
