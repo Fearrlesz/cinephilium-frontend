@@ -11,7 +11,6 @@ import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
-import FilmsCatalogPage from './pages/FilmsCatalogPage/FilmsCatalogPage'; // ← ДОБАВЛЕНО
 import './App.css';
 
 function App() {
