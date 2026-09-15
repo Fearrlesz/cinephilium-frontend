@@ -78,7 +78,7 @@ function HomePage() {
   const loadMore = useCallback(async () => {
     if (loadingMoreRef.current) return;
     if (loading) return;
-    if (page >= totalPages) return;
+    if (films.length >= totalCount) return;   // всё реально загружено
 
     // Запоминаем «поколение» загрузки. Если за время запроса случится
     // полная перезагрузка (смена сортировки / импорт) — resetReqIdRef
@@ -99,13 +99,20 @@ function HomePage() {
 
       const list = Array.isArray(data?.films) ? data.films : [];
 
+      // Бэк больше ничего не отдаёт — значит реально всё, что можно было, загружено.
+      // Синхронизируем totalCount с фактическим количеством, чтобы кнопка исчезла.
+      if (list.length === 0) {
+        setTotalCount(films.length);
+        return;
+      }
+
       setFilms(prev => {
         const seen = new Set(prev.map(f => f._id));
         return [...prev, ...list.filter(f => !seen.has(f._id))];
       });
       setPage(nextPage);
-      setTotalPages(data?.pagination?.pages ?? totalPages);
-      setTotalCount(data?.pagination?.total ?? totalCount);
+      if (data?.pagination?.pages) setTotalPages(data.pagination.pages);
+      if (typeof data?.pagination?.total === 'number') setTotalCount(data.pagination.total);
     } catch (err) {
       if (reqIdAtStart !== resetReqIdRef.current) return;
       console.error('Ошибка догрузки страницы:', err);
@@ -115,7 +122,7 @@ function HomePage() {
       loadingMoreRef.current = false;
       setLoadingMore(false);
     }
-  }, [page, totalPages, totalCount, sortType, loading]);
+  }, [page, totalCount, sortType, loading, films.length]);
 
   /* ---------------- Первичная загрузка + смена сортировки ---------------- */
   useEffect(() => {
@@ -214,7 +221,10 @@ function HomePage() {
     .sort((a, b) => b.averageRating - a.averageRating)
     .slice(0, 5);
 
-  const hasMore = page < totalPages;
+  // Считаем по количеству, а не по номерам страниц: из-за нестабильной
+  // сортировки на бэке часть фильмов теряется/дублируется, поэтому
+  // page === totalPages ещё не значит, что всё загружено.
+  const hasMore = films.length < totalCount;
 
   return (
     <div className="container">
