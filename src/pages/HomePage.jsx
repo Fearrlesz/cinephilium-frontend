@@ -9,12 +9,11 @@ import { getScoreColor } from '../utils/constants';
 import './HomePage.css';
 
 const FILMS_PER_PAGE = 20;
-const POLLING_INTERVAL = 60000; // мс; поставьте 0, чтобы отключить автообновление
 
 function HomePage() {
   const [films, setFilms] = useState([]);
-  const [loading, setLoading] = useState(true);        // полная перезагрузка (первая страница)
-  const [loadingMore, setLoadingMore] = useState(false); // догрузка следующей страницы
+  const [loading, setLoading] = useState(true);          // первая загрузка
+  const [loadingMore, setLoadingMore] = useState(false); // догрузка
   const [error, setError] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +24,7 @@ function HomePage() {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [sortType, setSortType] = useState('technical');
   const [user, setUser] = useState(null);
 
@@ -32,8 +32,10 @@ function HomePage() {
   const { showNotification } = useNotification();
   const { events, loading: eventsLoading, addEvent, refresh: refreshEvents } = useActivityEvents();
 
-  // Защита от гонок: устаревшие ответы не перезаписывают свежие
-  const requestIdRef = useRef(0);
+  // Защита только от гонок ПОЛНОЙ перезагрузки (смена сортировки / импорт).
+  // Догрузка страниц использует отдельный флаг loadingMore и не бампает этот счётчик.
+  const resetReqIdRef = useRef(0);
+  const loadingMoreRef = useRef(false);   // синхронный флаг (state асинхронный)
 
   /* ---------------- Пользователь ---------------- */
   useEffect(() => {
@@ -47,91 +49,92 @@ function HomePage() {
       });
   }, []);
 
-  /* ---------------- Загрузка фильмов ---------------- */
-  // Полностью явная функция: все параметры передаются снаружи
-  const loadFilms = useCallback(async (pageNum, sort, { append = false } = {}) => {
-    const reqId = ++requestIdRef.current;
-    if (append) setLoadingMore(true);
-    else setLoading(true);
+  /* ---------------- Загрузка первой страницы (reset) ---------------- */
+  const reloadFromStart = useCallback(async (sort) => {
+    const reqId = ++resetReqIdRef.current;
+    setLoading(true);
     setError('');
-
     try {
-      const response = await api.get('/films', {
-        params: { page: pageNum, limit: FILMS_PER_PAGE, sort }
+      const { data } = await api.get('/films', {
+        params: { page: 1, limit: FILMS_PER_PAGE, sort }
       });
+      if (reqId !== resetReqIdRef.current) return;   // устарел
 
-      // Пока ждали — пришёл более новый запрос, этот ответ устарел
-      if (reqId !== requestIdRef.current) return;
-
-      const data = response.data;
       const list = Array.isArray(data?.films) ? data.films : [];
-
-      if (append) {
-        setFilms(prev => {
-          const existingIds = new Set(prev.map(f => f._id));
-          return [...prev, ...list.filter(f => !existingIds.has(f._id))];
-        });
-      } else {
-        setFilms(list);
-      }
-
+      setFilms(list);
+      setPage(1);
       setTotalPages(data?.pagination?.pages || 1);
+      setTotalCount(data?.pagination?.total ?? list.length);
     } catch (err) {
-      if (reqId !== requestIdRef.current) return;
+      if (reqId !== resetReqIdRef.current) return;
       console.error('Ошибка загрузки фильмов:', err);
       setError('Не удалось загрузить фильмы. Попробуйте позже.');
     } finally {
-      if (reqId === requestIdRef.current) {
-        setLoading(false);
-        setLoadingMore(false);
-      }
+      if (reqId === resetReqIdRef.current) setLoading(false);
     }
-  }, []); // <- больше никаких зависимостей
+  }, []);
 
-  // Первичная загрузка + перезагрузка при смене сортировки
+  /* ---------------- Догрузка следующей страницы (append) ---------------- */
+  const loadMore = useCallback(async () => {
+    if (loadingMoreRef.current) return;
+    if (loading) return;
+    if (page >= totalPages) return;
+
+    // Запоминаем «поколение» загрузки. Если за время запроса случится
+    // полная перезагрузка (смена сортировки / импорт) — resetReqIdRef
+    // увеличится, и мы отбросим устаревший ответ.
+    const reqIdAtStart = resetReqIdRef.current;
+
+    const nextPage = page + 1;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+
+    try {
+      const { data } = await api.get('/films', {
+        params: { page: nextPage, limit: FILMS_PER_PAGE, sort: sortType }
+      });
+
+      // Проверяем, что за время запроса не было reset.
+      if (reqIdAtStart !== resetReqIdRef.current) return;
+
+      const list = Array.isArray(data?.films) ? data.films : [];
+
+      setFilms(prev => {
+        const seen = new Set(prev.map(f => f._id));
+        return [...prev, ...list.filter(f => !seen.has(f._id))];
+      });
+      setPage(nextPage);
+      setTotalPages(data?.pagination?.pages ?? totalPages);
+      setTotalCount(data?.pagination?.total ?? totalCount);
+    } catch (err) {
+      if (reqIdAtStart !== resetReqIdRef.current) return;
+      console.error('Ошибка догрузки страницы:', err);
+      setError('Не удалось загрузить ещё фильмы. Попробуйте позже.');
+    } finally {
+      // Флаг сбрасываем всегда — иначе после reset «залипнем» навсегда.
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [page, totalPages, totalCount, sortType, loading]);
+
+  /* ---------------- Первичная загрузка + смена сортировки ---------------- */
   useEffect(() => {
-    setPage(1);
-    loadFilms(1, sortType, { append: false });
-  }, [sortType, loadFilms]);
+    reloadFromStart(sortType);
+  }, [sortType, reloadFromStart]);
 
   /* ---------------- Лента активностей ---------------- */
-  useEffect(() => {
-    refreshEvents();
-  }, [refreshEvents]);
-
-  /* ---------------- Polling первой страницы ---------------- */
-  useEffect(() => {
-    if (!POLLING_INTERVAL) return;
-    const id = setInterval(() => {
-      if (isImporting) return;                          // не мешаем ручному импорту
-      if (document.hidden) return;                      // не грузим во фоне
-      loadFilms(1, sortType, { append: false });
-    }, POLLING_INTERVAL);
-    return () => clearInterval(id);
-  }, [loadFilms, sortType, isImporting]);
-
-  /* ---------------- Пагинация ---------------- */
-  const loadMore = useCallback(() => {
-    if (loading || loadingMore) return;
-    if (page >= totalPages) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
-    loadFilms(nextPage, sortType, { append: true });
-  }, [page, totalPages, sortType, loading, loadingMore, loadFilms]);
+  useEffect(() => { refreshEvents(); }, [refreshEvents]);
 
   /* ---------------- Смена сортировки ---------------- */
   const handleSortChange = useCallback((type) => {
     if (type === sortType) return;
-    setSortType(type); // useEffect выше сам сбросит page и перезагрузит
+    setSortType(type);   // useEffect выше перезагрузит
   }, [sortType]);
 
   /* ---------------- Поиск ---------------- */
   const handleSearch = useCallback(async () => {
     const query = searchQuery.trim();
-    if (!query) {
-      setSearchError('Введите название фильма');
-      return;
-    }
+    if (!query) { setSearchError('Введите название фильма'); return; }
     setSearchError('');
     setShowSearch(false);
     try {
@@ -146,40 +149,29 @@ function HomePage() {
     }
   }, [searchQuery, showNotification]);
 
-  /* ---------------- Импорт фильма ---------------- */
+  /* ---------------- Импорт ---------------- */
   const importFilm = useCallback(async (tmdbId, filmTitle) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      showNotification({
-        title: 'Доступ запрещён',
-        message: 'Войдите в систему, чтобы добавлять фильмы',
-        type: 'warning'
-      });
+      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы добавлять фильмы', type: 'warning' });
       navigate('/login');
       return;
     }
     if (isImporting) return;
     setIsImporting(true);
-
     try {
       const response = await api.post('/films/import', { tmdbId });
 
       if (response.data.alreadyExists) {
-        showNotification({
-          title: 'Уже в каталоге',
-          message: `Фильм "${response.data.film.title}" уже есть. Переход...`,
-          type: 'info'
-        });
+        showNotification({ title: 'Уже в каталоге', message: `Фильм "${response.data.film.title}" уже есть. Переход...`, type: 'info' });
         setTimeout(() => navigate(`/film/${response.data.film._id}`), 1000);
         return;
       }
 
-      // Закрываем поиск
       setShowSearch(false);
       setSearchQuery('');
       setSearchResults([]);
 
-      // Лента активностей
       if (user) {
         try {
           await addEvent({
@@ -188,23 +180,13 @@ function HomePage() {
             film: filmTitle || 'Новый фильм',
             filmId: response.data.film._id
           });
-        } catch (eventErr) {
-          console.warn('Не удалось сохранить событие:', eventErr?.message || eventErr);
-        }
+        } catch (e) { console.warn('event:', e); }
       }
 
-      // === ГЛАВНЫЙ ФИКС ===
-      // Сбрасываем страницу И принудительно перезагружаем список,
-      // потому что setPage(1) на первой странице не даёт никакого эффекта.
-      setPage(1);
-      await loadFilms(1, sortType, { append: false });
-      await refreshEvents(); // лента тоже обновляется сразу
+      await reloadFromStart(sortType);
+      await refreshEvents();
 
-      showNotification({
-        title: 'Фильм добавлен!',
-        message: 'Фильм успешно добавлен в каталог',
-        type: 'success'
-      });
+      showNotification({ title: 'Фильм добавлен!', message: 'Фильм успешно добавлен в каталог', type: 'success' });
     } catch (err) {
       showNotification({
         title: 'Ошибка',
@@ -214,10 +196,7 @@ function HomePage() {
     } finally {
       setIsImporting(false);
     }
-  }, [
-    isImporting, user, addEvent, refreshEvents,
-    navigate, showNotification, loadFilms, sortType
-  ]);
+  }, [isImporting, user, addEvent, refreshEvents, navigate, showNotification, reloadFromStart, sortType]);
 
   /* ---------------- Выход ---------------- */
   const handleLogout = useCallback(() => {
@@ -228,14 +207,14 @@ function HomePage() {
   }, [navigate, showNotification]);
 
   /* ---------------- Рендер ---------------- */
-  if (loading && films.length === 0) {
-    return <div className="loading">Загрузка...</div>;
-  }
+  if (loading && films.length === 0) return <div className="loading">Загрузка...</div>;
 
   const topFilms = [...films]
     .filter(f => f.averageRating > 0)
     .sort((a, b) => b.averageRating - a.averageRating)
     .slice(0, 5);
+
+  const hasMore = page < totalPages;
 
   return (
     <div className="container">
@@ -257,26 +236,14 @@ function HomePage() {
       </div>
 
       <div className="sort-tabs">
-        <div
-          className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`}
-          onClick={() => handleSortChange('technical')}
-        >
-          <span className="tab-icon">🎯</span>
-          <span className="tab-label">Техническая</span>
+        <div className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`} onClick={() => handleSortChange('technical')}>
+          <span className="tab-icon">🎯</span><span className="tab-label">Техническая</span>
         </div>
-        <div
-          className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`}
-          onClick={() => handleSortChange('vibe')}
-        >
-          <span className="tab-icon">💫</span>
-          <span className="tab-label">Вайб</span>
+        <div className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`} onClick={() => handleSortChange('vibe')}>
+          <span className="tab-icon">💫</span><span className="tab-label">Вайб</span>
         </div>
-        <div
-          className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`}
-          onClick={() => handleSortChange('combined')}
-        >
-          <span className="tab-icon">⭐</span>
-          <span className="tab-label">Общая</span>
+        <div className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`} onClick={() => handleSortChange('combined')}>
+          <span className="tab-icon">⭐</span><span className="tab-label">Общая</span>
         </div>
       </div>
 
@@ -288,20 +255,11 @@ function HomePage() {
           <div className="films-grid">
             {searchResults.map((film) => (
               <div key={film.id} className="film-card">
-                <img
-                  src={film.poster_path
-                    ? `https://image.tmdb.org/t/p/w200${film.poster_path}`
-                    : '/no-poster.jpg'}
-                  alt={film.title}
-                />
+                <img src={film.poster_path ? `https://image.tmdb.org/t/p/w200${film.poster_path}` : '/no-poster.jpg'} alt={film.title} />
                 <div className="film-info">
                   <h4>{film.title}</h4>
                   <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
-                  <button
-                    onClick={() => importFilm(film.id, film.title)}
-                    disabled={isImporting}
-                    className="btn-add"
-                  >
+                  <button onClick={() => importFilm(film.id, film.title)} disabled={isImporting} className="btn-add">
                     {isImporting ? 'Добавление...' : '➕ Добавить'}
                   </button>
                 </div>
@@ -313,9 +271,7 @@ function HomePage() {
 
       {topFilms.length > 0 && (
         <div className="top-films-netflix">
-          <div className="top-header-netflix">
-            <h3>🏆 Топ-5 сообщества</h3>
-          </div>
+          <div className="top-header-netflix"><h3>🏆 Топ-5 сообщества</h3></div>
           <div className="top-scroll-container">
             <div className="top-scroll-wrapper">
               {topFilms.map((film, i) => (
@@ -323,11 +279,7 @@ function HomePage() {
                   <div className="top-card-poster-wrapper">
                     <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
                     <div className="top-card-rank">
-                      {i === 0 && '👑'}
-                      {i === 1 && '🥇'}
-                      {i === 2 && '🥈'}
-                      {i === 3 && '🥉'}
-                      {i >= 4 && `#${i + 1}`}
+                      {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
                     </div>
                     <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
                       {film.averageRating?.toFixed(1)}
@@ -347,9 +299,7 @@ function HomePage() {
       <ActivityFeed events={events} loading={eventsLoading} />
 
       {films.length === 0 && !loading ? (
-        <div className="no-films glass-card">
-          Нет добавленных фильмов. Найдите и добавьте первый!
-        </div>
+        <div className="no-films glass-card">Нет добавленных фильмов. Найдите и добавьте первый!</div>
       ) : (
         <>
           <div className="films-grid">
@@ -387,18 +337,16 @@ function HomePage() {
             ))}
           </div>
 
-          {page < totalPages && (
-            <div className="load-more">
-              <button
-                onClick={loadMore}
-                className="load-more-btn"
-                disabled={loadingMore}
-              >
+          <div className="load-more">
+            {hasMore ? (
+              <button onClick={loadMore} className="load-more-btn" disabled={loadingMore}>
                 {loadingMore ? 'Загрузка...' : 'Загрузить ещё'}
               </button>
-              <span className="page-info">{page} / {totalPages}</span>
-            </div>
-          )}
+            ) : (
+              <span className="load-more-end">— Это все фильмы ({films.length}) —</span>
+            )}
+            <span className="page-info">Показано {films.length} из {totalCount}</span>
+          </div>
         </>
       )}
     </div>
