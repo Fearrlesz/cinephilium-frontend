@@ -1,268 +1,361 @@
-/* ============================================================
-   RATING FORM — премиум золото
-   Полностью переписан: исправлены конфликты классов,
-   fallback-цвета, градиентные дорожки слайдеров,
-   «пропадающие» элементы, тултипы и адаптив.
-   ============================================================ */
+/* =================================================================
+   RatingForm.css — УЛУЧШЕННАЯ ВЕРСИЯ
+   Premium Gold + Glassmorphism 2.0 + Bento + Dark-first
+   Все классы и селекторы сохранены. Изменения — только визуальные.
+   ================================================================= */
 
-/* ---------- Локальные fallback-переменные ----------
-   Если глобальные не заданы — берём разумные дефолты. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+/* ============================================================
+   1. ДИЗАЙН-ТОКЕНЫ
+   ============================================================ */
+:root,
 .rating-form {
-  --gold:          var(--gold,          #a88540);
-  --gold-bright:   var(--gold-bright,   #d9b45f);
-  --gold-15:       rgba(168, 133, 64, 0.15);
-  --gold-10:       rgba(168, 133, 64, 0.10);
-  --gold-06:       rgba(168, 133, 64, 0.06);
-  --gold-04:       rgba(168, 133, 64, 0.04);
-  --neon-purple:   var(--neon-purple,   #8b5cf6);
-  --neon-cyan:     var(--neon-cyan,     #22d3ee);
-  --neon-pink:     var(--neon-pink,     #ec4899);
-  --text-primary:  var(--text-primary,  #f0f0f5);
-  --text-secondary:var(--text-secondary,#a0a0b0);
-  --text-muted:    var(--text-muted,    #606070);
-  --bg-deep:       var(--bg-deep,       #0a0a14);
-  --glass-border:  var(--glass-border,  rgba(255, 255, 255, 0.06));
-  --transition-base: var(--transition-base, all .3s ease);
-  --transition-smooth: var(--transition-smooth, all .3s cubic-bezier(.2,.8,.2,1));
-  --radius-md: var(--radius-md, 12px);
-  --radius-lg: var(--radius-lg, 16px);
-  --font-sans: var(--font-sans, 'Inter', system-ui, sans-serif);
-  --font-mono: var(--font-mono, 'JetBrains Mono', 'Fira Code', monospace);
-  --ease-premium: var(--ease-premium, cubic-bezier(.2,.8,.2,1));
+  --gold: #a88540;
+  --gold-bright: #d9b45f;
+  --neon-purple: #8b5cf6;
+  --neon-cyan: #22d3ee;
+  --neon-pink: #ec4899;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+
+  --bg-deep: #0a0a14;
+  --bg-surface: #111122;
+  --bg-elevated: #171730;
+
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-strong: rgba(255, 255, 255, 0.14);
+  --glass-fill: rgba(255, 255, 255, 0.035);
+  --glass-fill-strong: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(24px) saturate(180%);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 60px;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --transition-base: all .2s ease;
+  --transition-smooth: all .3s cubic-bezier(.2,.8,.2,1);
+  --ease-premium: cubic-bezier(.2,.8,.2,1);
+
+  --h3-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  --h4-size: clamp(1.05rem, 0.95rem + 0.55vw, 1.35rem);
+  --ls-tight: -0.02em;
 }
 
 /* ============================================================
-   ЗАГОЛОВКИ БЛОКОВ — голографические (только реальные заголовки)
+   2. БАЗОВЫЙ КОНТЕЙНЕР И BENTO-СЕТКА
+   ============================================================ */
+.rating-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  /* Мягкий mesh-фон под всем интерфейсом (§1.4) */
+  background:
+    radial-gradient(circle at 12% 4%,  rgba(168, 133, 64, 0.10) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(139, 92, 246, 0.08) 0%, transparent 48%),
+    radial-gradient(circle at 50% 100%, rgba(34, 211, 238, 0.05) 0%, transparent 60%),
+    var(--bg-deep);
+}
+
+/* Бенто-сетка на десктопе (§1.4) */
+@media (min-width: 1024px) {
+  .rating-form {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .rating-form > * { margin-bottom: 0 !important; }
+
+  .genre-block     { grid-column: span 12; }
+  .criteria-block  { grid-column: span 6; }
+  .vibe-block      { grid-column: span 6; }
+  .review-block    { grid-column: span 6; }
+  .preview         { grid-column: span 6; position: sticky; top: 24px; }
+  .btn-save-rating { grid-column: span 12; }
+}
+
+/* ============================================================
+   3. КАРТОЧКИ — GLASSMORPHISM 2.0 (§1.4)
+   ============================================================ */
+.glass-card,
+.criteria-block,
+.vibe-block,
+.review-block,
+.preview {
+  position: relative;
+  padding: 22px 24px;
+  background:
+    linear-gradient(180deg,
+      var(--glass-fill-strong) 0%,
+      var(--glass-fill) 100%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  /* Elevation через тона, а не светлые тени (§1.4) */
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.35) inset,
+    0 8px 28px rgba(0, 0, 0, 0.35);
+  transition: var(--transition-smooth);
+}
+/* Внутренняя 1px подсветка сверху (§1.4) */
+.glass-card::before,
+.criteria-block::before,
+.vibe-block::before,
+.review-block::before,
+.preview::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(217, 180, 95, 0.24) 55%,
+    transparent 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.glass-card:hover,
+.criteria-block:hover,
+.vibe-block:hover,
+.review-block:hover,
+.preview:hover {
+  border-color: var(--glass-border-strong);
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.4) inset,
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(168, 133, 64, 0.10);
+}
+
+/* ============================================================
+   4. ТИПОГРАФИКА — КИНЕТИЧЕСКИЕ ЗАГОЛОВКИ (§1.4)
    ============================================================ */
 .genre-block > h3,
 .criteria-block > h4,
 .vibe-block > h3 {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1.2rem;
-  margin: 0 0 .75rem 0;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: var(--h3-size);
+  letter-spacing: var(--ls-tight);
+  line-height: 1.15;
+  margin: 0 0 1rem 0;
   display: inline-block;
-  padding-bottom: 6px;
-  border-bottom: 2px solid rgba(168, 133, 64, 0.12);
-  /* базовый цвет на случай отсутствия поддержки градиентного текста */
-  color: var(--text-primary, #f0f0f5);
+  padding-bottom: 8px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(168, 133, 64, 0.14);
+  transition: var(--transition-smooth);
 }
 
-/* Градиентный текст — только если браузер умеет background-clip: text */
+.criteria-block > h4 {
+  font-size: var(--h4-size);
+  font-weight: 700;
+}
+
+/* Голографический градиент — с аккуратной деградацией */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .genre-block > h3,
   .criteria-block > h4,
   .vibe-block > h3 {
-    background: linear-gradient(135deg,
-      var(--text-primary, #f0f0f5) 10%,
-      var(--gold, #a88540)        30%,
-      var(--gold-bright, #d9b45f) 45%,
-      var(--neon-purple, #8b5cf6) 65%,
-      var(--neon-cyan, #22d3ee)   80%,
-      var(--text-primary, #f0f0f5) 100%
-    );
-    background-size: 300% 300%;
+    background: linear-gradient(120deg,
+      #ffffff 0%,
+      var(--gold-bright) 22%,
+      var(--gold) 38%,
+      #ffffff 52%,
+      var(--gold) 68%,
+      #ffffff 100%);
+    background-size: 260% 100%;
     -webkit-background-clip: text;
             background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: holographicShift 10s ease-in-out infinite;
-    filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.04));
+    animation: holographicShift 12s ease-in-out infinite;
   }
 }
-
 @keyframes holographicShift {
   0%, 100% { background-position: 0% 50%; }
   50%      { background-position: 100% 50%; }
 }
 
 /* ============================================================
-   SELECT (жанр)
+   5. SELECT (жанр)
    ============================================================ */
 .genre-block select {
   width: 100%;
-  max-width: 100%;
-  padding: 16px 22px;
-  background-color: rgba(255, 255, 255, 0.03);
+  padding: 15px 22px;
+  background-color: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--glass-border);
-  border-radius: 60px;
+  border-radius: var(--radius-pill);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 500;
-  letter-spacing: 0.01em;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23d9b45f' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 22px center;
   cursor: pointer;
   transition: var(--transition-smooth);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
-
 .genre-block select:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(168, 133, 64, 0.30);
+  background-color: rgba(255, 255, 255, 0.055);
 }
-
-.genre-block select:focus {
+.genre-block select:focus-visible {
   outline: none;
-  border-color: var(--gold);
+  border-color: var(--gold-bright);
   box-shadow:
-    0 0 0 4px rgba(168, 133, 64, 0.08),
-    0 0 30px rgba(168, 133, 64, 0.04),
-    0 4px 20px rgba(0, 0, 0, 0.3);
+    0 0 0 3px rgba(168, 133, 64, 0.16),
+    0 0 32px rgba(168, 133, 64, 0.14);
 }
-
 .genre-block select option {
-  background: var(--bg-deep);
+  background: var(--bg-surface);
   color: var(--text-primary);
-  padding: 12px;
 }
 
 /* ============================================================
-   БАЗОВЫЙ RANGE — разделены background-color и background-image
+   6. БАЗОВЫЙ RANGE — сохранён, усилена реактивность (§1.5)
    ============================================================ */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  max-width: 100%;
   height: 6px;
   border-radius: 6px;
   outline: none;
   cursor: pointer;
-  transition: background-color .2s ease, box-shadow .2s ease;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-  /* база — светлая дорожка */
+  transition: box-shadow .2s ease, transform .2s ease;
   background-color: rgba(255, 255, 255, 0.06);
-  /* градиент — поверх, с fallback-цветами на каждую переменную */
   background-image: linear-gradient(
     to right,
-    var(--gold, #a88540) 0%,
-    var(--gold, #a88540) var(--fill, 0%),
-    transparent          var(--fill, 0%),
-    transparent          100%
+    var(--gold) 0%,
+    var(--gold) var(--fill, 0%),
+    transparent var(--fill, 0%),
+    transparent 100%
   );
   background-repeat: no-repeat;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold, #a88540));
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold) 78%);
   cursor: pointer;
+  margin-top: -11px;
   box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px   rgba(168, 133, 64, 0.1),
+    0 4px 18px rgba(168, 133, 64, 0.35),
     inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0  2px 4px rgba(255, 255, 255, 0.2);
-  transition: transform .15s ease, box-shadow .15s ease;
-  margin-top: -12px;
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: transform .15s ease, box-shadow .2s ease;
 }
-
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+  transform: scale(1.12);
   box-shadow:
-    0 6px 30px rgba(168, 133, 64, 0.5),
-    0 0 40px   rgba(168, 133, 64, 0.15),
+    0 6px 26px rgba(217, 180, 95, 0.5),
+    0 0 32px rgba(217, 180, 95, 0.22),
     inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0  2px 6px rgba(255, 255, 255, 0.3);
+    inset 0 2px 6px rgba(255, 255, 255, 0.3);
 }
-
 input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold, #a88540));
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold) 78%);
   cursor: pointer;
   box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.4),
-    0 0 30px   rgba(168, 133, 64, 0.1),
+    0 4px 18px rgba(168, 133, 64, 0.35),
     inset 0 -3px 8px rgba(0, 0, 0, 0.3),
-    inset 0  2px 4px rgba(255, 255, 255, 0.2);
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
-
 input[type="range"]::-moz-range-track {
   height: 6px;
   border-radius: 6px;
   background-color: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
 }
-
 input[type="range"]:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
-
 input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-moz-range-thumb {
   background: radial-gradient(circle at 35% 30%, #666, #444);
   box-shadow: none;
   border-color: #333;
 }
-
-/* ---------- Варианты дорожек ---------- */
-
-/* Веса блоков — яркое золото */
-.weight-slider input[type="range"] {
-  background-image: linear-gradient(
-    to right,
-    var(--gold-bright, #d9b45f) 0%,
-    var(--gold-bright, #d9b45f) var(--fill, 0%),
-    transparent                 var(--fill, 0%),
-    transparent                 100%
-  );
-}
-.weight-slider input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
-}
-.weight-slider input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+input[type="range"]:focus-visible {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0 3px rgba(168, 133, 64, 0.22);
 }
 
-/* Критерии — базовое золото */
-.criterion-slider input[type="range"] {
-  background-image: linear-gradient(
-    to right,
-    var(--gold, #a88540) 0%,
-    var(--gold, #a88540) var(--fill, 0%),
-    transparent          var(--fill, 0%),
-    transparent          100%
-  );
-}
-
-/* Вайб — яркое золото */
+/* Цвета дорожек по секциям */
+.weight-slider input[type="range"],
 .vibe-block input[type="range"] {
   background-image: linear-gradient(
     to right,
-    var(--gold-bright, #d9b45f) 0%,
-    var(--gold-bright, #d9b45f) var(--fill, 0%),
-    transparent                 var(--fill, 0%),
-    transparent                 100%
+    var(--gold-bright) 0%,
+    var(--gold-bright) var(--fill, 0%),
+    transparent var(--fill, 0%),
+    transparent 100%
   );
 }
+.weight-slider input[type="range"]::-webkit-slider-thumb,
 .vibe-block input[type="range"]::-webkit-slider-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright) 78%);
 }
+.weight-slider input[type="range"]::-moz-range-thumb,
 .vibe-block input[type="range"]::-moz-range-thumb {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright) 78%);
+}
+.criterion-slider input[type="range"] {
+  /* Используем цвет блока, если он проброшен из JSX */
+  background-image: linear-gradient(
+    to right,
+    var(--block-color, var(--gold)) 0%,
+    var(--block-color, var(--gold)) var(--fill, 0%),
+    transparent var(--fill, 0%),
+    transparent 100%
+  );
+}
+.criterion-slider input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--block-color, var(--gold)) 78%);
+}
+.criterion-slider input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--block-color, var(--gold)) 78%);
 }
 
 /* ============================================================
-   КОНТЕЙНЕРЫ СЛАЙДЕРОВ — без wrap, чтобы дорожка не «съезжала»
+   7. КОНТЕЙНЕРЫ СЛАЙДЕРОВ
    ============================================================ */
 .weight-slider,
 .criterion-slider {
@@ -271,714 +364,86 @@ input[type="range"]:disabled::-moz-range-thumb {
   gap: 14px;
   flex-wrap: nowrap;
   width: 100%;
-  max-width: 100%;
   margin-bottom: 14px;
 }
-
 .weight-slider label,
 .criterion-slider label {
-  flex: 0 0 180px;
+  flex: 0 0 190px;
   min-width: 110px;
   font-size: 0.9rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   line-height: 1.3;
+  transition: color .2s ease;
 }
-
+.criterion-slider:has(input:focus-visible) label,
+.weight-slider:has(input:focus-visible) label {
+  color: var(--text-primary);
+}
 .weight-slider input[type="range"],
 .criterion-slider input[type="range"] {
   flex: 1 1 auto;
-  min-width: 0;        /* критично для flex + range */
-  max-width: 100%;
+  min-width: 0;
 }
-
-.weight-slider .value-display,
-.criterion-slider .value-display {
+.value-display {
   flex: 0 0 50px;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.045);
   padding: 4px 10px;
-  border-radius: 40px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform .18s var(--ease-premium), color .2s ease,
+              border-color .2s ease, box-shadow .25s ease;
 }
 
-/* ============================================================
-   СУММА ВЕСОВ
-   ============================================================ */
-.weights-sum {
-  margin-top: 16px;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-align: right;
-  padding: 10px 22px;
-  border-radius: 60px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  display: inline-block;
-  float: right;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: var(--transition-smooth);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.genre-block::after {
-  /* очистка обтекания флоата */
-  content: '';
-  display: block;
-  clear: both;
-}
-
-.weights-sum:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-}
-
-.weights-sum.valid {
-  color: var(--gold-bright);
-  border-color: rgba(168, 133, 64, 0.25);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
-}
-
-.weights-sum.invalid {
-  color: var(--neon-pink);
-  border-color: rgba(236, 72, 153, 0.25);
-  box-shadow: 0 0 30px rgba(236, 72, 153, 0.04);
-}
-
-/* ============================================================
-   БЛОК КРИТЕРИЕВ
-   ============================================================ */
-.criteria-block {
-  padding: 20px 22px;
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: var(--transition-smooth);
-}
-
-.criteria-block:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-/* ============================================================
-   БЛОК ВАЙБА
-   ============================================================ */
-.vibe-block {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px 22px;
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: var(--transition-smooth);
-}
-
-.vibe-block:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-.vibe-block > h3 {
-  margin: 0;
-}
-
-.vibe-block > p,
-.vibe-block > .vibe-hint {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.vibe-block .value-display {
-  align-self: flex-end;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1rem;
-  min-width: 44px;
-  text-align: center;
-  color: var(--gold-bright);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 3px 14px;
-  border-radius: 40px;
-  border: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* ============================================================
-   HINT — иконка ⓘ и всплывающая подсказка
-   ============================================================ */
-.hint-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.hint-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  border: 1px solid var(--gold-10, rgba(168, 133, 64, 0.10));
-  border-radius: 50%;
-  font-size: 11px;
-  line-height: 1;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: var(--transition-base);
-}
-
-.hint-icon:hover {
-  color: var(--gold-bright);
-  border-color: var(--gold-15);
-  background: var(--gold-04);
+/* === Немедленное визуальное подтверждение при перетаскивании (§1.5) === */
+.criterion-slider:has(input:active) .value-display,
+.weight-slider:has(input:active) .value-display,
+.vibe-block:has(input:active) .value-display {
   transform: scale(1.08);
-}
-
-.hint-icon[aria-expanded="true"] {
-  color: var(--gold-bright);
+  color: #fff;
   border-color: var(--gold-bright);
-  background: var(--gold-06);
-  box-shadow: 0 0 12px var(--gold-04);
-}
-
-.hint-popup {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  z-index: 1000;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: min(260px, 80vw);
-  padding: 10px 14px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--text-primary);
-  letter-spacing: 0.01em;
-  background: linear-gradient(160deg,
-    rgba(26, 16, 36, 0.98) 0%,
-    rgba(16, 16, 26, 0.98) 100%
-  );
-  border: 1px solid var(--gold-10);
-  border-radius: var(--radius-md);
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.6),
-    0 0 30px var(--gold-04);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  animation: hintFadeIn 0.2s var(--ease-premium);
-  pointer-events: none;
-}
-
-.hint-popup::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: rgba(26, 16, 36, 0.98);
-}
-
-@keyframes hintFadeIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 3px rgba(217, 180, 95, 0.10),
+    0 0 24px rgba(217, 180, 95, 0.28);
 }
 
 /* ============================================================
-   PREVIEW — предварительный расчёт
+   8. ВЕС-ИНДИКАТОР И ВИЗУАЛИЗАЦИЯ ВЕСОВ
    ============================================================ */
-.preview {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 18px 20px;
-  margin: 20px 0;
-  background: linear-gradient(145deg,
-    rgba(168, 133, 64, 0.04) 0%,
-    rgba(20, 20, 40, 0.6)  50%,
-    rgba(168, 133, 64, 0.02) 100%
-  );
-  border: 1px solid rgba(168, 133, 64, 0.08);
-  border-radius: 14px;
-  transition: var(--transition-base);
-}
-
-.preview:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
-}
-
-.preview > h4 {
-  margin: 0 0 14px;
-  padding-bottom: 10px;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--text-primary);
-  border-bottom: 1px solid rgba(168, 133, 64, 0.08);
-}
-
-.preview-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 0;
-  font-size: 13px;
-  color: var(--text-secondary);
-  transition: var(--transition-base);
-}
-
-.preview-row:hover {
-  padding-left: 4px;
-  color: var(--text-primary);
-}
-
-.preview-row > span {
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.preview-row > strong {
-  min-width: 48px;
-  padding: 1px 12px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.04);
-  border: 1px solid rgba(168, 133, 64, 0.04);
-  border-radius: var(--radius-md);
-  transition: var(--transition-base);
-}
-
-.preview-row:hover > strong {
-  background: rgba(168, 133, 64, 0.08);
-  border-color: rgba(168, 133, 64, 0.08);
-}
-
-.preview-row:last-child {
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(168, 133, 64, 0.1);
-}
-
-.preview-row:last-child > span {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.preview-row:last-child > strong {
-  font-size: 15px;
-  color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.08);
-  border-color: rgba(168, 133, 64, 0.12);
-  box-shadow: 0 0 16px rgba(168, 133, 64, 0.06);
-}
-
-/* ============================================================
-   REVIEW BLOCK
-   ============================================================ */
-.review-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 20px;
-  margin: 20px 0;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  transition: var(--transition-base);
-}
-
-.review-block:hover,
-.review-block:focus-within {
-  border-color: rgba(168, 133, 64, 0.15);
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-.review-block > label {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.01em;
-  transition: var(--transition-base);
-}
-
-.review-block:focus-within > label {
-  color: var(--text-primary);
-}
-
-.review-textarea {
-  width: 100%;
-  min-height: 96px;
-  padding: 12px 14px;
-  resize: vertical;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-primary);
-  background: rgba(10, 10, 20, 0.5);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  outline: none;
-  transition: var(--transition-base);
-}
-
-.review-textarea::placeholder {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.review-textarea:hover {
-  border-color: rgba(168, 133, 64, 0.12);
-  background: rgba(10, 10, 20, 0.65);
-}
-
-.review-textarea:focus {
-  border-color: rgba(168, 133, 64, 0.35);
-  background: rgba(10, 10, 20, 0.75);
-  box-shadow:
-    0 0 0 3px rgba(168, 133, 64, 0.06),
-    0 0 24px  rgba(168, 133, 64, 0.04);
-}
-
-.review-textarea::-webkit-scrollbar { width: 3px; }
-.review-textarea::-webkit-scrollbar-track { background: transparent; }
-.review-textarea::-webkit-scrollbar-thumb {
-  background: rgba(168, 133, 64, 0.4);
-  border-radius: 4px;
-}
-
-/* ============================================================
-   КНОПКА СОХРАНЕНИЯ
-   ============================================================ */
-.btn-save-rating {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 16px 24px;
-  margin-top: 8px;
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #1a1208;
-  background: linear-gradient(135deg,
-    var(--gold-bright, #d9b45f) 0%,
-    var(--gold, #a88540)        100%
-  );
-  border: 1px solid rgba(168, 133, 64, 0.5);
-  border-radius: 60px;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-  box-shadow:
-    0 6px 24px rgba(168, 133, 64, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-
-.btn-save-rating:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow:
-    0 10px 30px rgba(168, 133, 64, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.btn-save-rating:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow:
-    0 4px 16px rgba(168, 133, 64, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.btn-save-rating:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  filter: grayscale(0.35);
-  box-shadow: none;
-}
-
-/* ============================================================
-   ГЛАСС-КАРТОЧКИ (общая база)
-   ============================================================ */
-.glass-card {
-  padding: 20px 22px;
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: var(--transition-smooth);
-}
-
-.glass-card:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-/* ============================================================
-   АДАПТИВ
-   ============================================================ */
-@media (max-width: 768px) {
-  .rating-form { padding: 20px 18px; }
-
-  .criteria-block,
-  .vibe-block,
-  .glass-card {
-    padding: 16px 16px 18px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 16px;
-  }
-
-  .genre-block select {
-    padding: 14px 18px;
-    font-size: 0.95rem;
-  }
-
-  .genre-block > h3,
-  .criteria-block > h4,
-  .vibe-block > h3 {
-    font-size: 1rem;
-  }
-
-  .weight-slider label,
-  .criterion-slider label {
-    flex: 0 0 140px;
-    min-width: 100px;
-    font-size: 0.85rem;
-  }
-
-  .weight-slider .value-display,
-  .criterion-slider .value-display {
-    flex: 0 0 44px;
-    font-size: 0.85rem;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    width: 26px;
-    height: 26px;
-    margin-top: -10px;
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
-  }
-
-  .preview-row {
-    font-size: 12.5px;
-  }
-  .preview-row > strong {
-    font-size: 12.5px;
-    min-width: 42px;
-    padding: 1px 10px;
-  }
-}
-
-@media (max-width: 640px) {
-  .criteria-block,
-  .vibe-block,
-  .glass-card {
-    padding: 18px 16px;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  /* Разрешаем wrap только на мобильных */
-  .weight-slider,
-  .criterion-slider {
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  .weight-slider label,
-  .criterion-slider label {
-    flex: 1 1 100%;
-    min-width: auto;
-    font-size: 0.85rem;
-  }
-
-  .weight-slider input[type="range"],
-  .criterion-slider input[type="range"] {
-    flex: 1 1 calc(100% - 60px);
-    order: 2;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .weight-slider .value-display,
-  .criterion-slider .value-display {
-    flex: 0 0 auto;
-    order: 3;
-    margin-left: auto;
-    font-size: 0.8rem;
-    padding: 2px 14px;
-    min-width: 44px;
-  }
-
-  .weights-sum {
-    float: none;
-    display: block;
-    text-align: center;
-    margin-top: 14px;
-    font-size: 0.85rem;
-    padding: 6px 16px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .vibe-block .value-display {
-    font-size: 1rem;
-    padding: 2px 16px;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    width: 32px;
-    height: 32px;
-    margin-top: -12px;
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-@media (max-width: 480px) {
-  .rating-form { padding: 14px 12px; }
-
-  .criteria-block,
-  .vibe-block,
-  .glass-card {
-    padding: 14px 12px;
-    margin-bottom: 14px;
-  }
-
-  .genre-block > h3,
-  .criteria-block > h4,
-  .vibe-block > h3 {
-    font-size: 0.95rem;
-  }
-
-  .weight-slider label,
-  .criterion-slider label {
-    font-size: 0.8rem;
-  }
-  .weight-slider .value-display,
-  .criterion-slider .value-display {
-    font-size: 0.75rem;
-    padding: 0 10px;
-  }
-
-  input[type="range"] {
-    height: 4px;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    width: 22px;
-    height: 22px;
-    margin-top: -9px;
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-  }
-
-  .preview { padding: 14px 14px; }
-  .preview > h4 { font-size: 13px; }
-  .preview-row { font-size: 12px; }
-  .preview-row > strong {
-    font-size: 12px;
-    min-width: 38px;
-    padding: 0 8px;
-  }
-}
-
-@media (max-width: 380px) {
-  .criteria-block,
-  .vibe-block,
-  .glass-card {
-    padding: 12px 10px;
-    border-radius: 14px;
-  }
-}
-
-
- /* ============================================================
-   НОВЫЕ БЛОКИ — дополнение к RatingForm.css
-   ============================================================ */
-
-/* ---------- Точка-индикатор цвета блока (в label) ---------- */
 .weight-dot {
   display: inline-block;
   flex: 0 0 10px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--gold, #a88540);
-  box-shadow:
-    0 0 8px currentColor,
-    inset 0 0 0 2px rgba(255, 255, 255, 0.06);
-  transition: transform var(--transition-base, .25s ease);
+  background: var(--gold);
+  box-shadow: 0 0 8px currentColor;
+  transition: transform .2s var(--ease-premium);
 }
+.weight-slider:hover .weight-dot { transform: scale(1.18); }
 
-.weight-slider:hover .weight-dot {
-  transform: scale(1.15);
-}
-
-/* ============================================================
-   ВИЗУАЛИЗАЦИЯ РАСПРЕДЕЛЕНИЯ ВЕСОВ
-   ============================================================ */
 .weights-viz {
   display: flex;
   width: 100%;
   height: 44px;
-  margin: 14px 0 20px;
-  border-radius: 60px;
+  margin: 16px 0 20px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.025) 0%,
-      rgba(255, 255, 255, 0.01) 100%);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
-  box-shadow:
-    inset 0 2px 10px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 4px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
 }
-
 .weights-viz__seg {
   display: flex;
   align-items: center;
@@ -989,19 +454,14 @@ input[type="range"]:disabled::-moz-range-thumb {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: rgba(10, 10, 20, 0.85);
+  color: rgba(10, 10, 20, 0.88);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.18);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: default;
   transition: filter .2s ease;
 }
-
-.weights-viz__seg:hover {
-  filter: brightness(1.12);
-}
-
+.weights-viz__seg:hover { filter: brightness(1.14); }
 .weights-viz__seg[data-empty="true"] {
   font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.32);
@@ -1010,8 +470,42 @@ input[type="range"]:disabled::-moz-range-thumb {
 }
 
 /* ============================================================
-   КНОПКА "УРОВНЯТЬ"
+   9. СУММА ВЕСОВ И КНОПКА «УРОВНЯТЬ» (§1.3 — green/red coding)
    ============================================================ */
+.weights-sum {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--glass-border);
+  display: inline-block;
+  float: right;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: var(--transition-smooth);
+}
+.genre-block::after { content: ''; display: block; clear: both; }
+.weights-sum.valid {
+  color: #7ad48f;                              /* §1.3 зелёный */
+  border-color: rgba(122, 212, 143, 0.35);
+  background: rgba(122, 212, 143, 0.06);
+  box-shadow: 0 0 30px rgba(122, 212, 143, 0.10);
+}
+.weights-sum.invalid {
+  color: var(--neon-pink);                      /* §1.3 красный */
+  border-color: rgba(236, 72, 153, 0.35);
+  background: rgba(236, 72, 153, 0.06);
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.10);
+}
+.weights-sum__total {
+  font-weight: 800;
+  color: inherit;
+}
+
 .normalize-btn {
   display: inline-flex;
   align-items: center;
@@ -1019,83 +513,148 @@ input[type="range"]:disabled::-moz-range-thumb {
   margin-left: 14px;
   padding: 6px 16px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-primary, #f0f0f5);
+  color: var(--text-primary);
   background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.18) 0%,
-    rgba(139, 92, 246, 0.14) 100%
-  );
-  border: 1px solid rgba(168, 133, 64, 0.28);
-  border-radius: 40px;
+    rgba(168, 133, 64, 0.22) 0%,
+    rgba(139, 92, 246, 0.18) 100%);
+  border: 1px solid rgba(168, 133, 64, 0.30);
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition:
-    color .2s ease,
-    background .25s ease,
-    border-color .25s ease,
-    box-shadow .25s ease,
-    transform .18s ease;
-  box-shadow:
-    0 2px 12px rgba(168, 133, 64, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: var(--transition-smooth);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
-
 .normalize-btn:hover {
-  color: var(--gold-bright, #d9b45f);
-  border-color: rgba(168, 133, 64, 0.5);
-  background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.28) 0%,
-    rgba(139, 92, 246, 0.2) 100%
-  );
+  color: var(--gold-bright);
+  border-color: rgba(217, 180, 95, 0.55);
   transform: translateY(-1px);
   box-shadow:
-    0 6px 20px rgba(168, 133, 64, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 22px rgba(168, 133, 64, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
-
-.normalize-btn:active {
-  transform: translateY(0);
-  box-shadow:
-    0 2px 8px rgba(168, 133, 64, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
+.normalize-btn:active { transform: translateY(0) scale(.98); }
 .normalize-btn:focus-visible {
   outline: none;
   box-shadow:
-    0 0 0 3px rgba(168, 133, 64, 0.2),
-    0 0 24px rgba(168, 133, 64, 0.18);
+    0 0 0 3px rgba(168, 133, 64, 0.28),
+    0 0 24px rgba(168, 133, 64, 0.22);
 }
 
 /* ============================================================
-   МЕТА ОТЗЫВА (счётчик символов)
+   10. HINT
    ============================================================ */
-.review-meta {
-  display: flex;
+.hint-wrapper {
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-muted, #606070);
 }
-
-.review-meta > span:last-child {
-  font-variant-numeric: tabular-nums;
-  color: var(--gold, #a88540);
-  padding: 2px 10px;
-  border-radius: 20px;
-  background: rgba(168, 133, 64, 0.06);
-  border: 1px solid rgba(168, 133, 64, 0.12);
+.hint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 1px solid rgba(168, 133, 64, 0.20);
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+.hint-icon:hover {
+  color: var(--gold-bright);
+  border-color: rgba(217, 180, 95, 0.5);
+  background: rgba(168, 133, 64, 0.08);
+  transform: scale(1.10);
+}
+.hint-icon[aria-expanded="true"] {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+  background: rgba(217, 180, 95, 0.10);
+  box-shadow: 0 0 12px rgba(217, 180, 95, 0.20);
+}
+.hint-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 1000;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(280px, 82vw);
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  background: rgba(17, 17, 34, 0.85);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-md);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(168, 133, 64, 0.10);
+  animation: hintFadeIn .22s var(--ease-premium);
+  pointer-events: none;
+}
+.hint-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(17, 17, 34, 0.85);
+}
+@keyframes hintFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ============================================================
-   ПРЕВЬЮ — шапка с бейджем оценки
+   11. VIBE-BLOCK
    ============================================================ */
+.vibe-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vibe-block > label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  transition: color .2s ease;
+}
+.vibe-block:has(input:focus-visible) > label { color: var(--text-primary); }
+.vibe-block .value-display {
+  align-self: flex-end;
+  min-width: 46px;
+  padding: 3px 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gold-bright);
+}
+
+/* ============================================================
+   12. PREVIEW, GRADE-BADGE, BLOCK-BARS (§1.3 цвета)
+   ============================================================ */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background:
+    linear-gradient(150deg,
+      rgba(217, 180, 95, 0.06) 0%,
+      rgba(17, 17, 34, 0.75) 45%,
+      rgba(139, 92, 246, 0.05) 100%);
+}
 .preview-head {
   display: flex;
   align-items: center;
@@ -1103,46 +662,40 @@ input[type="range"]:disabled::-moz-range-thumb {
   gap: 14px;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(168, 133, 64, 0.1);
+  border-bottom: 1px solid rgba(168, 133, 64, 0.14);
   flex-wrap: wrap;
 }
-
 .preview-head > h4 {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--text-primary, #f0f0f5);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
 }
 
-/* ---------- Бейдж буквенной оценки ---------- */
+/* Grade badge — цвет берётся из --grade-color (JSX) */
 .grade-badge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 16px 6px 10px;
-  border-radius: 60px;
+  padding: 6px 16px 6px 8px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(135deg,
-    color-mix(in oklab, var(--grade-color, #d9b45f) 18%, transparent) 0%,
-    rgba(20, 20, 40, 0.55) 100%
-  );
-  border: 1px solid color-mix(in oklab, var(--grade-color, #d9b45f) 35%, transparent);
+    color-mix(in oklab, var(--grade-color, var(--gold-bright)) 22%, transparent) 0%,
+    rgba(17, 17, 34, 0.65) 100%);
+  border: 1px solid color-mix(in oklab, var(--grade-color, var(--gold-bright)) 40%, transparent);
   box-shadow:
-    0 4px 20px color-mix(in oklab, var(--grade-color, #d9b45f) 14%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition:
-    transform .2s ease,
-    box-shadow .25s ease;
+    0 4px 22px color-mix(in oklab, var(--grade-color, var(--gold-bright)) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform .2s var(--ease-premium), box-shadow .25s ease;
 }
-
 .grade-badge:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 6px 26px color-mix(in oklab, var(--grade-color, #d9b45f) 26%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 8px 30px color-mix(in oklab, var(--grade-color, var(--gold-bright)) 30%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
-
 .grade-badge__letter {
   display: inline-flex;
   align-items: center;
@@ -1155,36 +708,31 @@ input[type="range"]:disabled::-moz-range-thumb {
   color: #0a0a14;
   background: radial-gradient(circle at 35% 30%,
     #ffffff 0%,
-    var(--grade-color, #d9b45f) 72%
-  );
+    var(--grade-color, var(--gold-bright)) 76%);
   border-radius: 50%;
   box-shadow:
-    0 2px 10px color-mix(in oklab, var(--grade-color, #d9b45f) 40%, transparent),
+    0 2px 10px color-mix(in oklab, var(--grade-color, var(--gold-bright)) 45%, transparent),
     inset 0 -2px 4px rgba(0, 0, 0, 0.25),
     inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
-
 .grade-badge__label {
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--grade-color, #d9b45f);
+  color: var(--grade-color, var(--gold-bright));
 }
 
-/* ============================================================
-   ПОЛОСКИ СРЕДНИХ ПО БЛОКАМ
-   ============================================================ */
+/* Block bars */
 .block-bars {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 16px;
   padding-bottom: 14px;
-  border-bottom: 1px dashed rgba(168, 133, 64, 0.12);
+  border-bottom: 1px dashed rgba(168, 133, 64, 0.14);
 }
-
 .block-bar {
   display: grid;
   grid-template-columns: minmax(120px, 1.2fr) 2fr auto;
@@ -1193,58 +741,42 @@ input[type="range"]:disabled::-moz-range-thumb {
   font-size: 0.8rem;
   transition: transform .2s ease;
 }
-
-.block-bar:hover {
-  transform: translateX(2px);
-}
-
+.block-bar:hover { transform: translateX(2px); }
 .block-bar__label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
-  color: var(--text-secondary, #a0a0b0);
+  color: var(--text-secondary);
   font-weight: 500;
-  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .block-bar__dot {
   display: inline-block;
   flex: 0 0 8px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--gold, #a88540);
   box-shadow: 0 0 10px currentColor;
 }
-
 .block-bar__track {
   position: relative;
   height: 8px;
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow:
-    inset 0 2px 6px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
 }
-
 .block-bar__fill {
   height: 100%;
   border-radius: 8px;
-  background: linear-gradient(90deg,
-    color-mix(in oklab, var(--gold, #a88540) 80%, transparent) 0%,
-    var(--gold, #a88540) 100%
-  );
   box-shadow:
     0 0 12px currentColor,
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  transition: width .5s var(--ease-premium, cubic-bezier(.22,1,.36,1));
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: width .55s var(--ease-premium);
 }
-
 .block-bar__value {
   min-width: 40px;
   font-family: var(--font-mono);
@@ -1252,50 +784,317 @@ input[type="range"]:disabled::-moz-range-thumb {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: right;
-  color: var(--text-primary, #f0f0f5);
+  color: var(--text-primary);
   padding: 2px 8px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--glass-border);
+}
+
+/* Preview rows */
+.preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: var(--transition-base);
+}
+.preview-row:hover { padding-left: 4px; color: var(--text-primary); }
+.preview-row > span {
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.preview-row > span > small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.preview-row > strong {
+  min-width: 52px;
+  padding: 2px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.06);
+  border: 1px solid rgba(168, 133, 64, 0.14);
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+.preview-row:hover > strong {
+  background: rgba(168, 133, 64, 0.12);
+  border-color: rgba(217, 180, 95, 0.28);
+}
+
+/* Финальная строка — визуальный фокус (§1.3 — «зелёный» сигнал) */
+.preview-row.primary {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(168, 133, 64, 0.16);
+}
+.preview-row.primary > span {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.preview-row.primary > strong {
+  font-size: 1rem;
+  color: #fff;
+  background: linear-gradient(135deg,
+    rgba(122, 212, 143, 0.15) 0%,
+    rgba(217, 180, 95, 0.14) 100%);
+  border-color: rgba(122, 212, 143, 0.30);
+  box-shadow: 0 0 18px rgba(122, 212, 143, 0.10);
 }
 
 /* ============================================================
-   АДАПТИВ ДЛЯ НОВЫХ БЛОКОВ
+   13. REVIEW BLOCK
    ============================================================ */
+.review-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review-block > label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition-base);
+}
+.review-block:focus-within > label { color: var(--text-primary); }
+.review-textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 14px 16px;
+  resize: vertical;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: rgba(10, 10, 20, 0.55);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-base);
+}
+.review-textarea::placeholder { color: var(--text-muted); font-style: italic; }
+.review-textarea:hover { border-color: rgba(168, 133, 64, 0.20); }
+.review-textarea:focus-visible {
+  border-color: rgba(217, 180, 95, 0.45);
+  background: rgba(10, 10, 20, 0.75);
+  box-shadow:
+    0 0 0 3px rgba(168, 133, 64, 0.14),
+    0 0 26px rgba(168, 133, 64, 0.10);
+}
+.review-textarea::-webkit-scrollbar { width: 4px; }
+.review-textarea::-webkit-scrollbar-thumb {
+  background: rgba(168, 133, 64, 0.45);
+  border-radius: 4px;
+}
+.review-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.review-meta > span:last-child {
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(168, 133, 64, 0.08);
+  border: 1px solid rgba(168, 133, 64, 0.16);
+}
+
+/* ============================================================
+   14. КНОПКА СОХРАНЕНИЯ — MORPH + CONFIRMATION (§1.5)
+   ============================================================ */
+.btn-save-rating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 17px 26px;
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #1a1208;
+  background: linear-gradient(135deg,
+    var(--gold-bright) 0%,
+    var(--gold) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow:
+    0 8px 28px rgba(168, 133, 64, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.btn-save-rating:hover:not(:disabled) {
+  transform: translateY(-2px);
+  letter-spacing: 0.04em;
+  box-shadow:
+    0 14px 38px rgba(168, 133, 64, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.btn-save-rating:active:not(:disabled) {
+  transform: translateY(0) scale(.995);
+  box-shadow:
+    0 5px 18px rgba(168, 133, 64, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.btn-save-rating:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(217, 180, 95, 0.28),
+    0 8px 28px rgba(168, 133, 64, 0.32);
+}
+.btn-save-rating:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  box-shadow: none;
+}
+
+/* ============================================================
+   15. МИКРОАНИМАЦИИ — fade-in карточек при скролле (§1.4)
+   ============================================================ */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .criteria-block,
+    .glass-card,
+    .vibe-block,
+    .preview,
+    .review-block {
+      animation: cardReveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 45%;
+    }
+  }
+}
+
+/* Плавный переход для всех интерактивных элементов */
+button, input, select, textarea, .weights-viz__seg {
+  transition-timing-function: var(--ease-premium);
+}
+
+/* ============================================================
+   16. A11Y: FOCUS-VISIBLE + REDUCED MOTION
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Тёмная тема — дефолт (§1.4). При светлой ОС сохраняем тёмный дизайн,
+   чтобы премиум-стиль не рассыпался. */
+@media (prefers-color-scheme: light) {
+  .rating-form {
+    color-scheme: dark;
+  }
+}
+
+/* ============================================================
+   17. АДАПТИВ
+   ============================================================ */
+@media (max-width: 1023px) {
+  .rating-form { padding: 20px 18px 36px; }
+}
+
+@media (max-width: 768px) {
+  .rating-form { padding: 18px 16px 32px; gap: 16px; }
+  .glass-card,
+  .criteria-block,
+  .vibe-block,
+  .review-block,
+  .preview {
+    padding: 18px 16px;
+    border-radius: var(--radius-lg);
+  }
+  .genre-block select { padding: 13px 18px; font-size: 0.95rem; }
+  :root, .rating-form {
+    --h3-size: clamp(1.1rem, 1rem + 0.6vw, 1.35rem);
+    --h4-size: clamp(1rem, 0.95rem + 0.4vw, 1.15rem);
+  }
+  .weight-slider label,
+  .criterion-slider label {
+    flex: 0 0 140px;
+    font-size: 0.85rem;
+  }
+  .value-display { flex: 0 0 44px; font-size: 0.85rem; }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 24px; height: 24px; margin-top: -9px;
+  }
+  input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; }
+}
+
 @media (max-width: 640px) {
-  .weights-viz {
-    height: 36px;
-    margin: 12px 0 16px;
-  }
-  .weights-viz__seg {
-    font-size: 0.68rem;
-    padding: 0 4px;
-  }
-  .weights-viz__seg[data-empty="true"] {
-    font-size: 0; /* скрываем цифры у тонких сегментов */
-  }
-
-  .normalize-btn {
-    margin-left: 8px;
-    padding: 5px 12px;
-    font-size: 0.7rem;
-  }
-
-  .preview-head {
-    gap: 10px;
-  }
-  .grade-badge {
-    padding: 4px 12px 4px 6px;
+  .weight-slider,
+  .criterion-slider {
+    flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 14px;
   }
-  .grade-badge__letter {
-    width: 26px;
-    height: 26px;
-    font-size: 0.95rem;
+  .weight-slider label,
+  .criterion-slider label {
+    flex: 1 1 100%;
+    min-width: auto;
   }
-  .grade-badge__label {
-    font-size: 0.7rem;
+  .weight-slider input[type="range"],
+  .criterion-slider input[type="range"] {
+    flex: 1 1 calc(100% - 56px);
+    order: 2;
   }
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    flex: 0 0 auto;
+    order: 3;
+    margin-left: auto;
+  }
+  .weights-sum {
+    float: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 14px;
+    box-sizing: border-box;
+  }
+  .weights-viz { height: 36px; }
+  .weights-viz__seg { font-size: 0.68rem; padding: 0 4px; }
+  .weights-viz__seg[data-empty="true"] { font-size: 0; }
+  .normalize-btn { margin-left: 8px; padding: 5px 12px; font-size: 0.7rem; }
+
+  .preview-head { gap: 10px; }
+  .grade-badge { padding: 4px 12px 4px 6px; gap: 8px; }
+  .grade-badge__letter { width: 26px; height: 26px; font-size: 0.95rem; }
+  .grade-badge__label { font-size: 0.7rem; }
 
   .block-bar {
     grid-template-columns: 1fr;
@@ -1310,27 +1109,20 @@ input[type="range"]:disabled::-moz-range-thumb {
 }
 
 @media (max-width: 480px) {
-  .weights-viz {
-    height: 30px;
+  .rating-form { padding: 14px 12px 28px; }
+  .glass-card,
+  .criteria-block,
+  .vibe-block,
+  .review-block,
+  .preview {
+    padding: 14px 14px;
   }
-  .weights-viz__seg {
-    font-size: 0.6rem;
-  }
-
-  .grade-badge__letter {
-    width: 22px;
-    height: 22px;
-    font-size: 0.85rem;
-  }
-  .grade-badge__label {
-    font-size: 0.65rem;
-    letter-spacing: 0.03em;
-  }
-
+  .weights-viz { height: 30px; }
+  .weights-viz__seg { font-size: 0.6rem; }
+  .grade-badge__letter { width: 22px; height: 22px; font-size: 0.85rem; }
+  .grade-badge__label { font-size: 0.65rem; }
   .block-bar__track { height: 6px; }
-  .block-bar__value {
-    min-width: 34px;
-    font-size: 0.72rem;
-    padding: 1px 6px;
-  }
-} 
+  .block-bar__value { min-width: 34px; font-size: 0.72rem; padding: 1px 6px; }
+  .preview-row { font-size: 0.8rem; }
+  .preview-row.primary > strong { font-size: 0.9rem; }
+}
