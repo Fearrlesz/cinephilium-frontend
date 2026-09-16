@@ -2,14 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { CRITERIA_CONFIG, GENRE_LABELS, BLOCK_NAMES } from '../../../utils/constants';
 import './RatingForm.css';
 
-/* === Диапазон оценок === */
-const MIN_SCORE = 10;
-const MAX_SCORE = 100;
-const DEFAULT_SCORE = 50; // середина шкалы
-const SCORE_STEP = 5;
-const RANGE = MAX_SCORE - MIN_SCORE; // 90
+/* === Диапазон оценок критериев и вайба — 1–10 === */
+const MIN_SCORE = 1;
+const MAX_SCORE = 10;
+const DEFAULT_SCORE = 5;          // середина шкалы 1–10
+const SCORE_STEP = 1;
+const RANGE = MAX_SCORE - MIN_SCORE; // 9
 
-/* процент заливки слайдера для значения в диапазоне 10–100 */
+/* процент заливки слайдера для значения в диапазоне 1–10 */
 const fillPercent = (value) => ((value - MIN_SCORE) / RANGE) * 100;
 
 /* === Цвета и иконки блоков (ключи соответствуют CRITERIA_CONFIG) === */
@@ -21,7 +21,7 @@ const BLOCK_META = {
   style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)' }, // зелёный
 };
 
-/* === Буквенная шкала оценок (10–100) === */
+/* === Буквенная шкала оценок (по ТБ, диапазон 10–100) === */
 const getGrade = (score) => {
   if (score >= 90) return { letter: 'S', label: 'Шедевр',  color: 'oklch(0.78 0.14 320)' };
   if (score >= 80) return { letter: 'A', label: 'Отлично', color: 'oklch(0.78 0.14 150)' };
@@ -82,7 +82,7 @@ function RatingForm({
     return blockWeights?.reduce((a, b) => a + b, 0) || 0;
   }, [blockWeights]);
 
-  /* === Средние по блокам — для полосок превью === */
+  /* === Средние по блокам (1–10) — для полосок превью === */
   const blockScores = useMemo(() => {
     return CRITERIA_CONFIG.map((cfg, i) => {
       const vals = cfg.criteria.map(c => scores?.[cfg.key]?.[c.key] ?? DEFAULT_SCORE);
@@ -91,7 +91,8 @@ function RatingForm({
       return {
         key: cfg.key,
         name: cfg.name,
-        avg,
+        avg,                                        // 1–10
+        fillPct: (avg / MAX_SCORE) * 100,           // для ширины полоски
         color: meta.color || 'oklch(0.80 0.145 72)',
         weight: blockWeights?.[i] ?? 0,
       };
@@ -202,7 +203,7 @@ function RatingForm({
         </div>
       </div>
 
-      {/* ================= КРИТЕРИИ ================= */}
+      {/* ================= КРИТЕРИИ (1–10) ================= */}
       {CRITERIA_CONFIG.map(block => {
         const meta = BLOCK_META[block.key] || {};
         return (
@@ -261,10 +262,10 @@ function RatingForm({
         );
       })}
 
-      {/* ================= ВАЙБ ================= */}
+      {/* ================= ВАЙБ (1–10) ================= */}
       <div className="vibe-block">
         <label htmlFor="vibeSlider">
-          💫 Вайб — субъективное впечатление (10–100). Не влияет на технический балл.
+          💫 Вайб — субъективное впечатление (1–10). Не влияет на технический балл.
         </label>
         <input
           id="vibeSlider"
@@ -325,7 +326,7 @@ function RatingForm({
               <div className="block-bar__track">
                 <div
                   className="block-bar__fill"
-                  style={{ width: `${b.avg}%`, background: b.color }}
+                  style={{ width: `${b.fillPct}%`, background: b.color }}
                 />
               </div>
               <span className="block-bar__value">{b.avg.toFixed(1)}</span>
@@ -336,7 +337,7 @@ function RatingForm({
         <div className="preview-row">
           <span>
             ⚔️ Технический балл
-            <small>Взвешенное среднее по блокам</small>
+            <small>Взвешенное среднее по блокам (10–100)</small>
           </span>
           <strong>{preview.tech?.toFixed(1) || '0.0'}</strong>
         </div>
@@ -344,15 +345,15 @@ function RatingForm({
         <div className="preview-row">
           <span>
             🚬 Вайб
-            <small>Субъективное впечатление</small>
+            <small>Субъективное впечатление (1–10)</small>
           </span>
-          <strong>{vibe?.toFixed(1) || '0.0'}</strong>
+          <strong>{vibe}</strong>
         </div>
 
         <div className="preview-row primary">
           <span>
             ⭐ Комбинированный
-            <small>75% техника + 25% вайб</small>
+            <small>70% техника + 30% вайб</small>
           </span>
           <strong>{preview.combined?.toFixed(1) || '0.0'}</strong>
         </div>
