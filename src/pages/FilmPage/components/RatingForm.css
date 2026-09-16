@@ -1,258 +1,1173 @@
 /* ============================================================
-   🆕 ДОПОЛНЕНИЕ К RATING FORM — Синефилиум 2.0
-   Стили для: weights-viz, grade-badge, block-bars,
-   preview-head, normalize-btn, weight-dot, primary-row.
-   Всё в той же премиум-золотой эстетике.
+   RATING FORM — премиум золото
+   Полностью переписан: исправлены конфликты классов,
+   fallback-цвета, градиентные дорожки слайдеров,
+   «пропадающие» элементы, тултипы и адаптив.
    ============================================================ */
 
-/* ---------- Базовая обёртка формы (если ещё нет) ---------- */
+/* ---------- Локальные fallback-переменные ----------
+   Если глобальные не заданы — берём разумные дефолты. */
 .rating-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 24px;
-  max-width: 720px;
-  margin: 0 auto;
+  --gold:          var(--gold,          #a88540);
+  --gold-bright:   var(--gold-bright,   #d9b45f);
+  --gold-15:       rgba(168, 133, 64, 0.15);
+  --gold-10:       rgba(168, 133, 64, 0.10);
+  --gold-06:       rgba(168, 133, 64, 0.06);
+  --gold-04:       rgba(168, 133, 64, 0.04);
+  --neon-purple:   var(--neon-purple,   #8b5cf6);
+  --neon-cyan:     var(--neon-cyan,     #22d3ee);
+  --neon-pink:     var(--neon-pink,     #ec4899);
+  --text-primary:  var(--text-primary,  #f0f0f5);
+  --text-secondary:var(--text-secondary,#a0a0b0);
+  --text-muted:    var(--text-muted,    #606070);
+  --bg-deep:       var(--bg-deep,       #0a0a14);
+  --glass-border:  var(--glass-border,  rgba(255, 255, 255, 0.06));
+  --transition-base: var(--transition-base, all .3s ease);
+  --transition-smooth: var(--transition-smooth, all .3s cubic-bezier(.2,.8,.2,1));
+  --radius-md: var(--radius-md, 12px);
+  --radius-lg: var(--radius-lg, 16px);
+  --font-sans: var(--font-sans, 'Inter', system-ui, sans-serif);
+  --font-mono: var(--font-mono, 'JetBrains Mono', 'Fira Code', monospace);
+  --ease-premium: var(--ease-premium, cubic-bezier(.2,.8,.2,1));
 }
 
 /* ============================================================
-   1. WEIGHTS VIZ — распределение весов по блокам
+   ЗАГОЛОВКИ БЛОКОВ — голографические (только реальные заголовки)
    ============================================================ */
-.weights-viz {
-  display: flex;
-  align-items: stretch;
+.genre-block > h3,
+.criteria-block > h4,
+.vibe-block > h3 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin: 0 0 .75rem 0;
+  letter-spacing: -0.01em;
+  display: inline-block;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(168, 133, 64, 0.12);
+  /* базовый цвет на случай отсутствия поддержки градиентного текста */
+  color: var(--text-primary, #f0f0f5);
+}
+
+/* Градиентный текст — только если браузер умеет background-clip: text */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .genre-block > h3,
+  .criteria-block > h4,
+  .vibe-block > h3 {
+    background: linear-gradient(135deg,
+      var(--text-primary, #f0f0f5) 10%,
+      var(--gold, #a88540)        30%,
+      var(--gold-bright, #d9b45f) 45%,
+      var(--neon-purple, #8b5cf6) 65%,
+      var(--neon-cyan, #22d3ee)   80%,
+      var(--text-primary, #f0f0f5) 100%
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: holographicShift 10s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.04));
+  }
+}
+
+@keyframes holographicShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ============================================================
+   SELECT (жанр)
+   ============================================================ */
+.genre-block select {
   width: 100%;
-  height: 42px;
-  margin: 16px 0 20px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
+  max-width: 100%;
+  padding: 16px 22px;
+  background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 22px center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
   box-shadow:
-    inset 0 2px 10px rgba(0, 0, 0, 0.5),
-    0 2px 12px rgba(0, 0, 0, 0.2);
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.genre-block select:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.genre-block select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.04),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.genre-block select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  padding: 12px;
+}
+
+/* ============================================================
+   БАЗОВЫЙ RANGE — разделены background-color и background-image
+   ============================================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  max-width: 100%;
+  height: 6px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  transition: background-color .2s ease, box-shadow .2s ease;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  /* база — светлая дорожка */
+  background-color: rgba(255, 255, 255, 0.06);
+  /* градиент — поверх, с fallback-цветами на каждую переменную */
+  background-image: linear-gradient(
+    to right,
+    var(--gold, #a88540) 0%,
+    var(--gold, #a88540) var(--fill, 0%),
+    transparent          var(--fill, 0%),
+    transparent          100%
+  );
+  background-repeat: no-repeat;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold, #a88540));
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px   rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0  2px 4px rgba(255, 255, 255, 0.2);
+  transition: transform .15s ease, box-shadow .15s ease;
+  margin-top: -12px;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 6px 30px rgba(168, 133, 64, 0.5),
+    0 0 40px   rgba(168, 133, 64, 0.15),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0  2px 6px rgba(255, 255, 255, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold, #a88540));
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(168, 133, 64, 0.4),
+    0 0 30px   rgba(168, 133, 64, 0.1),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3),
+    inset 0  2px 4px rgba(255, 255, 255, 0.2);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+input[type="range"]:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb,
+input[type="range"]:disabled::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #666, #444);
+  box-shadow: none;
+  border-color: #333;
+}
+
+/* ---------- Варианты дорожек ---------- */
+
+/* Веса блоков — яркое золото */
+.weight-slider input[type="range"] {
+  background-image: linear-gradient(
+    to right,
+    var(--gold-bright, #d9b45f) 0%,
+    var(--gold-bright, #d9b45f) var(--fill, 0%),
+    transparent                 var(--fill, 0%),
+    transparent                 100%
+  );
+}
+.weight-slider input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+}
+.weight-slider input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+}
+
+/* Критерии — базовое золото */
+.criterion-slider input[type="range"] {
+  background-image: linear-gradient(
+    to right,
+    var(--gold, #a88540) 0%,
+    var(--gold, #a88540) var(--fill, 0%),
+    transparent          var(--fill, 0%),
+    transparent          100%
+  );
+}
+
+/* Вайб — яркое золото */
+.vibe-block input[type="range"] {
+  background-image: linear-gradient(
+    to right,
+    var(--gold-bright, #d9b45f) 0%,
+    var(--gold-bright, #d9b45f) var(--fill, 0%),
+    transparent                 var(--fill, 0%),
+    transparent                 100%
+  );
+}
+.vibe-block input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+}
+.vibe-block input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--gold-bright, #d9b45f));
+}
+
+/* ============================================================
+   КОНТЕЙНЕРЫ СЛАЙДЕРОВ — без wrap, чтобы дорожка не «съезжала»
+   ============================================================ */
+.weight-slider,
+.criterion-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 14px;
+}
+
+.weight-slider label,
+.criterion-slider label {
+  flex: 0 0 180px;
+  min-width: 110px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+.weight-slider input[type="range"],
+.criterion-slider input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;        /* критично для flex + range */
+  max-width: 100%;
+}
+
+.weight-slider .value-display,
+.criterion-slider .value-display {
+  flex: 0 0 50px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   СУММА ВЕСОВ
+   ============================================================ */
+.weights-sum {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: right;
+  padding: 10px 22px;
+  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  display: inline-block;
+  float: right;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.genre-block::after {
+  /* очистка обтекания флоата */
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.weights-sum:hover {
+  border-color: rgba(168, 133, 64, 0.2);
+}
+
+.weights-sum.valid {
+  color: var(--gold-bright);
+  border-color: rgba(168, 133, 64, 0.25);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
+}
+
+.weights-sum.invalid {
+  color: var(--neon-pink);
+  border-color: rgba(236, 72, 153, 0.25);
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.04);
+}
+
+/* ============================================================
+   БЛОК КРИТЕРИЕВ
+   ============================================================ */
+.criteria-block {
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: var(--transition-smooth);
 }
 
-.weights-viz:hover {
-  border-color: rgba(168, 133, 64, 0.2);
+.criteria-block:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+   БЛОК ВАЙБА
+   ============================================================ */
+.vibe-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+}
+
+.vibe-block:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.vibe-block > h3 {
+  margin: 0;
+}
+
+.vibe-block > p,
+.vibe-block > .vibe-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.vibe-block .value-display {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 44px;
+  text-align: center;
+  color: var(--gold-bright);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 14px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   HINT — иконка ⓘ и всплывающая подсказка
+   ============================================================ */
+.hint-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 1px solid var(--gold-10, rgba(168, 133, 64, 0.10));
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.hint-icon:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-15);
+  background: var(--gold-04);
+  transform: scale(1.08);
+}
+
+.hint-icon[aria-expanded="true"] {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+  background: var(--gold-06);
+  box-shadow: 0 0 12px var(--gold-04);
+}
+
+.hint-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 1000;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(260px, 80vw);
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+  background: linear-gradient(160deg,
+    rgba(26, 16, 36, 0.98) 0%,
+    rgba(16, 16, 26, 0.98) 100%
+  );
+  border: 1px solid var(--gold-10);
+  border-radius: var(--radius-md);
   box-shadow:
-    inset 0 2px 10px rgba(0, 0, 0, 0.5),
-    0 0 24px rgba(168, 133, 64, 0.06);
+    0 12px 32px rgba(0, 0, 0, 0.6),
+    0 0 30px var(--gold-04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: hintFadeIn 0.2s var(--ease-premium);
+  pointer-events: none;
+}
+
+.hint-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(26, 16, 36, 0.98);
+}
+
+@keyframes hintFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ============================================================
+   PREVIEW — предварительный расчёт
+   ============================================================ */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  margin: 20px 0;
+  background: linear-gradient(145deg,
+    rgba(168, 133, 64, 0.04) 0%,
+    rgba(20, 20, 40, 0.6)  50%,
+    rgba(168, 133, 64, 0.02) 100%
+  );
+  border: 1px solid rgba(168, 133, 64, 0.08);
+  border-radius: 14px;
+  transition: var(--transition-base);
+}
+
+.preview:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
+}
+
+.preview > h4 {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(168, 133, 64, 0.08);
+}
+
+.preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: var(--transition-base);
+}
+
+.preview-row:hover {
+  padding-left: 4px;
+  color: var(--text-primary);
+}
+
+.preview-row > span {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.preview-row > strong {
+  min-width: 48px;
+  padding: 1px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.04);
+  border: 1px solid rgba(168, 133, 64, 0.04);
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+.preview-row:hover > strong {
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.08);
+}
+
+.preview-row:last-child {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(168, 133, 64, 0.1);
+}
+
+.preview-row:last-child > span {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.preview-row:last-child > strong {
+  font-size: 15px;
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.12);
+  box-shadow: 0 0 16px rgba(168, 133, 64, 0.06);
+}
+
+/* ============================================================
+   REVIEW BLOCK
+   ============================================================ */
+.review-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  margin: 20px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  transition: var(--transition-base);
+}
+
+.review-block:hover,
+.review-block:focus-within {
+  border-color: rgba(168, 133, 64, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.review-block > label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  transition: var(--transition-base);
+}
+
+.review-block:focus-within > label {
+  color: var(--text-primary);
+}
+
+.review-textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: rgba(10, 10, 20, 0.5);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-base);
+}
+
+.review-textarea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.review-textarea:hover {
+  border-color: rgba(168, 133, 64, 0.12);
+  background: rgba(10, 10, 20, 0.65);
+}
+
+.review-textarea:focus {
+  border-color: rgba(168, 133, 64, 0.35);
+  background: rgba(10, 10, 20, 0.75);
+  box-shadow:
+    0 0 0 3px rgba(168, 133, 64, 0.06),
+    0 0 24px  rgba(168, 133, 64, 0.04);
+}
+
+.review-textarea::-webkit-scrollbar { width: 3px; }
+.review-textarea::-webkit-scrollbar-track { background: transparent; }
+.review-textarea::-webkit-scrollbar-thumb {
+  background: rgba(168, 133, 64, 0.4);
+  border-radius: 4px;
+}
+
+/* ============================================================
+   КНОПКА СОХРАНЕНИЯ
+   ============================================================ */
+.btn-save-rating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px 24px;
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a1208;
+  background: linear-gradient(135deg,
+    var(--gold-bright, #d9b45f) 0%,
+    var(--gold, #a88540)        100%
+  );
+  border: 1px solid rgba(168, 133, 64, 0.5);
+  border-radius: 60px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow:
+    0 6px 24px rgba(168, 133, 64, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.btn-save-rating:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 30px rgba(168, 133, 64, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-save-rating:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 4px 16px rgba(168, 133, 64, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-save-rating:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+  box-shadow: none;
+}
+
+/* ============================================================
+   ГЛАСС-КАРТОЧКИ (общая база)
+   ============================================================ */
+.glass-card {
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: rgba(168, 133, 64, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .rating-form { padding: 20px 18px; }
+
+  .criteria-block,
+  .vibe-block,
+  .glass-card {
+    padding: 16px 16px 18px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 16px;
+  }
+
+  .genre-block select {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+  }
+
+  .genre-block > h3,
+  .criteria-block > h4,
+  .vibe-block > h3 {
+    font-size: 1rem;
+  }
+
+  .weight-slider label,
+  .criterion-slider label {
+    flex: 0 0 140px;
+    min-width: 100px;
+    font-size: 0.85rem;
+  }
+
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    flex: 0 0 44px;
+    font-size: 0.85rem;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  .preview-row {
+    font-size: 12.5px;
+  }
+  .preview-row > strong {
+    font-size: 12.5px;
+    min-width: 42px;
+    padding: 1px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .criteria-block,
+  .vibe-block,
+  .glass-card {
+    padding: 18px 16px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Разрешаем wrap только на мобильных */
+  .weight-slider,
+  .criterion-slider {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .weight-slider label,
+  .criterion-slider label {
+    flex: 1 1 100%;
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+
+  .weight-slider input[type="range"],
+  .criterion-slider input[type="range"] {
+    flex: 1 1 calc(100% - 60px);
+    order: 2;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    flex: 0 0 auto;
+    order: 3;
+    margin-left: auto;
+    font-size: 0.8rem;
+    padding: 2px 14px;
+    min-width: 44px;
+  }
+
+  .weights-sum {
+    float: none;
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vibe-block .value-display {
+    font-size: 1rem;
+    padding: 2px 16px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+    margin-top: -12px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-form { padding: 14px 12px; }
+
+  .criteria-block,
+  .vibe-block,
+  .glass-card {
+    padding: 14px 12px;
+    margin-bottom: 14px;
+  }
+
+  .genre-block > h3,
+  .criteria-block > h4,
+  .vibe-block > h3 {
+    font-size: 0.95rem;
+  }
+
+  .weight-slider label,
+  .criterion-slider label {
+    font-size: 0.8rem;
+  }
+  .weight-slider .value-display,
+  .criterion-slider .value-display {
+    font-size: 0.75rem;
+    padding: 0 10px;
+  }
+
+  input[type="range"] {
+    height: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    margin-top: -9px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  .preview { padding: 14px 14px; }
+  .preview > h4 { font-size: 13px; }
+  .preview-row { font-size: 12px; }
+  .preview-row > strong {
+    font-size: 12px;
+    min-width: 38px;
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .criteria-block,
+  .vibe-block,
+  .glass-card {
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+}
+
+
+/* ============================================================
+   НОВЫЕ БЛОКИ — дополнение к RatingForm.css
+   ============================================================ */
+
+/* ---------- Точка-индикатор цвета блока (в label) ---------- */
+.weight-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 10px;
+  background: var(--gold, #a88540);
+  box-shadow:
+    0 0 8px currentColor,
+    0 0 0 2px rgba(255, 255, 255, 0.04) inset;
+  transition: var(--transition-base);
+}
+
+.weight-slider:hover .weight-dot {
+  transform: scale(1.2);
+}
+
+/* ============================================================
+   ВИЗУАЛИЗАЦИЯ РАСПРЕДЕЛЕНИЯ ВЕСОВ
+   ============================================================ */
+.weights-viz {
+  display: flex;
+  width: 100%;
+  height: 44px;
+  margin: 14px 0 20px;
+  border-radius: 60px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 2px 10px rgba(0, 0, 0, 0.4),
+    0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .weights-viz__seg {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  padding: 0 6px;
+  min-width: 0;
+  padding: 0 8px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  border-right: 1px solid rgba(0, 0, 0, 0.35);
-  transition:
-    flex-grow 0.4s var(--ease-premium),
-    filter 0.2s ease,
-    opacity 0.2s ease;
-  position: relative;
+  letter-spacing: 0.02em;
+  color: rgba(10, 10, 20, 0.85);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    filter .25s ease,
+    transform .25s var(--ease-premium);
   cursor: default;
 }
 
-.weights-viz__seg:last-child {
-  border-right: none;
-}
-
-/* Лёгкий внутренний блик */
-.weights-viz__seg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    transparent 50%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
-  pointer-events: none;
-}
-
 .weights-viz__seg:hover {
-  filter: brightness(1.15) saturate(1.1);
-  z-index: 1;
+  filter: brightness(1.15);
 }
 
-/* Сегменты, которые почти исчезли — приглушаем текст */
 .weights-viz__seg[data-empty="true"] {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-shadow: none;
+  opacity: 0.55;
 }
 
 /* ============================================================
-   2. WEIGHT DOT — цветной кружок рядом с названием блока
-   ============================================================ */
-.weight-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  /* color берётся из inline-стиля, используем currentColor для свечения */
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 10px currentColor,
-    0 0 20px color-mix(in oklab, currentColor 40%, transparent);
-  transition: transform 0.2s var(--ease-premium), box-shadow 0.2s ease;
-}
-
-.weight-slider:hover .weight-dot {
-  transform: scale(1.25);
-}
-
-/* ============================================================
-   3. NORMALIZE BTN — «Уровнять»
+   КНОПКА "УРОВНЯТЬ"
    ============================================================ */
 .normalize-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 10px;
-  padding: 4px 14px;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--gold-bright, #d9b45f);
-  background: rgba(168, 133, 64, 0.06);
-  border: 1px solid rgba(168, 133, 64, 0.25);
-  border-radius: 60px;
+  gap: 6px;
+  margin-left: 14px;
+  padding: 6px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary, #f0f0f5);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.18) 0%,
+    rgba(139, 92, 246, 0.14) 100%
+  );
+  border: 1px solid rgba(168, 133, 64, 0.28);
+  border-radius: 40px;
   cursor: pointer;
-  transition: var(--transition-base);
-  white-space: nowrap;
+  transition: var(--transition-smooth);
+  box-shadow:
+    0 2px 12px rgba(168, 133, 64, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .normalize-btn:hover {
-  color: #fff;
-  background: rgba(168, 133, 64, 0.18);
-  border-color: var(--gold, #a88540);
+  color: var(--gold-bright, #d9b45f);
+  border-color: rgba(168, 133, 64, 0.5);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.28) 0%,
+    rgba(139, 92, 246, 0.2) 100%
+  );
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(168, 133, 64, 0.15);
+  box-shadow:
+    0 6px 20px rgba(168, 133, 64, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .normalize-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(168, 133, 64, 0.1);
+  box-shadow:
+    0 2px 8px rgba(168, 133, 64, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* Внутри .weights-sum убираем float — кнопка должна встать рядом */
-.weights-sum .normalize-btn {
-  vertical-align: middle;
+.normalize-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(168, 133, 64, 0.18),
+    0 0 24px rgba(168, 133, 64, 0.15);
 }
 
 /* ============================================================
-   4. PREVIEW HEAD — заголовок с бейджем
+   МЕТА ОТЗЫВА (счётчик символов)
+   ============================================================ */
+.review-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-muted, #606070);
+  opacity: 0.85;
+}
+
+.review-meta > span:last-child {
+  font-variant-numeric: tabular-nums;
+  color: var(--gold, #a88540);
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(168, 133, 64, 0.06);
+  border: 1px solid rgba(168, 133, 64, 0.1);
+}
+
+/* ============================================================
+   ПРЕВЬЮ — шапка с бейджем оценки
    ============================================================ */
 .preview-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(168, 133, 64, 0.08);
+  flex-wrap: wrap;
 }
 
 .preview-head > h4 {
   margin: 0;
-  padding: 0;
-  border: none;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: var(--text-primary);
+  color: var(--text-primary, #f0f0f5);
 }
 
-/* ============================================================
-   5. GRADE BADGE — буквенная оценка S/A/B/C/D/E
-   ============================================================ */
+/* ---------- Бейдж буквенной оценки ---------- */
 .grade-badge {
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-width: 56px;
-  padding: 6px 12px;
-  font-family: var(--font-mono);
-  border-radius: 12px;
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklab, var(--grade-color, #d9b45f) 22%, transparent) 0%,
-    color-mix(in oklab, var(--grade-color, #d9b45f) 6%,  transparent) 100%
-  );
-  border: 1px solid color-mix(in oklab, var(--grade-color, #d9b45f) 45%, transparent);
+  gap: 10px;
+  padding: 6px 16px 6px 10px;
+  border-radius: 60px;
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--grade-color, #d9b45f) 18%, transparent) 0%,
+      rgba(20, 20, 40, 0.6) 100%
+    );
+  border: 1px solid color-mix(in oklab, var(--grade-color, #d9b45f) 35%, transparent);
   box-shadow:
-    0 0 24px color-mix(in oklab, var(--grade-color, #d9b45f) 20%, transparent),
+    0 4px 20px color-mix(in oklab, var(--grade-color, #d9b45f) 15%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: var(--transition-smooth);
-  animation: gradePulse 3s ease-in-out infinite;
 }
 
 .grade-badge:hover {
-  transform: translateY(-1px) scale(1.04);
+  transform: translateY(-1px);
   box-shadow:
-    0 0 32px color-mix(in oklab, var(--grade-color, #d9b45f) 32%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 6px 26px color-mix(in oklab, var(--grade-color, #d9b45f) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .grade-badge__letter {
-  font-size: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--grade-color, #d9b45f);
-  text-shadow: 0 0 20px color-mix(in oklab, var(--grade-color, #d9b45f) 60%, transparent);
+  color: #0a0a14;
+  background: radial-gradient(circle at 35% 30%,
+    #ffffff 0%,
+    var(--grade-color, #d9b45f) 70%
+  );
+  border-radius: 50%;
+  box-shadow:
+    0 2px 10px color-mix(in oklab, var(--grade-color, #d9b45f) 40%, transparent),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .grade-badge__label {
-  margin-top: 3px;
   font-family: var(--font-sans);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--grade-color, #d9b45f);
-  opacity: 0.85;
-}
-
-@keyframes gradePulse {
-  0%, 100% {
-    box-shadow:
-      0 0 24px color-mix(in oklab, var(--grade-color, #d9b45f) 20%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  }
-  50% {
-    box-shadow:
-      0 0 34px color-mix(in oklab, var(--grade-color, #d9b45f) 32%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  }
-}
-
-/* Fallback для браузеров без color-mix */
-@supports not (color: color-mix(in oklab, red, blue)) {
-  .grade-badge {
-    background: rgba(168, 133, 64, 0.1);
-    border-color: rgba(168, 133, 64, 0.4);
-    box-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
-  }
 }
 
 /* ============================================================
-   6. BLOCK BARS — полоски средних по блокам
+   ПОЛОСКИ СРЕДНИХ ПО БЛОКАМ
    ============================================================ */
 .block-bars {
   display: flex;
@@ -260,26 +1175,30 @@
   gap: 10px;
   margin-bottom: 16px;
   padding-bottom: 14px;
-  border-bottom: 1px dashed rgba(168, 133, 64, 0.08);
+  border-bottom: 1px dashed rgba(168, 133, 64, 0.1);
 }
 
 .block-bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) 2fr auto;
   align-items: center;
-  gap: 10px;
-  font-size: 12.5px;
+  gap: 12px;
+  font-size: 0.8rem;
+  transition: var(--transition-base);
+}
+
+.block-bar:hover {
+  transform: translateX(2px);
 }
 
 .block-bar__label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  flex: 0 0 140px;
-  min-width: 110px;
-  font-family: var(--font-sans);
-  font-size: 12.5px;
+  gap: 8px;
+  min-width: 0;
+  color: var(--text-secondary, #a0a0b0);
   font-weight: 500;
-  color: var(--text-secondary);
+  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -287,304 +1206,119 @@
 
 .block-bar__dot {
   display: inline-block;
-  width: 7px;
-  height: 7px;
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  flex-shrink: 0;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 8px currentColor;
+  background: var(--gold, #a88540);
+  box-shadow: 0 0 10px currentColor;
 }
 
 .block-bar__track {
-  flex: 1 1 auto;
-  height: 6px;
-  min-width: 60px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
   position: relative;
+  height: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .block-bar__fill {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.45s var(--ease-premium), background 0.3s ease;
+  border-radius: 8px;
+  background: var(--gold, #a88540);
   box-shadow:
     0 0 12px currentColor,
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  position: relative;
-}
-
-/* Лёгкий пробегающий блик */
-.block-bar__fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.25) 50%,
-    transparent 100%
-  );
-  animation: barShimmer 2.5s ease-in-out infinite;
-  border-radius: inherit;
-}
-
-@keyframes barShimmer {
-  0%, 100% { opacity: 0.2; transform: translateX(-100%); }
-  50%      { opacity: 0.6; transform: translateX(100%);  }
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: width .6s var(--ease-premium);
 }
 
 .block-bar__value {
-  flex: 0 0 40px;
-  text-align: right;
+  min-width: 40px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.8rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
+  text-align: right;
+  color: var(--text-primary, #f0f0f5);
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.06));
 }
 
 /* ============================================================
-   7. PREVIEW ROW .PRIMARY — акцентная строка «Комбинированный»
+   АДАПТИВ ДЛЯ НОВЫХ БЛОКОВ
    ============================================================ */
-.preview-row.primary {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(168, 133, 64, 0.12);
-  font-size: 14px;
-}
-
-.preview-row.primary > span {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.preview-row.primary > strong {
-  min-width: 56px;
-  padding: 3px 16px;
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--gold-bright, #d9b45f);
-  background: linear-gradient(
-    135deg,
-    rgba(168, 133, 64, 0.14) 0%,
-    rgba(168, 133, 64, 0.06) 100%
-  );
-  border: 1px solid rgba(168, 133, 64, 0.18);
-  box-shadow:
-    0 0 20px rgba(168, 133, 64, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  animation: primaryGlow 4s ease-in-out infinite;
-}
-
-@keyframes primaryGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(168, 133, 64, 0.08),
-                         inset 0 1px 0 rgba(255, 255, 255, 0.05); }
-  50%      { box-shadow: 0 0 28px rgba(168, 133, 64, 0.16),
-                         inset 0 1px 0 rgba(255, 255, 255, 0.08); }
-}
-
-/* ============================================================
-   8. ТОНКИЕ ДОПОЛНЕНИЯ К СУЩЕСТВУЮЩИМ ЭЛЕМЕНТАМ
-   ============================================================ */
-
-/* Превью — теперь с flex и внутренней структурой */
-.preview {
-  /* сохраняем существующие свойства, добавляем плавное появление */
-  animation: previewFadeIn 0.4s var(--ease-premium);
-}
-
-@keyframes previewFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Кнопка сохранения — пульсация, когда активна */
-.btn-save-rating:not(:disabled) {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-save-rating:not(:disabled)::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.25) 50%,
-    transparent 100%
-  );
-  animation: btnSheen 3.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes btnSheen {
-  0%   { left: -100%; }
-  55%  { left: 100%;  }
-  100% { left: 100%;  }
-}
-
-/* Лёгкая анимация появления для блоков критериев */
-.criteria-block {
-  animation: blockFadeIn 0.35s var(--ease-premium) backwards;
-}
-
-.criteria-block:nth-of-type(1) { animation-delay: 0.02s; }
-.criteria-block:nth-of-type(2) { animation-delay: 0.06s; }
-.criteria-block:nth-of-type(3) { animation-delay: 0.10s; }
-.criteria-block:nth-of-type(4) { animation-delay: 0.14s; }
-.criteria-block:nth-of-type(5) { animation-delay: 0.18s; }
-
-@keyframes blockFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);   }
-}
-
-/* ============================================================
-   9. АДАПТИВ — для новых элементов
-   ============================================================ */
-@media (max-width: 768px) {
-  .rating-form {
-    padding: 18px 14px;
-  }
-
+@media (max-width: 640px) {
   .weights-viz {
     height: 36px;
-    border-radius: 12px;
+    margin: 12px 0 16px;
   }
-
   .weights-viz__seg {
     font-size: 0.68rem;
     padding: 0 4px;
-    min-width: 26px;
   }
-
-  .grade-badge {
-    min-width: 48px;
-    padding: 5px 10px;
-  }
-
-  .grade-badge__letter { font-size: 1.35rem; }
-  .grade-badge__label  { font-size: 0.56rem; }
-
-  .block-bar__label {
-    flex-basis: 120px;
-    font-size: 12px;
-  }
-
-  .block-bar__value {
-    font-size: 11.5px;
-    flex-basis: 36px;
-  }
-
-  .preview-head > h4 { font-size: 13px; }
-  .preview-row.primary { font-size: 13px; }
-  .preview-row.primary > strong { font-size: 14px; padding: 2px 12px; }
-}
-
-@media (max-width: 640px) {
-  .weights-viz {
-    height: 32px;
-    margin: 12px 0 16px;
-  }
-
-  .weights-viz__seg {
-    font-size: 0.62rem;
-    min-width: 22px;
-  }
-
-  /* На узких экранах показываем только цифры без иконок в labels */
-  .block-bar__label {
-    flex-basis: 100px;
-    font-size: 11.5px;
-  }
-
-  .block-bar {
-    gap: 8px;
+  .weights-viz__seg[data-empty="true"] {
+    font-size: 0; /* скрываем цифры у тонких сегментов */
   }
 
   .normalize-btn {
-    padding: 3px 10px;
-    font-size: 0.72rem;
+    margin-left: 8px;
+    padding: 5px 12px;
+    font-size: 0.7rem;
   }
 
+  .preview-head {
+    gap: 10px;
+  }
   .grade-badge {
-    min-width: 44px;
-    padding: 4px 9px;
-    border-radius: 10px;
+    padding: 4px 12px 4px 6px;
+    gap: 8px;
+  }
+  .grade-badge__letter {
+    width: 26px;
+    height: 26px;
+    font-size: 0.95rem;
+  }
+  .grade-badge__label {
+    font-size: 0.7rem;
   }
 
-  .grade-badge__letter { font-size: 1.2rem; }
-  .grade-badge__label  { font-size: 0.5rem; letter-spacing: 0.06em; }
+  .block-bar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "label value"
+      "track track";
+    gap: 6px 10px;
+  }
+  .block-bar__label { grid-area: label; font-size: 0.78rem; }
+  .block-bar__value { grid-area: value; }
+  .block-bar__track { grid-area: track; }
 }
 
 @media (max-width: 480px) {
   .weights-viz {
-    height: 28px;
+    height: 30px;
   }
-
   .weights-viz__seg {
-    font-size: 0.58rem;
-    padding: 0 3px;
-    min-width: 18px;
+    font-size: 0.6rem;
   }
 
-  /* На очень узких экранах — полоски превращаются в компактный вид */
-  .block-bar__label {
-    flex-basis: 90px;
-    font-size: 11px;
+  .grade-badge__letter {
+    width: 22px;
+    height: 22px;
+    font-size: 0.85rem;
+  }
+  .grade-badge__label {
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
   }
 
-  .block-bar__track {
-    min-width: 40px;
-  }
-
-  .preview-head {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .grade-badge {
-    margin-left: auto;
-  }
-}
-
-@media (max-width: 380px) {
-  .weights-viz__seg {
-    font-size: 0.55rem;
-    min-width: 16px;
-  }
-
-  .block-bar {
-    font-size: 11px;
-  }
-
-  .block-bar__label {
-    flex-basis: 80px;
-  }
-}
-
-/* ============================================================
-   10. УВАЖЕНИЕ К ПРЕДПОЧТЕНИЯМ — reduced motion
-   ============================================================ */
-@media (prefers-reduced-motion: reduce) {
-  .grade-badge,
-  .btn-save-rating::before,
-  .block-bar__fill::after,
-  .preview-row.primary > strong,
-  .criteria-block {
-    animation: none !important;
-  }
-
-  .block-bar__fill,
-  .weights-viz__seg {
-    transition: none !important;
+  .block-bar__track { height: 6px; }
+  .block-bar__value {
+    min-width: 34px;
+    font-size: 0.72rem;
+    padding: 1px 6px;
   }
 }
