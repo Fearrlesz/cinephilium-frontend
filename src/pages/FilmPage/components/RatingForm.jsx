@@ -5,33 +5,29 @@ import './RatingForm.css';
 /* === Диапазон оценок критериев и вайба — 1–10 === */
 const MIN_SCORE = 1;
 const MAX_SCORE = 10;
-const DEFAULT_SCORE = 5;          // середина шкалы 1–10
+const DEFAULT_SCORE = 5;
 const SCORE_STEP = 1;
-const RANGE = MAX_SCORE - MIN_SCORE; // 9
+const RANGE = MAX_SCORE - MIN_SCORE;
 
-/* процент заливки слайдера для значения в диапазоне 1–10 */
 const fillPercent = (value) => ((value - MIN_SCORE) / RANGE) * 100;
 
-/* === Цвета и иконки блоков (ключи соответствуют CRITERIA_CONFIG) === */
 const BLOCK_META = {
-  scenario:   { icon: '📋', color: 'oklch(0.72 0.14 40)'  }, // коралл
-  characters: { icon: '👥', color: 'oklch(0.78 0.14 320)' }, // маджента
-  visual:     { icon: '🎥', color: 'oklch(0.72 0.13 300)' }, // фиолет
-  sound:      { icon: '🔊', color: 'oklch(0.75 0.11 200)' }, // бирюза
-  style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)' }, // зелёный
+  scenario:   { icon: '📋', color: 'oklch(0.72 0.14 40)'  },
+  characters: { icon: '👥', color: 'oklch(0.78 0.14 320)' },
+  visual:     { icon: '🎥', color: 'oklch(0.72 0.13 300)' },
+  sound:      { icon: '🔊', color: 'oklch(0.75 0.11 200)' },
+  style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)' },
 };
 
-/* === Буквенная шкала оценок (по ТБ, диапазон 10–100) === */
 const getGrade = (score) => {
   if (score >= 90) return { letter: 'S', label: 'Шедевр',  color: 'oklch(0.78 0.14 320)' };
   if (score >= 80) return { letter: 'A', label: 'Отлично', color: 'oklch(0.78 0.14 150)' };
   if (score >= 65) return { letter: 'B', label: 'Хорошо',  color: 'oklch(0.80 0.13 100)' };
   if (score >= 50) return { letter: 'C', label: 'Средне',  color: 'oklch(0.80 0.145 72)' };
   if (score >= 35) return { letter: 'D', label: 'Слабо',   color: 'oklch(0.72 0.15 40)'  };
-  return                  { letter: 'E', label: 'Провал',  color: 'oklch(0.63 0.20 30)'  };
+  return              { letter: 'E', label: 'Провал',  color: 'oklch(0.63 0.20 30)'  };
 };
 
-/* === Пропорциональное приведение весов к 100% === */
 const normalizeWeightsArray = (weights) => {
   const total = weights.reduce((a, b) => a + b, 0);
   if (total === 0) return [30, 25, 20, 15, 10];
@@ -62,51 +58,31 @@ function RatingForm({
   onWeightChange = () => {},
   onTextReviewChange = () => {},
   onSave = () => {},
-  calculatePreview = () => ({ tech: 0, vibe: 0, combined: 0 })
+  calculatePreview = () => ({ tech: 0, vibe: 0, combined: 0 }),
 }) {
   const [activeHint, setActiveHint] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-{/* Вместо <select> */}
-<div className="custom-dropdown">
-  <div 
-    className="custom-dropdown__trigger" 
-    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  >
-    {genreLabel}
-    <span className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}>
-      ▼
-    </span>
-  </div>
+  /* === Служебное === */
+  const totalWeight = useMemo(
+    () => (blockWeights || []).reduce((a, b) => a + (Number(b) || 0), 0),
+    [blockWeights]
+  );
 
-  {isDropdownOpen && (
-    <ul className="custom-dropdown__menu">
-      <li 
-        className={`custom-dropdown__item ${!genrePreset ? 'active' : ''}`}
-        onClick={() => {
-          onGenreChange('');
-          setIsDropdownOpen(false);
-        }}
-      >
-        Без жанра (базовые веса 30/25/20/15/10)
-      </li>
-      {Object.entries(GENRE_LABELS).map(([k, l]) => (
-        <li 
-          key={k} 
-          className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
-          onClick={() => {
-            onGenreChange(k);
-            setIsDropdownOpen(false);
-          }}
-        >
-          {l}
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
+  const getScore = (blockKey, critKey) =>
+    scores?.[blockKey]?.[critKey] ?? DEFAULT_SCORE;
 
-  
-  /* === Средние по блокам (1–10) — для полосок превью === */
+  const preview = useMemo(
+    () => calculatePreview(scores, vibe, blockWeights, genrePreset),
+    [scores, vibe, blockWeights, genrePreset, calculatePreview]
+  );
+
+  const grade = useMemo(
+    () => getGrade(preview?.combined || 0),
+    [preview]
+  );
+
+  /* === Метаданные блоков (для полосок превью) === */
   const blockScores = useMemo(() => {
     return CRITERIA_CONFIG.map((cfg, i) => {
       const vals = cfg.criteria.map(c => scores?.[cfg.key]?.[c.key] ?? DEFAULT_SCORE);
@@ -115,18 +91,13 @@ function RatingForm({
       return {
         key: cfg.key,
         name: cfg.name,
-        avg,                                        // 1–10
-        fillPct: (avg / MAX_SCORE) * 100,           // для ширины полоски
+        avg,
+        fillPct: (avg / MAX_SCORE) * 100,
         color: meta.color || 'oklch(0.80 0.145 72)',
         weight: blockWeights?.[i] ?? 0,
       };
     });
   }, [scores, blockWeights]);
-
-  const grade = useMemo(
-    () => getGrade(preview.combined || 0),
-    [preview.combined]
-  );
 
   const handleNormalize = () => {
     const next = normalizeWeightsArray(blockWeights);
@@ -135,50 +106,75 @@ function RatingForm({
 
   const isHybrid = genrePreset === 'hybrid';
 
+  /* === Подпись выбранного жанра для триггера === */
+  const genreLabel = genrePreset
+    ? (GENRE_LABELS?.[genrePreset] ?? genrePreset)
+    : 'Без жанра (базовые веса 30/25/20/15/10)';
+
+  const handleSelectGenre = (key) => {
+    onGenreChange(key);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <>
       {/* ================= ЖАНР И ВЕСА ================= */}
       <div className="genre-block glass-card">
         <h3>⚙️ Жанр и веса блоков</h3>
 
-{/* Вместо <select> */}
-<div className="custom-dropdown">
-  <div 
-    className="custom-dropdown__trigger" 
-    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  >
-    {genreLabel}
-    <span className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}>
-      ▼
-    </span>
-  </div>
+        {/* === Кастомный дропдаун вместо <select> === */}
+        <div className="custom-dropdown">
+          <button
+            type="button"
+            className={`custom-dropdown__trigger ${isDropdownOpen ? 'is-open' : ''}`}
+            onClick={() => setIsDropdownOpen(v => !v)}
+            aria-haspopup="listbox"
+            aria-expanded={isDropdownOpen}
+          >
+            <span className="custom-dropdown__label">{genreLabel}</span>
+            <span
+              className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}
+              aria-hidden="true"
+            >
+              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                <path
+                  d="M1 1l6 6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+          </button>
 
-  {isDropdownOpen && (
-    <ul className="custom-dropdown__menu">
-      <li 
-        className={`custom-dropdown__item ${!genrePreset ? 'active' : ''}`}
-        onClick={() => {
-          onGenreChange('');
-          setIsDropdownOpen(false);
-        }}
-      >
-        Без жанра (базовые веса 30/25/20/15/10)
-      </li>
-      {Object.entries(GENRE_LABELS).map(([k, l]) => (
-        <li 
-          key={k} 
-          className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
-          onClick={() => {
-            onGenreChange(k);
-            setIsDropdownOpen(false);
-          }}
-        >
-          {l}
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
+          {isDropdownOpen && (
+            <ul className="custom-dropdown__menu" role="listbox">
+              <li
+                role="option"
+                aria-selected={!genrePreset}
+                className={`custom-dropdown__item ${!genrePreset ? 'active' : ''}`}
+                onClick={() => handleSelectGenre('')}
+              >
+                <span className="custom-dropdown__item-text">
+                  Без жанра
+                  <small>базовые веса 30/25/20/15/10</small>
+                </span>
+              </li>
+
+              {Object.entries(GENRE_LABELS).map(([k, l]) => (
+                <li
+                  key={k}
+                  role="option"
+                  aria-selected={genrePreset === k}
+                  className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
+                  onClick={() => handleSelectGenre(k)}
+                >
+                  <span className="custom-dropdown__item-text">{l}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Цветовая визуализация распределения весов */}
         <div className="weights-viz" role="img" aria-label="Распределение весов по блокам">
@@ -392,7 +388,7 @@ function RatingForm({
             ⚔️ Технический балл
             <small>Взвешенное среднее по блокам (10–100)</small>
           </span>
-          <strong>{preview.tech?.toFixed(1) || '0.0'}</strong>
+          <strong>{preview?.tech?.toFixed(1) || '0.0'}</strong>
         </div>
 
         <div className="preview-row">
@@ -408,7 +404,7 @@ function RatingForm({
             ⭐ Комбинированный
             <small>70% техника + 30% вайб</small>
           </span>
-          <strong>{preview.combined?.toFixed(1) || '0.0'}</strong>
+          <strong>{preview?.combined?.toFixed(1) || '0.0'}</strong>
         </div>
       </div>
 
