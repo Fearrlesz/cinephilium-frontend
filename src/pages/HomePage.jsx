@@ -102,7 +102,7 @@ function HomePage() {
       // Бэк больше ничего не отдаёт — значит реально всё, что можно было, загружено.
       // Синхронизируем totalCount с фактическим количеством, чтобы кнопка исчезла.
       if (list.length === 0) {
-        setTotalCount(films.length);
+        
         return;
       }
 
@@ -224,8 +224,7 @@ function HomePage() {
   // Считаем по количеству, а не по номерам страниц: из-за нестабильной
   // сортировки на бэке часть фильмов теряется/дублируется, поэтому
   // page === totalPages ещё не значит, что всё загружено.
-  const hasMore = films.length < totalCount;
-
+ const hasMore = page < totalPages; 
   return (
     <div className="container">
       <Header user={user} onLogout={handleLogout} />
