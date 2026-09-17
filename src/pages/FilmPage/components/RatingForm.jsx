@@ -66,29 +66,46 @@ function RatingForm({
 }) {
   const [activeHint, setActiveHint] = useState(null);
 
-  // В начале компонента RatingForm
-const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+{/* Вместо <select> */}
+<div className="custom-dropdown">
+  <div 
+    className="custom-dropdown__trigger" 
+    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+  >
+    {genreLabel}
+    <span className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}>
+      ▼
+    </span>
+  </div>
 
-const genreLabel = genrePreset 
-  ? GENRE_LABELS[genrePreset] 
-  : 'Без жанра (базовые веса 30/25/20/15/10)';
+  {isDropdownOpen && (
+    <ul className="custom-dropdown__menu">
+      <li 
+        className={`custom-dropdown__item ${!genrePreset ? 'active' : ''}`}
+        onClick={() => {
+          onGenreChange('');
+          setIsDropdownOpen(false);
+        }}
+      >
+        Без жанра (базовые веса 30/25/20/15/10)
+      </li>
+      {Object.entries(GENRE_LABELS).map(([k, l]) => (
+        <li 
+          key={k} 
+          className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
+          onClick={() => {
+            onGenreChange(k);
+            setIsDropdownOpen(false);
+          }}
+        >
+          {l}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
 
-  const getScore = (blockKey, critKey) => {
-    return scores?.[blockKey]?.[critKey] ?? DEFAULT_SCORE;
-  };
-
-  const preview = useMemo(() => {
-    try {
-      return calculatePreview() || { tech: 0, vibe: 0, combined: 0 };
-    } catch {
-      return { tech: 0, vibe: 0, combined: 0 };
-    }
-  }, [calculatePreview]);
-
-  const totalWeight = useMemo(() => {
-    return blockWeights?.reduce((a, b) => a + b, 0) || 0;
-  }, [blockWeights]);
-
+  
   /* === Средние по блокам (1–10) — для полосок превью === */
   const blockScores = useMemo(() => {
     return CRITERIA_CONFIG.map((cfg, i) => {
