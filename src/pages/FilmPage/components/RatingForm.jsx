@@ -66,6 +66,13 @@ function RatingForm({
 }) {
   const [activeHint, setActiveHint] = useState(null);
 
+  // В начале компонента RatingForm
+const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+const genreLabel = genrePreset 
+  ? GENRE_LABELS[genrePreset] 
+  : 'Без жанра (базовые веса 30/25/20/15/10)';
+
   const getScore = (blockKey, critKey) => {
     return scores?.[blockKey]?.[critKey] ?? DEFAULT_SCORE;
   };
@@ -117,15 +124,44 @@ function RatingForm({
       <div className="genre-block glass-card">
         <h3>⚙️ Жанр и веса блоков</h3>
 
-        <select
-          value={genrePreset}
-          onChange={e => onGenreChange(e.target.value)}
+{/* Вместо <select> */}
+<div className="custom-dropdown">
+  <div 
+    className="custom-dropdown__trigger" 
+    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+  >
+    {genreLabel}
+    <span className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}>
+      ▼
+    </span>
+  </div>
+
+  {isDropdownOpen && (
+    <ul className="custom-dropdown__menu">
+      <li 
+        className={`custom-dropdown__item ${!genrePreset ? 'active' : ''}`}
+        onClick={() => {
+          onGenreChange('');
+          setIsDropdownOpen(false);
+        }}
+      >
+        Без жанра (базовые веса 30/25/20/15/10)
+      </li>
+      {Object.entries(GENRE_LABELS).map(([k, l]) => (
+        <li 
+          key={k} 
+          className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
+          onClick={() => {
+            onGenreChange(k);
+            setIsDropdownOpen(false);
+          }}
         >
-          <option value="">Без жанра (базовые веса 30/25/20/15/10)</option>
-          {Object.entries(GENRE_LABELS).map(([k, l]) => (
-            <option key={k} value={k}>{l}</option>
-          ))}
-        </select>
+          {l}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
 
         {/* Цветовая визуализация распределения весов */}
         <div className="weights-viz" role="img" aria-label="Распределение весов по блокам">
