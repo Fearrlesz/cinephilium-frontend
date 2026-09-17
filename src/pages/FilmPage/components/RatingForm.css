@@ -1,73 +1,81 @@
 /* =================================================================
-   RatingForm.css — УЛУЧШЕННАЯ ВЕРСИЯ v2
-   Premium Gold + Glassmorphism 2.0 + Bento + Dark-first
-   Обновления:
-     • Чёткое (плотное) окно кастомного дропдауна
-     • Палитра градиентов для весов жанров и критериев:
-       gold + neon, различимые, но согласованные
-     • Слайдеры, бары и весовые сегменты — в цветах палитры
-   Логика и классы не тронуты, изменения — только визуальные.
+   RatingForm.css — v3
+   Premium Gold → Violet Neon + Glassmorphism 2.0 + Bento + Dark-first
+
+   Изменения v3:
+     • Единая палитра ползунков: золото → фиолетовый неон
+     • 5 жанровых весов и 15 слайдеров — в одной палитре
+     • Кастомный дропдаун: плотный, непрозрачный, поверх всего
+     • Логика и классы не тронуты — только визуал
    ================================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 
 /* ============================================================
-   1. ДИЗАЙН-ТОКЕНЫ
+   1. ДИЗАЙН-ТОКЕНЫ + ЕДИНАЯ ПАЛИТРА
    ============================================================ */
 :root,
 .rating-form {
-  --gold: #a88540;
-  --gold-bright: #d9b45f;
-  --neon-purple: #8b5cf6;
-  --neon-cyan: #22d3ee;
-  --neon-pink: #ec4899;
-  --text-primary: #f0f0f5;
-  --text-secondary: #a0a0b0;
-  --text-muted: #606070;
+  /* База */
+  --gold-deep:    #6b4e18;
+  --gold:         #a88540;
+  --gold-bright:  #d9b45f;
+  --gold-light:   #f0c862;
 
-  --bg-deep: #0a0a14;
-  --bg-surface: #111122;
+  --bronze:       #b8926a;
+  --mauve:        #9a7590;
+  --violet-light: #a78bfa;
+  --violet:       #8b5cf6;
+  --neon:         #a855f7;
+  --neon-deep:    #7c3aed;
+
+  --text-primary:   #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted:     #606070;
+
+  --bg-deep:     #0a0a14;
+  --bg-surface:  #111122;
   --bg-elevated: #171730;
 
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border:        rgba(255, 255, 255, 0.08);
   --glass-border-strong: rgba(255, 255, 255, 0.14);
-  --glass-fill: rgba(255, 255, 255, 0.035);
-  --glass-fill-strong: rgba(255, 255, 255, 0.06);
+  --glass-fill:          rgba(255, 255, 255, 0.035);
+  --glass-fill-strong:   rgba(255, 255, 255, 0.06);
   --glass-blur: blur(24px) saturate(180%);
 
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-sm:   10px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
   --radius-pill: 60px;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
-  --transition-base: all .2s ease;
+  --transition-base:   all .2s ease;
   --transition-smooth: all .3s cubic-bezier(.2,.8,.2,1);
-  --ease-premium: cubic-bezier(.2,.8,.2,1);
+  --ease-premium:      cubic-bezier(.2,.8,.2,1);
 
   --h3-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --h4-size: clamp(1.05rem, 0.95rem + 0.55vw, 1.35rem);
   --ls-tight: -0.02em;
 
-  /* -------- Палитра градиентов весов (gold + neon, согласованная) ----
-     Используется в .weight-slider, .weights-viz__seg,
-     а также (как fallback) — в .criterion-slider.
-     Каждая пара: --c-from (светлый/яркий край) и --c-to (глубокий край). */
-  --w1-from: #f0c862; --w1-to: #c89640;   /* 1 · Gold     */
-  --w2-from: #e8a850; --w2-to: #c07830;   /* 2 · Amber    */
-  --w3-from: #a78bfa; --w3-to: #7c5cd4;   /* 3 · Lilac    */
-  --w4-from: #22d3ee; --w4-to: #0891b2;   /* 4 · Cyan     */
-  --w5-from: #f472b6; --w5-to: #db2777;   /* 5 · Pink     */
-  --w6-from: #2dd4bf; --w6-to: #0d9488;   /* 6 · Teal     */
-  --w7-from: #fb923c; --w7-to: #ea580c;   /* 7 · Orange   */
-  --w8-from: #c084fc; --w8-to: #9333ea;   /* 8 · Violet   */
+  /* ------------------------------------------------------------------
+     ЕДИНАЯ ПАЛИТРА ВЕСОВ — от золотого к фиолетовому неону
+     Каждая пара: --wN-from (светлый край) → --wN-to (глубокий край).
+     ------------------------------------------------------------------ */
+  --w1-from: #f0c862; --w1-to: #d9b45f;   /* 1 · Bright gold           */
+  --w2-from: #d9b45f; --w2-to: #c9a355;   /* 2 · Gold                  */
+  --w3-from: #c9a355; --w3-to: #b8926a;   /* 3 · Gold → warm bronze    */
+  --w4-from: #b8926a; --w4-to: #9a7590;   /* 4 · Bronze → mauve        */
+  --w5-from: #9a7590; --w5-to: #a78bfa;   /* 5 · Mauve → light violet  */
+  --w6-from: #a78bfa; --w6-to: #8b5cf6;   /* 6 · Light violet → violet */
+  --w7-from: #8b5cf6; --w7-to: #a855f7;   /* 7 · Violet → neon violet  */
+  --w8-from: #a855f7; --w8-to: #7c3aed;   /* 8 · Neon → deep neon      */
 }
 
 /* ============================================================
-   2. БАЗОВЫЙ КОНТЕЙНЕР И BENTO-СЕТКА
+   2. БАЗОВЫЙ КОНТЕЙНЕР + BENTO-СЕТКА
    ============================================================ */
 .rating-form {
   display: flex;
@@ -83,8 +91,9 @@
   background:
     radial-gradient(circle at 12% 4%,  rgba(168, 133, 64, 0.10) 0%, transparent 42%),
     radial-gradient(circle at 88% 12%, rgba(139, 92, 246, 0.08) 0%, transparent 48%),
-    radial-gradient(circle at 50% 100%, rgba(34, 211, 238, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 60%),
     var(--bg-deep);
+  isolation: isolate;
 }
 
 @media (min-width: 1024px) {
@@ -160,6 +169,17 @@
     0 0 0 1px rgba(168, 133, 64, 0.10);
 }
 
+/* ------------------------------------------------------------------
+   FIX стекинга: жанровый блок с открытым дропдауном
+   должен рендериться ПОВЕРХ соседних grid-ячеек.
+   ------------------------------------------------------------------ */
+.genre-block {
+  position: relative;
+  z-index: 100;
+  overflow: visible;
+}
+.genre-block:has(.custom-dropdown__menu) { z-index: 200; }
+
 /* ============================================================
    4. ТИПОГРАФИКА
    ============================================================ */
@@ -178,7 +198,6 @@
   border-bottom: 1px solid rgba(168, 133, 64, 0.14);
   transition: var(--transition-smooth);
 }
-
 .criteria-block > h4 {
   font-size: var(--h4-size);
   font-weight: 700;
@@ -246,10 +265,7 @@
 }
 
 /* ============================================================
-   6. БАЗОВЫЙ RANGE (пустой трек + thumb)
-   Заполнение — двухслойная техника:
-     слой 1 (верх): градиент --c-from → --c-to, ширина = --fill
-     слой 2 (низ):  пустой тёмный трек
+   6. БАЗОВЫЙ RANGE — единая механика заливки через --c-from/--c-to
    ============================================================ */
 input[type="range"] {
   -webkit-appearance: none;
@@ -304,9 +320,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     inset 0 -3px 8px rgba(0, 0, 0, 0.3),
     inset 0 2px 6px rgba(255, 255, 255, 0.3);
 }
-input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(0.94);
-}
+input[type="range"]::-webkit-slider-thumb:active { transform: scale(0.94); }
 
 /* Firefox */
 input[type="range"]::-moz-range-thumb {
@@ -337,10 +351,7 @@ input[type="range"]::-moz-range-progress {
     var(--c-to, var(--gold)));
 }
 
-input[type="range"]:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
+input[type="range"]:disabled { opacity: 0.35; cursor: not-allowed; }
 input[type="range"]:disabled::-webkit-slider-thumb,
 input[type="range"]:disabled::-moz-range-thumb {
   background: radial-gradient(circle at 35% 30%, #666, #444);
@@ -354,9 +365,8 @@ input[type="range"]:focus-visible {
 }
 
 /* ============================================================
-   6.1 ПАЛИТРА ДЛЯ ВЕСОВ — назначается по индексу
-   Одинаковые индексы → одинаковые цвета у сегмента и слайдера.
-   JSX может переопределить через inline style { --c-from, --c-to }.
+   6.1 ПАЛИТРА ДЛЯ ЖАНРОВЫХ ВЕСОВ — по индексу
+   5 жанровых весов → берут w1…w5 (gold → mauve → violet)
    ============================================================ */
 .weights-viz__seg:nth-child(8n+1),
 .weight-slider:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
@@ -375,7 +385,6 @@ input[type="range"]:focus-visible {
 .weights-viz__seg:nth-child(8n+8),
 .weight-slider:nth-child(8n+8) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
 
-/* Явные классы — если JSX удобнее проставить их вручную */
 .weight-slider--1, .weights-viz__seg--1 { --c-from: var(--w1-from); --c-to: var(--w1-to); }
 .weight-slider--2, .weights-viz__seg--2 { --c-from: var(--w2-from); --c-to: var(--w2-to); }
 .weight-slider--3, .weights-viz__seg--3 { --c-from: var(--w3-from); --c-to: var(--w3-to); }
@@ -386,15 +395,38 @@ input[type="range"]:focus-visible {
 .weight-slider--8, .weights-viz__seg--8 { --c-from: var(--w8-from); --c-to: var(--w8-to); }
 
 /* ============================================================
-   6.2 ПАЛИТРА ДЛЯ КРИТЕРИЕВ
-   Если JSX задаёт --block-color — строим градиент от него.
-   Иначе — используется общий fallback (gold).
+   6.2 ПАЛИТРА ДЛЯ КРИТЕРИЕВ — тоже по индексу, БЕЗ --block-color
+   Все 15 слайдеров идут по той же палитре gold → violet neon.
    ============================================================ */
 .criterion-slider {
-  --c-from: color-mix(in oklab,
-    var(--block-color, var(--gold-bright)) 65%,
-    #ffffff 35%);
-  --c-to: var(--block-color, var(--gold-bright));
+  --c-from: var(--w1-from);
+  --c-to:   var(--w1-to);
+}
+
+/* Критерии внутри .criteria-block — позиция считается по самому классу */
+.criteria-block .criterion-slider:nth-child(1 of .criterion-slider) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
+.criteria-block .criterion-slider:nth-child(2 of .criterion-slider) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
+.criteria-block .criterion-slider:nth-child(3 of .criterion-slider) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
+.criteria-block .criterion-slider:nth-child(4 of .criterion-slider) { --c-from: var(--w4-from); --c-to: var(--w4-to); }
+.criteria-block .criterion-slider:nth-child(5 of .criterion-slider) { --c-from: var(--w5-from); --c-to: var(--w5-to); }
+.criteria-block .criterion-slider:nth-child(6 of .criterion-slider) { --c-from: var(--w6-from); --c-to: var(--w6-to); }
+.criteria-block .criterion-slider:nth-child(7 of .criterion-slider) { --c-from: var(--w7-from); --c-to: var(--w7-to); }
+.criteria-block .criterion-slider:nth-child(8 of .criterion-slider) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
+
+/* Вариант для любых других родителей (vibe и т.д.) */
+.criterion-slider:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
+.criterion-slider:nth-child(8n+2) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
+.criterion-slider:nth-child(8n+3) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
+.criterion-slider:nth-child(8n+4) { --c-from: var(--w4-from); --c-to: var(--w4-to); }
+.criterion-slider:nth-child(8n+5) { --c-from: var(--w5-from); --c-to: var(--w5-to); }
+.criterion-slider:nth-child(8n+6) { --c-from: var(--w6-from); --c-to: var(--w6-to); }
+.criterion-slider:nth-child(8n+7) { --c-from: var(--w7-from); --c-to: var(--w7-to); }
+.criterion-slider:nth-child(8n+8) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
+
+/* Фолбэк для «голых» range внутри vibe-block — плавный gold→violet */
+.vibe-block input[type="range"] {
+  --c-from: var(--gold-bright);
+  --c-to:   var(--neon);
 }
 
 /* ============================================================
@@ -422,14 +454,11 @@ input[type="range"]:focus-visible {
   transition: color .2s ease;
 }
 .criterion-slider:has(input:focus-visible) label,
-.weight-slider:has(input:focus-visible) label {
-  color: var(--text-primary);
-}
+.weight-slider:has(input:focus-visible) label { color: var(--text-primary); }
+
 .weight-slider input[type="range"],
-.criterion-slider input[type="range"] {
-  flex: 1 1 auto;
-  min-width: 0;
-}
+.criterion-slider input[type="range"] { flex: 1 1 auto; min-width: 0; }
+
 .value-display {
   flex: 0 0 50px;
   text-align: center;
@@ -447,8 +476,6 @@ input[type="range"]:focus-visible {
   transition: transform .18s var(--ease-premium), color .2s ease,
               border-color .2s ease, box-shadow .25s ease;
 }
-
-/* Реакция на перетаскивание — цвет берётся из палитры слайдера */
 .criterion-slider:has(input:active) .value-display,
 .weight-slider:has(input:active) .value-display,
 .vibe-block:has(input:active) .value-display {
@@ -462,7 +489,7 @@ input[type="range"]:focus-visible {
 }
 
 /* ============================================================
-   8. ВЕС-ИНДИКАТОР И ВИЗУАЛИЗАЦИЯ ВЕСОВ
+   8. ВЕС-ИНДИКАТОР + ВИЗУАЛИЗАЦИЯ ВЕСОВ
    ============================================================ */
 .weight-dot {
   display: inline-block;
@@ -489,8 +516,6 @@ input[type="range"]:focus-visible {
   border: 1px solid var(--glass-border);
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
 }
-
-/* Каждый сегмент — градиент из палитры (уже назначен выше) */
 .weights-viz__seg {
   display: flex;
   align-items: center;
@@ -507,8 +532,8 @@ input[type="range"]:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   background: linear-gradient(180deg,
-    color-mix(in oklab, var(--c-from, var(--w1-from)) 100%, transparent) 0%,
-    color-mix(in oklab, var(--c-to, var(--w1-to)) 100%, transparent) 100%);
+    var(--c-from, var(--w1-from)) 0%,
+    var(--c-to,   var(--w1-to))   100%);
   transition: filter .2s ease;
   position: relative;
 }
@@ -525,7 +550,7 @@ input[type="range"]:focus-visible {
 }
 
 /* ============================================================
-   9. СУММА ВЕСОВ И КНОПКА «УРОВНЯТЬ»
+   9. СУММА ВЕСОВ + КНОПКА «УРОВНЯТЬ»
    ============================================================ */
 .weights-sum {
   margin-top: 16px;
@@ -544,22 +569,20 @@ input[type="range"]:focus-visible {
   transition: var(--transition-smooth);
 }
 .genre-block::after { content: ''; display: block; clear: both; }
+
 .weights-sum.valid {
-  color: #7ad48f;
-  border-color: rgba(122, 212, 143, 0.35);
-  background: rgba(122, 212, 143, 0.06);
-  box-shadow: 0 0 30px rgba(122, 212, 143, 0.10);
+  color: #b9cf6a;                                     /* тёплый золотисто-зелёный */
+  border-color: rgba(185, 207, 106, 0.35);
+  background: rgba(185, 207, 106, 0.06);
+  box-shadow: 0 0 30px rgba(185, 207, 106, 0.10);
 }
 .weights-sum.invalid {
-  color: var(--neon-pink);
-  border-color: rgba(236, 72, 153, 0.35);
-  background: rgba(236, 72, 153, 0.06);
-  box-shadow: 0 0 30px rgba(236, 72, 153, 0.10);
+  color: var(--neon);
+  border-color: rgba(168, 85, 247, 0.45);
+  background: rgba(168, 85, 247, 0.08);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.16);
 }
-.weights-sum__total {
-  font-weight: 800;
-  color: inherit;
-}
+.weights-sum__total { font-weight: 800; color: inherit; }
 
 .normalize-btn {
   display: inline-flex;
@@ -601,11 +624,7 @@ input[type="range"]:focus-visible {
 /* ============================================================
    10. HINT
    ============================================================ */
-.hint-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
+.hint-wrapper { position: relative; display: inline-flex; align-items: center; }
 .hint-icon {
   display: inline-flex;
   align-items: center;
@@ -639,7 +658,7 @@ input[type="range"]:focus-visible {
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
-  z-index: 1000;
+  z-index: 1100;
   transform: translateX(-50%);
   width: max-content;
   max-width: min(280px, 82vw);
@@ -648,13 +667,11 @@ input[type="range"]:focus-visible {
   font-size: 12px;
   line-height: 1.55;
   color: var(--text-primary);
-  background: rgba(17, 17, 34, 0.92);
+  background: #14142a;
   border: 1px solid var(--glass-border-strong);
   border-radius: var(--radius-md);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.6),
+    0 16px 40px rgba(0, 0, 0, 0.7),
     0 0 30px rgba(168, 133, 64, 0.10);
   animation: hintFadeIn .22s var(--ease-premium);
   pointer-events: none;
@@ -666,7 +683,7 @@ input[type="range"]:focus-visible {
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: rgba(17, 17, 34, 0.92);
+  border-top-color: #14142a;
 }
 @keyframes hintFadeIn {
   from { opacity: 0; transform: translateX(-50%) translateY(6px); }
@@ -676,11 +693,7 @@ input[type="range"]:focus-visible {
 /* ============================================================
    11. VIBE-BLOCK
    ============================================================ */
-.vibe-block {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.vibe-block { display: flex; flex-direction: column; gap: 12px; }
 .vibe-block > label {
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -708,7 +721,7 @@ input[type="range"]:focus-visible {
     linear-gradient(150deg,
       rgba(217, 180, 95, 0.06) 0%,
       rgba(17, 17, 34, 0.75) 45%,
-      rgba(139, 92, 246, 0.05) 100%);
+      rgba(139, 92, 246, 0.06) 100%);
 }
 .preview-head {
   display: flex;
@@ -778,8 +791,6 @@ input[type="range"]:focus-visible {
   color: var(--grade-color, var(--gold-bright));
 }
 
-/* Block bars — используют --c-from/--c-to, если заданы (по индексу
-   или из JSX через --block-color). Иначе — градиент по --block-color. */
 .block-bars {
   display: flex;
   flex-direction: column;
@@ -815,10 +826,10 @@ input[type="range"]:focus-visible {
   height: 8px;
   border-radius: 50%;
   background: linear-gradient(135deg,
-    var(--c-from, var(--block-color, var(--gold-bright))),
-    var(--c-to, var(--block-color, var(--gold))));
+    var(--c-from, var(--gold-bright)),
+    var(--c-to, var(--gold)));
   box-shadow: 0 0 10px color-mix(in oklab,
-    var(--c-to, var(--block-color, var(--gold-bright))) 60%, transparent);
+    var(--c-to, var(--gold-bright)) 60%, transparent);
 }
 .block-bar__track {
   position: relative;
@@ -832,11 +843,11 @@ input[type="range"]:focus-visible {
   height: 100%;
   border-radius: 8px;
   background: linear-gradient(to right,
-    var(--c-from, var(--block-color, var(--gold-bright))),
-    var(--c-to, var(--block-color, var(--gold))));
+    var(--c-from, var(--gold-bright)),
+    var(--c-to, var(--gold)));
   box-shadow:
     0 0 12px color-mix(in oklab,
-      var(--c-to, var(--block-color, var(--gold-bright))) 55%, transparent),
+      var(--c-to, var(--gold-bright)) 55%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: width .55s var(--ease-premium);
 }
@@ -853,8 +864,7 @@ input[type="range"]:focus-visible {
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid var(--glass-border);
 }
-
-/* Авто-цвет для block-bar по индексу, если JSX не задаёт --block-color */
+/* Авто-цвет для block-bar по индексу — та же палитра */
 .block-bar:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
 .block-bar:nth-child(8n+2) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
 .block-bar:nth-child(8n+3) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
@@ -904,34 +914,26 @@ input[type="range"]:focus-visible {
   background: rgba(168, 133, 64, 0.12);
   border-color: rgba(217, 180, 95, 0.28);
 }
-
 .preview-row.primary {
   margin-top: 6px;
   padding-top: 14px;
   border-top: 1px dashed rgba(168, 133, 64, 0.16);
 }
-.preview-row.primary > span {
-  font-weight: 700;
-  color: var(--text-primary);
-}
+.preview-row.primary > span { font-weight: 700; color: var(--text-primary); }
 .preview-row.primary > strong {
   font-size: 1rem;
   color: #fff;
   background: linear-gradient(135deg,
-    rgba(122, 212, 143, 0.15) 0%,
+    rgba(185, 207, 106, 0.15) 0%,
     rgba(217, 180, 95, 0.14) 100%);
-  border-color: rgba(122, 212, 143, 0.30);
-  box-shadow: 0 0 18px rgba(122, 212, 143, 0.10);
+  border-color: rgba(185, 207, 106, 0.30);
+  box-shadow: 0 0 18px rgba(185, 207, 106, 0.10);
 }
 
 /* ============================================================
    13. REVIEW BLOCK
    ============================================================ */
-.review-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.review-block { display: flex; flex-direction: column; gap: 10px; }
 .review-block > label {
   font-size: 0.85rem;
   font-weight: 600;
@@ -1046,7 +1048,6 @@ input[type="range"]:focus-visible {
   from { opacity: 0; transform: translateY(22px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .criteria-block,
@@ -1060,7 +1061,6 @@ input[type="range"]:focus-visible {
     }
   }
 }
-
 button, input, select, textarea, .weights-viz__seg {
   transition-timing-function: var(--ease-premium);
 }
@@ -1072,21 +1072,15 @@ button, input, select, textarea, .weights-viz__seg {
   outline: 2px solid var(--gold-bright);
   outline-offset: 2px;
 }
-
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
   }
 }
-
 @media (prefers-color-scheme: light) {
-  .rating-form {
-    color-scheme: dark;
-  }
+  .rating-form { color-scheme: dark; }
 }
 
 /* ============================================================
@@ -1095,64 +1089,38 @@ button, input, select, textarea, .weights-viz__seg {
 @media (max-width: 1023px) {
   .rating-form { padding: 20px 18px 36px; }
 }
-
 @media (max-width: 768px) {
   .rating-form { padding: 18px 16px 32px; gap: 16px; }
   .glass-card,
   .criteria-block,
   .vibe-block,
   .review-block,
-  .preview {
-    padding: 18px 16px;
-    border-radius: var(--radius-lg);
-  }
+  .preview { padding: 18px 16px; border-radius: var(--radius-lg); }
   .genre-block select { padding: 13px 18px; font-size: 0.95rem; }
   :root, .rating-form {
     --h3-size: clamp(1.1rem, 1rem + 0.6vw, 1.35rem);
     --h4-size: clamp(1rem, 0.95rem + 0.4vw, 1.15rem);
   }
   .weight-slider label,
-  .criterion-slider label {
-    flex: 0 0 140px;
-    font-size: 0.85rem;
-  }
+  .criterion-slider label { flex: 0 0 140px; font-size: 0.85rem; }
   .value-display { flex: 0 0 44px; font-size: 0.85rem; }
   input[type="range"]::-webkit-slider-thumb {
     width: 24px; height: 24px; margin-top: -9px;
   }
   input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; }
 }
-
 @media (max-width: 640px) {
   .weight-slider,
-  .criterion-slider {
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
+  .criterion-slider { flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
   .weight-slider label,
-  .criterion-slider label {
-    flex: 1 1 100%;
-    min-width: auto;
-  }
+  .criterion-slider label { flex: 1 1 100%; min-width: auto; }
   .weight-slider input[type="range"],
-  .criterion-slider input[type="range"] {
-    flex: 1 1 calc(100% - 56px);
-    order: 2;
-  }
+  .criterion-slider input[type="range"] { flex: 1 1 calc(100% - 56px); order: 2; }
   .weight-slider .value-display,
-  .criterion-slider .value-display {
-    flex: 0 0 auto;
-    order: 3;
-    margin-left: auto;
-  }
+  .criterion-slider .value-display { flex: 0 0 auto; order: 3; margin-left: auto; }
   .weights-sum {
-    float: none;
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin-top: 14px;
-    box-sizing: border-box;
+    float: none; display: block; width: 100%;
+    text-align: center; margin-top: 14px; box-sizing: border-box;
   }
   .weights-viz { height: 36px; }
   .weights-viz__seg { font-size: 0.68rem; padding: 0 4px; }
@@ -1166,25 +1134,20 @@ button, input, select, textarea, .weights-viz__seg {
 
   .block-bar {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "label value"
-      "track track";
+    grid-template-areas: "label value" "track track";
     gap: 6px 10px;
   }
   .block-bar__label { grid-area: label; font-size: 0.78rem; }
   .block-bar__value { grid-area: value; }
   .block-bar__track { grid-area: track; }
 }
-
 @media (max-width: 480px) {
   .rating-form { padding: 14px 12px 28px; }
   .glass-card,
   .criteria-block,
   .vibe-block,
   .review-block,
-  .preview {
-    padding: 14px 14px;
-  }
+  .preview { padding: 14px 14px; }
   .weights-viz { height: 30px; }
   .weights-viz__seg { font-size: 0.6rem; }
   .grade-badge__letter { width: 22px; height: 22px; font-size: 0.85rem; }
@@ -1195,17 +1158,16 @@ button, input, select, textarea, .weights-viz__seg {
   .preview-row.primary > strong { font-size: 0.9rem; }
 }
 
-
 /* ============================================================
-   18. CUSTOM DROPDOWN — «ЧЁТКОЕ» ОКНО
-   Premium Gold + Glassmorphism 2.0 (плотный, читаемый список)
+   18. CUSTOM DROPDOWN — ПЛОТНОЕ, НЕПРОЗРАЧНОЕ, ПОВЕРХ ВСЕГО
    ============================================================ */
-
 .custom-dropdown {
   position: relative;
   width: 100%;
   margin-bottom: 20px;
+  z-index: 1;
 }
+.custom-dropdown:has(.custom-dropdown__menu) { z-index: 300; }
 
 /* ---------- TRIGGER ---------- */
 .custom-dropdown__trigger {
@@ -1229,12 +1191,10 @@ button, input, select, textarea, .weights-viz__seg {
   -webkit-appearance: none;
   appearance: none;
 }
-
 .custom-dropdown__trigger:hover {
   border-color: rgba(168, 133, 64, 0.30);
   background-color: rgba(255, 255, 255, 0.055);
 }
-
 .custom-dropdown__trigger:focus-visible {
   outline: none;
   border-color: var(--gold-bright);
@@ -1243,7 +1203,6 @@ button, input, select, textarea, .weights-viz__seg {
     0 0 0 3px rgba(168, 133, 64, 0.16),
     0 0 32px rgba(168, 133, 64, 0.14);
 }
-
 .custom-dropdown__trigger.is-open {
   border-color: rgba(217, 180, 95, 0.55);
   background-color: rgba(255, 255, 255, 0.06);
@@ -1252,7 +1211,6 @@ button, input, select, textarea, .weights-viz__seg {
     0 0 0 3px rgba(168, 133, 64, 0.14),
     0 0 28px rgba(168, 133, 64, 0.14);
 }
-
 .custom-dropdown__label {
   flex: 1 1 auto;
   min-width: 0;
@@ -1272,40 +1230,45 @@ button, input, select, textarea, .weights-viz__seg {
   color: var(--gold-bright);
   transition: transform .25s var(--ease-premium), color .2s ease;
 }
-
 .custom-dropdown__arrow.open {
   transform: rotate(180deg);
   color: var(--gold-bright);
 }
 
-/* ---------- MENU — плотный, читаемый ---------- */
+/* ---------- MENU — ПОЛНОСТЬЮ НЕПРОЗРАЧНОЕ, ВЫРАЗИТЕЛЬНОЕ ---------- */
 .custom-dropdown__menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1000;
   margin: 0;
-  padding: 8px;
+  padding: 10px;
   list-style: none;
-  max-height: 300px;
+  max-height: 340px;
   overflow-y: auto;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border-strong);
+
+  /* Плотный фон без прозрачности */
   background:
-    linear-gradient(180deg,
-      #1a1a2e 0%,
-      #14142a 100%);
+    linear-gradient(180deg, #1c1c30 0%, #12122a 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+
+  /* Выразительная рамка: золото с фиолетовым отливом */
+  border: 1px solid rgba(168, 133, 64, 0.55);
+
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
-    0 -1px 0 0 rgba(0, 0, 0, 0.5) inset,
-    0 20px 50px rgba(0, 0, 0, 0.75),
-    0 0 0 1px rgba(168, 133, 64, 0.12),
-    0 0 40px rgba(0, 0, 0, 0.4);
+    0 0 0 1px rgba(139, 92, 246, 0.18),
+    0 1px 0 0 rgba(255, 255, 255, 0.10) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.65) inset,
+    0 30px 80px rgba(0, 0, 0, 0.85),
+    0 0 60px rgba(168, 133, 64, 0.14),
+    0 0 100px rgba(139, 92, 246, 0.10);
+
   animation: dropdownIn .22s var(--ease-premium);
   transform-origin: top center;
+  isolation: isolate;
 }
 
 @keyframes dropdownIn {
@@ -1313,29 +1276,34 @@ button, input, select, textarea, .weights-viz__seg {
   to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
-/* Тонкая золотая подсветка сверху */
+/* Верхний золото-фиолетовый акцент */
 .custom-dropdown__menu::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.20) 45%,
-    rgba(217, 180, 95, 0.45) 55%,
+    var(--gold-bright) 30%,
+    var(--neon)        70%,
     transparent 100%);
   border-radius: inherit;
   pointer-events: none;
+  opacity: 0.85;
 }
 
 /* Скроллбар */
 .custom-dropdown__menu::-webkit-scrollbar { width: 6px; }
 .custom-dropdown__menu::-webkit-scrollbar-thumb {
-  background: rgba(168, 133, 64, 0.55);
+  background: linear-gradient(180deg,
+    rgba(168, 133, 64, 0.65) 0%,
+    rgba(168, 85, 247, 0.55) 100%);
   border-radius: 6px;
 }
 .custom-dropdown__menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 180, 95, 0.75);
+  background: linear-gradient(180deg,
+    rgba(217, 180, 95, 0.85) 0%,
+    rgba(168, 85, 247, 0.75) 100%);
 }
 .custom-dropdown__menu::-webkit-scrollbar-track { background: transparent; }
 
@@ -1351,10 +1319,7 @@ button, input, select, textarea, .weights-viz__seg {
   transition: var(--transition-base);
   background: rgba(255, 255, 255, 0.015);
 }
-
-.custom-dropdown__item + .custom-dropdown__item {
-  margin-top: 2px;
-}
+.custom-dropdown__item + .custom-dropdown__item { margin-top: 2px; }
 
 .custom-dropdown__item-text {
   display: inline-flex;
@@ -1362,7 +1327,6 @@ button, input, select, textarea, .weights-viz__seg {
   gap: 2px;
   min-width: 0;
 }
-
 .custom-dropdown__item-text > small {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -1370,7 +1334,6 @@ button, input, select, textarea, .weights-viz__seg {
   color: var(--text-muted);
   letter-spacing: 0.02em;
 }
-
 .custom-dropdown__item:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
@@ -1379,18 +1342,17 @@ button, input, select, textarea, .weights-viz__seg {
   color: var(--text-secondary);
 }
 
-/* Выбранный элемент — золотая подсветка + левая полоса + галочка */
+/* Активный элемент — золото → фиолетовый неон */
 .custom-dropdown__item.active {
-  color: var(--text-primary);
+  color: #fff;
   font-weight: 600;
   background: linear-gradient(90deg,
-    rgba(168, 133, 64, 0.20) 0%,
-    rgba(168, 133, 64, 0.06) 100%);
+    rgba(168, 133, 64, 0.28) 0%,
+    rgba(139, 92, 246, 0.18) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(217, 180, 95, 0.28),
-    0 4px 14px rgba(168, 133, 64, 0.10);
+    inset 0 0 0 1px rgba(217, 180, 95, 0.35),
+    0 4px 14px rgba(168, 133, 64, 0.14);
 }
-
 .custom-dropdown__item.active::before {
   content: '';
   position: absolute;
@@ -1400,10 +1362,9 @@ button, input, select, textarea, .weights-viz__seg {
   width: 3px;
   height: 62%;
   border-radius: 3px;
-  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  background: linear-gradient(180deg, var(--gold-bright), var(--neon));
   box-shadow: 0 0 10px rgba(217, 180, 95, 0.65);
 }
-
 .custom-dropdown__item.active::after {
   content: '';
   position: absolute;
@@ -1419,31 +1380,19 @@ button, input, select, textarea, .weights-viz__seg {
 }
 
 /* ============================================================
-   19. АДАПТИВ — согласован с общим @media (768 / 480)
+   19. АДАПТИВ ДРОПДАУНА
    ============================================================ */
 @media (max-width: 768px) {
-  .custom-dropdown__trigger {
-    padding: 13px 18px;
-    font-size: 0.95rem;
-  }
+  .custom-dropdown__trigger { padding: 13px 18px; font-size: 0.95rem; }
   .custom-dropdown__menu {
     border-radius: var(--radius-md);
-    max-height: 260px;
+    max-height: 280px;
     padding: 6px;
   }
 }
-
 @media (max-width: 480px) {
-  .custom-dropdown__trigger {
-    padding: 12px 16px;
-    font-size: 0.9rem;
-  }
-  .custom-dropdown__menu {
-    max-height: 220px;
-  }
-  .custom-dropdown__item {
-    padding: 9px 12px;
-    font-size: 0.88rem;
-  }
+  .custom-dropdown__trigger { padding: 12px 16px; font-size: 0.9rem; }
+  .custom-dropdown__menu { max-height: 240px; }
+  .custom-dropdown__item { padding: 9px 12px; font-size: 0.88rem; }
   .custom-dropdown__item.active::after { right: 12px; }
 }
