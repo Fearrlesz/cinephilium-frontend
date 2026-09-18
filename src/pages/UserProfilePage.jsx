@@ -107,10 +107,10 @@ function UserProfilePage() {
     );
   }
 
-   const isOwnProfile = currentUser?._id === user._id;
-  
+  const isOwnProfile = currentUser?._id === user._id;
+
   // 👇 Читаем флаг (он придет с бэкенда из роута /users/:id)
-  const isExclusive = user.isExclusive; 
+  const isExclusive = user.isExclusive;
 
   return (
     // 👇 Добавляем динамический класс
@@ -125,24 +125,24 @@ function UserProfilePage() {
           <h1>
             {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
-            
+
             {/* 👇 ДОБАВЛЯЕМ БЕЙДЖ "АРХИТЕКТОР СИНЕФИЛИУМА" */}
             {isExclusive && (
               <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
             )}
           </h1>
-          
-          {/* ... остальной код без изменений ... */} 
+        </div>
+      </div>
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -161,15 +161,23 @@ function UserProfilePage() {
                   <div key={rating._id} className="rating-item">
                     <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
                       <div className="rating-film-info">
-                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
+                        <img
+                          src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'}
+                          alt={rating.film?.title || rating.filmId?.title || 'Фильм'}
+                          className="rating-poster-small"
+                        />
                         <div>
                           <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
                           <p>{rating.film?.year || rating.filmId?.year}</p>
                         </div>
                       </div>
                     </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>
+                      {rating.finalScore}
+                    </div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>
+                      🔍 Детали
+                    </button>
                   </div>
                 ))}
               </div>
@@ -190,7 +198,7 @@ function UserProfilePage() {
                       <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
                           ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
