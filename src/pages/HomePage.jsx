@@ -295,30 +295,41 @@ function HomePage() {
       )}
 
 
-                   {topFilms.map((film, i) => {
-                const value =
-                  sortType === 'vibe'     ? film.averageVibe :
-                  sortType === 'combined' ? film.averageCombined :
-                                            film.averageRating;
-                return (
-                  <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
-                    <div className="top-card-poster-wrapper">
-                      <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
-                      <div className="top-card-rank">
-                        {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
-                      </div>
-                      <div className="top-card-score" style={{ color: getScoreColor(value) }}>
-                        {Number.isFinite(value) ? value.toFixed(1) : '—'}
-                      </div>
-                    </div>
-                    <div className="top-card-info">
-                      <span className="top-card-title">{film.title}</span>
-                      <span className="top-card-year">{film.year}</span>
-                    </div>
-                  </Link>
-                );
-              })} 
+       {topFilms.length > 0 && (
+  <div className="top-films-netflix">
+    <div className="top-header-netflix">
+      <h3>Топ-5</h3>
+    </div>
 
+    <div className="top-scroll-container">
+      <div className="top-scroll-wrapper">
+        {topFilms.map((film, i) => {
+          const value =
+            sortType === 'vibe'     ? film.averageVibe :
+            sortType === 'combined' ? film.averageCombined :
+                                      film.averageRating;
+          return (
+            <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
+              <div className="top-card-poster-wrapper">
+                <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
+                <div className="top-card-rank">
+                  {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
+                </div>
+                <div className="top-card-score" style={{ color: getScoreColor(value) }}>
+                  {Number.isFinite(value) ? value.toFixed(1) : '—'}
+                </div>
+              </div>
+              <div className="top-card-info">
+                <span className="top-card-title">{film.title}</span>
+                <span className="top-card-year">{film.year}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}            
       
 
       <ActivityFeed events={events} loading={eventsLoading} />
