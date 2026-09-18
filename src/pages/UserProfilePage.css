@@ -107,3 +107,322 @@
   }
 }
 
+/* ============================================================
+   ЭКСКЛЮЗИВНАЯ ТЕМА — «Архитектор Синефилиума» 🇮🇹
+   Ностальгическая, шероховатая палитра: старая плёнка,
+   выцветшее золото, терракота, оливковый, тёплая сепия.
+   Активируется классом .exclusive-theme на .container.profile-page
+   ============================================================ */
+
+.exclusive-theme {
+  /* Локальные переменные темы (не трогают базовые --*) */
+  --ex-bg-deep:    #14100c;
+  --ex-bg:         #1c1712;
+  --ex-bg-soft:    #241d16;
+  --ex-paper:      #d9c9a8;
+  --ex-paper-dim:  #b8a583;
+  --ex-gold:       #c9a961;
+  --ex-gold-bright:#e3c47a;
+  --ex-gold-dark:  #8a6f3a;
+  --ex-terra:      #a85a3c;
+  --ex-olive:      #6b6a3f;
+  --ex-line:       rgba(201, 169, 97, 0.22);
+  --ex-line-soft:  rgba(217, 201, 168, 0.08);
+  --ex-shadow:     rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- Фон страницы: зерно, виньетка, тёплый сепийный подтон ---------- */
+.exclusive-theme.container.profile-page {
+  position: relative;
+  background-color: var(--ex-bg-deep);
+  background-image:
+    radial-gradient(circle at 18% 8%,  rgba(201, 169, 97, 0.07), transparent 55%),
+    radial-gradient(circle at 88% 82%, rgba(168, 90, 60, 0.08),  transparent 60%),
+    radial-gradient(circle at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 3px),
+    repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, 0.035) 0 1px,
+      transparent 1px 4px);
+}
+
+/* ---------- Кнопка «Назад» ---------- */
+.exclusive-theme .back-btn {
+  color: var(--ex-paper-dim);
+  border: 1px solid var(--ex-line);
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(201, 169, 97, 0.04) 0 5px,
+      transparent 5px 10px),
+    linear-gradient(180deg, rgba(36, 29, 22, 0.9), rgba(20, 16, 12, 0.9));
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.exclusive-theme .back-btn:hover {
+  color: var(--ex-gold-bright);
+  border-color: var(--ex-gold);
+  transform: translateX(-2px);
+}
+
+/* ---------- Шапка профиля (базовый .glass-card сохраняется) ---------- */
+.exclusive-theme .profile-header.glass-card {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(201, 169, 97, 0.10), transparent 60%),
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.014) 0 1px,
+      transparent 1px 4px),
+    linear-gradient(160deg,
+      rgba(36, 29, 22, 0.92) 0%,
+      rgba(28, 23, 18, 0.88) 50%,
+      rgba(20, 16, 12, 0.94) 100%);
+  border: 1px solid var(--ex-line);
+  border-radius: 6px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(217, 201, 168, 0.06);
+  position: relative;
+}
+
+/* Тонкая «затёртая» рамка-паспарту */
+.exclusive-theme .profile-header.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--ex-line-soft);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* ---------- Аватар ---------- */
+.exclusive-theme .profile-avatar .avatar-placeholder {
+  color: var(--ex-gold-bright);
+  border: 2px solid var(--ex-line);
+  border-radius: 4px;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(217, 201, 168, 0.14), transparent 62%),
+    repeating-linear-gradient(45deg,
+      rgba(201, 169, 97, 0.05) 0 6px,
+      transparent 6px 12px),
+    linear-gradient(160deg, var(--ex-bg-soft), var(--ex-bg-deep));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 12px 34px rgba(0, 0, 0, 0.6),
+    inset 0 0 26px rgba(201, 169, 97, 0.09);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Ник: градиентный «выцветший» металл ---------- */
+.exclusive-theme .profile-info h1 {
+  background: linear-gradient(180deg,
+    var(--ex-gold-bright) 0%,
+    var(--ex-gold) 45%,
+    var(--ex-terra) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Бейдж «Архитектор Синефилиума» ---------- */
+.exclusive-theme .profile-info h1 .exclusive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  margin-left: 12px;
+  padding: 4px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.38em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(255, 255, 255, 0.10) 0 3px,
+      transparent 3px 6px),
+    linear-gradient(180deg, #e6d6b0 0%, var(--ex-gold) 55%, var(--ex-gold-dark) 100%);
+  border: 1px solid var(--ex-gold-dark);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+
+  /* Явный возврат цвета — перекрывает background-clip родителя */
+  color: #111;
+  -webkit-text-fill-color: #111;
+}
+
+.exclusive-theme .profile-info h1 .exclusive-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ---------- Мета-информация (дата регистрации, счётчики) ---------- */
+.exclusive-theme .profile-info p {
+  color: var(--ex-paper-dim);
+  letter-spacing: 0.02em;
+}
+
+.exclusive-theme .profile-info p strong,
+.exclusive-theme .profile-info p span {
+  color: var(--ex-paper);
+}
+
+/* ---------- Блок достижений ---------- */
+.exclusive-theme .achievements-section {
+  border-top: 1px solid var(--ex-line-soft);
+  padding-top: 14px;
+}
+
+.exclusive-theme .achievements-section .achievement,
+.exclusive-theme .achievements-section .achievement-item {
+  border: 1px solid var(--ex-line-soft);
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(160deg, rgba(36, 29, 22, 0.75), rgba(20, 16, 12, 0.85));
+  border-radius: 4px;
+  color: var(--ex-paper-dim);
+}
+
+.exclusive-theme .achievements-section .achievement:hover,
+.exclusive-theme .achievements-section .achievement-item:hover {
+  border-color: var(--ex-line);
+  color: var(--ex-gold-bright);
+}
+
+/* ---------- Табы ---------- */
+.exclusive-theme .profile-tabs.glass-card {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 4px),
+    linear-gradient(160deg,
+      rgba(32, 26, 19, 0.92) 0%,
+      rgba(20, 16, 12, 0.94) 100%);
+  border: 1px solid var(--ex-line);
+  border-radius: 6px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6);
+}
+
+.exclusive-theme .tabs-header {
+  border-bottom: 1px solid var(--ex-line-soft);
+}
+
+.exclusive-theme .tab-btn {
+  color: var(--ex-paper-dim);
+  letter-spacing: 0.06em;
+  transition: color 0.3s ease;
+}
+
+.exclusive-theme .tab-btn:hover {
+  color: var(--ex-gold-bright);
+}
+
+.exclusive-theme .tab-btn.active {
+  color: var(--ex-gold-bright);
+  background: linear-gradient(180deg, rgba(201, 169, 97, 0.06), transparent);
+  border-bottom: 2px solid var(--ex-gold);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Список оценок ---------- */
+.exclusive-theme .ratings-list .rating-item {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(160deg, rgba(36, 29, 22, 0.65), rgba(20, 16, 12, 0.8));
+  border: 1px solid var(--ex-line-soft);
+  border-left: 3px solid var(--ex-line);
+  border-radius: 4px;
+  color: var(--ex-paper-dim);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+
+.exclusive-theme .ratings-list .rating-item:hover {
+  border-left-color: var(--ex-gold);
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.016) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(160deg, rgba(44, 35, 26, 0.75), rgba(24, 19, 14, 0.85));
+  transform: translateX(2px);
+}
+
+.exclusive-theme .ratings-list .rating-item .rating-score,
+.exclusive-theme .ratings-list .rating-item strong {
+  color: var(--ex-gold-bright);
+}
+
+/* ---------- Список рецензий ---------- */
+.exclusive-theme .reviews-list .review-item {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(160deg, rgba(36, 29, 22, 0.6), rgba(20, 16, 12, 0.82));
+  border: 1px solid var(--ex-line-soft);
+  border-left: 3px solid var(--ex-line);
+  border-radius: 4px;
+  color: var(--ex-paper-dim);
+  box-shadow: inset 0 1px 0 rgba(217, 201, 168, 0.04);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.exclusive-theme .reviews-list .review-item:hover {
+  border-left-color: var(--ex-terra);
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.016) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(160deg, rgba(46, 35, 26, 0.72), rgba(24, 19, 14, 0.86));
+}
+
+.exclusive-theme .reviews-list .review-item h3,
+.exclusive-theme .reviews-list .review-item h4,
+.exclusive-theme .reviews-list .review-item .review-title {
+  color: var(--ex-paper);
+  letter-spacing: 0.01em;
+}
+
+.exclusive-theme .reviews-list .review-item .review-date,
+.exclusive-theme .reviews-list .review-item time {
+  color: rgba(184, 165, 131, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .exclusive-theme .profile-header.glass-card::after {
+    inset: 4px;
+  }
+
+  .exclusive-theme .profile-info h1 .exclusive-badge {
+    display: inline-flex;
+    margin-left: 0;
+    margin-top: 8px;
+    font-size: 0.45em;
+    letter-spacing: 0.12em;
+  }
+
+  .exclusive-theme .ratings-list .rating-item:hover,
+  .exclusive-theme .reviews-list .review-item:hover {
+    transform: none;
+  }
+}
