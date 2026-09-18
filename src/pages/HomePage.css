@@ -197,7 +197,6 @@
 .film-card:nth-child(11) { animation-delay: 0.55s; }
 .film-card:nth-child(12) { animation-delay: 0.60s; }
 
-/* ✨ Бегущая рамка — золото + неон */
 .film-card::before {
   content: '';
   position: absolute;
@@ -229,7 +228,6 @@
   opacity: 1;
 }
 
-/* ✨ Отражение снизу — золотое */
 .film-card::after {
   content: '';
   position: absolute;
@@ -281,7 +279,6 @@
   margin: 0;
 }
 
-/* ===== РЕЙТИНГ В КАРТОЧКЕ — золото ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
@@ -388,11 +385,6 @@
   text-shadow: 0 0 30px rgba(34, 211, 238, 0.12);
 }
 
-
-
-
-
-
 /* ============================================================
    ТОП-5 В СТИЛЕ NETFLIX — золото
    ============================================================ */
@@ -400,7 +392,6 @@
   margin: 30px 0 20px;
   padding: 20px 0 12px;
   position: relative;
-  /* ключевое: ограничиваем ширину контейнера */
   width: 100%;
   min-width: 0;
 }
@@ -455,13 +446,12 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  /* НЕ hidden — иначе на некоторых браузерах flex-дети могут ужаться */
   overflow: hidden;
 }
 
 .top-scroll-wrapper {
   display: flex;
-  flex-wrap: nowrap;              /* ЗАПРЕЩАЕМ перенос */
+  flex-wrap: nowrap;
   gap: 12px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -470,6 +460,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--gold) rgba(255, 255, 255, 0.03);
+  scroll-snap-type: x proximity;
 }
 
 .top-scroll-wrapper::-webkit-scrollbar {
@@ -490,7 +481,7 @@
 
 /* ── Карточка ── */
 .top-card-netflix {
-  flex: 0 0 120px;                /* было 160 — уменьшили */
+  flex: 0 0 120px;
   width: 120px;
   max-width: 120px;
   text-decoration: none;
@@ -499,10 +490,6 @@
   border-radius: 10px;
   overflow: hidden;
   scroll-snap-align: start;
-}
-
-.top-scroll-wrapper {
-  scroll-snap-type: x proximity;  /* приятный снап при скролле */
 }
 
 .top-card-netflix:hover {
@@ -519,7 +506,6 @@
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  /* фиксируем высоту по аспекту 2/3 от ширины 120 = 180px */
   aspect-ratio: 2 / 3;
   width: 100%;
 }
@@ -599,7 +585,6 @@
   margin-top: 2px;
 }
 
-  
 /* ============================================================
    ПАНЕЛЬ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
    ============================================================ */
@@ -1045,10 +1030,17 @@
     font-size: 0.9rem;
   }
 
-  /* Netflix-топ */
-  .top-card-netflix {
-    flex: 0 0 130px;
+  /* ✅ ИСПРАВЛЕНО: Netflix-топ остаётся flex-скроллом, меняем только размеры */
+  .top-scroll-wrapper {
+    gap: 10px;
+    padding: 8px 0 14px;
+    scroll-snap-type: x mandatory;
   }
+
+  .top-card-netflix {
+    flex: 0 0 110px;
+  }
+
   .top-card-rank {
     width: 30px;
     height: 30px;
@@ -1152,22 +1144,7 @@
     display: none !important;
   }
 
-  /* Netflix-топ — сетка */
-  .top-scroll-wrapper {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 14px !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
-    padding: 8px 0 16px 0 !important;
-    scroll-behavior: auto !important;
-    -webkit-overflow-scrolling: auto !important;
-  }
-
-  .top-card-netflix {
-    flex: none !important;
-    width: 100% !important;
-  }
+  /* ✅ ИСПРАВЛЕНО: блок .top-scroll-wrapper с display: grid УДАЛЁН */
 
   /* Базовые */
   body {
@@ -1198,10 +1175,11 @@
   }
 }
 
+/* ✅ ИСПРАВЛЕНО: удалено правило grid-template-columns для .top-scroll-wrapper */
 @media (min-width: 420px) and (max-width: 768px) {
   .films-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .search-results .films-grid { grid-template-columns: repeat(3, 1fr) !important; }
-  .top-scroll-wrapper { grid-template-columns: repeat(3, 1fr) !important; }
+  /* .top-scroll-wrapper теперь НЕ трогается — остаётся горизонтальным flex-скроллом */
 }
 
 @media (max-width: 480px) {
@@ -1216,7 +1194,7 @@
   .sort-controls label { font-size: 11px; letter-spacing: 0.06em; }
   .sort-info { font-size: 0.75rem; padding: 6px 12px; }
 
-  .top-card-netflix { flex: 0 0 110px; }
+  /* ✅ .top-scroll-wrapper не трогаем, только .top-card-netflix уже задан выше */
   .top-card-rank { width: 26px; height: 26px; font-size: 12px; }
   .top-card-score { font-size: 13px; padding: 2px 10px; }
   .top-card-title { font-size: 12px; }
