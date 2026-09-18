@@ -294,6 +294,7 @@ function HomePage() {
         </div>
       )}
 
+
                    {topFilms.map((film, i) => {
                 const value =
                   sortType === 'vibe'     ? film.averageVibe :
@@ -317,6 +318,8 @@ function HomePage() {
                   </Link>
                 );
               })} 
+
+      
 
       <ActivityFeed events={events} loading={eventsLoading} />
 
