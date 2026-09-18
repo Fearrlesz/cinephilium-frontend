@@ -8,7 +8,7 @@ export function formatDate(date) {
     });
   } catch {
     return 'Неизвестно';
-  }
+  } 
 }
 
 export function getTimeAgo(date) {
