@@ -5,7 +5,7 @@ import { useNotification } from '../context/NotificationContext';
 import useActivityEvents from '../hooks/useActivityEvents';
 import { formatDate } from '../utils/ratingUtils';
 import { getScoreColor } from '../utils/constants';
-import RatingDetailsModal from '../components/RatingDetailsModal';
+import RatingDetailsModal from '../components/RatingDetailsModal'; 
 import './ProfilePage.css';
 
 function ProfilePage() {
