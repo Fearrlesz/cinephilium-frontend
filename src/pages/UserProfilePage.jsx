@@ -161,23 +161,15 @@ function UserProfilePage() {
                   <div key={rating._id} className="rating-item">
                     <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
                       <div className="rating-film-info">
-                        <img
-                          src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'}
-                          alt={rating.film?.title || rating.filmId?.title || 'Фильм'}
-                          className="rating-poster-small"
-                        />
+                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
                         <div>
                           <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
                           <p>{rating.film?.year || rating.filmId?.year}</p>
                         </div>
                       </div>
                     </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>
-                      {rating.finalScore}
-                    </div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>
-                      🔍 Детали
-                    </button>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
                   </div>
                 ))}
               </div>
