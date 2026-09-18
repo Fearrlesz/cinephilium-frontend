@@ -1,78 +1,87 @@
 /* ============================================================
-   ГЕРОЙ — стекло + золотой акцент
+   ГЕРОЙ — стекло + золотой акцент (успокоен, читаемость выше)
    ============================================================ */
 .hero {
   text-align: center;
-  padding: 50px 20px 40px;
+  padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 32px) clamp(28px, 4vw, 44px);
   background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
   border-radius: 20px;
   border: 1px solid var(--glass-border);
-  margin-bottom: 40px;
+  margin-bottom: clamp(28px, 4vw, 48px);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
+/* Тонкая верхняя линия — сдержанная, без «мигания» */
 .hero::before {
   content: '';
   position: absolute;
   top: 0;
   left: 20%;
   width: 60%;
-  height: 2px;
+  height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--gold), transparent);
-  opacity: 0.4;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .hero h2 {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 28px;
+  font-size: clamp(20px, 3.2vw, 30px);
+  line-height: 1.2;
   letter-spacing: -0.02em;
-  margin-bottom: 24px;
+  margin: 0 auto 24px;
   background: linear-gradient(135deg,
-    var(--text-primary) 20%,
-    var(--gold-bright) 35%,
-    var(--gold) 45%,
-    var(--neon-purple) 60%,
-    var(--neon-cyan) 75%,
-    var(--gold-bright) 85%,
-    var(--text-primary) 100%
+    var(--text-primary) 25%,
+    var(--gold-bright) 45%,
+    var(--gold) 55%,
+    var(--neon-purple) 70%,
+    var(--text-primary) 90%
   );
-  background-size: 300% 300%;
+  background-size: 200% 200%;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holographic 4s ease-in-out infinite;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: holographic 6s ease-in-out infinite;
   position: relative;
   display: inline-block;
-  filter: drop-shadow(0 0 20px rgba(168, 133, 64, 0.08));
+  filter: drop-shadow(0 0 24px rgba(168, 133, 64, 0.1));
+  text-wrap: balance;
 }
 
 @keyframes holographic {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
+/* Мягкий радиальный блик — теперь только на hover/focus-within, не постоянно */
 .hero h2::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 30% 50%,
-    rgba(168, 133, 64, 0.04),
-    transparent 60%
-  );
+  inset: -8px -12px;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(168, 133, 64, 0.06),
+    transparent 65%);
   pointer-events: none;
-  animation: shimmer 3s ease-in-out infinite;
-  border-radius: 4px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hero:hover h2::before,
+.hero:focus-within h2::before {
+  opacity: 1;
 }
 
 @keyframes shimmer {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
+  50%      { opacity: 0.8; }
 }
 
 /* ============================================================
@@ -80,59 +89,91 @@
    ============================================================ */
 .search-box {
   display: flex;
-  max-width: 600px;
+  max-width: 620px;
   margin: 0 auto;
   gap: 10px;
+  align-items: stretch;
 }
 
 .search-box input {
   flex: 1;
-  padding: 12px 20px;
+  min-width: 0;
+  padding: 14px 22px;
   border-radius: 40px;
   border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.035);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
-  transition: all 0.3s;
+  line-height: 1.4;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 .search-box input::placeholder {
   color: var(--text-secondary);
+  opacity: 0.75;
+}
+.search-box input:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 .search-box input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.1),
+    0 0 30px rgba(168, 133, 64, 0.05);
 }
 
 .search-box button {
-  padding: 12px 28px;
+  padding: 14px 30px;
   border-radius: 40px;
-  border: 1px solid rgba(168, 133, 64, 0.15);
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.06));
+  border: 1px solid rgba(168, 133, 64, 0.18);
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.14), rgba(124, 58, 237, 0.07));
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.15s ease;
   width: auto;
   margin-top: 0;
+  white-space: nowrap;
 }
 .search-box button:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.2), rgba(124, 58, 237, 0.1));
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.08);
+}
+.search-box button:active {
+  transform: scale(0.97);
+}
+
+/* Доступность: клавиатурный фокус */
+.search-box button:focus-visible,
+.sort-select:focus-visible,
+.load-more-btn:focus-visible,
+.top-all-link-netflix:focus-visible,
+.film-card-link:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+  border-radius: 40px;
+}
+.film-card-link:focus-visible {
+  border-radius: 12px;
+  outline-offset: 4px;
 }
 
 /* ============================================================
-   СТЕКЛЯННАЯ ПОЛКА — золото + неон
+   СЕТКА ФИЛЬМОВ — «дыхание» и адаптивность
    ============================================================ */
 .films-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 30px 20px;
-  padding: 30px 0 60px 0;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: clamp(16px, 2vw, 26px) clamp(12px, 1.6vw, 22px);
+  padding: clamp(20px, 3vw, 34px) 0 clamp(40px, 5vw, 64px);
   position: relative;
 }
 
@@ -142,27 +183,31 @@
   bottom: 0;
   left: 5%;
   width: 90%;
-  height: 2px;
+  height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--neon-cyan), var(--gold), transparent);
-  opacity: 0.2;
+  opacity: 0.22;
 }
 
 .film-card-link {
   text-decoration: none;
   color: inherit;
-  outline: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-touch-callout: none !important;
-  user-select: none !important;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  border-radius: 12px;
+  display: block;
 }
 
 .film-card-link:focus,
 .film-card-link:active,
 .film-card-link:visited {
-  outline: none !important;
-  -webkit-tap-highlight-color: transparent !important;
+  outline: none;
 }
 
+/* ============================================================
+   КАРТОЧКА ФИЛЬМА — премиум-стекло
+   ============================================================ */
 .film-card {
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
@@ -170,92 +215,110 @@
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.45s ease;
   position: relative;
-  transform: perspective(800px) rotateX(0deg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
   opacity: 0;
-  animation: fadeUp 0.6s cubic-bezier(0.2, 0, 0, 1) forwards;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
   z-index: 1;
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.film-card:nth-child(1) { animation-delay: 0.05s; }
-.film-card:nth-child(2) { animation-delay: 0.10s; }
-.film-card:nth-child(3) { animation-delay: 0.15s; }
-.film-card:nth-child(4) { animation-delay: 0.20s; }
-.film-card:nth-child(5) { animation-delay: 0.25s; }
-.film-card:nth-child(6) { animation-delay: 0.30s; }
-.film-card:nth-child(7) { animation-delay: 0.35s; }
-.film-card:nth-child(8) { animation-delay: 0.40s; }
-.film-card:nth-child(9) { animation-delay: 0.45s; }
-.film-card:nth-child(10) { animation-delay: 0.50s; }
-.film-card:nth-child(11) { animation-delay: 0.55s; }
-.film-card:nth-child(12) { animation-delay: 0.60s; }
+.film-card:nth-child(1)  { animation-delay: 0.03s; }
+.film-card:nth-child(2)  { animation-delay: 0.06s; }
+.film-card:nth-child(3)  { animation-delay: 0.09s; }
+.film-card:nth-child(4)  { animation-delay: 0.12s; }
+.film-card:nth-child(5)  { animation-delay: 0.15s; }
+.film-card:nth-child(6)  { animation-delay: 0.18s; }
+.film-card:nth-child(7)  { animation-delay: 0.21s; }
+.film-card:nth-child(8)  { animation-delay: 0.24s; }
+.film-card:nth-child(9)  { animation-delay: 0.27s; }
+.film-card:nth-child(10) { animation-delay: 0.30s; }
+.film-card:nth-child(11) { animation-delay: 0.33s; }
+.film-card:nth-child(12) { animation-delay: 0.36s; }
 
+/* ✨ Верхняя бегущая линия вместо тяжёлой conic-рамки */
 .film-card::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  padding: 2px;
-  border-radius: 14px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0%,
-    var(--gold) 15%,
-    var(--neon-purple) 30%,
-    transparent 50%,
-    var(--gold-bright) 65%,
-    var(--neon-cyan) 80%,
-    transparent 100%
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--gold) 25%,
+    var(--gold-bright) 50%,
+    var(--neon-purple) 75%,
+    transparent
   );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  background-size: 200% 100%;
   opacity: 0;
-  transition: opacity 0.5s ease;
-  animation: borderSpin 4s linear infinite;
+  transition: opacity 0.4s ease;
+  animation: borderSlide 4s linear infinite;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
+}
+.film-card:hover::before,
+.film-card-link:focus-visible .film-card::before {
+  opacity: 0.9;
 }
 
-.film-card:hover::before {
-  opacity: 1;
+@keyframes borderSlide {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
+/* ✨ Отражение снизу — мягкое золотое свечение */
 .film-card::after {
   content: '';
   position: absolute;
-  bottom: -20px;
-  left: 5%;
-  width: 90%;
-  height: 20px;
-  background: linear-gradient(to bottom, rgba(168, 133, 64, 0.2), transparent);
+  bottom: -24px;
+  left: 8%;
+  width: 84%;
+  height: 22px;
+  background: linear-gradient(to bottom, rgba(168, 133, 64, 0.22), transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
-  filter: blur(8px);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
-.film-card:hover::after {
-  opacity: 0.4;
+.film-card:hover::after,
+.film-card-link:focus-visible .film-card::after {
+  opacity: 0.55;
 }
 
-.film-card:hover {
-  transform: perspective(800px) rotateX(2deg) translateY(-8px);
+.film-card:hover,
+.film-card-link:focus-visible .film-card {
+  transform: translateY(-6px) scale(1.012);
   border-color: var(--gold);
-  box-shadow: 0 20px 60px rgba(168, 133, 64, 0.1);
+  box-shadow:
+    0 20px 55px rgba(168, 133, 64, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .film-card img {
   width: 100%;
-  aspect-ratio: 2/3;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  filter: saturate(0.95);
+}
+
+.film-card:hover img,
+.film-card-link:focus-visible .film-card img {
+  transform: scale(1.045);
+  filter: saturate(1.08);
 }
 
 .film-info {
@@ -266,19 +329,23 @@
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 15px;
+  line-height: 1.35;
   margin: 0 0 4px;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.005em;
 }
 
 .film-info p {
   color: var(--text-secondary);
   font-size: 13px;
+  line-height: 1.4;
   margin: 0;
 }
 
+/* ===== РЕЙТИНГ В КАРТОЧКЕ — золото ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
@@ -291,7 +358,7 @@
   border-radius: 0;
   letter-spacing: -0.02em;
   color: var(--gold-bright);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
+  text-shadow: 0 0 20px rgba(168, 133, 64, 0.18);
 }
 
 .votes-count {
@@ -303,21 +370,24 @@
   font-weight: 400;
   margin-top: 2px;
   padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.025);
   border-radius: 20px;
   border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
   align-self: flex-start;
   font-family: var(--font-sans);
+  line-height: 1;
 }
 
-.film-card:hover .votes-count {
-  border-color: rgba(168, 133, 64, 0.1);
+.film-card:hover .votes-count,
+.film-card-link:focus-visible .votes-count {
+  border-color: rgba(168, 133, 64, 0.22);
   color: var(--text-secondary);
+  background: rgba(168, 133, 64, 0.05);
 }
 
 /* ============================================================
-   БЛОК С ТРЕМЯ РЕЙТИНГАМИ — РАЗНЫЕ ЦВЕТА
+   БЛОК С ТРЕМЯ РЕЙТИНГАМИ — контрастные цвета
    ============================================================ */
 .film-ratings {
   display: flex;
@@ -328,12 +398,13 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease;
 }
 
-.film-card:hover .film-ratings {
-  border-color: rgba(168, 133, 64, 0.15);
-  background: rgba(168, 133, 64, 0.02);
+.film-card:hover .film-ratings,
+.film-card-link:focus-visible .film-ratings {
+  border-color: rgba(168, 133, 64, 0.18);
+  background: rgba(168, 133, 64, 0.025);
 }
 
 .rating-row {
@@ -342,6 +413,7 @@
   align-items: center;
   padding: 2px 0;
   font-size: 0.85rem;
+  gap: 8px;
 }
 
 .rating-label {
@@ -356,7 +428,7 @@
   font-weight: 700;
   font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
-  transition: all 0.3s ease;
+  transition: text-shadow 0.3s ease;
   min-width: 32px;
   text-align: right;
 }
@@ -366,30 +438,30 @@
   text-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
 }
 .rating-technical:hover {
-  text-shadow: 0 0 30px rgba(168, 133, 64, 0.2);
+  text-shadow: 0 0 30px rgba(168, 133, 64, 0.28);
 }
 
 .rating-vibe {
   color: var(--neon-pink);
-  text-shadow: 0 0 20px rgba(236, 72, 153, 0.08);
+  text-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
 }
 .rating-vibe:hover {
-  text-shadow: 0 0 30px rgba(236, 72, 153, 0.15);
+  text-shadow: 0 0 30px rgba(236, 72, 153, 0.24);
 }
 
 .rating-combined {
   color: var(--neon-cyan);
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.06);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
 }
 .rating-combined:hover {
-  text-shadow: 0 0 30px rgba(34, 211, 238, 0.12);
+  text-shadow: 0 0 30px rgba(34, 211, 238, 0.22);
 }
 
 /* ============================================================
-   ТОП-5 В СТИЛЕ NETFLIX — золото
+   ТОП-5 В СТИЛЕ NETFLIX — плавный скролл, snap, золото
    ============================================================ */
 .top-films-netflix {
-  margin: 30px 0 20px;
+  margin: clamp(24px, 3vw, 36px) 0 20px;
   padding: 20px 0 12px;
   position: relative;
   width: 100%;
@@ -400,36 +472,38 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px 16px 4px;
+  gap: 12px;
+  padding: 0 4px 18px 4px;
 }
 
 .top-header-netflix h3 {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 24px;
+  font-size: clamp(18px, 2.2vw, 24px);
   color: var(--text-primary);
   letter-spacing: -0.02em;
   margin: 0;
+  line-height: 1.15;
 }
 
 .top-header-netflix h3::after {
   content: '';
   display: block;
-  width: 60px;
-  height: 3px;
+  width: 56px;
+  height: 2px;
   background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
-  margin-top: 4px;
+  margin-top: 6px;
   border-radius: 2px;
 }
 
 .top-all-link-netflix {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: all 0.3s;
-  padding: 6px 12px;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  padding: 6px 14px;
   border-radius: 20px;
   border: 1px solid transparent;
   white-space: nowrap;
@@ -437,8 +511,8 @@
 
 .top-all-link-netflix:hover {
   color: var(--gold-bright);
-  border-color: rgba(168, 133, 64, 0.15);
-  background: rgba(168, 133, 64, 0.03);
+  border-color: rgba(168, 133, 64, 0.2);
+  background: rgba(168, 133, 64, 0.05);
 }
 
 /* ── Горизонтальный скролл-контейнер ── */
@@ -447,20 +521,23 @@
   width: 100%;
   min-width: 0;
   overflow: hidden;
+  /* Мягкие «затухания» по краям — приятный кинематографичный эффект */
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
 }
 
 .top-scroll-wrapper {
   display: flex;
   flex-wrap: nowrap;
-  gap: 12px;
+  gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 8px 4px 16px 4px;
+  padding: 8px 20px 16px 4px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
   scrollbar-width: thin;
   scrollbar-color: var(--gold) rgba(255, 255, 255, 0.03);
-  scroll-snap-type: x proximity;
 }
 
 .top-scroll-wrapper::-webkit-scrollbar {
@@ -473,41 +550,51 @@
 .top-scroll-wrapper::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, var(--gold), var(--neon-purple));
   border-radius: 4px;
-  box-shadow: 0 0 20px rgba(168, 133, 64, 0.15);
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.2);
 }
 .top-scroll-wrapper::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(90deg, var(--gold-bright), var(--neon-cyan));
 }
 
-/* ── Карточка ── */
+/* ── Карточка топа ── */
 .top-card-netflix {
-  flex: 0 0 120px;
-  width: 120px;
-  max-width: 120px;
+  flex: 0 0 clamp(128px, 14vw, 156px);
+  width: clamp(128px, 14vw, 156px);
+  max-width: clamp(128px, 14vw, 156px);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 10px;
-  overflow: hidden;
   scroll-snap-align: start;
+  outline: none;
 }
 
-.top-card-netflix:hover {
-  transform: scale(1.05);
+.top-card-netflix:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 4px;
+}
+
+.top-card-netflix:hover,
+.top-card-netflix:focus-visible {
+  transform: translateY(-4px) scale(1.03);
   z-index: 10;
 }
 
-.top-card-netflix:hover .top-card-poster {
-  box-shadow: 0 8px 40px rgba(168, 133, 64, 0.15);
+.top-card-netflix:hover .top-card-poster,
+.top-card-netflix:focus-visible .top-card-poster {
+  box-shadow:
+    0 12px 40px rgba(168, 133, 64, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .top-card-poster-wrapper {
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   aspect-ratio: 2 / 3;
   width: 100%;
+  background: var(--bg-deep);
 }
 
 .top-card-poster {
@@ -515,27 +602,35 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.4s ease, filter 0.4s ease;
   background: var(--bg-deep);
+  filter: saturate(0.95);
+}
+
+.top-card-netflix:hover .top-card-poster,
+.top-card-netflix:focus-visible .top-card-poster {
+  filter: saturate(1.1);
 }
 
 .top-card-rank {
   position: absolute;
   top: 6px;
   left: 6px;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  border: 1px solid rgba(168, 133, 64, 0.2);
+  font-weight: 700;
+  border: 1px solid rgba(168, 133, 64, 0.25);
   color: var(--gold-bright);
+  line-height: 1;
 }
 
 .top-card-score {
@@ -546,19 +641,22 @@
   font-weight: 800;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 3px 10px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   letter-spacing: 0.5px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   line-height: 1;
+  color: var(--gold-bright);
 }
 
-.top-card-netflix:hover .top-card-score {
-  transform: scale(1.05);
+.top-card-netflix:hover .top-card-score,
+.top-card-netflix:focus-visible .top-card-score {
+  transform: scale(1.06);
+  border-color: rgba(168, 133, 64, 0.35);
 }
 
 .top-card-info {
@@ -575,6 +673,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
+  letter-spacing: -0.005em;
 }
 
 .top-card-year {
@@ -582,82 +681,73 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
 }
 
 /* ============================================================
-   ПАНЕЛЬ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
+   ПАНЕЛЬ СОРТИРОВКИ — чище и читаемее
    ============================================================ */
 .sort-panel {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px 24px;
-  padding: 18px 28px;
+  gap: 14px 22px;
+  padding: 16px 24px;
   background: linear-gradient(160deg,
     rgba(20, 20, 40, 0.8) 0%,
     rgba(12, 12, 30, 0.85) 40%,
     rgba(8, 8, 20, 0.9) 100%
   );
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-radius: 18px;
   margin-bottom: 24px;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 -4px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.35s ease;
   position: relative;
   overflow: hidden;
 }
 
+/* Тонкая верхняя линия — статичная, не мигает */
 .sort-panel::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 15%;
-  width: 70%;
-  height: 2px;
+  left: 20%;
+  width: 60%;
+  height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.15;
+  opacity: 0.25;
   transition: opacity 0.4s ease;
 }
 
 .sort-panel:hover::before {
-  opacity: 0.4;
+  opacity: 0.55;
 }
 
+/* Убираем conic-рамку — оставляем только тонкий контур при hover */
 .sort-panel::after {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 20px;
-  padding: 1.5px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0%,
-    var(--gold) 10%,
-    var(--gold-bright) 20%,
-    var(--neon-purple) 35%,
-    transparent 50%,
-    var(--neon-cyan) 65%,
-    var(--gold) 80%,
-    transparent 100%
-  );
+  inset: 0;
+  border-radius: 18px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.35), rgba(124, 58, 237, 0.25));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
-  animation: borderSpin 8s linear infinite;
 }
 
 .sort-panel:hover::after {
-  opacity: 0.2;
+  opacity: 0.5;
 }
 
 .sort-controls {
@@ -671,24 +761,24 @@
   font-family: var(--font-sans);
   font-weight: 600;
   color: var(--text-secondary);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .sort-select {
-  padding: 10px 48px 10px 20px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 11px 46px 11px 20px;
+  background: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--glass-border);
   border-radius: 60px;
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
   font-weight: 500;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   box-shadow:
     0 2px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -701,16 +791,16 @@
 }
 
 .sort-select:hover {
-  border-color: rgba(168, 133, 64, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(168, 133, 64, 0.28);
+  background-color: rgba(255, 255, 255, 0.055);
 }
 
 .sort-select:focus {
   outline: none;
   border-color: var(--gold);
   box-shadow:
-    0 0 0 4px rgba(168, 133, 64, 0.08),
-    0 0 30px rgba(168, 133, 64, 0.04),
+    0 0 0 4px rgba(168, 133, 64, 0.1),
+    0 0 30px rgba(168, 133, 64, 0.05),
     0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -722,7 +812,7 @@
 }
 
 .sort-select option:checked {
-  background: rgba(168, 133, 64, 0.15);
+  background: rgba(168, 133, 64, 0.18);
   color: var(--gold-bright);
 }
 
@@ -733,12 +823,12 @@
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 400;
-  padding: 6px 16px;
+  padding: 7px 16px;
   border-radius: 60px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.025);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease;
 }
 
 .sort-info span {
@@ -760,12 +850,12 @@
 }
 
 .sort-info:hover {
-  border-color: rgba(168, 133, 64, 0.15);
-  background: rgba(168, 133, 64, 0.02);
+  border-color: rgba(168, 133, 64, 0.18);
+  background: rgba(168, 133, 64, 0.03);
 }
 
 /* ============================================================
-   КНОПКА "ЗАГРУЗИТЬ ЕЩЁ" — ПРЕМИУМ
+   КНОПКА «ЗАГРУЗИТЬ ЕЩЁ» — премиум
    ============================================================ */
 .load-more {
   display: flex;
@@ -785,7 +875,7 @@
   width: 60%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.15;
+  opacity: 0.18;
 }
 
 .load-more-btn {
@@ -793,20 +883,25 @@
   border-radius: 60px;
   border: 1px solid var(--glass-border);
   background: linear-gradient(160deg,
-    rgba(20, 20, 40, 0.7) 0%,
-    rgba(12, 12, 30, 0.8) 100%
+    rgba(20, 20, 40, 0.75) 0%,
+    rgba(12, 12, 30, 0.85) 100%
   );
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    box-shadow 0.4s ease,
+    background 0.35s ease,
+    opacity 0.3s ease;
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   position: relative;
   overflow: hidden;
   letter-spacing: 0.02em;
@@ -815,44 +910,34 @@
   margin-top: 0;
 }
 
+/* Тонкая световая полоса, проходящая при hover */
 .load-more-btn::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: 60px;
-  background: conic-gradient(
-    from var(--angle, 0deg),
-    transparent 0%,
-    var(--gold) 15%,
-    var(--gold-bright) 25%,
-    var(--neon-purple) 40%,
-    transparent 55%,
-    var(--neon-cyan) 70%,
-    var(--gold) 85%,
-    transparent 100%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: -1;
-  padding: 2px;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: borderSpin 6s linear infinite;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg,
+    transparent 30%,
+    rgba(168, 133, 64, 0.18) 50%,
+    transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
 .load-more-btn:hover:not(:disabled)::before {
-  opacity: 0.35;
+  transform: translateX(120%);
 }
 
+/* Тонкая рамка-подсветка при hover */
 .load-more-btn::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 60px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(168, 133, 64, 0.05), transparent 70%);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(168, 133, 64, 0.5);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.35s ease;
   pointer-events: none;
 }
 
@@ -863,14 +948,14 @@
 .load-more-btn:hover:not(:disabled) {
   border-color: var(--gold);
   background: linear-gradient(160deg,
-    rgba(25, 25, 50, 0.8) 0%,
-    rgba(16, 16, 35, 0.85) 100%
+    rgba(28, 26, 52, 0.85) 0%,
+    rgba(16, 16, 35, 0.9) 100%
   );
   box-shadow:
-    0 8px 40px rgba(168, 133, 64, 0.08),
-    0 0 60px rgba(168, 133, 64, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transform: translateY(-3px) scale(1.01);
+    0 10px 40px rgba(168, 133, 64, 0.12),
+    0 0 60px rgba(168, 133, 64, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transform: translateY(-3px);
 }
 
 .load-more-btn:active:not(:disabled) {
@@ -878,12 +963,14 @@
 }
 
 .load-more-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none;
 }
 
-.load-more-btn:disabled::before {
+.load-more-btn:disabled::before,
+.load-more-btn:disabled::after {
   opacity: 0 !important;
 }
 
@@ -893,7 +980,7 @@
   color: var(--text-muted);
   letter-spacing: 0.04em;
   padding: 6px 18px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.025);
   border-radius: 20px;
   border: 1px solid var(--glass-border);
 }
@@ -904,11 +991,11 @@
 }
 
 /* ============================================================
-   ПОИСКОВЫЕ РЕЗУЛЬТАТЫ — золото
+   ПОИСКОВЫЕ РЕЗУЛЬТАТЫ
    ============================================================ */
 .search-results {
   margin: 30px 0;
-  padding: 20px 24px;
+  padding: 22px 24px;
   background: var(--bg-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -924,27 +1011,30 @@
   top: 0;
   left: 15%;
   width: 70%;
-  height: 2px;
+  height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.2;
+  opacity: 0.25;
 }
 
 .search-results h3 {
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 18px;
+  line-height: 1.3;
   color: var(--text-primary);
   margin-bottom: 16px;
+  letter-spacing: -0.01em;
 }
 
 /* ============================================================
-   АДАПТИВНОСТЬ
+   АДАПТИВНОСТЬ — mobile-first, чистые breakpoints
    ============================================================ */
 @media (max-width: 768px) {
   .hero h2 {
     font-size: 20px;
-    animation-duration: 3s;
+    animation-duration: 5s;
   }
+
   .films-grid {
     gap: 14px;
   }
@@ -959,24 +1049,23 @@
   }
 
   .search-box input {
-    font-size: 16px !important;
-    padding: 14px 20px !important;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-size: 16px;
+    padding: 14px 20px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   }
 
   .search-box input:focus {
-    transform: scale(1.02);
-    border-color: var(--gold) !important;
-    box-shadow: 0 0 40px rgba(168, 133, 64, 0.04) !important;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(168, 133, 64, 0.12);
   }
 
   .search-box button {
-    padding: 14px 28px !important;
-    font-size: 16px !important;
+    padding: 14px 28px;
+    font-size: 16px;
     width: 100%;
   }
 
-  /* Пульсирующая кнопка для мобильных */
+  /* Кнопка «Загрузить ещё» */
   .load-more {
     margin-top: 30px;
     padding: 16px 0 24px;
@@ -984,14 +1073,14 @@
   }
 
   .load-more-btn {
-    padding: 12px 32px;
+    padding: 13px 34px;
     font-size: 0.9rem;
-    min-width: 160px;
+    min-width: 170px;
   }
 
   .page-info {
     font-size: 0.75rem;
-    padding: 4px 14px;
+    padding: 5px 14px;
   }
 
   /* Сортировка */
@@ -1014,7 +1103,7 @@
   }
 
   .sort-select {
-    padding: 12px 48px 12px 18px;
+    padding: 12px 46px 12px 18px;
     font-size: 0.9rem;
     min-width: unset;
     width: 100%;
@@ -1030,32 +1119,23 @@
     font-size: 0.9rem;
   }
 
-  /* ✅ ИСПРАВЛЕНО: Netflix-топ остаётся flex-скроллом, меняем только размеры */
-  .top-scroll-wrapper {
-    gap: 10px;
-    padding: 8px 0 14px;
-    scroll-snap-type: x mandatory;
-  }
-
+  /* Netflix-топ */
   .top-card-netflix {
-    flex: 0 0 110px;
+    flex: 0 0 130px;
+    width: 130px;
+    max-width: 130px;
   }
-
   .top-card-rank {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    top: 6px;
-    left: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
   }
   .top-card-score {
-    font-size: 15px;
-    padding: 3px 12px;
-    bottom: 6px;
-    right: 6px;
+    font-size: 13px;
+    padding: 3px 10px;
   }
   .top-card-title {
-    font-size: 13px;
+    font-size: 12.5px;
   }
   .top-header-netflix h3 {
     font-size: 20px;
@@ -1066,18 +1146,17 @@
     padding: 8px 10px 10px;
     gap: 4px;
   }
-  .rating-row { font-size: 0.8rem; }
+  .rating-row   { font-size: 0.8rem; }
   .rating-label { font-size: 0.75rem; }
   .rating-value { font-size: 0.85rem; min-width: 28px; }
-  .votes-count { font-size: 0.7rem; padding: 3px 10px; }
+  .votes-count  { font-size: 0.7rem; padding: 3px 10px; }
 
-  /* Поисковые результаты мобильные */
+  /* Поисковые результаты — компактная сетка */
   .search-results .films-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 14px !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow: visible !important;
     flex-wrap: wrap !important;
     scroll-snap-type: none !important;
     padding: 10px 0 20px 0 !important;
@@ -1114,13 +1193,12 @@
     background: var(--gold-bright);
   }
 
-  /* Основная сетка фильмов — вертикальная */
+  /* Основная сетка фильмов */
   .films-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 14px !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow: visible !important;
     flex-wrap: wrap !important;
     scroll-snap-type: none !important;
     padding: 20px 8px 30px 8px !important;
@@ -1144,7 +1222,22 @@
     display: none !important;
   }
 
-  /* ✅ ИСПРАВЛЕНО: блок .top-scroll-wrapper с display: grid УДАЛЁН */
+  /* Netflix-топ — превращаем в сетку на мобилке */
+  .top-scroll-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow: visible !important;
+    padding: 8px 0 16px 0 !important;
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+
+  .top-card-netflix {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 
   /* Базовые */
   body {
@@ -1160,51 +1253,63 @@
 
   /* Тактильная обратная связь */
   .film-card-link:active .film-card {
-    transform: scale(0.96);
-    transition-duration: 0.08s;
+    transform: scale(0.97);
+    transition-duration: 0.1s;
   }
 
   .load-more-btn:active {
-    transform: scale(0.92);
-    transition-duration: 0.08s;
+    transform: scale(0.94);
+    transition-duration: 0.1s;
   }
 
   .film-card-link .film-card,
   .load-more-btn {
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
-/* ✅ ИСПРАВЛЕНО: удалено правило grid-template-columns для .top-scroll-wrapper */
 @media (min-width: 420px) and (max-width: 768px) {
-  .films-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .films-grid              { grid-template-columns: repeat(3, 1fr) !important; }
   .search-results .films-grid { grid-template-columns: repeat(3, 1fr) !important; }
-  /* .top-scroll-wrapper теперь НЕ трогается — остаётся горизонтальным flex-скроллом */
+  .top-scroll-wrapper      { grid-template-columns: repeat(3, 1fr) !important; }
 }
 
 @media (max-width: 480px) {
   .hero h2 { font-size: 16px; }
+
   .films-grid { gap: 10px; }
   .film-info h3 { font-size: 12px; }
-  .film-info p { font-size: 11px; }
+  .film-info p  { font-size: 11px; }
   .rating-badge { font-size: 14px; }
 
   .sort-panel { padding: 14px 16px; border-radius: 14px; }
-  .sort-select { font-size: 0.85rem; padding: 10px 44px 10px 16px; }
+  .sort-select { font-size: 0.85rem; padding: 10px 42px 10px 16px; }
   .sort-controls label { font-size: 11px; letter-spacing: 0.06em; }
   .sort-info { font-size: 0.75rem; padding: 6px 12px; }
 
-  /* ✅ .top-scroll-wrapper не трогаем, только .top-card-netflix уже задан выше */
-  .top-card-rank { width: 26px; height: 26px; font-size: 12px; }
-  .top-card-score { font-size: 13px; padding: 2px 10px; }
+  .top-card-netflix { flex: 0 0 110px; width: 110px; max-width: 110px; }
+  .top-card-rank  { width: 26px; height: 26px; font-size: 12px; }
+  .top-card-score { font-size: 12px; padding: 2px 10px; }
   .top-card-title { font-size: 12px; }
   .top-header-netflix h3 { font-size: 18px; }
 
   .film-ratings { padding: 6px 8px 8px; }
-  .rating-row { font-size: 0.7rem; }
+  .rating-row   { font-size: 0.7rem; }
   .rating-label { font-size: 0.7rem; }
   .rating-value { font-size: 0.75rem; min-width: 24px; }
-  .votes-count { font-size: 0.65rem; padding: 2px 8px; }
+  .votes-count  { font-size: 0.65rem; padding: 2px 8px; }
 
-  .load-more-btn { padding: 10px 24px; font-size: 0.85rem; min-width: 140px; }
+  .load-more-btn { padding: 11px 26px; font-size: 0.85rem; min-width: 150px; }
+}
+
+/* Уважение к prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero h2,
+  .film-card,
+  .film-card::before,
+  .load-more-btn::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  .film-card { opacity: 1; }
 }
