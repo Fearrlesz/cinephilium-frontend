@@ -27,6 +27,7 @@ function HomePage() {
   const [totalCount, setTotalCount] = useState(0);
   const [sortType, setSortType] = useState('technical');
   const [user, setUser] = useState(null);
+  const [topFilms, setTopFilms] = useState([]);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -74,6 +75,19 @@ function HomePage() {
     }
   }, []);
 
+    /* ---------------- Загрузка топа (независимо от пагинации) ---------------- */
+  const loadTopFilms = useCallback(async (sort) => {
+    try {
+      const { data } = await api.get('/films/top', {
+        params: { sort, limit: 5 }
+      });
+      setTopFilms(Array.isArray(data?.films) ? data.films : []);
+    } catch (err) {
+      console.error('Ошибка загрузки топа:', err);
+      setTopFilms([]);
+    }
+  }, []);
+
   /* ---------------- Догрузка следующей страницы (append) ---------------- */
   const loadMore = useCallback(async () => {
     if (loadingMoreRef.current) return;
@@ -101,8 +115,10 @@ function HomePage() {
 
       // Бэк больше ничего не отдаёт — значит реально всё, что можно было, загружено.
       // Синхронизируем totalCount с фактическим количеством, чтобы кнопка исчезла.
-      if (list.length === 0) {
-        
+            if (list.length === 0) {
+        // Бэк больше ничего не отдаёт — фиксируем фактический total,
+        // чтобы кнопка «Загрузить ещё» исчезла.
+        setTotalCount(films.length);
         return;
       }
 
@@ -125,9 +141,10 @@ function HomePage() {
   }, [page, totalCount, sortType, loading, films.length]);
 
   /* ---------------- Первичная загрузка + смена сортировки ---------------- */
-  useEffect(() => {
+   useEffect(() => {
     reloadFromStart(sortType);
-  }, [sortType, reloadFromStart]);
+    loadTopFilms(sortType);
+  }, [sortType, reloadFromStart, loadTopFilms]); 
 
   /* ---------------- Лента активностей ---------------- */
   useEffect(() => { refreshEvents(); }, [refreshEvents]);
@@ -191,6 +208,7 @@ function HomePage() {
       }
 
       await reloadFromStart(sortType);
+      await loadTopFilms(sortType);
       await refreshEvents();
 
       showNotification({ title: 'Фильм добавлен!', message: 'Фильм успешно добавлен в каталог', type: 'success' });
@@ -203,7 +221,8 @@ function HomePage() {
     } finally {
       setIsImporting(false);
     }
-  }, [isImporting, user, addEvent, refreshEvents, navigate, showNotification, reloadFromStart, sortType]);
+   }, [isImporting, user, addEvent, refreshEvents, navigate, showNotification,
+      reloadFromStart, loadTopFilms, sortType]); 
 
   /* ---------------- Выход ---------------- */
   const handleLogout = useCallback(() => {
@@ -216,15 +235,12 @@ function HomePage() {
   /* ---------------- Рендер ---------------- */
   if (loading && films.length === 0) return <div className="loading">Загрузка...</div>;
 
-  const topFilms = [...films]
-    .filter(f => f.averageRating > 0)
-    .sort((a, b) => b.averageRating - a.averageRating)
-    .slice(0, 5);
+  
 
   // Считаем по количеству, а не по номерам страниц: из-за нестабильной
   // сортировки на бэке часть фильмов теряется/дублируется, поэтому
   // page === totalPages ещё не значит, что всё загружено.
- const hasMore = page < totalPages; 
+  const hasMore = films.length < totalCount; 
   return (
     <div className="container">
       <Header user={user} onLogout={handleLogout} />
@@ -278,32 +294,29 @@ function HomePage() {
         </div>
       )}
 
-      {topFilms.length > 0 && (
-        <div className="top-films-netflix">
-          <div className="top-header-netflix"><h3>🏆 Топ-5 сообщества</h3></div>
-          <div className="top-scroll-container">
-            <div className="top-scroll-wrapper">
-              {topFilms.map((film, i) => (
-                <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
-                  <div className="top-card-poster-wrapper">
-                    <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
-                    <div className="top-card-rank">
-                      {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
+                   {topFilms.map((film, i) => {
+                const value =
+                  sortType === 'vibe'     ? film.averageVibe :
+                  sortType === 'combined' ? film.averageCombined :
+                                            film.averageRating;
+                return (
+                  <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
+                    <div className="top-card-poster-wrapper">
+                      <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
+                      <div className="top-card-rank">
+                        {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
+                      </div>
+                      <div className="top-card-score" style={{ color: getScoreColor(value) }}>
+                        {Number.isFinite(value) ? value.toFixed(1) : '—'}
+                      </div>
                     </div>
-                    <div className="top-card-score" style={{ color: getScoreColor(film.averageRating) }}>
-                      {film.averageRating?.toFixed(1)}
+                    <div className="top-card-info">
+                      <span className="top-card-title">{film.title}</span>
+                      <span className="top-card-year">{film.year}</span>
                     </div>
-                  </div>
-                  <div className="top-card-info">
-                    <span className="top-card-title">{film.title}</span>
-                    <span className="top-card-year">{film.year}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+                  </Link>
+                );
+              })} 
 
       <ActivityFeed events={events} loading={eventsLoading} />
 
