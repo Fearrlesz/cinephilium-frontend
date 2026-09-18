@@ -1,1 +1,498 @@
+/* ============================================================
+   ARCHITECT.CSS — эксклюзивная тема «Архитектор Синефилиума»
+   Подключается классом .exclusive-theme на .container.profile-page
+   Палитра: античное золото + стерильное серебро + лёгкая ч/б зернистость
+   Все селекторы с префиксом .exclusive-theme — не протекают на обычные профили
+   ============================================================ */
 
+.exclusive-theme {
+  /* --- Золото (основной акцент темы) --- */
+  --ex-gold:         #c9a961;
+  --ex-gold-bright:  #e6c878;
+  --ex-gold-deep:    #8f7434;
+  --ex-gold-soft:    rgba(201, 169, 97, 0.10);
+  --ex-gold-line:    rgba(201, 169, 97, 0.22);
+
+  /* --- Серебро / ч-б нейтраль (второй акцент) --- */
+  --ex-silver:        #d9d9d9;
+  --ex-silver-bright: #f2f2f2;
+  --ex-silver-dim:    rgba(217, 217, 217, 0.55);
+  --ex-silver-soft:   rgba(217, 217, 217, 0.06);
+  --ex-silver-line:   rgba(217, 217, 217, 0.10);
+
+  /* --- Глубокие тона --- */
+  --ex-ink:   #0b0b0c;
+  --ex-paper: #fafafa;
+
+  position: relative;
+  isolation: isolate;
+}
+
+/* Лёгкая чёрно-белая зернистость поверх всей страницы профиля.
+   Очень деликатная — 3% непрозрачности, без blend-mode, без вмешательства в клики. */
+.exclusive-theme::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.03;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ============================================================
+   ШАПКА
+   ============================================================ */
+.exclusive-theme .profile-header {
+  border-color: var(--ex-silver-line);
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.02), rgba(0, 0, 0, 0.04)),
+    var(--bg-glass);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 169, 97, 0.04),
+    0 20px 60px -20px rgba(0, 0, 0, 0.45);
+}
+
+.exclusive-theme .profile-header::before {
+  left: 8%;
+  width: 84%;
+  opacity: 0.55;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--ex-silver-dim),
+    var(--ex-gold),
+    var(--ex-gold-bright),
+    var(--ex-silver-dim),
+    transparent
+  );
+}
+
+/* Универсальная корректировка стекла в рамках темы */
+.exclusive-theme .glass-card {
+  border-color: var(--ex-silver-line);
+}
+
+/* ============================================================
+   АВАТАР
+   ============================================================ */
+.exclusive-theme .profile-avatar {
+  border-color: var(--ex-silver);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(217, 217, 217, 0.06), rgba(0, 0, 0, 0.35));
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 169, 97, 0.28),
+    inset 0 0 22px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(217, 217, 217, 0.06);
+}
+
+.exclusive-theme .profile-avatar:hover {
+  border-color: var(--ex-gold-bright);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 169, 97, 0.5),
+    0 0 44px rgba(201, 169, 97, 0.14);
+}
+
+.exclusive-theme .avatar-placeholder {
+  background: linear-gradient(180deg, var(--ex-silver-bright) 0%, var(--ex-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ex-silver-bright);
+  text-shadow: 0 0 24px rgba(201, 169, 97, 0.15);
+}
+
+/* ============================================================
+   НИК
+   ============================================================ */
+.exclusive-theme .profile-info h1 {
+  background: linear-gradient(180deg, var(--ex-silver-bright) 0%, var(--ex-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ex-silver-bright);
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 30px rgba(201, 169, 97, 0.08);
+}
+
+/* Восстанавливаем видимый цвет для вложенных бейджей, т.к. h1 градиентный */
+.exclusive-theme .profile-info h1 .admin-badge {
+  -webkit-text-fill-color: initial;
+  color: var(--ex-silver-bright);
+  display: inline-block;
+}
+
+/* ============================================================
+   БЕЙДЖ «АРХИТЕКТОР СИНЕФИЛИУМА» — отдельной строкой под ником
+   ============================================================ */
+.exclusive-theme .profile-info h1 .exclusive-badge {
+  display: block;
+  width: fit-content;
+  margin: 10px 0 0;
+  padding: 4px 14px;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  /* Возвращаем видимость текста — родитель использует background-clip: text */
+  color: var(--ex-gold-bright);
+  -webkit-text-fill-color: var(--ex-gold-bright);
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.05), rgba(201, 169, 97, 0.05)),
+    rgba(11, 11, 12, 0.35);
+  border: 1px solid var(--ex-gold-line);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 12px rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(201, 169, 97, 0.06);
+  text-shadow: 0 0 10px rgba(201, 169, 97, 0.25);
+}
+
+/* ============================================================
+   СТАТИСТИКА
+   ============================================================ */
+.exclusive-theme .profile-stats p {
+  color: var(--ex-silver-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.exclusive-theme .profile-stats strong {
+  color: var(--ex-gold-bright);
+  font-weight: 700;
+  text-shadow: 0 0 14px rgba(201, 169, 97, 0.18);
+}
+
+/* ============================================================
+   ДОСТИЖЕНИЯ
+   ============================================================ */
+.exclusive-theme .achievements-section {
+  border-color: var(--ex-silver-line);
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.025), rgba(0, 0, 0, 0.03));
+}
+
+.exclusive-theme .achievements-section:hover {
+  border-color: var(--ex-gold-line);
+  background:
+    linear-gradient(180deg, rgba(201, 169, 97, 0.04), rgba(0, 0, 0, 0.02));
+  box-shadow: 0 0 40px rgba(201, 169, 97, 0.04);
+}
+
+.exclusive-theme .achievements-section h3,
+.exclusive-theme .achievements-section h4 {
+  background: linear-gradient(90deg, var(--ex-silver-bright), var(--ex-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ex-silver-bright);
+}
+
+/* ============================================================
+   ВКЛАДКИ
+   ============================================================ */
+.exclusive-theme .profile-tabs {
+  border-color: var(--ex-silver-line);
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.02), rgba(0, 0, 0, 0.03)),
+    var(--bg-glass);
+}
+
+.exclusive-theme .profile-tabs:hover {
+  border-color: var(--ex-gold-line);
+  box-shadow: 0 0 40px rgba(201, 169, 97, 0.04);
+}
+
+.exclusive-theme .tabs-header {
+  background: linear-gradient(180deg, rgba(217, 217, 217, 0.03), rgba(0, 0, 0, 0.02));
+  border-bottom-color: var(--ex-silver-line);
+}
+
+.exclusive-theme .tab-btn {
+  color: var(--ex-silver-dim);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exclusive-theme .tab-btn:hover {
+  color: var(--ex-silver-bright);
+  background: var(--ex-silver-soft);
+}
+
+.exclusive-theme .tab-btn.active {
+  color: var(--ex-gold-bright);
+  border-bottom-color: var(--ex-gold);
+  background: linear-gradient(180deg, rgba(201, 169, 97, 0.07), rgba(201, 169, 97, 0.02));
+}
+
+.exclusive-theme .tab-btn .tab-count {
+  color: var(--ex-silver-dim);
+  background: var(--ex-silver-soft);
+  border: 1px solid var(--ex-silver-line);
+}
+
+.exclusive-theme .tab-btn.active .tab-count {
+  color: var(--ex-gold-bright);
+  background: var(--ex-gold-soft);
+  border-color: var(--ex-gold-line);
+}
+
+/* ============================================================
+   ОЦЕНКИ
+   ============================================================ */
+.exclusive-theme .rating-item {
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.02), rgba(0, 0, 0, 0.025));
+  border-left-color: var(--ex-silver-line);
+}
+
+.exclusive-theme .rating-item:hover {
+  border-left-color: var(--ex-gold);
+  background:
+    linear-gradient(90deg, rgba(201, 169, 97, 0.05), rgba(0, 0, 0, 0.01));
+}
+
+.exclusive-theme .rating-poster-small {
+  box-shadow: 0 0 0 1px rgba(217, 217, 217, 0.08);
+}
+
+.exclusive-theme .rating-film-info h4 {
+  color: var(--ex-silver-bright);
+}
+
+.exclusive-theme .rating-film-info p {
+  color: var(--ex-silver-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.exclusive-theme .rating-score {
+  color: var(--ex-gold-bright);
+  text-shadow: 0 0 20px rgba(201, 169, 97, 0.22);
+}
+
+.exclusive-theme .details-btn {
+  color: var(--ex-silver);
+  background: var(--ex-silver-soft);
+  border: 1px solid var(--ex-silver-line);
+}
+
+.exclusive-theme .details-btn:hover {
+  color: var(--ex-gold-bright);
+  background: var(--ex-gold-soft);
+  border-color: var(--ex-gold-line);
+}
+
+/* ============================================================
+   РЕЦЕНЗИИ
+   ============================================================ */
+.exclusive-theme .review-item {
+  border-color: var(--ex-silver-line);
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.02), rgba(0, 0, 0, 0.025));
+}
+
+.exclusive-theme .review-item::before {
+  background: linear-gradient(
+    to bottom,
+    var(--ex-silver),
+    var(--ex-gold),
+    var(--ex-gold-bright)
+  );
+  opacity: 0.45;
+}
+
+.exclusive-theme .review-item:hover::before {
+  opacity: 0.9;
+}
+
+.exclusive-theme .review-item:hover {
+  border-color: var(--ex-gold-line);
+  background:
+    linear-gradient(180deg, rgba(201, 169, 97, 0.04), rgba(0, 0, 0, 0.02));
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(201, 169, 97, 0.05);
+}
+
+.exclusive-theme .review-title {
+  color: var(--ex-silver-bright);
+}
+
+.exclusive-theme .review-film-link:hover .review-title {
+  color: var(--ex-gold-bright);
+}
+
+.exclusive-theme .review-film-name {
+  color: var(--ex-silver-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.exclusive-theme .review-rating {
+  color: var(--ex-gold-bright);
+  text-shadow: 0 0 14px rgba(201, 169, 97, 0.2);
+}
+
+.exclusive-theme .review-text {
+  color: var(--ex-silver);
+}
+
+.exclusive-theme .review-date {
+  color: var(--ex-silver-dim);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.exclusive-theme .review-footer {
+  border-top-color: var(--ex-silver-line);
+}
+
+.exclusive-theme .review-go-to-film {
+  color: var(--ex-gold-bright);
+  background: var(--ex-gold-soft);
+  border-color: var(--ex-gold-line);
+}
+
+.exclusive-theme .review-go-to-film:hover {
+  background: rgba(201, 169, 97, 0.14);
+  border-color: rgba(201, 169, 97, 0.4);
+  box-shadow: 0 0 30px rgba(201, 169, 97, 0.08);
+}
+
+.exclusive-theme .like-btn {
+  color: var(--ex-silver);
+  border-color: var(--ex-silver-line);
+}
+
+.exclusive-theme .like-btn:hover {
+  color: var(--ex-gold-bright);
+  border-color: var(--ex-gold-line);
+}
+
+/* ============================================================
+   КНОПКИ (шапка / навигация / выход / редактирование)
+   ============================================================ */
+.exclusive-theme .back-btn {
+  color: var(--ex-silver);
+}
+
+.exclusive-theme .back-btn:hover {
+  color: var(--ex-gold-bright);
+}
+
+.exclusive-theme .btn-edit-profile {
+  color: var(--ex-gold-bright);
+  background: var(--ex-gold-soft);
+  border-color: var(--ex-gold-line);
+}
+
+.exclusive-theme .btn-edit-profile:hover {
+  background: rgba(201, 169, 97, 0.14);
+  border-color: rgba(201, 169, 97, 0.4);
+  box-shadow: 0 0 30px rgba(201, 169, 97, 0.08);
+}
+
+.exclusive-theme .logout-btn {
+  color: var(--ex-silver-dim);
+  border-color: var(--ex-silver-line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+.exclusive-theme .logout-btn:hover {
+  color: var(--ex-silver-bright);
+  background: var(--ex-silver-soft);
+  border-color: rgba(217, 217, 217, 0.28);
+}
+
+/* Блок активации админа внутри профиля-владельца (ProfilePage) */
+.exclusive-theme .admin-activation.glass-card {
+  border-color: var(--ex-silver-line);
+  background:
+    linear-gradient(180deg, rgba(217, 217, 217, 0.02), rgba(0, 0, 0, 0.03)),
+    var(--bg-glass);
+}
+
+/* Пустые состояния в теме */
+.exclusive-theme .profile-ratings .empty-state,
+.exclusive-theme .profile-reviews .empty-state {
+  color: var(--ex-silver-dim);
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 768px) {
+  .exclusive-theme .profile-header {
+    border-color: var(--ex-silver-line);
+  }
+
+  .exclusive-theme .profile-header::before {
+    left: 12%;
+    width: 76%;
+  }
+
+  .exclusive-theme .profile-info h1 {
+    font-size: 22px;
+  }
+
+  /* Бейдж под ником — по центру на мобильном */
+  .exclusive-theme .profile-info h1 .exclusive-badge {
+    margin: 8px auto 0;
+    padding: 3px 12px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  /* Активный таб в мобильной раскладке (левая полоса) — на золоте */
+  .exclusive-theme .tab-btn.active {
+    border-bottom-color: transparent;
+    border-left-color: var(--ex-gold);
+    background: linear-gradient(90deg, rgba(201, 169, 97, 0.07), rgba(201, 169, 97, 0.01));
+  }
+
+  .exclusive-theme .tab-btn .tab-count {
+    float: right;
+  }
+
+  .exclusive-theme .review-item:hover {
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.3),
+      0 0 22px rgba(201, 169, 97, 0.05);
+  }
+
+  /* Зернистость на мобильном — ещё деликатнее */
+  .exclusive-theme::after {
+    opacity: 0.025;
+    background-size: 160px 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .exclusive-theme .profile-info h1 .exclusive-badge {
+    font-size: 9px;
+    padding: 3px 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .exclusive-theme .logout-btn {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  }
