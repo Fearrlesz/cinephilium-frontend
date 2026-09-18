@@ -108,12 +108,9 @@ function UserProfilePage() {
   }
 
   const isOwnProfile = currentUser?._id === user._id;
-
-  // 👇 Читаем флаг (он придет с бэкенда из роута /users/:id)
   const isExclusive = user.isExclusive;
 
   return (
-    // 👇 Добавляем динамический класс
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
@@ -125,12 +122,26 @@ function UserProfilePage() {
           <h1>
             {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
-
-            {/* 👇 ДОБАВЛЯЕМ БЕЙДЖ "АРХИТЕКТОР СИНЕФИЛИУМА" */}
             {isExclusive && (
               <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
             )}
           </h1>
+
+          {/* 👇 БЛОК ДОСТИЖЕНИЙ (возвращен из старой версии) */}
+          <div className="achievements-section" style={{ marginTop: '15px' }}>
+            <h4>🏅 Достижения</h4>
+            {user.achievements?.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                {user.achievements.map(ach => (
+                  <span key={ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    🏅 {ach}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#888', fontSize: '13px' }}>Нет достижений</p>
+            )}
+          </div>
         </div>
       </div>
 
