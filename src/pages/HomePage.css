@@ -227,6 +227,44 @@
   z-index: 1;
 }
 
+/* ============================================================
+   ИНДИВИДУАЛЬНЫЙ АКЦЕНТ РЕЙТИНГА ДЛЯ КАЖДОЙ КАРТОЧКИ
+   Цикл из 5 цветов палитры сайта — золото, розовый, циан,
+   фиолет, приглушённое золото. Задаётся через nth-child,
+   поэтому HTML менять не нужно.
+   ============================================================ */
+.film-card {
+  --rating-accent: var(--gold-bright);
+  --rating-glow:   rgba(168, 133, 64, 0.22);
+  --rating-soft:   rgba(168, 133, 64, 0.10);
+}
+
+.film-card:nth-child(5n+1) {
+  --rating-accent: var(--gold-bright);
+  --rating-glow:   rgba(168, 133, 64, 0.22);
+  --rating-soft:   rgba(168, 133, 64, 0.10);
+}
+.film-card:nth-child(5n+2) {
+  --rating-accent: var(--neon-pink);
+  --rating-glow:   rgba(236, 72, 153, 0.24);
+  --rating-soft:   rgba(236, 72, 153, 0.10);
+}
+.film-card:nth-child(5n+3) {
+  --rating-accent: var(--neon-cyan);
+  --rating-glow:   rgba(34, 211, 238, 0.24);
+  --rating-soft:   rgba(34, 211, 238, 0.10);
+}
+.film-card:nth-child(5n+4) {
+  --rating-accent: var(--neon-purple);
+  --rating-glow:   rgba(124, 58, 237, 0.26);
+  --rating-soft:   rgba(124, 58, 237, 0.10);
+}
+.film-card:nth-child(5n+5) {
+  --rating-accent: var(--gold);
+  --rating-glow:   rgba(168, 133, 64, 0.20);
+  --rating-soft:   rgba(168, 133, 64, 0.09);
+}
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -345,7 +383,7 @@
   margin: 0;
 }
 
-/* ===== РЕЙТИНГ В КАРТОЧКЕ — золото ===== */
+/* ===== РЕЙТИНГ В КАРТОЧКЕ — цвет под фильм ===== */
 .rating-badge {
   display: inline-block;
   font-family: var(--font-mono);
@@ -357,8 +395,14 @@
   background: none;
   border-radius: 0;
   letter-spacing: -0.02em;
-  color: var(--gold-bright);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.18);
+  color: var(--rating-accent);
+  text-shadow: 0 0 20px var(--rating-glow);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.film-card:hover .rating-badge,
+.film-card-link:focus-visible .rating-badge {
+  text-shadow: 0 0 30px var(--rating-glow);
 }
 
 .votes-count {
@@ -381,9 +425,9 @@
 
 .film-card:hover .votes-count,
 .film-card-link:focus-visible .votes-count {
-  border-color: rgba(168, 133, 64, 0.22);
+  border-color: var(--rating-soft);
   color: var(--text-secondary);
-  background: rgba(168, 133, 64, 0.05);
+  background: var(--rating-soft);
 }
 
 /* ============================================================
@@ -403,8 +447,8 @@
 
 .film-card:hover .film-ratings,
 .film-card-link:focus-visible .film-ratings {
-  border-color: rgba(168, 133, 64, 0.18);
-  background: rgba(168, 133, 64, 0.025);
+  border-color: var(--rating-soft);
+  background: var(--rating-soft);
 }
 
 .rating-row {
@@ -433,28 +477,18 @@
   text-align: right;
 }
 
-.rating-technical {
-  color: var(--gold-bright);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
-}
-.rating-technical:hover {
-  text-shadow: 0 0 30px rgba(168, 133, 64, 0.28);
-}
-
-.rating-vibe {
-  color: var(--neon-pink);
-  text-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
-}
-.rating-vibe:hover {
-  text-shadow: 0 0 30px rgba(236, 72, 153, 0.24);
-}
-
+/* Все три строки рейтинга подхватывают акцент карточки */
+.rating-technical,
+.rating-vibe,
 .rating-combined {
-  color: var(--neon-cyan);
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
+  color: var(--rating-accent);
+  text-shadow: 0 0 20px var(--rating-glow);
 }
+
+.rating-technical:hover,
+.rating-vibe:hover,
 .rating-combined:hover {
-  text-shadow: 0 0 30px rgba(34, 211, 238, 0.22);
+  text-shadow: 0 0 30px var(--rating-glow);
 }
 
 /* ============================================================
