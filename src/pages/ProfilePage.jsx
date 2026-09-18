@@ -178,7 +178,6 @@ function ProfilePage() {
 
           <p>📧 {user.email}</p>
           <div className="profile-stats">
-            <p>📊 Средняя оценка: <strong>{avgRating}</strong></p>
             <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
             <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
