@@ -154,7 +154,29 @@ function ProfilePage() {
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
+  const isExclusive = user.isExclusive; 
+
   return (
+    // 👇 Добавляем динамический класс
+    <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+
+      <div className="profile-header glass-card">
+        <div className="profile-avatar">
+          <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
+        </div>
+        <div className="profile-info">
+          <h1>
+            {user.nickname || 'Пользователь'}
+            {user.isAdmin && <span className="admin-badge"> 👑</span>}
+            
+            {/* 👇 ДОБАВЛЯЕМ БЕЙДЖ "АРХИТЕКТОР СИНЕФИЛИУМА" */}
+            {isExclusive && (
+              <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
+            )}
+          </h1>
+
+          
     <div className="container profile-page">
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
