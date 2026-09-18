@@ -126,8 +126,11 @@ function UserProfilePage() {
               <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
             )}
           </h1>
-
-          {/* 👇 БЛОК ДОСТИЖЕНИЙ (возвращен из старой версии) */}
+          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
+          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
+          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
+          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
+          
           <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4>🏅 Достижения</h4>
             {user.achievements?.length > 0 ? (
@@ -147,13 +150,13 @@ function UserProfilePage() {
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button
+          <button 
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Оценки ({ratings.length})
           </button>
-          <button
+          <button 
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -201,7 +204,7 @@ function UserProfilePage() {
                       <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
                           ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
