@@ -1,1 +1,807 @@
+/* ============================================================
+   Architect.css
+   Эксклюзивная тема «Архитектор Синефилиума»
+   Проект: cinephilium-frontend
+   Подключение: src/pages/Architect.css
+   Активация:  .container.profile-page.exclusive-theme
+   Область:    ТОЛЬКО под .exclusive-theme. Базовые стили — в
+               ProfilePage.css / UserProfilePage.css.
+   ------------------------------------------------------------
+   Визуальный код темы:
+   — палитра: чёрный / серый / пересвеченный белый, без сепии;
+   — жёсткий контраст, резкие тени, никаких размытий;
+   — зерно + виньетка, логика кадра 1.85:1;
+   — антиква в заголовках, узкий гротеск в тексте;
+   — медленное движение: 900–1600 ms, cubic-bezier(0.65,0,0.35,1);
+   — без неона, глассморфизма, градиентного текста, мягких теней.
+   ============================================================ */
 
+.exclusive-theme {
+  /* нейтральные тона — единственная «палитра» темы */
+  --arch-black: #0a0a0a;
+  --arch-deep:  #1a1a1a;
+  --arch-mid:   #6f6f6f;
+  --arch-light: #d9d9d9;
+  --arch-white: #f5f2e8;
+
+  /* типографика */
+  --arch-serif: "Times New Roman", "Georgia", "Playfair Display", serif;
+  --arch-sans:  "Helvetica Neue", "Inter", "Arial", sans-serif;
+
+  /* движение */
+  --arch-ease:  cubic-bezier(0.65, 0, 0.35, 1);
+  --arch-slow:  1100ms;
+  --arch-mid-t: 900ms;
+}
+
+/* ============================================================
+   КОНТЕЙНЕР / ФОН / ЗЕРНО / ВИНЬЕТКА
+   ============================================================ */
+
+.exclusive-theme.container.profile-page {
+  position: relative;
+  isolation: isolate;
+  background: var(--arch-black);
+  color: var(--arch-light);
+  font-family: var(--arch-sans);
+  letter-spacing: 0.01em;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 4rem 8vw 6rem;
+  min-height: 100vh;
+}
+
+/* зерно: SVG feTurbulence, приглушённое до состояния плёночного шума */
+.exclusive-theme.container.profile-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)' opacity='0.32'/></svg>");
+  background-size: 240px 240px;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+}
+
+/* виньетка: чёрная рамка света */
+.exclusive-theme.container.profile-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 10, 10, 0) 42%,
+    rgba(10, 10, 10, 0.55) 78%,
+    rgba(10, 10, 10, 0.92) 100%
+  );
+}
+
+/* содержимое поверх зерна и виньетки */
+.exclusive-theme.container.profile-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   ШАПКА
+   ============================================================ */
+
+.exclusive-theme .profile-header.glass-card {
+  background: var(--arch-deep);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 2.5rem 2.75rem;
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  transition:
+    border-color var(--arch-slow) var(--arch-ease),
+    background var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .profile-header.glass-card:hover {
+  border-color: var(--arch-light);
+}
+
+/* ============================================================
+   АВАТАР
+   ============================================================ */
+
+.exclusive-theme .profile-avatar {
+  flex: 0 0 auto;
+  position: relative;
+  aspect-ratio: 1.85 / 1;
+  width: 220px;
+  border: 1px solid var(--arch-mid);
+  background: var(--arch-black);
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+}
+
+.exclusive-theme .profile-avatar img,
+.exclusive-theme .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  background: var(--arch-black);
+  color: var(--arch-mid);
+  font-family: var(--arch-serif);
+  letter-spacing: 0.08em;
+  filter: grayscale(1) contrast(1.15);
+  transition: filter var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .profile-avatar:hover img,
+.exclusive-theme .profile-avatar:hover .avatar-placeholder {
+  filter: grayscale(0.35) contrast(1.2);
+}
+
+/* ============================================================
+   ИНФОБЛОК / НИК
+   ============================================================ */
+
+.exclusive-theme .profile-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.exclusive-theme .profile-info h1 {
+  font-family: var(--arch-serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--arch-white);
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: var(--arch-white);
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.exclusive-theme .profile-info p {
+  font-family: var(--arch-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--arch-mid);
+  letter-spacing: 0.04em;
+  margin: 0.2rem 0;
+}
+
+/* ============================================================
+   БЕЙДЖ
+   ============================================================ */
+
+.exclusive-theme .exclusive-badge {
+  display: inline-block;
+  font-family: var(--arch-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.45em 0.75em;
+  background: var(--arch-white);
+  color: var(--arch-black);
+  -webkit-text-fill-color: var(--arch-black);
+  border: 1px solid var(--arch-white);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  vertical-align: middle;
+  transform: translateY(-0.15em);
+  white-space: nowrap;
+  transition:
+    background var(--arch-mid-t) var(--arch-ease),
+    color var(--arch-mid-t) var(--arch-ease),
+    border-color var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .exclusive-badge:hover {
+  background: transparent;
+  color: var(--arch-white);
+  -webkit-text-fill-color: var(--arch-white);
+  border-color: var(--arch-white);
+}
+
+/* admin-badge — сохраняем читаемость внутри градиентного h1 */
+.exclusive-theme .admin-badge {
+  display: inline-block;
+  font-family: var(--arch-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.45em 0.75em;
+  background: transparent;
+  color: var(--arch-light);
+  -webkit-text-fill-color: var(--arch-light);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  vertical-align: middle;
+  transform: translateY(-0.15em);
+  transition:
+    border-color var(--arch-mid-t) var(--arch-ease),
+    color var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .admin-badge:hover {
+  border-color: var(--arch-white);
+  color: var(--arch-white);
+  -webkit-text-fill-color: var(--arch-white);
+}
+
+/* ============================================================
+   СТАТИСТИКА
+   ============================================================ */
+
+.exclusive-theme .profile-stats {
+  margin-top: 1.75rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--arch-mid);
+  border-bottom: 1px solid var(--arch-mid);
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem 3rem;
+}
+
+.exclusive-theme .profile-stats p {
+  margin: 0;
+  font-family: var(--arch-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+  font-weight: 400;
+}
+
+.exclusive-theme .profile-stats strong,
+.exclusive-theme .profile-stats span {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--arch-serif);
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  color: var(--arch-white);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   ДОСТИЖЕНИЯ
+   ============================================================ */
+
+.exclusive-theme .achievements-section {
+  margin-top: 1.75rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+  background: var(--arch-black);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  transition: border-color var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .achievements-section:hover {
+  border-color: var(--arch-light);
+}
+
+.exclusive-theme .achievements-section h3,
+.exclusive-theme .achievements-section h2 {
+  font-family: var(--arch-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+  margin: 0 0 1rem 0;
+}
+
+.exclusive-theme .achievements-section * {
+  border-radius: 0;
+}
+
+/* ============================================================
+   АДМИН-АКТИВАЦИЯ
+   ============================================================ */
+
+.exclusive-theme .admin-activation.glass-card {
+  background: var(--arch-black);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 1.5rem;
+  margin-top: 1.75rem;
+}
+
+/* ============================================================
+   ТАБЫ
+   ============================================================ */
+
+.exclusive-theme .profile-tabs.glass-card {
+  margin-top: 2.5rem;
+  background: var(--arch-deep);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.exclusive-theme .tabs-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid var(--arch-mid);
+  background: var(--arch-black);
+}
+
+.exclusive-theme .tab-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--arch-mid);
+  border-radius: 0;
+  padding: 1.1rem 1.75rem;
+  font-family: var(--arch-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+  cursor: pointer;
+  transition:
+    background var(--arch-mid-t) var(--arch-ease),
+    color var(--arch-mid-t) var(--arch-ease),
+    letter-spacing var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .tab-btn:hover {
+  color: var(--arch-white);
+  letter-spacing: 0.28em;
+}
+
+.exclusive-theme .tab-btn.active {
+  background: var(--arch-white);
+  color: var(--arch-black);
+  border-right-color: var(--arch-white);
+  letter-spacing: 0.26em;
+}
+
+/* ============================================================
+   ОЦЕНКИ
+   ============================================================ */
+
+.exclusive-theme .profile-ratings {
+  padding: 2rem;
+}
+
+.exclusive-theme .ratings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--arch-mid);
+}
+
+.exclusive-theme .rating-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 0.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--arch-mid);
+  border-radius: 0;
+  transition:
+    background var(--arch-slow) var(--arch-ease),
+    padding-left var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .rating-item:hover {
+  background: var(--arch-black);
+  padding-left: 0.9rem;
+}
+
+.exclusive-theme .rating-film-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.exclusive-theme .rating-poster-small {
+  width: 52px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 0;
+  border: 1px solid var(--arch-mid);
+  filter: grayscale(1) contrast(1.15);
+  transition: filter var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .rating-item:hover .rating-poster-small {
+  filter: grayscale(0.3) contrast(1.2);
+}
+
+.exclusive-theme .rating-film-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-family: var(--arch-serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--arch-white);
+}
+
+.exclusive-theme .rating-film-info p {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+}
+
+.exclusive-theme .rating-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  padding: 0.45rem 0.7rem;
+  font-family: var(--arch-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--arch-white);
+  background: var(--arch-black);
+  border: 1px solid var(--arch-light);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+}
+
+/* ============================================================
+   РЕЦЕНЗИИ
+   ============================================================ */
+
+.exclusive-theme .profile-reviews {
+  padding: 2rem;
+}
+
+.exclusive-theme .reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exclusive-theme .review-item {
+  padding: 1.5rem 1.75rem;
+  background: var(--arch-black);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  transition:
+    border-color var(--arch-slow) var(--arch-ease),
+    background var(--arch-slow) var(--arch-ease);
+}
+
+.exclusive-theme .review-item:hover {
+  border-color: var(--arch-light);
+  background: var(--arch-deep);
+}
+
+.exclusive-theme .review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--arch-mid);
+}
+
+.exclusive-theme .review-film-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-decoration: none;
+}
+
+.exclusive-theme .review-title {
+  font-family: var(--arch-serif);
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  color: var(--arch-white);
+  transition: color var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .review-film-link:hover .review-title {
+  color: var(--arch-light);
+}
+
+.exclusive-theme .review-film-name {
+  font-family: var(--arch-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+}
+
+.exclusive-theme .review-rating {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--arch-serif);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--arch-white);
+  background: transparent;
+  border: 1px solid var(--arch-light);
+  border-radius: 0;
+}
+
+.exclusive-theme .review-text {
+  font-family: var(--arch-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--arch-light);
+  margin: 0 0 1.25rem 0;
+  max-width: 62ch;
+}
+
+.exclusive-theme .review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--arch-mid);
+}
+
+.exclusive-theme .review-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.exclusive-theme .review-date {
+  font-family: var(--arch-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--arch-mid);
+}
+
+.exclusive-theme .review-go-to-film {
+  font-family: var(--arch-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--arch-white);
+  text-decoration: none;
+  border-bottom: 1px solid var(--arch-white);
+  padding-bottom: 0.15rem;
+  transition:
+    color var(--arch-mid-t) var(--arch-ease),
+    border-color var(--arch-mid-t) var(--arch-ease),
+    letter-spacing var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .review-go-to-film:hover {
+  color: var(--arch-light);
+  border-bottom-color: var(--arch-light);
+  letter-spacing: 0.26em;
+}
+
+/* ============================================================
+   КНОПКИ
+   ============================================================ */
+
+.exclusive-theme .back-btn,
+.exclusive-theme .logout-btn,
+.exclusive-theme .details-btn,
+.exclusive-theme .like-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  font-family: var(--arch-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: transparent;
+  color: var(--arch-light);
+  border: 1px solid var(--arch-mid);
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--arch-black);
+  transition:
+    background var(--arch-mid-t) var(--arch-ease),
+    color var(--arch-mid-t) var(--arch-ease),
+    border-color var(--arch-mid-t) var(--arch-ease),
+    letter-spacing var(--arch-mid-t) var(--arch-ease);
+}
+
+.exclusive-theme .back-btn:hover,
+.exclusive-theme .logout-btn:hover,
+.exclusive-theme .details-btn:hover,
+.exclusive-theme .like-btn:hover {
+  background: var(--arch-white);
+  color: var(--arch-black);
+  border-color: var(--arch-white);
+  letter-spacing: 0.26em;
+}
+
+.exclusive-theme .like-btn.active {
+  background: var(--arch-white);
+  color: var(--arch-black);
+  border-color: var(--arch-white);
+}
+
+.exclusive-theme .back-btn {
+  margin-bottom: 2rem;
+}
+
+/* ============================================================
+   МОДАЛКА ДЕТАЛЕЙ ОЦЕНКИ
+   ============================================================ */
+
+.exclusive-theme .rating-details-modal,
+.exclusive-theme .modal-content {
+  border-radius: 0;
+  background: var(--arch-black);
+  border: 1px solid var(--arch-mid);
+  box-shadow: 0 0 0 1px var(--arch-black);
+  color: var(--arch-light);
+}
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .exclusive-theme.container.profile-page {
+    padding: 2.5rem 6vw 4rem;
+  }
+
+  .exclusive-theme .profile-header.glass-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .exclusive-theme .profile-avatar {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1.85 / 1;
+    margin: 0 auto;
+  }
+
+  .exclusive-theme .profile-info h1 {
+    font-size: clamp(1.5rem, 7vw, 2.25rem);
+    letter-spacing: -0.03em;
+    gap: 0.4rem;
+  }
+
+  .exclusive-theme .exclusive-badge,
+  .exclusive-theme .admin-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    padding: 0.4em 0.6em;
+    transform: translateY(-0.1em);
+  }
+
+  .exclusive-theme .profile-stats {
+    gap: 1.25rem 1.75rem;
+    padding: 1rem 0;
+  }
+
+  .exclusive-theme .profile-stats strong,
+  .exclusive-theme .profile-stats span {
+    font-size: 1.25rem;
+  }
+
+  .exclusive-theme .achievements-section,
+  .exclusive-theme .admin-activation.glass-card {
+    padding: 1rem;
+  }
+
+  .exclusive-theme .tabs-header {
+    flex-direction: column;
+  }
+
+  .exclusive-theme .tab-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.9rem 1.1rem;
+    border-right: none;
+    border-bottom: 1px solid var(--arch-mid);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .exclusive-theme .tab-btn:last-child {
+    border-bottom: none;
+  }
+
+  .exclusive-theme .profile-ratings,
+  .exclusive-theme .profile-reviews {
+    padding: 1.25rem;
+  }
+
+  .exclusive-theme .rating-item {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "info  score"
+      "btn   btn";
+    gap: 0.9rem 1rem;
+    padding: 1rem 0.25rem;
+  }
+
+  .exclusive-theme .rating-film-info { grid-area: info; gap: 0.9rem; }
+  .exclusive-theme .rating-score      { grid-area: score; }
+  .exclusive-theme .details-btn       { grid-area: btn; justify-self: start; }
+
+  .exclusive-theme .rating-poster-small {
+    width: 44px;
+    height: 64px;
+  }
+
+  .exclusive-theme .review-item {
+    padding: 1.1rem 1rem;
+  }
+
+  .exclusive-theme .review-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .exclusive-theme .review-title {
+    font-size: 1.15rem;
+  }
+
+  .exclusive-theme .review-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .exclusive-theme .review-actions {
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .exclusive-theme .back-btn,
+  .exclusive-theme .logout-btn,
+  .exclusive-theme .details-btn,
+  .exclusive-theme .like-btn {
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    padding: 0.55rem 0.9rem;
+  }
+}
