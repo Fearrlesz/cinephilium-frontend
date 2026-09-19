@@ -8,8 +8,8 @@ import './CriticPage.css';
 
 export default function CriticPage() {
   const navigate = useNavigate();
-  const { critic, topMovies, loading, error } = useCriticData();
-
+  const { critic, topMovies, reviewPosters, loading, error } = useCriticData();
+  
   if (loading) return <div className="loading">Загрузка...</div>;
 
   if (error) {
@@ -35,7 +35,7 @@ export default function CriticPage() {
 
       <CriticTopMovies movies={topMovies} />
 
-      <CriticReviews reviews={CRITIC_REVIEWS} />
+      <CriticReviews reviews={CRITIC_REVIEWS} posters={reviewPosters} />
     </div>
   );
 }
