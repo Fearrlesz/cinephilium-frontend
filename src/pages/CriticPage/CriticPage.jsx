@@ -1,68 +1,41 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getPosterUrl, handleImgError, PLACEHOLDER } from '../../utils/posterUrl';
-import './CriticReviews.css';
+import { useNavigate } from 'react-router-dom';
+import useCriticData from '../../hooks/useCriticData';
+import CriticHero from '../../components/Critic/CriticHero';
+import CriticTopMovies from '../../components/Critic/CriticTopMovies';
+import CriticReviews from '../../components/Critic/CriticReviews';
+import { CRITIC_META, CRITIC_REVIEWS } from '../../utils/mockCriticData';
+import './CriticPage.css';
 
-export default function CriticReviews({ reviews, posters = {} }) {
-  const [openId, setOpenId] = useState(null);
+export default function CriticPage() {
+  const navigate = useNavigate();
+  const { critic, topMovies, reviewPosters, loading, error } = useCriticData();
+  
+  if (loading) return <div className="loading">Загрузка...</div>;
+
+  if (error) {
+    return (
+      <div className="container">
+        <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+        <div className="error-msg" style={{ textAlign: 'center', padding: '40px' }}>
+          <h2>😕 {error}</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <section className="critic-reviews">
-      <h2>Рецензии</h2>
+    <div className="container critic-page">
+      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
-      {reviews.length === 0 ? (
-        <p className="critic-reviews__empty">Пока пусто</p>
-      ) : (
-        <div className="critic-reviews__list">
-          {reviews.map((rev) => {
-            const open = openId === rev.id;
-            const poster = posters[rev.filmId]
-              ? getPosterUrl(posters[rev.filmId])
-              : PLACEHOLDER;
+      <CriticHero
+        critic={critic}
+        tagline={CRITIC_META.tagline}
+        bio={CRITIC_META.bio}
+      />
 
-            return (
-              <article
-                key={rev.id}
-                className={`critic-reviews__item ${open ? 'open' : ''}`}
-              >
-                <div className="critic-reviews__header">
-                  <Link
-                    to={`/film/${rev.filmId}`}
-                    className="critic-reviews__poster"
-                    title={`Открыть «${rev.title}»`}
-                  >
-                    <img
-                      src={poster}
-                      alt={rev.title}
-                      onError={handleImgError}
-                      loading="lazy"
-                    />
-                  </Link>
+      <CriticTopMovies movies={topMovies} />
 
-                  <button
-                    className="critic-reviews__headline-btn"
-                    onClick={() => setOpenId(open ? null : rev.id)}
-                  >
-                    <div className="critic-reviews__headline">
-                      <h3>{rev.title}</h3>
-                      {rev.meta && <p className="critic-reviews__meta">{rev.meta}</p>}
-                    </div>
-                    <span className="critic-reviews__toggle">{open ? '−' : '+'}</span>
-                  </button>
-                </div>
-
-                {open && (
-                  <div className="critic-reviews__text">
-                    {rev.text.split('\n\n').map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
-                )}
-              </article>
-            );
-          })}
-        </div>
-      )}
-    </section>
+      <CriticReviews reviews={CRITIC_REVIEWS} posters={reviewPosters} />
+    </div>
   );
 }
