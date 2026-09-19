@@ -8,6 +8,7 @@ function Header({ user, onLogout }) {
       <h1>🎬 СИНЕФИЛИУМ</h1>
       <div className="header-actions">
         <Link to="/about" className="btn-about">📖 О системе</Link>
+        <Link to="/critic" className="btn-critic">🇮🇹 Архитектор</Link>
         <Link to="/top" className="btn-top">🏆 Топ</Link>
         <a href="https://t.me/Cinephilium" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
         {user ? (
