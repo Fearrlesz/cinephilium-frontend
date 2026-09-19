@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getPosterUrl, handleImgError, PLACEHOLDER } from '../../utils/posterUrl';
 import './CriticReviews.css';
 
@@ -24,26 +25,31 @@ export default function CriticReviews({ reviews, posters = {} }) {
                 key={rev.id}
                 className={`critic-reviews__item ${open ? 'open' : ''}`}
               >
-                <button
-                  className="critic-reviews__header"
-                  onClick={() => setOpenId(open ? null : rev.id)}
-                >
-                  <div className="critic-reviews__poster">
+                <div className="critic-reviews__header">
+                  <Link
+                    to={`/film/${rev.filmId}`}
+                    className="critic-reviews__poster"
+                    title={`Открыть «${rev.title}»`}
+                  >
                     <img
                       src={poster}
                       alt={rev.title}
                       onError={handleImgError}
                       loading="lazy"
                     />
-                  </div>
+                  </Link>
 
-                  <div className="critic-reviews__headline">
-                    <h3>{rev.title}</h3>
-                    {rev.meta && <p className="critic-reviews__meta">{rev.meta}</p>}
-                  </div>
-
-                  <span className="critic-reviews__toggle">{open ? '−' : '+'}</span>
-                </button>
+                  <button
+                    className="critic-reviews__headline-btn"
+                    onClick={() => setOpenId(open ? null : rev.id)}
+                  >
+                    <div className="critic-reviews__headline">
+                      <h3>{rev.title}</h3>
+                      {rev.meta && <p className="critic-reviews__meta">{rev.meta}</p>}
+                    </div>
+                    <span className="critic-reviews__toggle">{open ? '−' : '+'}</span>
+                  </button>
+                </div>
 
                 {open && (
                   <div className="critic-reviews__text">
