@@ -11,6 +11,7 @@ import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
+import CriticPage from './pages/CriticPage/CriticPage';
 import './App.css';
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/top" element={<TopUsersPage />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/critic" element={<CriticPage />} />
           <Route path="/film/:id" element={<FilmPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
