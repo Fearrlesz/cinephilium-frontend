@@ -1,1 +1,197 @@
 
+/* ============================================================
+   CRITIC HERO — шапка профиля критика
+   ============================================================ */
+
+.critic-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg) calc(var(--spacing-lg) * 1.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Дополнительное свечение под аватаркой */
+.critic-hero::after {
+  /* перекрываем дефолтный ::after из glass-card золотой полосой сверху —
+     усиливаем её для hero-блока */
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  opacity: 0.25;
+}
+
+.critic-hero:hover::after {
+  opacity: 0.55;
+}
+
+/* Аватар */
+.critic-hero__avatar {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.critic-hero__avatar::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    var(--gold) 15%,
+    var(--gold-bright) 25%,
+    var(--neon-purple) 45%,
+    transparent 60%,
+    var(--neon-cyan) 80%,
+    transparent 100%
+  );
+  opacity: 0.35;
+  filter: blur(8px);
+  animation: heroAvatarSpin 12s linear infinite;
+  z-index: 0;
+}
+
+@keyframes heroAvatarSpin {
+  to { transform: rotate(360deg); }
+}
+
+.avatar-placeholder {
+  position: relative;
+  z-index: 1;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(150deg,
+    rgba(30, 30, 55, 0.9) 0%,
+    rgba(15, 15, 32, 0.95) 100%
+  );
+  border: 1px solid var(--glass-border-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 44px;
+  font-weight: 600;
+  color: var(--gold-bright);
+  text-shadow: 0 0 24px var(--gold-glow);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -6px 24px rgba(0, 0, 0, 0.6),
+    0 12px 40px rgba(0, 0, 0, 0.5);
+  transition: all var(--transition-smooth);
+}
+
+.critic-hero:hover .avatar-placeholder {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -6px 24px rgba(0, 0, 0, 0.6),
+    0 16px 50px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(168, 133, 64, 0.12);
+}
+
+/* Информация */
+.critic-hero__info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.critic-hero__info h1 {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Бейдж «Архитектор Синефилиума» */
+.exclusive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: var(--gold-bright);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.14) 0%,
+    rgba(74, 58, 26, 0.08) 100%
+  );
+  border: 1px solid var(--gold-dim);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 20px rgba(168, 133, 64, 0.08);
+  transition: all var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.exclusive-badge:hover {
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 30px rgba(168, 133, 64, 0.15);
+}
+
+/* Теглайн */
+.critic-hero__tagline {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--gold-bright);
+  letter-spacing: 0.01em;
+  opacity: 0.9;
+  padding-left: 12px;
+  border-left: 2px solid var(--gold-dim);
+}
+
+/* Био */
+.critic-hero__bio {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 640px;
+}
+
+/* Адаптив */
+@media (max-width: 640px) {
+  .critic-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .avatar-placeholder {
+    width: 88px;
+    height: 88px;
+    font-size: 34px;
+  }
+
+  .critic-hero__info {
+    align-items: center;
+  }
+
+  .critic-hero__info h1 {
+    font-size: 24px;
+    justify-content: center;
+  }
+
+  .critic-hero__tagline {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--gold-dim);
+    padding-top: 8px;
+  }
+}
