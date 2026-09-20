@@ -207,7 +207,7 @@
    ============================================================ */
 .btn-critic {
   position: relative;
-  padding: 8px 20px 8px 34px; /* левый паддинг больше — под иконку-точку */
+  padding: 8px 20px 8px 34px;
   border-radius: 40px;
   text-decoration: none;
   font-family: var(--font-sans);
@@ -229,7 +229,6 @@
   isolation: isolate;
 }
 
-/* Пульсирующая золотая точка слева (статус «exclusive») */
 .btn-critic::before {
   content: '';
   position: absolute;
@@ -262,7 +261,6 @@
   }
 }
 
-/* Итальянский триколор — тонкая полоса снизу, появляется на hover */
 .btn-critic::after {
   content: '';
   position: absolute;
@@ -316,49 +314,189 @@
 }
 
 /* ============================================================
-   АДАПТИВНОСТЬ
+   АДАПТИВ — ПЛАНШЕТ / УЗКИЙ ДЕСКТОП (≤ 900px)
    ============================================================ */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .header {
-    flex-direction: column;
-    align-items: stretch;
+    padding: 12px 20px;
     gap: 10px;
-    margin: 0 10px 24px;
-    padding: 14px 18px;
+    margin: 0 14px 28px;
+  }
+
+  .header h1 {
+    font-size: 19px;
   }
 
   .header-actions {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 18px;
+    gap: 8px;
   }
 
   .btn-profile,
   .btn-login,
   .btn-about,
   .btn-top,
-  .btn-admin {
-    padding: 6px 14px;
+  .btn-admin,
+  .btn-logout,
+  .btn-telegram {
+    padding: 7px 14px;
     font-size: 12px;
   }
 
   .btn-critic {
-    padding: 6px 14px 6px 26px;
+    padding: 7px 14px 7px 28px;
     font-size: 12px;
   }
 
   .btn-critic::before {
-    left: 10px;
+    left: 12px;
     width: 5px;
     height: 5px;
   }
+}
 
-  .btn-telegram {
-    padding: 6px 14px;
+/* ============================================================
+   АДАПТИВ — МОБИЛЬНЫЕ (≤ 768px)
+   ------------------------------------------------------------
+   Кнопки перестраиваются в аккуратную сетку 2×N:
+   все ячейки одинаковые, ничего не разлетается.
+   ============================================================ */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin: 0 8px 20px;
+    padding: 14px 14px;
+    top: 8px;
+    border-radius: 16px;
+  }
+
+  .header h1 {
+    font-size: 17px;
+    text-align: center;
+    letter-spacing: 0.08em;
+  }
+
+  .header h1::after {
+    font-size: 20px;
+  }
+
+  /* Сетка кнопок: 2 колонки, все ячейки равные */
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* Унифицируем все кнопки в сетке */
+  .header-actions > * {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
     font-size: 12px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* «Архитектор» — оставляем выравнивание по левому краю из-за точки */
+  .btn-critic {
+    padding: 10px 12px 10px 28px;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .btn-critic::before {
+    left: 13px;
+  }
+
+  /* Одиночная кнопка «Войти» (когда не залогинен) — на всю ширину */
+  .btn-login:only-child,
+  .header-actions > .btn-login:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ============================================================
+   АДАПТИВ — УЗКИЕ МОБИЛЬНЫЕ (≤ 480px)
+   ============================================================ */
+@media (max-width: 480px) {
+  .header {
+    padding: 12px 10px;
+    gap: 10px;
+    margin: 0 6px 16px;
+    border-radius: 14px;
+  }
+
+  .header h1 {
+    font-size: 15px;
+    letter-spacing: 0.06em;
+  }
+
+  .header h1::after {
+    font-size: 18px;
+    margin-left: 4px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions > * {
+    padding: 9px 8px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    border-radius: 30px;
+  }
+
+  .btn-critic {
+    padding: 9px 8px 9px 24px;
+  }
+
+  .btn-critic::before {
+    left: 11px;
+    width: 5px;
+    height: 5px;
+  }
+}
+
+/* ============================================================
+   АДАПТИВ — ЭКСТРА-УЗКИЕ (≤ 360px, iPhone SE)
+   ============================================================ */
+@media (max-width: 360px) {
+  .header {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .header h1 {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .header-actions {
+    gap: 5px;
+  }
+
+  .header-actions > * {
+    padding: 8px 6px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .btn-critic {
+    padding: 8px 6px 8px 22px;
+  }
+
+  .btn-critic::before {
+    left: 10px;
+    width: 4px;
+    height: 4px;
   }
 }
