@@ -1,12 +1,7 @@
 /* =================================================================
-   RatingForm.css — v3
-   Premium Gold → Violet Neon + Glassmorphism 2.0 + Bento + Dark-first
-
-   Изменения v3:
-     • Единая палитра ползунков: золото → фиолетовый неон
-     • 5 жанровых весов и 15 слайдеров — в одной палитре
-     • Кастомный дропдаун: плотный, непрозрачный, поверх всего
-     • Логика и классы не тронуты — только визуал
+   RatingForm.css — v4
+   Единая палитра: GOLD → NEON для каждого блока оценок.
+   Все слайдеры внутри блока наследуют --c-from / --c-to.
    ================================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
@@ -61,17 +56,27 @@
   --ls-tight: -0.02em;
 
   /* ------------------------------------------------------------------
-     ЕДИНАЯ ПАЛИТРА ВЕСОВ — от золотого к фиолетовому неону
-     Каждая пара: --wN-from (светлый край) → --wN-to (глубокий край).
+     ПАЛИТРА ВЕСОВ — используется как fallback для block-bar / weights-viz
      ------------------------------------------------------------------ */
-  --w1-from: #f0c862; --w1-to: #d9b45f;   /* 1 · Bright gold           */
-  --w2-from: #d9b45f; --w2-to: #c9a355;   /* 2 · Gold                  */
-  --w3-from: #c9a355; --w3-to: #b8926a;   /* 3 · Gold → warm bronze    */
-  --w4-from: #b8926a; --w4-to: #9a7590;   /* 4 · Bronze → mauve        */
-  --w5-from: #9a7590; --w5-to: #a78bfa;   /* 5 · Mauve → light violet  */
-  --w6-from: #a78bfa; --w6-to: #8b5cf6;   /* 6 · Light violet → violet */
-  --w7-from: #8b5cf6; --w7-to: #a855f7;   /* 7 · Violet → neon violet  */
-  --w8-from: #a855f7; --w8-to: #7c3aed;   /* 8 · Neon → deep neon      */
+  --w1-from: #f0c862; --w1-to: #d9b45f;
+  --w2-from: #d9b45f; --w2-to: #c9a355;
+  --w3-from: #c9a355; --w3-to: #b8926a;
+  --w4-from: #b8926a; --w4-to: #9a7590;
+  --w5-from: #9a7590; --w5-to: #a78bfa;
+  --w6-from: #a78bfa; --w6-to: #8b5cf6;
+  --w7-from: #8b5cf6; --w7-to: #a855f7;
+  --w8-from: #a855f7; --w8-to: #7c3aed;
+
+  /* ------------------------------------------------------------------
+     ПАЛИТРА БЛОКОВ — 5 блоков, от золота к неону.
+     Эти значения приходят inline из JSX (BLOCK_META.colorFrom/colorTo),
+     здесь — только дефолт-fallback на случай отсутствия inline.
+     ------------------------------------------------------------------ */
+  --blk-scenario-from:   #f0c862; --blk-scenario-to:   #e0bc58;
+  --blk-characters-from: #d9b45f; --blk-characters-to: #b8926a;
+  --blk-visual-from:     #b8926a; --blk-visual-to:     #9a7590;
+  --blk-sound-from:      #9a7590; --blk-sound-to:      #a78bfa;
+  --blk-style-from:      #a78bfa; --blk-style-to:      #a855f7;
 }
 
 /* ============================================================
@@ -169,10 +174,6 @@
     0 0 0 1px rgba(168, 133, 64, 0.10);
 }
 
-/* ------------------------------------------------------------------
-   FIX стекинга: жанровый блок с открытым дропдауном
-   должен рендериться ПОВЕРХ соседних grid-ячеек.
-   ------------------------------------------------------------------ */
 .genre-block {
   position: relative;
   z-index: 100;
@@ -322,7 +323,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 input[type="range"]::-webkit-slider-thumb:active { transform: scale(0.94); }
 
-/* Firefox */
 input[type="range"]::-moz-range-thumb {
   width: 28px;
   height: 28px;
@@ -365,66 +365,30 @@ input[type="range"]:focus-visible {
 }
 
 /* ============================================================
-   6.1 ПАЛИТРА ДЛЯ ЖАНРОВЫХ ВЕСОВ — по индексу
-   5 жанровых весов → берут w1…w5 (gold → mauve → violet)
+   6.1 ПАЛИТРА ДЛЯ ВЕСОВ И ВИЗУАЛИЗАЦИИ
+   Значения --c-from/--c-to приходят inline из JSX (по индексу блока),
+   поэтому nth-child-правила больше не нужны. Оставлены только
+   fallback-правила для случая, если inline не установлен.
    ============================================================ */
-.weights-viz__seg:nth-child(8n+1),
-.weight-slider:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
-.weights-viz__seg:nth-child(8n+2),
-.weight-slider:nth-child(8n+2) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
-.weights-viz__seg:nth-child(8n+3),
-.weight-slider:nth-child(8n+3) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
-.weights-viz__seg:nth-child(8n+4),
-.weight-slider:nth-child(8n+4) { --c-from: var(--w4-from); --c-to: var(--w4-to); }
-.weights-viz__seg:nth-child(8n+5),
-.weight-slider:nth-child(8n+5) { --c-from: var(--w5-from); --c-to: var(--w5-to); }
-.weights-viz__seg:nth-child(8n+6),
-.weight-slider:nth-child(8n+6) { --c-from: var(--w6-from); --c-to: var(--w6-to); }
-.weights-viz__seg:nth-child(8n+7),
-.weight-slider:nth-child(8n+7) { --c-from: var(--w7-from); --c-to: var(--w7-to); }
-.weights-viz__seg:nth-child(8n+8),
-.weight-slider:nth-child(8n+8) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
-
-.weight-slider--1, .weights-viz__seg--1 { --c-from: var(--w1-from); --c-to: var(--w1-to); }
-.weight-slider--2, .weights-viz__seg--2 { --c-from: var(--w2-from); --c-to: var(--w2-to); }
-.weight-slider--3, .weights-viz__seg--3 { --c-from: var(--w3-from); --c-to: var(--w3-to); }
-.weight-slider--4, .weights-viz__seg--4 { --c-from: var(--w4-from); --c-to: var(--w4-to); }
-.weight-slider--5, .weights-viz__seg--5 { --c-from: var(--w5-from); --c-to: var(--w5-to); }
-.weight-slider--6, .weights-viz__seg--6 { --c-from: var(--w6-from); --c-to: var(--w6-to); }
-.weight-slider--7, .weights-viz__seg--7 { --c-from: var(--w7-from); --c-to: var(--w7-to); }
-.weight-slider--8, .weights-viz__seg--8 { --c-from: var(--w8-from); --c-to: var(--w8-to); }
-
-/* ============================================================
-   6.2 ПАЛИТРА ДЛЯ КРИТЕРИЕВ — тоже по индексу, БЕЗ --block-color
-   Все 15 слайдеров идут по той же палитре gold → violet neon.
-   ============================================================ */
-.criterion-slider {
+.weights-viz__seg,
+.weight-slider {
   --c-from: var(--w1-from);
   --c-to:   var(--w1-to);
 }
 
-/* Критерии внутри .criteria-block — позиция считается по самому классу */
-.criteria-block .criterion-slider:nth-child(1 of .criterion-slider) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
-.criteria-block .criterion-slider:nth-child(2 of .criterion-slider) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
-.criteria-block .criterion-slider:nth-child(3 of .criterion-slider) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
-.criteria-block .criterion-slider:nth-child(4 of .criterion-slider) { --c-from: var(--w4-from); --c-to: var(--w4-to); }
-.criteria-block .criterion-slider:nth-child(5 of .criterion-slider) { --c-from: var(--w5-from); --c-to: var(--w5-to); }
-.criteria-block .criterion-slider:nth-child(6 of .criterion-slider) { --c-from: var(--w6-from); --c-to: var(--w6-to); }
-.criteria-block .criterion-slider:nth-child(7 of .criterion-slider) { --c-from: var(--w7-from); --c-to: var(--w7-to); }
-.criteria-block .criterion-slider:nth-child(8 of .criterion-slider) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
+/* ============================================================
+   6.2 ПАЛИТРА ДЛЯ КРИТЕРИЕВ
+   Значения наследуются от .criteria-block (inline --c-from/--c-to).
+   Убираем принудительный nth-child — он перебивал наследование.
+   ============================================================ */
+.criterion-slider {
+  /* намеренно НЕ объявляем --c-from/--c-to — они наследуются */
+  --c-from: var(--c-from, var(--gold-bright));
+  --c-to:   var(--c-to,   var(--neon));
+}
 
-/* Вариант для любых других родителей (vibe и т.д.) */
-.criterion-slider:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
-.criterion-slider:nth-child(8n+2) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
-.criterion-slider:nth-child(8n+3) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
-.criterion-slider:nth-child(8n+4) { --c-from: var(--w4-from); --c-to: var(--w4-to); }
-.criterion-slider:nth-child(8n+5) { --c-from: var(--w5-from); --c-to: var(--w5-to); }
-.criterion-slider:nth-child(8n+6) { --c-from: var(--w6-from); --c-to: var(--w6-to); }
-.criterion-slider:nth-child(8n+7) { --c-from: var(--w7-from); --c-to: var(--w7-to); }
-.criterion-slider:nth-child(8n+8) { --c-from: var(--w8-from); --c-to: var(--w8-to); }
-
-/* Фолбэк для «голых» range внутри vibe-block — плавный gold→violet */
-.vibe-block input[type="range"] {
+/* Вайб — глобальная шкала gold → neon на всём блоке */
+.vibe-block {
   --c-from: var(--gold-bright);
   --c-to:   var(--neon);
 }
@@ -571,7 +535,7 @@ input[type="range"]:focus-visible {
 .genre-block::after { content: ''; display: block; clear: both; }
 
 .weights-sum.valid {
-  color: #b9cf6a;                                     /* тёплый золотисто-зелёный */
+  color: #b9cf6a;
   border-color: rgba(185, 207, 106, 0.35);
   background: rgba(185, 207, 106, 0.06);
   box-shadow: 0 0 30px rgba(185, 207, 106, 0.10);
@@ -864,7 +828,6 @@ input[type="range"]:focus-visible {
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid var(--glass-border);
 }
-/* Авто-цвет для block-bar по индексу — та же палитра */
 .block-bar:nth-child(8n+1) { --c-from: var(--w1-from); --c-to: var(--w1-to); }
 .block-bar:nth-child(8n+2) { --c-from: var(--w2-from); --c-to: var(--w2-to); }
 .block-bar:nth-child(8n+3) { --c-from: var(--w3-from); --c-to: var(--w3-to); }
@@ -928,64 +891,6 @@ input[type="range"]:focus-visible {
     rgba(217, 180, 95, 0.14) 100%);
   border-color: rgba(185, 207, 106, 0.30);
   box-shadow: 0 0 18px rgba(185, 207, 106, 0.10);
-}
-
-/* ============================================================
-   13. REVIEW BLOCK
-   ============================================================ */
-.review-block { display: flex; flex-direction: column; gap: 10px; }
-.review-block > label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  transition: var(--transition-base);
-}
-.review-block:focus-within > label { color: var(--text-primary); }
-.review-textarea {
-  width: 100%;
-  min-height: 110px;
-  padding: 14px 16px;
-  resize: vertical;
-  font-family: var(--font-sans);
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: var(--text-primary);
-  background: rgba(10, 10, 20, 0.55);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  outline: none;
-  transition: var(--transition-base);
-}
-.review-textarea::placeholder { color: var(--text-muted); font-style: italic; }
-.review-textarea:hover { border-color: rgba(168, 133, 64, 0.20); }
-.review-textarea:focus-visible {
-  border-color: rgba(217, 180, 95, 0.45);
-  background: rgba(10, 10, 20, 0.75);
-  box-shadow:
-    0 0 0 3px rgba(168, 133, 64, 0.14),
-    0 0 26px rgba(168, 133, 64, 0.10);
-}
-.review-textarea::-webkit-scrollbar { width: 4px; }
-.review-textarea::-webkit-scrollbar-thumb {
-  background: rgba(168, 133, 64, 0.45);
-  border-radius: 4px;
-}
-.review-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-.review-meta > span:last-child {
-  font-variant-numeric: tabular-nums;
-  color: var(--gold);
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
-  background: rgba(168, 133, 64, 0.08);
-  border: 1px solid rgba(168, 133, 64, 0.16);
 }
 
 /* ============================================================
@@ -1108,6 +1013,22 @@ button, input, select, textarea, .weights-viz__seg {
     width: 24px; height: 24px; margin-top: -9px;
   }
   input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; }
+
+  /* ---------- ФИКС ТУЛТИПОВ: не выходят за пределы карточки ---------- */
+  .criterion-slider { position: relative; }              /* новый containing block */
+  .criterion-slider .hint-wrapper { position: static; }  /* снимаем CB с иконки  */
+  .hint-popup {
+    left: 8px;
+    right: 8px;
+    transform: none;
+    width: auto;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  .hint-popup::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 @media (max-width: 640px) {
   .weight-slider,
@@ -1169,7 +1090,6 @@ button, input, select, textarea, .weights-viz__seg {
 }
 .custom-dropdown:has(.custom-dropdown__menu) { z-index: 300; }
 
-/* ---------- TRIGGER ---------- */
 .custom-dropdown__trigger {
   display: flex;
   align-items: center;
@@ -1219,7 +1139,6 @@ button, input, select, textarea, .weights-viz__seg {
   text-overflow: ellipsis;
 }
 
-/* ---------- ARROW ---------- */
 .custom-dropdown__arrow {
   display: inline-flex;
   align-items: center;
@@ -1235,7 +1154,6 @@ button, input, select, textarea, .weights-viz__seg {
   color: var(--gold-bright);
 }
 
-/* ---------- MENU — ПОЛНОСТЬЮ НЕПРОЗРАЧНОЕ, ВЫРАЗИТЕЛЬНОЕ ---------- */
 .custom-dropdown__menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -1248,16 +1166,11 @@ button, input, select, textarea, .weights-viz__seg {
   max-height: 340px;
   overflow-y: auto;
   border-radius: var(--radius-lg);
-
-  /* Плотный фон без прозрачности */
   background:
     linear-gradient(180deg, #1c1c30 0%, #12122a 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-
-  /* Выразительная рамка: золото с фиолетовым отливом */
   border: 1px solid rgba(168, 133, 64, 0.55);
-
   box-shadow:
     0 0 0 1px rgba(139, 92, 246, 0.18),
     0 1px 0 0 rgba(255, 255, 255, 0.10) inset,
@@ -1265,7 +1178,6 @@ button, input, select, textarea, .weights-viz__seg {
     0 30px 80px rgba(0, 0, 0, 0.85),
     0 0 60px rgba(168, 133, 64, 0.14),
     0 0 100px rgba(139, 92, 246, 0.10);
-
   animation: dropdownIn .22s var(--ease-premium);
   transform-origin: top center;
   isolation: isolate;
@@ -1276,7 +1188,6 @@ button, input, select, textarea, .weights-viz__seg {
   to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
-/* Верхний золото-фиолетовый акцент */
 .custom-dropdown__menu::before {
   content: '';
   position: absolute;
@@ -1292,7 +1203,6 @@ button, input, select, textarea, .weights-viz__seg {
   opacity: 0.85;
 }
 
-/* Скроллбар */
 .custom-dropdown__menu::-webkit-scrollbar { width: 6px; }
 .custom-dropdown__menu::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg,
@@ -1307,7 +1217,6 @@ button, input, select, textarea, .weights-viz__seg {
 }
 .custom-dropdown__menu::-webkit-scrollbar-track { background: transparent; }
 
-/* ---------- ITEM ---------- */
 .custom-dropdown__item {
   position: relative;
   padding: 11px 16px;
@@ -1342,7 +1251,6 @@ button, input, select, textarea, .weights-viz__seg {
   color: var(--text-secondary);
 }
 
-/* Активный элемент — золото → фиолетовый неон */
 .custom-dropdown__item.active {
   color: #fff;
   font-weight: 600;
