@@ -1,97 +1,102 @@
 /* ============================================================
    CRITIC PAGE — контейнер страницы критика
-   Палитра та же. Изменена её роль: золото — единственный
-   доминирующий акцент, неон — микро-детали.
    ============================================================ */
 
 .critic-page {
-  /* Новый токен: характерный шрифт с засечками для «литературного» слоя */
-  --font-display: 'Cormorant Garamond', 'Playfair Display', Georgia,
-                  'Times New Roman', serif;
-
-  padding-top: 40px;
-  padding-bottom: 96px;
+  padding-top: 24px;
+  padding-bottom: 60px;
   display: flex;
   flex-direction: column;
-  gap: 72px;                 /* внешние интервалы — большие */
-  animation: criticPageFadeIn 0.4s ease-out both;
+  gap: var(--spacing-lg);
+  animation: criticPageFadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Кнопка «На главную» — служебная строка, а не пилюля */
+/* Верхняя кнопка «На главную» */
+.critic-page .back-btn,
 .back-btn {
   align-self: flex-start;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--glass-border);
-  border-radius: 0;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding: 6px 0;
+  background: rgba(20, 20, 40, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: color 0.3s ease, border-color 0.3s ease;
+  transition: all var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
 }
 
 .back-btn:hover {
   color: var(--gold-bright);
   border-color: var(--gold);
-  background: none;
-  transform: none;
-  box-shadow: none;
+  background: rgba(28, 28, 52, 0.7);
+  transform: translateX(-3px);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.5),
+    0 0 20px var(--gold-glow);
 }
 
 .back-btn:active {
-  transform: none;
-  opacity: 0.7;
+  transform: translateX(-1px) scale(0.98);
 }
 
 /* Ошибка */
 .critic-page .error-msg {
-  background: rgba(20, 10, 16, 0.5);
-  border: 1px solid rgba(236, 72, 153, 0.18);
-  border-radius: 2px;
-  box-shadow: none;
-  padding: 32px;
+  background: linear-gradient(160deg,
+    rgba(40, 15, 25, 0.6) 0%,
+    rgba(20, 8, 15, 0.8) 100%
+  );
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    var(--shadow-card-3d),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .critic-page .error-msg h2 {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
   color: var(--neon-pink);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-/* Загрузка — без пульсации, статичная служебная строка */
+/* Загрузка */
 .critic-page .loading,
 .loading {
-  text-align: left;
-  padding: 96px 0;
-  color: var(--text-muted);
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.32em;
+  font-size: 13px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  animation: none;
+  animation: criticPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes criticPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
 }
 
 @keyframes criticPageFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Адаптив */
 @media (max-width: 640px) {
   .critic-page {
-    padding-top: 24px;
-    padding-bottom: 64px;
-    gap: 52px;
+    padding-top: 16px;
+    padding-bottom: 40px;
+    gap: var(--spacing-md);
   }
 
   .back-btn {
-    font-size: 10px;
-    letter-spacing: 0.14em;
+    font-size: 12px;
+    padding: 7px 14px;
   }
 }
