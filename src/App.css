@@ -88,10 +88,13 @@ body {
 /* ============================================================
    ФИШКА 1: 3D-ФОН С ПАРЯЩИМИ ЗОЛОТЫМИ И НЕОНОВЫМИ ШАРАМИ
    ------------------------------------------------------------
-   Film grain — на html::after, выше всего, не конфликтует с шарами.
-   Шары: body::before (золото), body::after (пурпур), #root::before (циан).
+   ИСПРАВЛЕНО:
+   - Film grain переехал на html::after (чтобы не конфликтовать с шарами)
+   - Шары: body::before (золото), body::after (пурпур) — по одному на элемент
+   - Третий шар: #root::before (циан)
    ============================================================ */
 
+/* ✨ Film grain — теперь на html::after, выше всего, не конфликтует с шарами */
 html::after {
   content: '';
   position: fixed;
@@ -103,6 +106,7 @@ html::after {
   background-repeat: repeat;
 }
 
+/* Шары — по одному псевдоэлементу на каждый */
 body::before,
 body::after {
   content: '';
@@ -135,6 +139,7 @@ body::after {
   animation-delay: 2s;
 }
 
+/* Третий шар — на #root::before (чтобы не пересекаться с film grain) */
 #root::before {
   content: '';
   position: fixed;
@@ -237,6 +242,13 @@ body::after {
 }
 
 /* ============================================================
+   СТЕКЛЯННЫЕ КАРТОЧКИ (glass-card) — золото
+   ------------------------------------------------------------
+   ИСПРАВЛЕНО: убрано дублирующее объявление .glass-card.
+   Базовые стили теперь только в блоке "УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА".
+   ============================================================ */
+
+/* ============================================================
    ЗОЛОТОЙ ТЕКСТ (gold-text) — вместо neon-text
    ============================================================ */
 .gold-text {
@@ -258,14 +270,6 @@ body::after {
 
 /* ============================================================
    УНИВЕРСАЛЬНАЯ 3D-КАРТОЧКА (подушка) — ПРЕМИУМ
-   ------------------------------------------------------------
-   ВАЖНО:
-   - overflow: hidden УБРАН. Он обрезал всплывающие подсказки
-     (.hint-popup) внутри .criteria-block / .vibe-block / .glass-card.
-   - isolation: isolate ОСТАВЛЕН — он создаёт stacking context,
-     благодаря чему декоративные ::before/::after не конфликтуют
-     с фоном страницы и не вылезают «сквозь» соседей.
-   - Контент карточки лежит над псевдоэлементами через z-index: 1.
    ============================================================ */
 .glass-card,
 .criteria-block,
@@ -287,13 +291,14 @@ body::after {
     var(--shadow-inset-3d),
     0 0 40px rgba(168, 133, 64, 0.02);
   position: relative;
+  overflow: hidden;
   width: 100%;
   max-width: 100%;
   transform: perspective(1200px) rotateX(0deg) rotateY(0deg);
   transform-style: preserve-3d;
-  /* Создаём stacking context для внутренних слоёв, но НЕ режем контент. */
+  /* ИСПРАВЛЕНО: создаём stacking context, чтобы ::before/::after
+     не вылезали наружу и корректно перекрывались внутри карточки */
   isolation: isolate;
-  /* overflow: hidden — НЕ добавлять. */
 }
 
 .glass-card::after,
@@ -310,7 +315,6 @@ body::after {
   transition: opacity var(--transition-smooth);
   z-index: 0;
   pointer-events: none;
-  border-radius: 2px;
 }
 
 .glass-card:hover::after,
@@ -324,7 +328,7 @@ body::after {
 .vibe-block::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: 0; /* ИСПРАВЛЕНО: было -1px, при overflow:hidden вылет обрезался */
   border-radius: var(--radius-xl);
   padding: 1.5px;
   background: conic-gradient(
@@ -342,7 +346,7 @@ body::after {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.06;
-  transition: opacity var(--transition-smooth);
+  transition: all var(--transition-smooth);
   pointer-events: none;
   animation: borderGlow 8s linear infinite;
   z-index: 0;
@@ -401,75 +405,15 @@ body::after {
 }
 
 /* ============================================================
-   ПОДСКАЗКИ (hint-popup) внутри карточек критериев / вайба
+   КНОПКА СОХРАНЕНИЯ — премиум золото (универсальная button)
    ------------------------------------------------------------
-   Локальные «страховки» на случай, если в RatingForm.css
-   не задан высокий z-index. Псевдоэлементы карточки лежат на
-   z-index: 0, контент — на z-index: 1, поэтому подсказка
-   поднимается на z-index: 50, чтобы быть поверх соседних
-   строк и ползунков внутри того же блока.
-   ============================================================ */
-.hint-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.hint-popup {
-  position: absolute;
-  z-index: 50;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 200px;
-  max-width: 320px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: linear-gradient(160deg,
-    rgba(28, 28, 52, 0.98) 0%,
-    rgba(14, 14, 30, 0.98) 100%);
-  border: 1px solid rgba(168, 133, 64, 0.35);
-  color: var(--text-primary);
-  font-size: 0.85rem;
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: 0.01em;
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(168, 133, 64, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  white-space: normal;
-  text-align: left;
-  pointer-events: none;
-  animation: hintIn 0.18s ease-out;
-}
-
-/* Стрелочка сверху */
-.hint-popup::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: 14px;
-  width: 8px;
-  height: 8px;
-  background: rgba(28, 28, 52, 0.98);
-  border-left: 1px solid rgba(168, 133, 64, 0.35);
-  border-top: 1px solid rgba(168, 133, 64, 0.35);
-  transform: rotate(45deg);
-}
-
-@keyframes hintIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================================
-   КНОПКА СОХРАНЕНИЯ — премиум золото
-   ------------------------------------------------------------
-   - z-index: 0 у ::before — рамка под контентом, но над фоном.
-   - isolation: isolate — рамка не вылезает наружу страницы,
-     но может светиться за края кнопки (inset: -2px).
+   ИСПРАВЛЕНО:
+   - Убран z-index: -1 у ::before (уезжал за фон кнопки)
+   - Убран overflow: hidden (обрезал конусную рамку)
+   - Добавлен isolation: isolate, чтобы рамка не вылезала наружу страницы
+   - ::before теперь лежит под контентом, но над фоном (z-index: 0),
+     контент кнопки — на z-index: 1 через ::after-обёртку не нужен,
+     текст рендерится поверх псевдоэлементов по умолчанию (они absolute).
    ============================================================ */
 button {
   display: inline-block;
@@ -499,6 +443,8 @@ button {
   margin-top: 8px;
   border: 1px solid rgba(168, 133, 64, 0.08);
   letter-spacing: 0.02em;
+  /* ИСПРАВЛЕНО: создаём stacking context, чтобы ::before с z-index: 0
+     не уезжал за фон кнопки и не вылезал наружу */
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -508,7 +454,7 @@ button {
 button::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: -2px; /* свечение чуть выходит за пределы — isolation это позволяет */
   border-radius: 60px;
   background: conic-gradient(
     from var(--angle, 0deg),
@@ -528,6 +474,8 @@ button::before {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: borderSpin 6s linear infinite;
+  /* ИСПРАВЛЕНО: было -1 — уезжало под фон. Теперь 0, фон кнопки лежит ниже
+     в порядке отрисовки (background кнопки < ::before), но текст — выше. */
   z-index: 0;
   pointer-events: none;
 }
@@ -710,18 +658,6 @@ textarea {
     width: 100%;
     box-sizing: border-box;
   }
-
-  /* Подсказки на мобилке — по центру, чтобы не улетали за экран */
-  .hint-popup {
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 180px;
-    max-width: min(320px, calc(100vw - 48px));
-  }
-  .hint-popup::before {
-    left: 50%;
-    transform: translateX(-50%) rotate(45deg);
-  }
 }
 
 @media (max-width: 380px) {
@@ -737,9 +673,5 @@ textarea {
   button {
     font-size: 0.9rem;
     padding: 12px 16px;
-  }
-  .hint-popup {
-    font-size: 0.8rem;
-    padding: 8px 10px;
   }
 }
