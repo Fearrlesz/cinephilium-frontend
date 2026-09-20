@@ -33,10 +33,12 @@
 
 @keyframes liquidShift {
   0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
-/* ===== ЗАГОЛОВОК — золото + неон ===== */
+/* ============================================================
+   ЗАГОЛОВОК — золото + неон (голографический)
+   ============================================================ */
 .header h1 {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -62,8 +64,8 @@
 }
 
 @keyframes holographicTitle {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
@@ -81,9 +83,12 @@
 
 @keyframes dotBlink {
   0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
+  50%      { opacity: 1;   transform: scale(1.2); }
 }
 
+/* ============================================================
+   КОНТЕЙНЕР КНОПОК
+   ============================================================ */
 .header-actions {
   display: flex;
   align-items: center;
@@ -92,14 +97,15 @@
 }
 
 /* ============================================================
-   КНОПКИ — золото + неон
+   БАЗОВЫЕ КНОПКИ — общие стили
    ============================================================ */
 .btn-profile,
 .btn-login,
 .btn-about,
 .btn-top,
 .btn-admin,
-.btn-logout {
+.btn-logout,
+.btn-critic {
   padding: 8px 20px;
   border-radius: 40px;
   text-decoration: none;
@@ -114,30 +120,45 @@
   color: var(--text-secondary);
 }
 
+/* ============================================================
+   КНОПКА «ПРОФИЛЬ» — золото
+   ============================================================ */
 .btn-profile {
   color: var(--gold-bright);
 }
+
 .btn-profile:hover {
   background: rgba(168, 133, 64, 0.08);
   color: var(--gold-bright);
 }
 
+/* ============================================================
+   КНОПКА «ВОЙТИ»
+   ============================================================ */
 .btn-login {
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.08));
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.12),
+    rgba(124, 58, 237, 0.08)
+  );
   color: var(--text-primary);
   border: 1px solid rgba(168, 133, 64, 0.15);
 }
+
 .btn-login:hover {
   border-color: var(--gold);
   box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
   transform: translateY(-1px);
 }
 
+/* ============================================================
+   КНОПКИ «О СИСТЕМЕ», «ТОП», «АДМИНКА»
+   ============================================================ */
 .btn-about,
 .btn-top,
 .btn-admin {
   color: var(--text-secondary);
 }
+
 .btn-about:hover,
 .btn-top:hover,
 .btn-admin:hover {
@@ -145,9 +166,13 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+/* ============================================================
+   КНОПКА «ВЫЙТИ»
+   ============================================================ */
 .btn-logout {
   color: var(--text-muted);
 }
+
 .btn-logout:hover {
   color: var(--neon-pink);
   background: rgba(236, 72, 153, 0.08);
@@ -178,6 +203,119 @@
 }
 
 /* ============================================================
+   КНОПКА «АРХИТЕКТОР» — премиум (золото + Италия 🇮🇹)
+   ============================================================ */
+.btn-critic {
+  position: relative;
+  padding: 8px 20px 8px 34px; /* левый паддинг больше — под иконку-точку */
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--gold-bright);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.10) 0%,
+    rgba(74, 58, 26, 0.06) 50%,
+    rgba(124, 58, 237, 0.05) 100%
+  );
+  border: 1px solid var(--gold-dim);
+  overflow: hidden;
+  transition: all var(--transition-smooth);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 12px rgba(0, 0, 0, 0.3);
+  isolation: isolate;
+}
+
+/* Пульсирующая золотая точка слева (статус «exclusive») */
+.btn-critic::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  transform: translateY(-50%);
+  box-shadow:
+    0 0 0 0 rgba(201, 163, 85, 0.6),
+    0 0 12px var(--gold-bright);
+  animation: criticDotPulse 2.4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes criticDotPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(201, 163, 85, 0.6),
+      0 0 10px var(--gold-bright);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(201, 163, 85, 0),
+      0 0 18px var(--gold-bright);
+    opacity: 1;
+  }
+}
+
+/* Итальянский триколор — тонкая полоса снизу, появляется на hover */
+.btn-critic::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    #2e8b57 0%,
+    #2e8b57 33%,
+    #e8e4dd 33%,
+    #e8e4dd 66%,
+    #c8102e 66%,
+    #c8102e 100%
+  );
+  opacity: 0;
+  transform: translateY(2px);
+  transition: all var(--transition-smooth);
+  z-index: 1;
+}
+
+.btn-critic:hover {
+  color: var(--text-primary);
+  border-color: var(--gold);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.18) 0%,
+    rgba(74, 58, 26, 0.10) 50%,
+    rgba(124, 58, 237, 0.08) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 28px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(168, 133, 64, 0.15);
+}
+
+.btn-critic:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-critic:hover::before {
+  background: var(--text-primary);
+  box-shadow:
+    0 0 0 4px rgba(201, 163, 85, 0.15),
+    0 0 22px var(--gold-bright);
+}
+
+.btn-critic:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ============================================================
    АДАПТИВНОСТЬ
    ============================================================ */
 @media (max-width: 768px) {
@@ -188,6 +326,7 @@
     margin: 0 10px 24px;
     padding: 14px 18px;
   }
+
   .header-actions {
     justify-content: center;
   }
@@ -197,11 +336,28 @@
   .header h1 {
     font-size: 18px;
   }
+
   .btn-profile,
   .btn-login,
   .btn-about,
   .btn-top,
   .btn-admin {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .btn-critic {
+    padding: 6px 14px 6px 26px;
+    font-size: 12px;
+  }
+
+  .btn-critic::before {
+    left: 10px;
+    width: 5px;
+    height: 5px;
+  }
+
+  .btn-telegram {
     padding: 6px 14px;
     font-size: 12px;
   }
