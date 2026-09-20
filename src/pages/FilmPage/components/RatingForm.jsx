@@ -12,11 +12,11 @@ const RANGE = MAX_SCORE - MIN_SCORE;
 const fillPercent = (value) => ((value - MIN_SCORE) / RANGE) * 100;
 
 const BLOCK_META = {
-  scenario:   { icon: '📋', color: 'oklch(0.72 0.14 40)'  },
-  characters: { icon: '👥', color: 'oklch(0.78 0.14 320)' },
-  visual:     { icon: '🎥', color: 'oklch(0.72 0.13 300)' },
-  sound:      { icon: '🔊', color: 'oklch(0.75 0.11 200)' },
-  style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)' },
+  scenario:   { icon: '📋', color: 'oklch(0.72 0.14 40)',  colorFrom: '#f0c862', colorTo: '#e0bc58' }, /* золото          */
+  characters: { icon: '👥', color: 'oklch(0.78 0.14 320)', colorFrom: '#d9b45f', colorTo: '#b8926a' }, /* золото→бронза   */
+  visual:     { icon: '🎥', color: 'oklch(0.72 0.13 300)', colorFrom: '#b8926a', colorTo: '#9a7590' }, /* бронза→мокко    */
+  sound:      { icon: '🔊', color: 'oklch(0.75 0.11 200)', colorFrom: '#9a7590', colorTo: '#a78bfa' }, /* мокко→фиолет    */
+  style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)', colorFrom: '#a78bfa', colorTo: '#a855f7' }, /* фиолет→неон     */
 };
 
 const getGrade = (score) => {
@@ -181,14 +181,18 @@ function RatingForm({
           {BLOCK_NAMES.map((name, i) => {
             const w     = blockWeights?.[i] ?? 0;
             const key   = CRITERIA_CONFIG[i]?.key;
-            const color = BLOCK_META[key]?.color || 'oklch(0.80 0.145 72)';
+            const meta  = BLOCK_META[key] || {};
             const empty = w < 6;
             return (
               <div
                 key={i}
                 className="weights-viz__seg"
                 data-empty={empty}
-                style={{ flexGrow: w || 0.0001, background: color }}
+                style={{
+                  flexGrow:   w || 0.0001,
+                  '--c-from': meta.colorFrom,
+                  '--c-to':   meta.colorTo,
+                }}
                 title={`${name}: ${w}%`}
               >
                 {w}%
@@ -202,17 +206,16 @@ function RatingForm({
           const isDisabled = !isHybrid;
           const key        = CRITERIA_CONFIG[i]?.key;
           const meta       = BLOCK_META[key] || {};
-          const color      = meta.color || 'oklch(0.80 0.145 72)';
           const icon       = meta.icon  || '';
 
           return (
-            <div key={i} className="weight-slider">
+            <div
+              key={i}
+              className="weight-slider"
+              style={{ '--c-from': meta.colorFrom, '--c-to': meta.colorTo }}
+            >
               <label htmlFor={`weight-${i}`}>
-                <span
-                  className="weight-dot"
-                  style={{ background: color, color }}
-                  aria-hidden="true"
-                />
+                <span className="weight-dot" aria-hidden="true" />
                 {icon} {name}
               </label>
               <input
@@ -224,12 +227,10 @@ function RatingForm({
                 value={weight}
                 disabled={isDisabled}
                 onChange={e => onWeightChange(i, Number(e.target.value))}
-                style={{ '--fill': `${weight}%`, '--slider-color': color }}
+                style={{ '--fill': `${weight}%` }}
                 aria-label={`Вес блока ${name}`}
               />
-              <span className="value-display" style={{ color }}>
-                {weight}%
-              </span>
+              <span className="value-display">{weight}%</span>
             </div>
           );
         })}
@@ -259,7 +260,11 @@ function RatingForm({
           <div
             key={block.key}
             className="criteria-block"
-            style={{ '--block-color': meta.color || 'oklch(0.80 0.145 72)' }}
+            style={{
+              '--block-color': meta.color || 'oklch(0.80 0.145 72)',
+              '--c-from':      meta.colorFrom,
+              '--c-to':        meta.colorTo,
+            }}
           >
             <h4>{meta.icon} {block.name}</h4>
 
@@ -327,24 +332,6 @@ function RatingForm({
           style={{ '--fill': `${fillPercent(vibe)}%` }}
         />
         <span className="value-display">{vibe}</span>
-      </div>
-
-      {/* ================= ОТЗЫВ ================= */}
-      <div className="review-block glass-card">
-        <label htmlFor="reviewText">📝 Текстовый отзыв (опционально)</label>
-        <textarea
-          id="reviewText"
-          value={textReview || ''}
-          onChange={e => onTextReviewChange(e.target.value)}
-          placeholder="Напишите свои впечатления о фильме..."
-          rows={4}
-          maxLength={2000}
-          className="review-textarea"
-        />
-        <div className="review-meta">
-          <span>Помогает запомнить детали</span>
-          <span>{(textReview || '').length} / 2000</span>
-        </div>
       </div>
 
       {/* ================= ПРЕВЬЮ ================= */}
