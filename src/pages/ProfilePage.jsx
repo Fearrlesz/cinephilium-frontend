@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
 import useActivityEvents from '../hooks/useActivityEvents';
 import { formatDate } from '../utils/ratingUtils';
 import { getScoreColor } from '../utils/constants';
-import RatingDetailsModal from '../components/RatingDetailsModal'; 
+import RatingDetailsModal from '../components/RatingDetailsModal';
 import './ProfilePage.css';
 import './Architect.css';
 
@@ -20,6 +20,7 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -34,63 +35,62 @@ function ProfilePage() {
   }, [navigate]);
 
   const loadAchievementProgress = useCallback(async (userData) => {
-  try {
-    const response = await api.get('/users/me/achievements');
-    if (response.data?.achievements) {
-      const oldAchievements = userData?.achievements || [];
-      const newAchievements = response.data.achievements;
-      const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
-      
-      if (freshAchievements.length > 0) {
-        try {
-          await addEvent({
-            type: 'achievement',
-            user: userData?.nickname || 'Пользователь',
-            film: 'система',
-            filmId: 'system',
-            metadata: { achievements: freshAchievements }
-          });
-        } catch (err) {
-          console.error('Ошибка создания события о достижениях:', err);
+    try {
+      const response = await api.get('/users/me/achievements');
+      if (response.data?.achievements) {
+        const oldAchievements = userData?.achievements || [];
+        const newAchievements = response.data.achievements;
+        const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+
+        if (freshAchievements.length > 0) {
+          try {
+            await addEvent({
+              type: 'achievement',
+              user: userData?.nickname || 'Пользователь',
+              film: 'система',
+              filmId: 'system',
+              metadata: { achievements: freshAchievements }
+            });
+          } catch (err) {
+            console.error('Ошибка создания события о достижениях:', err);
+          }
         }
+
+        setUser({
+          ...userData,
+          achievements: newAchievements,
+          totalPoints: response.data.totalPoints || userData?.totalPoints || 0
+        });
       }
-      
-      // ✅ ИСПРАВЛЕНО: используем userData как основу
-      setUser({
-        ...userData,  // все поля от свежего профиля
-        achievements: newAchievements,
-        totalPoints: response.data.totalPoints || userData?.totalPoints || 0
-      });
+    } catch (err) {
+      console.error('Ошибка загрузки прогресса достижений:', err);
     }
-  } catch (err) {
-    console.error('Ошибка загрузки прогресса достижений:', err);
-  }
-}, [addEvent]);
+  }, [addEvent]);
 
   const loadProfile = useCallback(async () => {
-  setLoading(true);
-  try {
-    const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
-      api.get('/auth/me'),
-      api.get('/ratings/user'),
-      api.get('/reviews/user')
-    ]);
-    const userData = userResponse.data;
-    setUser(userData);
-    setRatings(ratingsResponse.data || []);
-    setReviews(reviewsResponse.data || []);
-    await loadAchievementProgress(userData);
-  } catch (err) {
-    console.error('Ошибка загрузки профиля:', err);
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      navigate('/login');
+    setLoading(true);
+    try {
+      const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
+        api.get('/auth/me'),
+        api.get('/ratings/user'),
+        api.get('/reviews/user')
+      ]);
+      const userData = userResponse.data;
+      setUser(userData);
+      setRatings(ratingsResponse.data || []);
+      setReviews(reviewsResponse.data || []);
+      await loadAchievementProgress(userData);
+    } catch (err) {
+      console.error('Ошибка загрузки профиля:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-}, [navigate, loadAchievementProgress]);
-  
+  }, [navigate, loadAchievementProgress]);
+
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -150,15 +150,46 @@ function ProfilePage() {
     }
   };
 
-  const avgRating = ratings.length ? (ratings.reduce((sum,r)=>sum+r.finalScore,0)/ratings.length).toFixed(1) : 'Нет';
+  /* ===== СОРТИРОВКА ОЦЕНОК (по комб. баллу / дате) ===== */
+  const sortedRatings = useMemo(() => {
+    const getCombined = (r) =>
+      (typeof r.combinedScore === 'number' ? r.combinedScore : null) ??
+      (typeof r.finalScore === 'number' ? r.finalScore : null) ?? 0;
+
+    const getTime = (r) => new Date(r.createdAt || 0).getTime();
+
+    const arr = [...ratings];
+    switch (sortBy) {
+      case 'oldest':
+        return arr.sort((a, b) => getTime(a) - getTime(b));
+      case 'highest':
+        return arr.sort((a, b) => getCombined(b) - getCombined(a));
+      case 'lowest':
+        return arr.sort((a, b) => getCombined(a) - getCombined(b));
+      case 'newest':
+      default:
+        return arr.sort((a, b) => getTime(b) - getTime(a));
+    }
+  }, [ratings, sortBy]);
+
+  const avgRating = ratings.length
+    ? (ratings.reduce((sum, r) => sum + r.finalScore, 0) / ratings.length).toFixed(1)
+    : 'Нет';
 
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
-  const isExclusive = user.isExclusive; 
+  const isExclusive = user.isExclusive;
+
+  /* ===== UI сортировки ===== */
+  const sortOptions = [
+    { key: 'newest',  label: '🆕 Новые' },
+    { key: 'oldest',  label: '🕰 Старые' },
+    { key: 'highest', label: '⬆ Высокие' },
+    { key: 'lowest',  label: '⬇ Низкие' }
+  ];
 
   return (
-    // 👇 Динамический класс для эксклюзивной темы
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
@@ -171,7 +202,6 @@ function ProfilePage() {
             {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
 
-            {/* 👇 Бейдж "Архитектор Синефилиума" */}
             {isExclusive && (
               <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
             )}
@@ -220,13 +250,13 @@ function ProfilePage() {
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Мои оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -236,12 +266,46 @@ function ProfilePage() {
 
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <h2>Мои оценки</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <h2 style={{ margin: 0 }}>Мои оценки</h2>
+
+              {ratings.length > 0 && (
+                <div
+                  className="sort-controls"
+                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
+                >
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setSortBy(opt.key)}
+                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: sortBy === opt.key
+                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
+                          : 'rgba(255,255,255,0.05)',
+                        color: sortBy === opt.key ? '#fff' : '#ddd',
+                        fontWeight: sortBy === opt.key ? 600 : 400,
+                        transition: 'all .2s'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {ratings.length === 0 ? (
               <p>Вы еще не оценили ни одного фильма</p>
             ) : (
-              <div className="ratings-list">
-                {ratings.map((rating) => (
+              <div className="ratings-list" style={{ marginTop: '15px' }}>
+                {sortedRatings.map((rating) => (
                   <div key={rating._id} className="rating-item">
                     <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
                       <div className="rating-film-info">
@@ -252,7 +316,9 @@ function ProfilePage() {
                         </div>
                       </div>
                     </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}>
+                      {rating.combinedScore ?? rating.finalScore}
+                    </div>
                     <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
                   </div>
                 ))}
@@ -274,7 +340,7 @@ function ProfilePage() {
                       <Link to={`/film/${review.filmId?._id || review.film?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'} 
+                          🎬 {review.filmId?.title || review.film?.title || 'Фильм'}
                           ({review.filmId?.year || review.film?.year || 'N/A'})
                         </p>
                       </Link>
