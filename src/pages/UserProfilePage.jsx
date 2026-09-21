@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
@@ -18,6 +18,7 @@ function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState(null);
   const [activeTab, setActiveTab] = useState('ratings');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
   const [currentUser, setCurrentUser] = useState(null);
   const { showNotification } = useNotification();
 
@@ -94,6 +95,28 @@ function UserProfilePage() {
     }
   };
 
+  /* ===== СОРТИРОВКА ОЦЕНОК (по комб. баллу / дате) ===== */
+  const sortedRatings = useMemo(() => {
+    const getCombined = (r) =>
+      (typeof r.combinedScore === 'number' ? r.combinedScore : null) ??
+      (typeof r.finalScore === 'number' ? r.finalScore : null) ?? 0;
+
+    const getTime = (r) => new Date(r.createdAt || 0).getTime();
+
+    const arr = [...ratings];
+    switch (sortBy) {
+      case 'oldest':
+        return arr.sort((a, b) => getTime(a) - getTime(b));
+      case 'highest':
+        return arr.sort((a, b) => getCombined(b) - getCombined(a));
+      case 'lowest':
+        return arr.sort((a, b) => getCombined(a) - getCombined(b));
+      case 'newest':
+      default:
+        return arr.sort((a, b) => getTime(b) - getTime(a));
+    }
+  }, [ratings, sortBy]);
+
   if (loading) return <div className="loading">Загрузка...</div>;
 
   if (!user) {
@@ -110,6 +133,13 @@ function UserProfilePage() {
 
   const isOwnProfile = currentUser?._id === user._id;
   const isExclusive = user.isExclusive;
+
+  const sortOptions = [
+    { key: 'newest',  label: '🆕 Новые' },
+    { key: 'oldest',  label: '🕰 Старые' },
+    { key: 'highest', label: '⬆ Высокие' },
+    { key: 'lowest',  label: '⬇ Низкие' }
+  ];
 
   return (
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
@@ -131,7 +161,7 @@ function UserProfilePage() {
           <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
           <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
           <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
-          
+
           <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4>🏅 Достижения</h4>
             {user.achievements?.length > 0 ? (
@@ -151,13 +181,13 @@ function UserProfilePage() {
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
             ⭐ Оценки ({ratings.length})
           </button>
-          <button 
+          <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
@@ -167,23 +197,66 @@ function UserProfilePage() {
 
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <h2>Оценки пользователя</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <h2 style={{ margin: 0 }}>Оценки пользователя</h2>
+
+              {ratings.length > 0 && (
+                <div
+                  className="sort-controls"
+                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
+                >
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setSortBy(opt.key)}
+                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: sortBy === opt.key
+                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
+                          : 'rgba(255,255,255,0.05)',
+                        color: sortBy === opt.key ? '#fff' : '#ddd',
+                        fontWeight: sortBy === opt.key ? 600 : 400,
+                        transition: 'all .2s'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {ratings.length === 0 ? (
               <p>Пользователь еще не оценил ни одного фильма</p>
             ) : (
-              <div className="ratings-list">
-                {ratings.map((rating) => (
-                  <div key={rating._id} className="rating-item">
+              <div className="ratings-list" style={{ marginTop: '15px' }}>
+                {sortedRatings.map((rating) => (
+                  <div key={rating._id || rating.id} className="rating-item">
                     <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
                       <div className="rating-film-info">
-                        <img src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'} alt={rating.film?.title || rating.filmId?.title || 'Фильм'} className="rating-poster-small" />
+                        <img
+                          src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'}
+                          alt={rating.film?.title || rating.filmId?.title || 'Фильм'}
+                          className="rating-poster-small"
+                        />
                         <div>
                           <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
                           <p>{rating.film?.year || rating.filmId?.year}</p>
                         </div>
                       </div>
                     </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.finalScore) }}>{rating.finalScore}</div>
+                    <div
+                      className="rating-score"
+                      style={{ color: getScoreColor(rating.combinedScore ?? rating.technicalScore) }}
+                    >
+                      {rating.combinedScore ?? rating.technicalScore}
+                    </div>
                     <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
                   </div>
                 ))}
@@ -205,7 +278,7 @@ function UserProfilePage() {
                       <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
                         <h3 className="review-title">{review.title}</h3>
                         <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'} 
+                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
                           ({review.film?.year || review.filmId?.year || 'N/A'})
                         </p>
                       </Link>
