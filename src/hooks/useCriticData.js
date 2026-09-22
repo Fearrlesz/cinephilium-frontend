@@ -3,7 +3,7 @@ import api from '../api/client';
 import { getUserIdByNickname, getUserProfileById } from '../api/critics';
 import { CRITIC_NICKNAME, TOP_FILM_TITLES, CRITIC_REVIEWS } from '../utils/mockCriticData';
 
-export default function useCriticData() {
+export default function useCriticData() { 
   const [critic, setCritic] = useState(null);
   const [ratings, setRatings] = useState([]);
   const [topMovies, setTopMovies] = useState([]);
