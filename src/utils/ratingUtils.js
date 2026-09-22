@@ -1,5 +1,5 @@
 export function formatDate(date) {
-  if (!date) return 'Неизвестно';
+  if (!date) return 'Неизвестно'; 
   try {
     return new Date(date).toLocaleDateString('ru-RU', {
       day: 'numeric',
