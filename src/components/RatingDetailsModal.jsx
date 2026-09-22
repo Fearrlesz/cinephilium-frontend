@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import { CRITERIA_CONFIG, GENRE_LABELS, getScoreColor } from '../utils/constants';
 
 function RatingDetailsModal({ rating, onClose }) {
