@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../api/client';
+import api from '../api/client'; 
 import { getUserIdByNickname, getUserProfileById } from '../api/critics';
 import { CRITIC_NICKNAME, TOP_FILM_TITLES, CRITIC_REVIEWS } from '../utils/mockCriticData';
 
