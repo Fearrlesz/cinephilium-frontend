@@ -5,7 +5,7 @@ import {
   GENRE_LABELS,
   PRESET_WEIGHTS,
   getScoreColor
-} from '../utils/constants';
+} from '../../../utils/constants';
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;
