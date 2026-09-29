@@ -5,7 +5,7 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
 import { getScoreColor } from '../../utils/constants';
 import FilmInfo from './components/FilmInfo';
-import RatingForm from './components/RatingForm'; 
+import RatingForm from './components/RatingForm';
 import CommentsSection from './components/CommentsSection';
 import ReviewsSection from './components/ReviewsSection';
 import UsersList from './components/UsersList';
@@ -188,8 +188,15 @@ function FilmPage() {
       <div className="film-page">
         <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
-        <FilmInfo film={film} userRating={userRating} onToggleRating={toggleRatingMode} isRatingMode={isRatingMode} />
+        {/* 1. Информация о фильме + ваша оценка */}
+        <FilmInfo
+          film={film}
+          userRating={userRating}
+          onToggleRating={toggleRatingMode}
+          isRatingMode={isRatingMode}
+        />
 
+        {/* 2. Форма оценки (открывается по кнопке) */}
         {isRatingMode && (
           <RatingForm
             scores={scores}
@@ -209,15 +216,7 @@ function FilmPage() {
           />
         )}
 
-        <ReviewsSection
-          reviews={reviews}
-          currentUser={currentUser}
-          film={film}
-          userRating={userRating}
-          onAddReview={addReview}
-          onLikeReview={likeReview}
-        />
-
+        {/* 3. Список оценок пользователей + детали оценки */}
         <UsersList
           filmUsers={filmUsers}
           usersLoading={false}
@@ -225,47 +224,7 @@ function FilmPage() {
           onOpenRatingDetails={openRatingDetails}
         />
 
-        {showUsersModal && (
-          <div className="modal-overlay" onClick={() => setShowUsersModal(false)}>
-            <div className="modal-content users-modal" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
-              <h2>👥 Все оценки фильма</h2>
-              <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
-              <div className="users-modal-list">
-                {filmUsers.map((item) => (
-                  <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
-                    <div className="user-info">
-                      <Link to={`/user/${item.user._id}`} className="user-link">
-                        👤 {item.user.nickname || 'Пользователь'}
-                      </Link>
-                      {item.user.isAdmin && <span className="admin-badge">👑</span>}
-                    </div>
-                    <div className="rating-info">
-                      <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
-                        {item.rating.finalScore}
-                      </span>
-                      <button className="details-btn" onClick={() => {
-                        setShowUsersModal(false);
-                        openRatingDetails(item.rating);
-                      }}>
-                        🔍 Детали
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <CommentsSection
-          comments={comments}
-          currentUser={currentUser}
-          film={film}
-          onAddComment={addComment}
-          onLikeComment={likeComment}
-        />
-
+        {/* 4. Трейлер */}
         {film.trailer && (
           <div className="trailer glass-card">
             <h3>Трейлер</h3>
@@ -278,7 +237,63 @@ function FilmPage() {
             />
           </div>
         )}
+
+        {/* 5. Рецензии — ниже всей основной информации */}
+        <ReviewsSection
+          reviews={reviews}
+          currentUser={currentUser}
+          film={film}
+          userRating={userRating}
+          onAddReview={addReview}
+          onLikeReview={likeReview}
+        />
+
+        {/* 6. Комментарии — самые нижние */}
+        <CommentsSection
+          comments={comments}
+          currentUser={currentUser}
+          film={film}
+          onAddComment={addComment}
+          onLikeComment={likeComment}
+        />
       </div>
+
+      {/* Модалка "Все оценки фильма" */}
+      {showUsersModal && (
+        <div className="modal-overlay" onClick={() => setShowUsersModal(false)}>
+          <div className="modal-content users-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
+            <h2>👥 Все оценки фильма</h2>
+            <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
+            <div className="users-modal-list">
+              {filmUsers.map((item) => (
+                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
+                  <div className="user-info">
+                    <Link to={`/user/${item.user._id}`} className="user-link">
+                      👤 {item.user.nickname || 'Пользователь'}
+                    </Link>
+                    {item.user.isAdmin && <span className="admin-badge">👑</span>}
+                  </div>
+                  <div className="rating-info">
+                    <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
+                      {item.rating.finalScore}
+                    </span>
+                    <button
+                      className="details-btn"
+                      onClick={() => {
+                        setShowUsersModal(false);
+                        openRatingDetails(item.rating);
+                      }}
+                    >
+                      🔍 Детали
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
     </div>
