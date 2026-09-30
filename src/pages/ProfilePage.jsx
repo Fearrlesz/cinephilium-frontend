@@ -183,10 +183,10 @@ function ProfilePage() {
 
   /* ===== UI сортировки ===== */
   const sortOptions = [
-    { key: 'newest',  label: '🆕 Новые' },
-    { key: 'oldest',  label: '🕰 Старые' },
-    { key: 'highest', label: '⬆ Высокие' },
-    { key: 'lowest',  label: '⬇ Низкие' }
+    { key: 'newest',  label: ' Новые' },
+    { key: 'oldest',  label: ' Старые' },
+    { key: 'highest', label: ' Высокие' },
+    { key: 'lowest',  label: ' Низкие' }
   ];
 
   return (
