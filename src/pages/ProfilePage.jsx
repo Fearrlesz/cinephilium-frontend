@@ -270,20 +270,47 @@ function ProfilePage() {
               <h2>Мои оценки</h2>
 
               {ratings.length > 0 && (
-                <div className="sort-controls">
-                  {sortOptions.map(opt => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSortBy(opt.key)}
-                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+  <div
+    className="sort-controls"
+    style={{
+      display: 'flex',
+      gap: '6px',
+      flexWrap: 'wrap'
+    }}
+  >
+    {sortOptions.map(opt => (
+      <button
+        key={opt.key}
+        type="button"
+        onClick={() => setSortBy(opt.key)}
+        className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+        style={{
+          padding: '6px 12px',
+          fontSize: '13px',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          width: 'auto',
+          marginTop: 0,
+          border: sortBy === opt.key
+            ? '1px solid rgba(168, 133, 64, 0.25)'
+            : '1px solid var(--glass-border)',
+          background: sortBy === opt.key
+            ? 'rgba(168, 133, 64, 0.08)'
+            : 'rgba(255, 255, 255, 0.02)',
+          color: sortBy === opt.key ? 'var(--gold-bright)' : 'var(--text-secondary)',
+          fontWeight: sortBy === opt.key ? 600 : 400,
+          boxShadow: 'none',
+          filter: 'none',
+          textShadow: 'none',
+          outline: 'none',
+          transition: 'background .25s ease, color .25s ease, border-color .25s ease'
+        }}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+)}
 
             {ratings.length === 0 ? (
               <p>Вы еще не оценили ни одного фильма</p>
