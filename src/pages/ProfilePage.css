@@ -578,3 +578,167 @@
     padding: 12px;
   }
 }
+/* ============================================================
+   СОРТИРОВКА ОЦЕНОК В ПРОФИЛЕ
+   ============================================================ */
+.profile-ratings .sort-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-ratings .sort-controls:hover {
+  border-color: rgba(168, 133, 64, 0.25);
+  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
+}
+
+.sort-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  width: auto;
+  margin-top: 0;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  white-space: nowrap;
+}
+
+.sort-btn:hover {
+  color: var(--text-primary);
+  background: rgba(168, 133, 64, 0.05);
+  border-color: rgba(168, 133, 64, 0.15);
+}
+
+.sort-btn:active {
+  transform: scale(0.97);
+}
+
+.sort-btn.active {
+  color: #1a1208;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  border-color: rgba(255, 215, 130, 0.35);
+  box-shadow:
+    0 0 20px rgba(168, 133, 64, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.sort-btn.active:hover {
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold-bright));
+  transform: translateY(-1px);
+}
+
+/* Разделитель между "по дате" и "по баллу" (визуально необязательный) */
+.sort-btn + .sort-btn {
+  position: relative;
+}
+
+/* ============================================================
+   ПЛАВНОЕ ПОЯВЛЕНИЕ СПИСКА ОЦЕНОК ПРИ СМЕНЕ СОРТИРОВКИ
+   ============================================================ */
+.ratings-list {
+  animation: ratingsFadeIn 0.35s ease;
+}
+
+@keyframes ratingsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Номер позиции в отсортированном списке (если добавишь .rating-rank в JSX) */
+.rating-rank {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.rating-item:hover .rating-rank {
+  color: var(--gold-bright);
+  opacity: 1;
+}
+
+/* ============================================================
+   КНОПКА "ДЕТАЛИ" В СПИСКЕ ОЦЕНОК
+   ============================================================ */
+.details-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  cursor: pointer;
+  width: auto;
+  margin-top: 0;
+  box-shadow: none;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  white-space: nowrap;
+}
+
+.details-btn:hover {
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.25);
+  transform: scale(1.04);
+}
+
+.details-btn:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================
+   АДАПТИВ ДЛЯ СОРТИРОВКИ
+   ============================================================ */
+@media (max-width: 768px) {
+  .profile-ratings .sort-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .sort-btn {
+    flex: 1 1 calc(50% - 6px);
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sort-btn {
+    flex: 1 1 calc(50% - 4px);
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  .details-btn {
+    width: 100%;
+    text-align: center;
+    padding: 8px 12px;
+  }
+                   }
