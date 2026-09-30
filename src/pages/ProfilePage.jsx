@@ -20,7 +20,7 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
-  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
+  const [sortBy, setSortBy] = useState('newest');
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -214,21 +214,21 @@ function ProfilePage() {
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
 
-          <div className="achievements-section" style={{ marginTop: '20px' }}>
+          <div className="achievements-section">
             <h3>🏅 Достижения</h3>
             {user.achievements?.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
+              <div className="achievements-grid">
                 {user.achievements.map(ach => (
-                  <div key={ach} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    <span style={{ fontSize: '24px' }}>🏅</span>
-                    <div>
-                      <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
-                    </div>
+                  <div key={ach} className="achievement-card">
+                    <span className="achievement-icon">🏅</span>
+                    <div className="achievement-name">{ach}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#888', padding: '10px 0' }}>Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!</p>
+              <p className="achievements-empty">
+                Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
+              </p>
             )}
           </div>
 
@@ -266,33 +266,17 @@ function ProfilePage() {
 
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-              <h2 style={{ margin: 0 }}>Мои оценки</h2>
+            <div className="profile-ratings-header">
+              <h2>Мои оценки</h2>
 
               {ratings.length > 0 && (
-                <div
-                  className="sort-controls"
-                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
-                >
+                <div className="sort-controls">
                   {sortOptions.map(opt => (
                     <button
                       key={opt.key}
                       type="button"
                       onClick={() => setSortBy(opt.key)}
                       className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: '13px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        background: sortBy === opt.key
-                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
-                          : 'rgba(255,255,255,0.05)',
-                        color: sortBy === opt.key ? '#fff' : '#ddd',
-                        fontWeight: sortBy === opt.key ? 600 : 400,
-                        transition: 'all .2s'
-                      }}
                     >
                       {opt.label}
                     </button>
@@ -304,22 +288,31 @@ function ProfilePage() {
             {ratings.length === 0 ? (
               <p>Вы еще не оценили ни одного фильма</p>
             ) : (
-              <div className="ratings-list" style={{ marginTop: '15px' }}>
-                {sortedRatings.map((rating) => (
+              <div className="ratings-list">
+                {sortedRatings.map((rating, idx) => (
                   <div key={rating._id} className="rating-item">
                     <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
                       <div className="rating-film-info">
-                        <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
+                        <img
+                          src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'}
+                          alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
+                          className="rating-poster-small"
+                        />
                         <div>
                           <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
                           <p>{rating.filmId?.year || rating.film?.year}</p>
                         </div>
                       </div>
                     </Link>
-                    <div className="rating-score" style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}>
+                    <div
+                      className="rating-score"
+                      style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}
+                    >
                       {rating.combinedScore ?? rating.finalScore}
                     </div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>
+                      🔍 Детали
+                    </button>
                   </div>
                 ))}
               </div>
