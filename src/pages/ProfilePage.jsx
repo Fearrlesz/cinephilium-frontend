@@ -270,80 +270,81 @@ function ProfilePage() {
               <h2>Мои оценки</h2>
 
               {ratings.length > 0 && (
-  <div
-    className="sort-controls"
-    style={{
-      display: 'flex',
-      gap: '6px',
-      flexWrap: 'wrap'
-    }}
-  >
-    {sortOptions.map(opt => (
-      <button
-        key={opt.key}
-        type="button"
-        onClick={() => setSortBy(opt.key)}
-        className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-        style={{
-          padding: '6px 12px',
-          fontSize: '13px',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          width: 'auto',
-          marginTop: 0,
-          border: sortBy === opt.key
-            ? '1px solid rgba(168, 133, 64, 0.25)'
-            : '1px solid var(--glass-border)',
-          background: sortBy === opt.key
-            ? 'rgba(168, 133, 64, 0.08)'
-            : 'rgba(255, 255, 255, 0.02)',
-          color: sortBy === opt.key ? 'var(--gold-bright)' : 'var(--text-secondary)',
-          fontWeight: sortBy === opt.key ? 600 : 400,
-          boxShadow: 'none',
-          filter: 'none',
-          textShadow: 'none',
-          outline: 'none',
-          transition: 'background .25s ease, color .25s ease, border-color .25s ease'
-        }}
-      >
-        {opt.label}
-      </button>
-    ))}
-  </div>
-)}
-
-            {ratings.length === 0 ? (
-              <p>Вы еще не оценили ни одного фильма</p>
-            ) : (
-              <div className="ratings-list">
-                {sortedRatings.map((rating, idx) => (
-                  <div key={rating._id} className="rating-item">
-                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
-                      <div className="rating-film-info">
-                        <img
-                          src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'}
-                          alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
-                          className="rating-poster-small"
-                        />
-                        <div>
-                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                          <p>{rating.filmId?.year || rating.film?.year}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    <div
-                      className="rating-score"
-                      style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}
+                <div
+                  className="sort-controls"
+                  style={{
+                    display: 'flex',
+                    gap: '6px',
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setSortBy(opt.key)}
+                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        width: 'auto',
+                        marginTop: 0,
+                        border: sortBy === opt.key
+                          ? '1px solid rgba(168, 133, 64, 0.25)'
+                          : '1px solid var(--glass-border)',
+                        background: sortBy === opt.key
+                          ? 'rgba(168, 133, 64, 0.08)'
+                          : 'rgba(255, 255, 255, 0.02)',
+                        color: sortBy === opt.key ? 'var(--gold-bright)' : 'var(--text-secondary)',
+                        fontWeight: sortBy === opt.key ? 600 : 400,
+                        boxShadow: 'none',
+                        filter: 'none',
+                        textShadow: 'none',
+                        outline: 'none',
+                        transition: 'background .25s ease, color .25s ease, border-color .25s ease'
+                      }}
                     >
-                      {rating.combinedScore ?? rating.finalScore}
-                    </div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>
-                      🔍 Детали
+                      {opt.label}
                     </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+
+              {ratings.length === 0 ? (
+                <p>Вы еще не оценили ни одного фильма</p>
+              ) : (
+                <div className="ratings-list">
+                  {sortedRatings.map((rating) => (
+                    <div key={rating._id} className="rating-item">
+                      <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
+                        <div className="rating-film-info">
+                          <img
+                            src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'}
+                            alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
+                            className="rating-poster-small"
+                          />
+                          <div>
+                            <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
+                            <p>{rating.filmId?.year || rating.film?.year}</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <div
+                        className="rating-score"
+                        style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}
+                      >
+                        {rating.combinedScore ?? rating.finalScore}
+                      </div>
+                      <button className="details-btn" onClick={() => openRatingDetails(rating)}>
+                        🔍 Детали
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
