@@ -1,5 +1,5 @@
 /* ============================================================
-   ПРОФИЛЬ — золото
+   ПРОФИЛЬ — золото (без неона и без фиолетовых полосок)
    ============================================================ */
 .profile-page {
   max-width: 900px;
@@ -27,27 +27,25 @@
   top: 0;
   left: 15%;
   width: 70%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  opacity: 0.3;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 133, 64, 0.5), transparent);
+  opacity: 0.35;
 }
 
 .profile-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(168, 133, 64, 0.08);
+  background: rgba(168, 133, 64, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid var(--gold);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.05);
   transition: all 0.3s ease;
 }
 
 .profile-avatar:hover {
   border-color: var(--gold-bright);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.1);
 }
 
 .avatar-placeholder {
@@ -87,7 +85,7 @@
 .logout-btn {
   padding: 8px 20px;
   border-radius: 40px;
-  border: 1px solid rgba(236, 72, 153, 0.2);
+  border: 1px solid rgba(236, 72, 153, 0.22);
   background: transparent;
   color: var(--neon-pink);
   cursor: pointer;
@@ -122,17 +120,7 @@
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
-
-.profile-ratings h2::after,
-.profile-reviews h2::after {
-  content: '';
-  display: block;
-  width: 40px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
-  margin-top: 4px;
-  border-radius: 2px;
-}
+/* Декоративные подчёркивания под заголовками удалены */
 
 /* Заголовок вкладки с сортировкой */
 .profile-ratings-header {
@@ -156,7 +144,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.14);
   border-radius: 10px;
   border-left: 3px solid var(--glass-border);
   transition: all 0.3s ease;
@@ -164,7 +152,7 @@
 
 .rating-item:hover {
   border-left-color: var(--gold);
-  background: rgba(168, 133, 64, 0.02);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .rating-film-info {
@@ -218,18 +206,17 @@
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease;
 }
 
 .profile-tabs:hover {
-  border-color: var(--gold);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
+  border-color: rgba(168, 133, 64, 0.4);
 }
 
 .tabs-header {
   display: flex;
   gap: 0;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.14);
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -255,13 +242,13 @@
 
 .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(168, 133, 64, 0.02);
+  background: rgba(168, 133, 64, 0.03);
 }
 
 .tab-btn.active {
   color: var(--gold-bright);
   border-bottom-color: var(--gold);
-  background: rgba(168, 133, 64, 0.04);
+  background: rgba(168, 133, 64, 0.05);
 }
 
 .tab-btn .tab-count {
@@ -283,9 +270,10 @@
 
 /* ============================================================
    КАРТОЧКА РЕЦЕНЗИИ В ПРОФИЛЕ — золото
+   (без фиолетовой полосы слева)
    ============================================================ */
 .review-item {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.14);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 20px 24px;
@@ -295,27 +283,10 @@
   overflow: hidden;
 }
 
-.review-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(to bottom, var(--gold), var(--gold-bright), var(--neon-purple));
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
-}
-
-.review-item:hover::before {
-  opacity: 0.8;
-}
-
 .review-item:hover {
-  background: rgba(168, 133, 64, 0.02);
-  border-color: var(--gold);
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(168, 133, 64, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.04);
 }
 
 .review-film-link {
@@ -364,7 +335,7 @@
   padding: 6px 20px;
   background: rgba(168, 133, 64, 0.06);
   color: var(--gold-bright);
-  border: 1px solid rgba(168, 133, 64, 0.12);
+  border: 1px solid rgba(168, 133, 64, 0.16);
   border-radius: 20px;
   text-decoration: none;
   font-size: 14px;
@@ -375,9 +346,8 @@
 
 .review-go-to-film:hover {
   background: rgba(168, 133, 64, 0.12);
-  border-color: rgba(168, 133, 64, 0.25);
-  transform: scale(1.04);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
+  border-color: rgba(168, 133, 64, 0.28);
+  transform: scale(1.03);
 }
 
 /* Кнопка редактирования профиля */
@@ -386,7 +356,7 @@
   padding: 8px 24px;
   background: rgba(168, 133, 64, 0.06);
   color: var(--gold-bright);
-  border: 1px solid rgba(168, 133, 64, 0.12);
+  border: 1px solid rgba(168, 133, 64, 0.16);
   border-radius: 20px;
   text-decoration: none;
   font-size: 14px;
@@ -398,9 +368,8 @@
 
 .btn-edit-profile:hover {
   background: rgba(168, 133, 64, 0.12);
-  border-color: rgba(168, 133, 64, 0.25);
-  transform: scale(1.04);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.04);
+  border-color: rgba(168, 133, 64, 0.28);
+  transform: scale(1.03);
 }
 
 /* Пустое состояние */
@@ -428,7 +397,7 @@
    ДОСТИЖЕНИЯ
    ============================================================ */
 .achievements-section {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.14);
   padding: 16px 20px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
@@ -436,9 +405,8 @@
 }
 
 .achievements-section:hover {
-  border-color: var(--gold);
-  background: rgba(168, 133, 64, 0.03);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
+  border-color: rgba(168, 133, 64, 0.4);
+  background: rgba(0, 0, 0, 0.18);
 }
 
 .achievements-section h3,
@@ -455,17 +423,27 @@
 .achievement-first-frame {
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 165, 0, 0.05));
   border: 1px solid rgba(255, 215, 0, 0.15);
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.03);
 }
 
 .achievement-first-frame .achievement-icon {
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
   animation: firstFrameGlow 2s ease-in-out infinite;
 }
 
 @keyframes firstFrameGlow {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
+}
+
+/* ============================================================
+   СОРТИРОВКА ОЦЕНОК (кнопки в ряду)
+   ============================================================ */
+.sort-controls .sort-btn {
+  box-shadow: none !important;
+}
+.sort-controls .sort-btn:hover {
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.4);
+  color: var(--text-primary);
 }
 
 /* ============================================================
@@ -504,8 +482,8 @@
 
   .tab-btn.active {
     border-bottom-color: transparent;
-    border-left-color: var(--neon-cyan);
-    background: rgba(34, 211, 238, 0.04);
+    border-left-color: var(--gold);
+    background: rgba(168, 133, 64, 0.06);
   }
 
   .tab-btn .tab-count {
@@ -591,7 +569,7 @@
 }
 
 /* ============================================================
-   КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК СОРТИРОВКИ
+   ВЫПАДАЮЩИЙ СПИСОК СОРТИРОВКИ (без свечения)
    ============================================================ */
 .sort-select {
   position: relative;
@@ -627,15 +605,14 @@
 
 .sort-select-trigger:hover {
   color: var(--text-primary);
-  border-color: rgba(168, 133, 64, 0.25);
-  background: rgba(168, 133, 64, 0.04);
+  border-color: rgba(168, 133, 64, 0.3);
+  background: rgba(168, 133, 64, 0.05);
 }
 
 .sort-select-trigger.open {
   color: var(--gold-bright);
-  border-color: rgba(168, 133, 64, 0.35);
-  background: rgba(168, 133, 64, 0.06);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.4);
+  background: rgba(168, 133, 64, 0.07);
 }
 
 .sort-select-icon {
@@ -644,7 +621,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 6px rgba(168, 133, 64, 0.15));
 }
 
 .sort-select-label {
@@ -675,14 +651,11 @@
   width: max-content;
   padding: 6px;
   border-radius: 12px;
-  background: rgba(18, 18, 22, 0.92);
+  background: rgba(18, 18, 22, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(168, 133, 64, 0.08) inset,
-    0 0 40px rgba(168, 133, 64, 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -690,16 +663,6 @@
   animation: sortMenuAppear 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   transform-origin: top left;
   overflow: hidden;
-}
-
-.sort-select-menu::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  width: 80%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168, 133, 64, 0.4), transparent);
 }
 
 @keyframes sortMenuAppear {
@@ -754,8 +717,7 @@
   height: 60%;
   width: 2px;
   border-radius: 2px;
-  background: linear-gradient(to bottom, var(--gold), var(--gold-bright));
-  box-shadow: 0 0 10px rgba(168, 133, 64, 0.4);
+  background: var(--gold);
 }
 
 .sort-select-option .sort-select-icon {
@@ -776,7 +738,6 @@
   font-weight: 700;
   margin-left: auto;
   padding-left: 8px;
-  filter: drop-shadow(0 0 6px rgba(168, 133, 64, 0.3));
 }
 
 /* Мобильная адаптация выпадающего списка */
