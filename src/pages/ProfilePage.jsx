@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
@@ -20,9 +20,7 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
-  const [sortBy, setSortBy] = useState('newest');
-  const [sortOpen, setSortOpen] = useState(false);
-  const sortRef = useRef(null);
+  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -35,27 +33,6 @@ function ProfilePage() {
     }
     loadProfile();
   }, [navigate]);
-
-  /* Закрытие выпадающего окна по клику вне и по Escape */
-  useEffect(() => {
-    if (!sortOpen) return;
-
-    const handleClickOutside = (e) => {
-      if (sortRef.current && !sortRef.current.contains(e.target)) {
-        setSortOpen(false);
-      }
-    };
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') setSortOpen(false);
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [sortOpen]);
 
   const loadAchievementProgress = useCallback(async (userData) => {
     try {
@@ -204,20 +181,13 @@ function ProfilePage() {
 
   const isExclusive = user.isExclusive;
 
-  /* ===== ОПЦИИ СОРТИРОВКИ ===== */
+  /* ===== UI сортировки ===== */
   const sortOptions = [
-    { key: 'newest',  label: 'Новые',   icon: '🆕' },
-    { key: 'oldest',  label: 'Старые',  icon: '📜' },
-    { key: 'highest', label: 'Высокие', icon: '⬆️' },
-    { key: 'lowest',  label: 'Низкие',  icon: '⬇️' }
+    { key: 'newest',  label: '🆕 Новые' },
+    { key: 'oldest',  label: '🕰 Старые' },
+    { key: 'highest', label: '⬆ Высокие' },
+    { key: 'lowest',  label: '⬇ Низкие' }
   ];
-
-  const currentSort = sortOptions.find(o => o.key === sortBy) || sortOptions[0];
-
-  const handleSelectSort = (key) => {
-    setSortBy(key);
-    setSortOpen(false);
-  };
 
   return (
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
@@ -244,21 +214,21 @@ function ProfilePage() {
             <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
           </div>
 
-          <div className="achievements-section">
+          <div className="achievements-section" style={{ marginTop: '20px' }}>
             <h3>🏅 Достижения</h3>
             {user.achievements?.length > 0 ? (
-              <div className="achievements-grid">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
                 {user.achievements.map(ach => (
-                  <div key={ach} className="achievement-card">
-                    <span className="achievement-icon">🏅</span>
-                    <div className="achievement-name">{ach}</div>
+                  <div key={ach} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <span style={{ fontSize: '24px' }}>🏅</span>
+                    <div>
+                      <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="achievements-empty">
-                Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
-              </p>
+              <p style={{ color: '#888', padding: '10px 0' }}>Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!</p>
             )}
           </div>
 
@@ -296,77 +266,64 @@ function ProfilePage() {
 
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <div className="profile-ratings-header">
-              <h2>Мои оценки</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <h2 style={{ margin: 0 }}>Мои оценки</h2>
 
               {ratings.length > 0 && (
-                <div className="sort-select" ref={sortRef}>
-                  <button
-                    type="button"
-                    className={`sort-select-trigger ${sortOpen ? 'open' : ''}`}
-                    onClick={() => setSortOpen(o => !o)}
-                    aria-haspopup="listbox"
-                    aria-expanded={sortOpen}
-                  >
-                    <span className="sort-select-icon">{currentSort.icon}</span>
-                    <span className="sort-select-label">{currentSort.label}</span>
-                    <span className={`sort-select-arrow ${sortOpen ? 'open' : ''}`}>▾</span>
-                  </button>
-
-                  {sortOpen && (
-                    <div className="sort-select-menu" role="listbox">
-                      {sortOptions.map(opt => (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          role="option"
-                          aria-selected={sortBy === opt.key}
-                          className={`sort-select-option ${sortBy === opt.key ? 'active' : ''}`}
-                          onClick={() => handleSelectSort(opt.key)}
-                        >
-                          <span className="sort-select-icon">{opt.icon}</span>
-                          <span className="sort-select-label">{opt.label}</span>
-                          {sortBy === opt.key && <span className="sort-select-check">✓</span>}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {ratings.length === 0 ? (
-                <p>Вы еще не оценили ни одного фильма</p>
-              ) : (
-                <div className="ratings-list">
-                  {sortedRatings.map((rating) => (
-                    <div key={rating._id} className="rating-item">
-                      <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
-                        <div className="rating-film-info">
-                          <img
-                            src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'}
-                            alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
-                            className="rating-poster-small"
-                          />
-                          <div>
-                            <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                            <p>{rating.filmId?.year || rating.film?.year}</p>
-                          </div>
-                        </div>
-                      </Link>
-                      <div
-                        className="rating-score"
-                        style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}
-                      >
-                        {rating.combinedScore ?? rating.finalScore}
-                      </div>
-                      <button className="details-btn" onClick={() => openRatingDetails(rating)}>
-                        🔍 Детали
-                      </button>
-                    </div>
+                <div
+                  className="sort-controls"
+                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
+                >
+                  {sortOptions.map(opt => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setSortBy(opt.key)}
+                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: sortBy === opt.key
+                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
+                          : 'rgba(255,255,255,0.05)',
+                        color: sortBy === opt.key ? '#fff' : '#ddd',
+                        fontWeight: sortBy === opt.key ? 600 : 400,
+                        transition: 'all .2s'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
                   ))}
                 </div>
               )}
             </div>
+
+            {ratings.length === 0 ? (
+              <p>Вы еще не оценили ни одного фильма</p>
+            ) : (
+              <div className="ratings-list" style={{ marginTop: '15px' }}>
+                {sortedRatings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
+                      <div className="rating-film-info">
+                        <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
+                        <div>
+                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
+                          <p>{rating.filmId?.year || rating.film?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="rating-score" style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}>
+                      {rating.combinedScore ?? rating.finalScore}
+                    </div>
+                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
