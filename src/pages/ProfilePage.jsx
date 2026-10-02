@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
@@ -21,6 +21,8 @@ function ProfilePage() {
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
   const [sortBy, setSortBy] = useState('newest');
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef(null);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -33,6 +35,27 @@ function ProfilePage() {
     }
     loadProfile();
   }, [navigate]);
+
+  /* Закрытие выпадающего окна по клику вне и по Escape */
+  useEffect(() => {
+    if (!sortOpen) return;
+
+    const handleClickOutside = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) {
+        setSortOpen(false);
+      }
+    };
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') setSortOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [sortOpen]);
 
   const loadAchievementProgress = useCallback(async (userData) => {
     try {
@@ -181,13 +204,20 @@ function ProfilePage() {
 
   const isExclusive = user.isExclusive;
 
-  /* ===== UI сортировки ===== */
+  /* ===== ОПЦИИ СОРТИРОВКИ ===== */
   const sortOptions = [
-    { key: 'newest',  label: ' Новые' },
-    { key: 'oldest',  label: ' Старые' },
-    { key: 'highest', label: ' Высокие' },
-    { key: 'lowest',  label: ' Низкие' }
+    { key: 'newest',  label: 'Новые',   icon: '🆕' },
+    { key: 'oldest',  label: 'Старые',  icon: '📜' },
+    { key: 'highest', label: 'Высокие', icon: '⬆️' },
+    { key: 'lowest',  label: 'Низкие',  icon: '⬇️' }
   ];
+
+  const currentSort = sortOptions.find(o => o.key === sortBy) || sortOptions[0];
+
+  const handleSelectSort = (key) => {
+    setSortBy(key);
+    setSortOpen(false);
+  };
 
   return (
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
@@ -270,45 +300,37 @@ function ProfilePage() {
               <h2>Мои оценки</h2>
 
               {ratings.length > 0 && (
-                <div
-                  className="sort-controls"
-                  style={{
-                    display: 'flex',
-                    gap: '6px',
-                    flexWrap: 'wrap'
-                  }}
-                >
-                  {sortOptions.map(opt => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSortBy(opt.key)}
-                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: '13px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        width: 'auto',
-                        marginTop: 0,
-                        border: sortBy === opt.key
-                          ? '1px solid rgba(168, 133, 64, 0.25)'
-                          : '1px solid var(--glass-border)',
-                        background: sortBy === opt.key
-                          ? 'rgba(168, 133, 64, 0.08)'
-                          : 'rgba(255, 255, 255, 0.02)',
-                        color: sortBy === opt.key ? 'var(--gold-bright)' : 'var(--text-secondary)',
-                        fontWeight: sortBy === opt.key ? 600 : 400,
-                        boxShadow: 'none',
-                        filter: 'none',
-                        textShadow: 'none',
-                        outline: 'none',
-                        transition: 'background .25s ease, color .25s ease, border-color .25s ease'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="sort-select" ref={sortRef}>
+                  <button
+                    type="button"
+                    className={`sort-select-trigger ${sortOpen ? 'open' : ''}`}
+                    onClick={() => setSortOpen(o => !o)}
+                    aria-haspopup="listbox"
+                    aria-expanded={sortOpen}
+                  >
+                    <span className="sort-select-icon">{currentSort.icon}</span>
+                    <span className="sort-select-label">{currentSort.label}</span>
+                    <span className={`sort-select-arrow ${sortOpen ? 'open' : ''}`}>▾</span>
+                  </button>
+
+                  {sortOpen && (
+                    <div className="sort-select-menu" role="listbox">
+                      {sortOptions.map(opt => (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          role="option"
+                          aria-selected={sortBy === opt.key}
+                          className={`sort-select-option ${sortBy === opt.key ? 'active' : ''}`}
+                          onClick={() => handleSelectSort(opt.key)}
+                        >
+                          <span className="sort-select-icon">{opt.icon}</span>
+                          <span className="sort-select-label">{opt.label}</span>
+                          {sortBy === opt.key && <span className="sort-select-check">✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
