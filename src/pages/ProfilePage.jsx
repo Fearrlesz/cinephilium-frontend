@@ -181,12 +181,12 @@ function ProfilePage() {
 
   const isExclusive = user.isExclusive;
 
-  /* ===== UI сортировки ===== */
+  /* ===== UI сортировки (без эмодзи и без неона) ===== */
   const sortOptions = [
-    { key: 'newest',  label: '🆕 Новые' },
-    { key: 'oldest',  label: '🕰 Старые' },
-    { key: 'highest', label: '⬆ Высокие' },
-    { key: 'lowest',  label: '⬇ Низкие' }
+    { key: 'newest',  label: 'Новые' },
+    { key: 'oldest',  label: 'Старые' },
+    { key: 'highest', label: 'Высокие' },
+    { key: 'lowest',  label: 'Низкие' }
   ];
 
   return (
@@ -274,29 +274,35 @@ function ProfilePage() {
                   className="sort-controls"
                   style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
                 >
-                  {sortOptions.map(opt => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSortBy(opt.key)}
-                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: '13px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        background: sortBy === opt.key
-                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
-                          : 'rgba(255,255,255,0.05)',
-                        color: sortBy === opt.key ? '#fff' : '#ddd',
-                        fontWeight: sortBy === opt.key ? 600 : 400,
-                        transition: 'all .2s'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  {sortOptions.map(opt => {
+                    const isActive = sortBy === opt.key;
+                    return (
+                      <button
+                        key={opt.key}
+                        type="button"
+                        onClick={() => setSortBy(opt.key)}
+                        className={`sort-btn ${isActive ? 'active' : ''}`}
+                        style={{
+                          padding: '6px 14px',
+                          fontSize: '13px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          border: isActive
+                            ? '1px solid rgba(168, 133, 64, 0.55)'
+                            : '1px solid rgba(255, 255, 255, 0.14)',
+                          background: isActive
+                            ? 'rgba(168, 133, 64, 0.14)'
+                            : 'rgba(255, 255, 255, 0.04)',
+                          color: isActive ? 'var(--gold-bright)' : 'var(--text-secondary)',
+                          fontWeight: isActive ? 600 : 400,
+                          boxShadow: 'none',
+                          transition: 'all .2s ease'
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
