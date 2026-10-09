@@ -435,20 +435,25 @@
 }
 
 /* ============================================================
-   СОРТИРОВКА ОЦЕНОК (кнопки в ряду — золото, без неона)
+   СОРТИРОВКА ОЦЕНОК (горизонтальный ряд, золото, без неона)
    ============================================================ */
 .sort-controls {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;      /* ← запрещаем перенос */
+  white-space: nowrap;
 }
 
 .sort-btn {
+  flex: 0 0 auto;         /* кнопки не растягиваются и не сжимаются */
   padding: 6px 14px;
   font-size: 13px;
   font-family: var(--font-sans);
   font-weight: 400;
   letter-spacing: 0.01em;
+  line-height: 1;
   border-radius: 8px;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.14);
