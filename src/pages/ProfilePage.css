@@ -599,4 +599,44 @@
     padding: 12px;
   }
 }
+/* ============================================================
+   АДАПТИВ: КНОПКИ СОРТИРОВКИ
+   ============================================================ */
 
+/* Планшет — ещё в строку, но компактнее */
+@media (max-width: 768px) {
+  .sort-controls {
+    gap: 6px;
+  }
+  .sort-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Телефон — разрешаем перенос и уменьшаем кнопки */
+@media (max-width: 480px) {
+  .sort-controls {
+    flex-wrap: wrap;             /* ← разрешаем перенос */
+    justify-content: flex-start;
+    width: 100%;                 /* контейнер на всю ширину */
+    gap: 6px;
+  }
+
+  .sort-btn {
+    flex: 1 1 auto;              /* кнопки растягиваются и делят место поровну */
+    min-width: 0;                /* чтобы не ломались из-за min-content */
+    padding: 6px 8px;
+    font-size: 12px;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+/* Очень узкий экран — ещё компактнее */
+@media (max-width: 360px) {
+  .sort-btn {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+}
