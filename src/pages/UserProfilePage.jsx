@@ -200,37 +200,20 @@ function UserProfilePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ margin: 0 }}>Оценки пользователя</h2>
 
-              {ratings.length > 0 && (
-                <div
-                  className="sort-controls"
-                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
-                >
-                  {sortOptions.map(opt => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setSortBy(opt.key)}
-                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: '13px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        background: sortBy === opt.key
-                          ? 'linear-gradient(135deg, #7c3aed, #ec4899)'
-                          : 'rgba(255,255,255,0.05)',
-                        color: sortBy === opt.key ? '#fff' : '#ddd',
-                        fontWeight: sortBy === opt.key ? 600 : 400,
-                        transition: 'all .2s'
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+           {ratings.length > 0 && (
+  <div className="sort-controls">
+    {sortOptions.map(opt => (
+      <button
+        key={opt.key}
+        type="button"
+        onClick={() => setSortBy(opt.key)}
+        className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+)}
 
             {ratings.length === 0 ? (
               <p>Пользователь еще не оценил ни одного фильма</p>
