@@ -135,11 +135,11 @@ function UserProfilePage() {
   const isExclusive = user.isExclusive;
 
   const sortOptions = [
-    { key: 'newest',  label: '🆕 Новые' },
-    { key: 'oldest',  label: '🕰 Старые' },
-    { key: 'highest', label: '⬆ Высокие' },
-    { key: 'lowest',  label: '⬇ Низкие' }
-  ];
+  { key: 'newest',  label: 'Новые' },
+  { key: 'oldest',  label: 'Старые' },
+  { key: 'highest', label: 'Высокие' },
+  { key: 'lowest',  label: 'Низкие' }
+];
 
   return (
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
