@@ -269,43 +269,20 @@ function ProfilePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ margin: 0 }}>Мои оценки</h2>
 
-              {ratings.length > 0 && (
-                <div
-                  className="sort-controls"
-                  style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}
-                >
-                  {sortOptions.map(opt => {
-                    const isActive = sortBy === opt.key;
-                    return (
-                      <button
-                        key={opt.key}
-                        type="button"
-                        onClick={() => setSortBy(opt.key)}
-                        className={`sort-btn ${isActive ? 'active' : ''}`}
-                        style={{
-                          padding: '6px 14px',
-                          fontSize: '13px',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          border: isActive
-                            ? '1px solid rgba(168, 133, 64, 0.55)'
-                            : '1px solid rgba(255, 255, 255, 0.14)',
-                          background: isActive
-                            ? 'rgba(168, 133, 64, 0.14)'
-                            : 'rgba(255, 255, 255, 0.04)',
-                          color: isActive ? 'var(--gold-bright)' : 'var(--text-secondary)',
-                          fontWeight: isActive ? 600 : 400,
-                          boxShadow: 'none',
-                          transition: 'all .2s ease'
-                        }}
-                      >
-                        {opt.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+             {ratings.length > 0 && (
+  <div className="sort-controls">
+    {sortOptions.map(opt => (
+      <button
+        key={opt.key}
+        type="button"
+        onClick={() => setSortBy(opt.key)}
+        className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+)}
 
             {ratings.length === 0 ? (
               <p>Вы еще не оценили ни одного фильма</p>
