@@ -195,58 +195,59 @@ function UserProfilePage() {
           </button>
         </div>
 
-        {activeTab === 'ratings' && (
-          <div className="profile-ratings">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-              <h2 style={{ margin: 0 }}>Оценки пользователя</h2>
+   {activeTab === 'ratings' && (
+  <div className="profile-ratings">
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+      <h2 style={{ margin: 0 }}>Оценки пользователя</h2>
 
-           {ratings.length > 0 && (
-  <div className="sort-controls">
-    {sortOptions.map(opt => (
-      <button
-        key={opt.key}
-        type="button"
-        onClick={() => setSortBy(opt.key)}
-        className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
-      >
-        {opt.label}
-      </button>
-    ))}
+      {ratings.length > 0 && (
+        <div className="sort-controls">
+          {sortOptions.map(opt => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setSortBy(opt.key)}
+              className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {ratings.length === 0 ? (
+      <p>Пользователь еще не оценил ни одного фильма</p>
+    ) : (
+      <div className="ratings-list" style={{ marginTop: '15px' }}>
+        {sortedRatings.map((rating) => (
+          <div key={rating._id || rating.id} className="rating-item">
+            <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
+              <div className="rating-film-info">
+                <img
+                  src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'}
+                  alt={rating.film?.title || rating.filmId?.title || 'Фильм'}
+                  className="rating-poster-small"
+                />
+                <div>
+                  <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
+                  <p>{rating.film?.year || rating.filmId?.year}</p>
+                </div>
+              </div>
+            </Link>
+            <div
+              className="rating-score"
+              style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}
+            >
+              {rating.combinedScore ?? rating.finalScore}
+            </div>
+            <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 )}
-
-            {ratings.length === 0 ? (
-              <p>Пользователь еще не оценил ни одного фильма</p>
-            ) : (
-              <div className="ratings-list" style={{ marginTop: '15px' }}>
-                {sortedRatings.map((rating) => (
-                  <div key={rating._id || rating.id} className="rating-item">
-                    <Link to={`/film/${rating.film?._id || rating.filmId?._id}`}>
-                      <div className="rating-film-info">
-                        <img
-                          src={rating.film?.poster || rating.filmId?.poster || '/no-poster.jpg'}
-                          alt={rating.film?.title || rating.filmId?.title || 'Фильм'}
-                          className="rating-poster-small"
-                        />
-                        <div>
-                          <h4>{rating.film?.title || rating.filmId?.title || 'Фильм'}</h4>
-                          <p>{rating.film?.year || rating.filmId?.year}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    <div
-                      className="rating-score"
-                      style={{ color: getScoreColor(rating.combinedScore ?? rating.technicalScore) }}
-                    >
-                      {rating.combinedScore ?? rating.technicalScore}
-                    </div>
-                    <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         {activeTab === 'reviews' && (
           <div className="profile-reviews">
