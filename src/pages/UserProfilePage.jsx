@@ -357,7 +357,8 @@ function UserProfilePage() {
       </div>
     )}
   </div>
-)}       
+)}
+      </div>
 
       <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
     </div>
