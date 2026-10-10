@@ -661,9 +661,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 10px;
+  flex-wrap: nowrap;      /* ← бейдж с оценкой не переносится на новую строку */
   margin-bottom: 10px;
+}
+
+.review-film-link {
+  min-width: 0;           /* ← чтобы длинное название обрезалось, а не толкало бейдж */
+  flex: 1 1 auto;
+}
+
+.review-title,
+.review-film-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .review-rating-badge {
@@ -680,6 +691,8 @@
   letter-spacing: 0.01em;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+  align-self: flex-start;
 }
 
 /* ---------- Сводка: Технический / Вайб / Комбо ---------- */
@@ -735,7 +748,7 @@
 /* ---------- Средние по 5 блокам ---------- */
 .criteria-blocks-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));   /* ← всегда 5 в ряд */
   gap: 8px;
 }
 
@@ -782,21 +795,30 @@
     margin: 12px 0 10px;
   }
 
+  /* 5 чипов в один ряд, но компактнее */
   .criteria-blocks-row {
-    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .criteria-block-chip {
-    padding: 6px 4px;
+    padding: 6px 2px;
+    gap: 2px;
+    border-radius: 6px;
   }
 
   .chip-label {
-    font-size: 9.5px;
+    font-size: 8.5px;              /* ← уменьшаем, чтобы влезало */
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .chip-value {
     font-size: 13px;
+    line-height: 1;
   }
 
   .summary-pill {
@@ -806,5 +828,11 @@
 
   .summary-pill-label {
     font-size: 11px;
+  }
+
+  .review-rating-badge {
+    padding: 4px 10px;
+    font-size: 12.5px;
+    gap: 4px;
   }
 }
