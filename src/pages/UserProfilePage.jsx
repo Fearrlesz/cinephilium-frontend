@@ -249,48 +249,115 @@ function UserProfilePage() {
   </div>
 )}
 
-        {activeTab === 'reviews' && (
-          <div className="profile-reviews">
-            <h2>Рецензии пользователя</h2>
-            {reviews.length === 0 ? (
-              <p>Пользователь еще не написал ни одной рецензии</p>
-            ) : (
-              <div className="reviews-list">
-                {reviews.map((review) => (
-                  <div key={review._id} className="review-item">
-                    <div className="review-header">
-                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-film-link">
-                        <h3 className="review-title">{review.title}</h3>
-                        <p className="review-film-name">
-                          🎬 {review.film?.title || review.filmId?.title || 'Фильм'}
-                          ({review.film?.year || review.filmId?.year || 'N/A'})
-                        </p>
-                      </Link>
-                      <div className="review-rating">
-                        ⭐ Оценка: {review.ratingId?.finalScore || 'Нет оценки'}
-                      </div>
-                    </div>
-                    <p className="review-text">{review.text}</p>
-                    <div className="review-footer">
-                      <div className="review-actions">
-                        <button className="like-btn" onClick={() => likeReview(review._id)}>
-                          ❤️ {review.likes?.length || 0}
-                        </button>
-                        <span className="review-date">
-                          📅 {formatDate(review.createdAt)}
+ {activeTab === 'reviews' && (
+  <div className="profile-reviews">
+    <h2>Рецензии пользователя</h2>
+    {reviews.length === 0 ? (
+      <p>Пользователь еще не написал ни одной рецензии</p>
+    ) : (
+      <div className="reviews-list">
+        {reviews.map((review) => {
+          const rating = review.ratingId;
+          const blockAvgs = computeBlockAverages(rating?.scores);
+          const film = review.filmId || review.film;
+          const combinedScore = rating?.combinedScore ?? rating?.finalScore;
+          const vibe = rating?.vibe;
+          const technical = rating?.technicalScore;
+
+          return (
+            <div key={review._id} className="review-item">
+              <div className="review-header">
+                <Link to={`/film/${film?._id}`} className="review-film-link">
+                  <h3 className="review-title">{review.title}</h3>
+                  <p className="review-film-name">
+                    🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
+                  </p>
+                </Link>
+
+                {combinedScore != null && (
+                  <div
+                    className="review-rating-badge"
+                    style={{ color: getScoreColor(combinedScore) }}
+                    title="Комбинированный балл"
+                  >
+                    ★ {combinedScore}
+                  </div>
+                )}
+              </div>
+
+              <p className="review-text">{review.text}</p>
+
+              {rating && (
+                <div className="review-criteria-summary">
+                  <div className="criteria-summary-row">
+                    {technical != null && (
+                      <div className="summary-pill">
+                        <span className="summary-pill-label">Технический</span>
+                        <span
+                          className="summary-pill-value"
+                          style={{ color: getScoreColor(technical) }}
+                        >
+                          {technical}
                         </span>
                       </div>
-                      <Link to={`/film/${review.film?._id || review.filmId?._id}`} className="review-go-to-film">
-                        🎬 Перейти к фильму
-                      </Link>
+                    )}
+                    <div className="summary-pill">
+                      <span className="summary-pill-label">Вайб</span>
+                      <span className="summary-pill-value">
+                        {vibe ?? '—'}
+                        {vibe != null && <span className="summary-pill-suffix">/10</span>}
+                      </span>
                     </div>
+                    {combinedScore != null && (
+                      <div className="summary-pill">
+                        <span className="summary-pill-label">Комбо</span>
+                        <span
+                          className="summary-pill-value"
+                          style={{ color: getScoreColor(combinedScore) }}
+                        >
+                          {combinedScore}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                ))}
+
+                  {blockAvgs && (
+                    <div className="criteria-blocks-row">
+                      {Object.entries(blockAvgs).map(([key, avg]) =>
+                        avg != null ? (
+                          <div key={key} className="criteria-block-chip">
+                            <span className="chip-label">
+                              {BLOCK_CRITERIA_LABELS[key].name}
+                            </span>
+                            <span className="chip-value">{avg}</span>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="review-footer">
+                <div className="review-actions">
+                  <button className="like-btn" onClick={() => likeReview(review._id)}>
+                    ❤️ {review.likes?.length || 0}
+                  </button>
+                  <span className="review-date">
+                    📅 {formatDate(review.createdAt)}
+                  </span>
+                </div>
+                <Link to={`/film/${film?._id}`} className="review-go-to-film">
+                  🎬 Перейти к фильму
+                </Link>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          );
+        })}
       </div>
+    )}
+  </div>
+)}       
 
       <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
     </div>
