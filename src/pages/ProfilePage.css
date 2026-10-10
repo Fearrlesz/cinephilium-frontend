@@ -4,6 +4,7 @@
 .profile-page {
   max-width: 900px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .profile-header {
@@ -109,6 +110,8 @@
   padding: 24px 28px;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-ratings h2,
@@ -120,7 +123,6 @@
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
-/* Декоративные подчёркивания под заголовками удалены */
 
 /* Заголовок вкладки с сортировкой */
 .profile-ratings-header {
@@ -148,6 +150,8 @@
   border-radius: 10px;
   border-left: 3px solid var(--glass-border);
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .rating-item:hover {
@@ -207,6 +211,8 @@
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-tabs:hover {
@@ -270,7 +276,6 @@
 
 /* ============================================================
    КАРТОЧКА РЕЦЕНЗИИ В ПРОФИЛЕ — золото
-   (без фиолетовой полосы слева)
    ============================================================ */
 .review-item {
   background: rgba(0, 0, 0, 0.14);
@@ -281,6 +286,8 @@
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .review-item:hover {
@@ -442,16 +449,16 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  flex-wrap: nowrap;      /* ← запрещаем перенос */
+  flex-wrap: nowrap;
   white-space: nowrap;
 }
 
 .sort-btn {
-  flex: 0 0 auto;         /* кнопки не растягиваются и не сжимаются */
+  flex: 0 0 auto;
   padding: 6px 14px;
   font-size: 13px;
   font-family: var(--font-sans);
-  font-weight: 600;       /* ← всегда одинаковый вес, чтобы не «прыгала» ширина */
+  font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
   border-radius: 8px;
@@ -464,8 +471,6 @@
   width: auto;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-
-  /* ← анимируем только цвета, не размеры/вес */
   transition: background-color 0.2s ease,
               border-color     0.2s ease,
               color            0.2s ease;
@@ -481,7 +486,130 @@
   border-color: rgba(168, 133, 64, 0.55);
   background: rgba(168, 133, 64, 0.14);
   color: var(--gold-bright);
-  /* font-weight НЕ трогаем — иначе кнопка меняет ширину и «скачет» */
+}
+
+/* ============================================================
+   БЛОК СРЕДНИХ ПО КРИТЕРИЯМ В КАРТОЧКЕ РЕЦЕНЗИИ ПРОФИЛЯ
+   (Новый дизайн: крупная цифра + ряд цифр с тултипами)
+   ============================================================ */
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin-bottom: 10px;
+}
+
+.review-film-link {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.review-title,
+.review-film-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Контейнер для общей оценки и блочных оценок */
+.review-criteria-summary {
+  margin: 16px 0 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Выравнивание по левому краю */
+  gap: 6px;
+}
+
+/* Общая цифра (крупная) */
+.review-rating-badge {
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+/* Ряд цифр по блокам */
+.criteria-blocks-row {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Обёртка для одной цифры */
+.criteria-block-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: default;
+}
+
+/* Сама цифра */
+.chip-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gold-bright);
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.criteria-block-chip:hover .chip-value {
+  color: var(--text-primary);
+}
+
+/* Всплывающая подсказка (скрытая) */
+.chip-label {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  background: #222222;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+
+/* Стрелочка у тултипа */
+.chip-label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #222222 transparent transparent transparent;
+}
+
+/* Показ тултипа при наведении */
+.criteria-block-chip:hover .chip-label {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
 }
 
 /* ============================================================
@@ -491,7 +619,7 @@
   .profile-header {
     flex-direction: column;
     text-align: center;
-    padding: 20px;
+    padding: 20px 16px;
   }
   .profile-stats {
     justify-content: center;
@@ -500,6 +628,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+    padding: 12px;
   }
   .rating-film-info {
     justify-content: center;
@@ -530,20 +659,18 @@
 
   .profile-ratings,
   .profile-reviews {
-    padding: 16px;
+    padding: 16px 8px;
+    border-radius: 12px;
   }
 
   .review-item {
-    padding: 16px 18px;
+    padding: 16px 12px;
+    border-radius: 8px;
   }
 
   .review-header {
     flex-direction: column;
-  }
-
-  .review-rating {
-    align-self: flex-start;
-    font-size: 13px;
+    gap: 8px;
   }
 
   .review-title {
@@ -575,42 +702,67 @@
 }
 
 @media (max-width: 480px) {
+  .profile-page {
+    padding: 0 4px;
+  }
+
+  .profile-ratings,
+  .profile-reviews {
+    padding: 12px 4px;
+    border-radius: 8px;
+  }
+
   .tab-btn {
     padding: 12px 14px;
     font-size: 13px;
   }
+  
   .review-item {
-    padding: 14px 14px;
+    padding: 14px 10px;
+    border-radius: 8px;
   }
+  
   .review-title {
     font-size: 15px;
   }
+  
   .review-text {
     font-size: 13px;
   }
-  .review-rating {
-    font-size: 12px;
-    padding: 2px 10px;
-  }
-  .like-btn {
-    font-size: 13px;
-    padding: 4px 10px;
-  }
+
   .review-go-to-film {
     font-size: 13px;
     padding: 6px 14px;
   }
-  .profile-ratings,
-  .profile-reviews {
-    padding: 12px;
+
+  /* Адаптив нового блока с оценками */
+  .review-criteria-summary {
+    margin: 10px 0 8px;
+    gap: 4px;
+  }
+
+  .review-rating-badge {
+    font-size: 24px; /* Уменьшаем общую цифру на телефонах */
+  }
+
+  .criteria-blocks-row {
+    gap: 4px;
+  }
+
+  .chip-value {
+    font-size: 13px;
+  }
+
+  .chip-label {
+    font-size: 11px;
+    padding: 4px 8px;
+    bottom: calc(100% + 6px);
   }
 }
 
 /* ============================================================
    АДАПТИВ: КНОПКИ СОРТИРОВКИ
    ============================================================ */
-
-/* Планшет — ещё в строку, но компактнее */
 @media (max-width: 768px) {
   .sort-controls {
     gap: 6px;
@@ -621,17 +773,16 @@
   }
 }
 
-/* Телефон — ровно 2 кнопки в строку, фиксированная ширина */
 @media (max-width: 480px) {
   .sort-controls {
-    flex-wrap: wrap;             /* ← разрешаем перенос */
+    flex-wrap: wrap;
     justify-content: flex-start;
-    width: 100%;                 /* контейнер на всю ширину */
+    width: 100%;
     gap: 6px;
   }
 
   .sort-btn {
-    flex: 1 1 calc(50% - 3px);   /* ← ровно 2 кнопки в строку, не зависят от текста */
+    flex: 1 1 calc(50% - 3px);
     min-width: 0;
     padding: 6px 8px;
     font-size: 12px;
@@ -643,196 +794,10 @@
   }
 }
 
-/* Очень узкий экран — по одной в строку, ещё компактнее */
 @media (max-width: 360px) {
   .sort-btn {
-    flex: 1 1 100%;              /* по одной кнопке в строку */
+    flex: 1 1 100%;
     padding: 5px 6px;
     font-size: 11px;
-  }
-}
-
-
-/* ============================================================
-   БЛОК СРЕДНИХ ПО КРИТЕРИЯМ В КАРТОЧКЕ РЕЦЕНЗИИ ПРОФИЛЯ
-   ============================================================ */
-
-.review-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: nowrap;      /* ← бейдж с оценкой не переносится на новую строку */
-  margin-bottom: 10px;
-}
-
-.review-film-link {
-  min-width: 0;           /* ← чтобы длинное название обрезалось, а не толкало бейдж */
-  flex: 1 1 auto;
-}
-
-.review-title,
-.review-film-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.review-rating-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background: rgba(168, 133, 64, 0.08);
-  border: 1px solid rgba(168, 133, 64, 0.22);
-  border-radius: 20px;
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  flex: 0 0 auto;
-  align-self: flex-start;
-}
-
-/* ---------- Сводка: Технический / Вайб / Комбо ---------- */
-.review-criteria-summary {
-  margin: 14px 0 12px;
-  padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.criteria-summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.summary-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  font-size: 13px;
-  line-height: 1;
-}
-
-.summary-pill-label {
-  color: var(--text-secondary);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-}
-
-.summary-pill-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  color: var(--gold-bright);
-  font-variant-numeric: tabular-nums;
-}
-
-.summary-pill-suffix {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-left: 1px;
-}
-
-/* ---------- Средние по 5 блокам ---------- */
-.criteria-blocks-row {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));   /* ← всегда 5 в ряд */
-  gap: 8px;
-}
-
-.criteria-block-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 6px;
-  background: rgba(168, 133, 64, 0.05);
-  border: 1px solid rgba(168, 133, 64, 0.16);
-  border-radius: 8px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.criteria-block-chip:hover {
-  background: rgba(168, 133, 64, 0.10);
-  border-color: rgba(168, 133, 64, 0.32);
-}
-
-.chip-label {
-  font-size: 10.5px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.chip-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--gold-bright);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-}
-
-/* ---------- Адаптив ---------- */
-@media (max-width: 480px) {
-  .review-criteria-summary {
-    padding: 10px 12px;
-    margin: 12px 0 10px;
-  }
-
-  /* 5 чипов в один ряд, но компактнее */
-  .criteria-blocks-row {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px;
-  }
-
-  .criteria-block-chip {
-    padding: 6px 2px;
-    gap: 2px;
-    border-radius: 6px;
-  }
-
-  .chip-label {
-    font-size: 8.5px;              /* ← уменьшаем, чтобы влезало */
-    letter-spacing: 0.02em;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .chip-value {
-    font-size: 13px;
-    line-height: 1;
-  }
-
-  .summary-pill {
-    padding: 5px 12px;
-    font-size: 12px;
-  }
-
-  .summary-pill-label {
-    font-size: 11px;
-  }
-
-  .review-rating-badge {
-    padding: 4px 10px;
-    font-size: 12.5px;
-    gap: 4px;
   }
 }
