@@ -21,6 +21,7 @@ function ProfilePage() {
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
   const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
+
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
@@ -34,38 +35,43 @@ function ProfilePage() {
     loadProfile();
   }, [navigate]);
 
-  const loadAchievementProgress = useCallback(async (userData) => {
-    try {
-      const response = await api.get('/users/me/achievements');
-      if (response.data?.achievements) {
-        const oldAchievements = userData?.achievements || [];
-        const newAchievements = response.data.achievements;
-        const freshAchievements = newAchievements.filter(ach => !oldAchievements.includes(ach));
+  const loadAchievementProgress = useCallback(
+    async (userData) => {
+      try {
+        const response = await api.get('/users/me/achievements');
+        if (response.data?.achievements) {
+          const oldAchievements = userData?.achievements || [];
+          const newAchievements = response.data.achievements;
+          const freshAchievements = newAchievements.filter(
+            (ach) => !oldAchievements.includes(ach)
+          );
 
-        if (freshAchievements.length > 0) {
-          try {
-            await addEvent({
-              type: 'achievement',
-              user: userData?.nickname || 'Пользователь',
-              film: 'система',
-              filmId: 'system',
-              metadata: { achievements: freshAchievements }
-            });
-          } catch (err) {
-            console.error('Ошибка создания события о достижениях:', err);
+          if (freshAchievements.length > 0) {
+            try {
+              await addEvent({
+                type: 'achievement',
+                user: userData?.nickname || 'Пользователь',
+                film: 'система',
+                filmId: 'system',
+                metadata: { achievements: freshAchievements },
+              });
+            } catch (err) {
+              console.error('Ошибка создания события о достижениях:', err);
+            }
           }
-        }
 
-        setUser({
-          ...userData,
-          achievements: newAchievements,
-          totalPoints: response.data.totalPoints || userData?.totalPoints || 0
-        });
+          setUser({
+            ...userData,
+            achievements: newAchievements,
+            totalPoints: response.data.totalPoints || userData?.totalPoints || 0,
+          });
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки прогресса достижений:', err);
       }
-    } catch (err) {
-      console.error('Ошибка загрузки прогресса достижений:', err);
-    }
-  }, [addEvent]);
+    },
+    [addEvent]
+  );
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
@@ -73,7 +79,7 @@ function ProfilePage() {
       const [userResponse, ratingsResponse, reviewsResponse] = await Promise.all([
         api.get('/auth/me'),
         api.get('/ratings/user'),
-        api.get('/reviews/user')
+        api.get('/reviews/user'),
       ]);
       const userData = userResponse.data;
       setUser(userData);
@@ -94,28 +100,44 @@ function ProfilePage() {
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
-    showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });
+    showNotification({
+      title: 'До свидания!',
+      message: 'Вы вышли из аккаунта',
+      type: 'info',
+    });
   };
 
   const openRatingDetails = async (rating) => {
     try {
       const ratingId = rating._id || rating.id;
       if (!ratingId) {
-        showNotification({ title: 'Ошибка', message: 'ID оценки не найден', type: 'error' });
+        showNotification({
+          title: 'Ошибка',
+          message: 'ID оценки не найден',
+          type: 'error',
+        });
         return;
       }
       const response = await api.get(`/ratings/${ratingId}/details`);
       setSelectedRating(response.data);
     } catch (err) {
       console.error('Ошибка загрузки деталей оценки:', err);
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось загрузить детали оценки', type: 'error' });
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось загрузить детали оценки',
+        type: 'error',
+      });
     }
   };
 
   const likeReview = async (reviewId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы ставить лайки', type: 'warning' });
+      showNotification({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы ставить лайки',
+        type: 'warning',
+      });
       navigate('/login');
       return;
     }
@@ -123,9 +145,17 @@ function ProfilePage() {
       await api.post(`/reviews/${reviewId}/like`);
       const response = await api.get('/reviews/user');
       setReviews(response.data || []);
-      showNotification({ title: 'Лайк поставлен!', message: 'Вы оценили рецензию', type: 'success' });
+      showNotification({
+        title: 'Лайк поставлен!',
+        message: 'Вы оценили рецензию',
+        type: 'success',
+      });
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось поставить лайк', type: 'error' });
+      showNotification({
+        title: 'Ошибка',
+        message: err.response?.data?.error || 'Не удалось поставить лайк',
+        type: 'error',
+      });
     }
   };
 
@@ -140,9 +170,17 @@ function ProfilePage() {
     try {
       const response = await api.post('/admin/make', { secretKey: adminSecret });
       setAdminSuccess(response.data.message);
-      setUser(prev => ({ ...prev, isAdmin: true, totalPoints: response.data.totalPoints }));
+      setUser((prev) => ({
+        ...prev,
+        isAdmin: true,
+        totalPoints: response.data.totalPoints,
+      }));
       setAdminSecret('');
-      showNotification({ title: 'Поздравляем!', message: 'Вы стали администратором! 👑', type: 'success' });
+      showNotification({
+        title: 'Поздравляем!',
+        message: 'Вы стали администратором! 👑',
+        type: 'success',
+      });
     } catch (err) {
       setAdminError(err.response?.data?.error || 'Ошибка активации');
     } finally {
@@ -154,7 +192,8 @@ function ProfilePage() {
   const sortedRatings = useMemo(() => {
     const getCombined = (r) =>
       (typeof r.combinedScore === 'number' ? r.combinedScore : null) ??
-      (typeof r.finalScore === 'number' ? r.finalScore : null) ?? 0;
+      (typeof r.finalScore === 'number' ? r.finalScore : null) ??
+      0;
 
     const getTime = (r) => new Date(r.createdAt || 0).getTime();
 
@@ -183,43 +222,72 @@ function ProfilePage() {
 
   /* ===== UI сортировки (без эмодзи и без неона) ===== */
   const sortOptions = [
-    { key: 'newest',  label: 'Новые' },
-    { key: 'oldest',  label: 'Старые' },
+    { key: 'newest', label: 'Новые' },
+    { key: 'oldest', label: 'Старые' },
     { key: 'highest', label: 'Высокие' },
-    { key: 'lowest',  label: 'Низкие' }
+    { key: 'lowest', label: 'Низкие' },
   ];
 
   return (
     <div className={`container profile-page ${isExclusive ? 'exclusive-theme' : ''}`}>
-      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
+      <button onClick={() => navigate('/')} className="back-btn">
+        ← На главную
+      </button>
 
+      {/* ===================== ШАПКА ПРОФИЛЯ ===================== */}
       <div className="profile-header glass-card">
         <div className="profile-avatar">
           <div className="avatar-placeholder">{user.nickname?.[0] || '?'}</div>
         </div>
+
         <div className="profile-info">
           <h1>
             {user.nickname || 'Пользователь'}
             {user.isAdmin && <span className="admin-badge"> 👑</span>}
-
             {isExclusive && (
               <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
             )}
           </h1>
 
           <p>📧 {user.email}</p>
+
           <div className="profile-stats">
-            <p>🏆 Всего оценок: <strong>{ratings.length}</strong></p>
-            <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
-            <p>⭐ Баллов: <strong>{user.totalPoints || 0}</strong></p>
+            <p>
+              🏆 Всего оценок: <strong>{ratings.length}</strong>
+            </p>
+            <p>
+              📝 Рецензий: <strong>{reviews.length}</strong>
+            </p>
+            <p>
+              ⭐ Баллов: <strong>{user.totalPoints || 0}</strong>
+            </p>
           </div>
 
+          {/* --------- Достижения --------- */}
           <div className="achievements-section" style={{ marginTop: '20px' }}>
             <h3>🏅 Достижения</h3>
             {user.achievements?.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
-                {user.achievements.map(ach => (
-                  <div key={ach} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '10px',
+                  marginTop: '10px',
+                }}
+              >
+                {user.achievements.map((ach) => (
+                  <div
+                    key={ach}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px',
+                      background: 'rgba(255,255,255,0.05)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                  >
                     <span style={{ fontSize: '24px' }}>🏅</span>
                     <div>
                       <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
@@ -228,26 +296,42 @@ function ProfilePage() {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#888', padding: '10px 0' }}>Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!</p>
+              <p style={{ color: '#888', padding: '10px 0' }}>
+                Нет достижений. Начните оценивать фильмы, писать рецензии и комментарии!
+              </p>
             )}
           </div>
 
+          {/* --------- Активация админа --------- */}
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
               <h4>🔑 Стать администратором</h4>
-              <p className="admin-hint">Введите секретный ключ, чтобы получить права администратора</p>
+              <p className="admin-hint">
+                Введите секретный ключ, чтобы получить права администратора
+              </p>
               <div className="admin-form">
-                <input type="password" placeholder="Секретный ключ..." value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)} />
-                <button onClick={activateAdmin} disabled={adminLoading}>{adminLoading ? 'Проверка...' : '👑 Активировать'}</button>
+                <input
+                  type="password"
+                  placeholder="Секретный ключ..."
+                  value={adminSecret}
+                  onChange={(e) => setAdminSecret(e.target.value)}
+                />
+                <button onClick={activateAdmin} disabled={adminLoading}>
+                  {adminLoading ? 'Проверка...' : '👑 Активировать'}
+                </button>
               </div>
               {adminError && <div className="error-msg">{adminError}</div>}
               {adminSuccess && <div className="success-msg">{adminSuccess}</div>}
             </div>
           )}
-          <button onClick={logout} className="logout-btn">🚪 Выйти</button>
+
+          <button onClick={logout} className="logout-btn">
+            🚪 Выйти
+          </button>
         </div>
       </div>
 
+      {/* ===================== ТАБЫ ===================== */}
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
           <button
@@ -264,164 +348,202 @@ function ProfilePage() {
           </button>
         </div>
 
-    {activeTab === 'ratings' && (
-  <div className="profile-ratings">
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-      <h2 style={{ margin: 0 }}>Мои оценки</h2>
-
-      {ratings.length > 0 && (
-        <div className="sort-controls">
-          {sortOptions.map(opt => (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => setSortBy(opt.key)}
-              className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+        {/* --------- Таб: Мои оценки --------- */}
+        {activeTab === 'ratings' && (
+          <div className="profile-ratings">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '10px',
+              }}
             >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+              <h2 style={{ margin: 0 }}>Мои оценки</h2>
 
-    {ratings.length === 0 ? (
-      <p>Вы еще не оценили ни одного фильма</p>
-    ) : (
-      <div className="ratings-list" style={{ marginTop: '15px' }}>
-        {sortedRatings.map((rating) => (
-          <div key={rating._id} className="rating-item">
-            <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
-              <div className="rating-film-info">
-                <img src={rating.filmId?.poster || rating.film?.poster || '/no-poster.jpg'} alt={rating.filmId?.title || rating.film?.title || 'Фильм'} className="rating-poster-small" />
-                <div>
-                  <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
-                  <p>{rating.filmId?.year || rating.film?.year}</p>
-                </div>
-              </div>
-            </Link>
-            <div className="rating-score" style={{ color: getScoreColor(rating.combinedScore ?? rating.finalScore) }}>
-              {rating.combinedScore ?? rating.finalScore}
-            </div>
-            <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
-
-{activeTab === 'reviews' && (
-  <div className="profile-reviews">
-    <h2>Мои рецензии</h2>
-    {reviews.length === 0 ? (
-      <p>Вы еще не написали ни одной рецензии</p>
-    ) : (
-      <div className="reviews-list">
-        {reviews.map((review) => {
-          const rating = review.ratingId;
-          const blockAvgs = computeBlockAverages(rating?.scores);
-          const film = review.filmId || review.film;
-          const combinedScore = rating?.combinedScore ?? rating?.finalScore;
-          const vibe = rating?.vibe;
-          const technical = rating?.technicalScore;
-
-          return (
-            <div key={review._id} className="review-item">
-              <div className="review-header">
-                <Link to={`/film/${film?._id}`} className="review-film-link">
-                  <h3 className="review-title">{review.title}</h3>
-                  <p className="review-film-name">
-                    🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
-                  </p>
-                </Link>
-
-                {combinedScore != null && (
-                  <div
-                    className="review-rating-badge"
-                    style={{ color: getScoreColor(combinedScore) }}
-                    title="Комбинированный балл"
-                  >
-                    ★ {combinedScore}
-                  </div>
-                )}
-              </div>
-
-              <p className="review-text">{review.text}</p>
-
-              {rating && (
-                <div className="review-criteria-summary">
-                  <div className="criteria-summary-row">
-                    {technical != null && (
-                      <div className="summary-pill">
-                        <span className="summary-pill-label">Технический</span>
-                        <span
-                          className="summary-pill-value"
-                          style={{ color: getScoreColor(technical) }}
-                        >
-                          {technical}
-                        </span>
-                      </div>
-                    )}
-                    <div className="summary-pill">
-                      <span className="summary-pill-label">Вайб</span>
-                      <span className="summary-pill-value">
-                        {vibe ?? '—'}
-                        {vibe != null && <span className="summary-pill-suffix">/10</span>}
-                      </span>
-                    </div>
-                    {combinedScore != null && (
-                      <div className="summary-pill">
-                        <span className="summary-pill-label">Комбо</span>
-                        <span
-                          className="summary-pill-value"
-                          style={{ color: getScoreColor(combinedScore) }}
-                        >
-                          {combinedScore}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {blockAvgs && (
-                    <div className="criteria-blocks-row">
-                      {Object.entries(blockAvgs).map(([key, avg]) =>
-                        avg != null ? (
-                          <div key={key} className="criteria-block-chip">
-                            <span className="chip-label">
-                              {BLOCK_CRITERIA_LABELS[key].name}
-                            </span>
-                            <span className="chip-value">{avg}</span>
-                          </div>
-                        ) : null
-                      )}
-                    </div>
-                  )}
+              {ratings.length > 0 && (
+                <div className="sort-controls">
+                  {sortOptions.map((opt) => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setSortBy(opt.key)}
+                      className={`sort-btn ${sortBy === opt.key ? 'active' : ''}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               )}
-
-              <div className="review-footer">
-                <div className="review-actions">
-                  <button className="like-btn" onClick={() => likeReview(review._id)}>
-                    ❤️ {review.likes?.length || 0}
-                  </button>
-                  <span className="review-date">
-                    📅 {formatDate(review.createdAt)}
-                  </span>
-                </div>
-                <Link to={`/film/${film?._id}`} className="review-go-to-film">
-                  🎬 Перейти к фильму
-                </Link>
-              </div>
             </div>
-          );
-        })}
-      </div>
-    )}
-  </div>
-)}
 
-      <RatingDetailsModal rating={selectedRating} onClose={() => setSelectedRating(null)} />
+            {ratings.length === 0 ? (
+              <p>Вы еще не оценили ни одного фильма</p>
+            ) : (
+              <div className="ratings-list" style={{ marginTop: '15px' }}>
+                {sortedRatings.map((rating) => (
+                  <div key={rating._id} className="rating-item">
+                    <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
+                      <div className="rating-film-info">
+                        <img
+                          src={
+                            rating.filmId?.poster ||
+                            rating.film?.poster ||
+                            '/no-poster.jpg'
+                          }
+                          alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
+                          className="rating-poster-small"
+                        />
+                        <div>
+                          <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>
+                          <p>{rating.filmId?.year || rating.film?.year}</p>
+                        </div>
+                      </div>
+                    </Link>
+                    <div
+                      className="rating-score"
+                      style={{
+                        color: getScoreColor(rating.combinedScore ?? rating.finalScore),
+                      }}
+                    >
+                      {rating.combinedScore ?? rating.finalScore}
+                    </div>
+                    <button
+                      className="details-btn"
+                      onClick={() => openRatingDetails(rating)}
+                    >
+                      🔍 Детали
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --------- Таб: Мои рецензии --------- */}
+        {activeTab === 'reviews' && (
+          <div className="profile-reviews">
+            <h2>Мои рецензии</h2>
+            {reviews.length === 0 ? (
+              <p>Вы еще не написали ни одной рецензии</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => {
+                  const rating = review.ratingId;
+                  const blockAvgs = computeBlockAverages(rating?.scores);
+                  const film = review.filmId || review.film;
+                  const combinedScore = rating?.combinedScore ?? rating?.finalScore;
+                  const vibe = rating?.vibe;
+                  const technical = rating?.technicalScore;
+
+                  return (
+                    <div key={review._id} className="review-item">
+                      <div className="review-header">
+                        <Link to={`/film/${film?._id}`} className="review-film-link">
+                          <h3 className="review-title">{review.title}</h3>
+                          <p className="review-film-name">
+                            🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
+                          </p>
+                        </Link>
+
+                        {combinedScore != null && (
+                          <div
+                            className="review-rating-badge"
+                            style={{ color: getScoreColor(combinedScore) }}
+                            title="Комбинированный балл"
+                          >
+                            ★ {combinedScore}
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="review-text">{review.text}</p>
+
+                      {rating && (
+                        <div className="review-criteria-summary">
+                          <div className="criteria-summary-row">
+                            {technical != null && (
+                              <div className="summary-pill">
+                                <span className="summary-pill-label">Технический</span>
+                                <span
+                                  className="summary-pill-value"
+                                  style={{ color: getScoreColor(technical) }}
+                                >
+                                  {technical}
+                                </span>
+                              </div>
+                            )}
+                            <div className="summary-pill">
+                              <span className="summary-pill-label">Вайб</span>
+                              <span className="summary-pill-value">
+                                {vibe ?? '—'}
+                                {vibe != null && (
+                                  <span className="summary-pill-suffix">/10</span>
+                                )}
+                              </span>
+                            </div>
+                            {combinedScore != null && (
+                              <div className="summary-pill">
+                                <span className="summary-pill-label">Комбо</span>
+                                <span
+                                  className="summary-pill-value"
+                                  style={{ color: getScoreColor(combinedScore) }}
+                                >
+                                  {combinedScore}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {blockAvgs && (
+                            <div className="criteria-blocks-row">
+                              {Object.entries(blockAvgs).map(([key, avg]) =>
+                                avg != null ? (
+                                  <div key={key} className="criteria-block-chip">
+                                    <span className="chip-label">
+                                      {BLOCK_CRITERIA_LABELS[key].name}
+                                    </span>
+                                    <span className="chip-value">{avg}</span>
+                                  </div>
+                                ) : null
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="review-footer">
+                        <div className="review-actions">
+                          <button
+                            className="like-btn"
+                            onClick={() => likeReview(review._id)}
+                          >
+                            ❤️ {review.likes?.length || 0}
+                          </button>
+                          <span className="review-date">
+                            📅 {formatDate(review.createdAt)}
+                          </span>
+                        </div>
+                        <Link to={`/film/${film?._id}`} className="review-go-to-film">
+                          🎬 Перейти к фильму
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ===== Модалка — вне табов, на уровне контейнера ===== */}
+      <RatingDetailsModal
+        rating={selectedRating}
+        onClose={() => setSelectedRating(null)}
+      />
     </div>
   );
 }
