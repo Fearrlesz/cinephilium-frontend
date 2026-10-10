@@ -1,33 +1,24 @@
 /* ============================================================
-   ПРОФИЛЬ — золото (без неона)
-   Переработанный дизайн: чище, консистентнее, отзывчивее
+   ПРОФИЛЬ — золото (без неона и без фиолетовых полосок)
    ============================================================ */
-
-/* ------------------------------------------------------------
-   Контейнер страницы
-   ------------------------------------------------------------ */
 .profile-page {
-  width: 100%;
-  max-width: 100%;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-/* ------------------------------------------------------------
-   Шапка профиля
-   ------------------------------------------------------------ */
 .profile-header {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 28px;
-  padding: 28px 32px;
-  margin-bottom: 28px;
-  overflow: hidden;
+  gap: 30px;
   background: var(--bg-glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  padding: 28px 32px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-header::before {
@@ -37,32 +28,24 @@
   left: 15%;
   width: 70%;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(168, 133, 64, 0.5),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(168, 133, 64, 0.5), transparent);
   opacity: 0.35;
-  pointer-events: none;
 }
 
 .profile-avatar {
-  flex-shrink: 0;
   width: 80px;
   height: 80px;
+  border-radius: 50%;
+  background: rgba(168, 133, 64, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid var(--gold);
-  border-radius: 50%;
-  background: rgba(168, 133, 64, 0.06);
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .profile-avatar:hover {
   border-color: var(--gold-bright);
-  transform: scale(1.04);
 }
 
 .avatar-placeholder {
@@ -70,108 +53,85 @@
   font-weight: 700;
   font-size: 32px;
   color: var(--gold-bright);
-  line-height: 1;
-}
-
-.profile-info {
-  flex: 1;
-  min-width: 0;
 }
 
 .profile-info h1 {
-  margin: 0 0 4px;
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 24px;
-  line-height: 1.2;
+  margin-bottom: 4px;
   color: var(--text-primary);
 }
-
 .profile-info p {
-  margin: 0 0 2px;
-  font-size: 14px;
   color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 2px;
 }
 
 .profile-stats {
   display: flex;
-  flex-wrap: wrap;
   gap: 20px;
+  flex-wrap: wrap;
   margin: 8px 0;
 }
-
 .profile-stats p {
-  margin: 0;
   font-size: 13px;
   color: var(--text-secondary);
 }
-
 .profile-stats strong {
   color: var(--gold-bright);
-  font-weight: 700;
 }
 
-/* Кнопка выхода */
 .logout-btn {
-  width: auto;
-  margin-top: 8px;
   padding: 8px 20px;
+  border-radius: 40px;
+  border: 1px solid rgba(236, 72, 153, 0.22);
+  background: transparent;
+  color: var(--neon-pink);
+  cursor: pointer;
   font-family: var(--font-sans);
   font-size: 13px;
+  transition: all 0.3s;
+  margin-top: 8px;
+  width: auto;
   font-weight: 400;
-  color: var(--neon-pink);
-  background: transparent;
-  border: 1px solid rgba(236, 72, 153, 0.22);
-  border-radius: 40px;
   box-shadow: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
-
 .logout-btn:hover {
   background: rgba(236, 72, 153, 0.08);
-  border-color: rgba(236, 72, 153, 0.4);
 }
 
-.logout-btn:focus-visible {
-  outline: 2px solid var(--neon-pink);
-  outline-offset: 2px;
-}
-
-/* ------------------------------------------------------------
-   Карточки: оценки / рецензии
-   ------------------------------------------------------------ */
 .profile-ratings,
 .profile-reviews {
-  padding: 24px 28px;
   background: var(--bg-glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  padding: 24px 28px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
 }
 
 .profile-ratings h2,
 .profile-reviews h2 {
-  margin: 0 0 16px;
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 20px;
-  letter-spacing: -0.02em;
   color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
 }
+/* Декоративные подчёркивания под заголовками удалены */
 
-.profile-ratings-header-row {
+/* Заголовок вкладки с сортировкой */
+.profile-ratings-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
 }
 
-/* ------------------------------------------------------------
-   Список оценок
-   ------------------------------------------------------------ */
+.profile-ratings-header h2 {
+  margin-bottom: 8px;
+}
+
 .ratings-list {
   display: flex;
   flex-direction: column;
@@ -181,60 +141,52 @@
 
 .rating-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  align-items: center;
   padding: 10px 16px;
   background: rgba(0, 0, 0, 0.14);
-  border-left: 3px solid var(--glass-border);
   border-radius: 10px;
-  transition: background-color 0.3s ease, border-left-color 0.3s ease;
+  border-left: 3px solid var(--glass-border);
+  transition: all 0.3s ease;
 }
 
 .rating-item:hover {
-  background: rgba(0, 0, 0, 0.2);
   border-left-color: var(--gold);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .rating-film-info {
   display: flex;
   align-items: center;
   gap: 14px;
-  min-width: 0;
-  color: inherit;
   text-decoration: none;
+  color: inherit;
 }
 
 .rating-poster-small {
-  flex-shrink: 0;
   width: 40px;
   height: 60px;
   object-fit: cover;
   border-radius: 6px;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.rating-film-info:hover .rating-poster-small {
-  transform: scale(1.05);
+.rating-poster-small:hover {
+  border-color: var(--gold);
 }
 
 .rating-film-info h4 {
-  margin: 0;
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   color: var(--text-primary);
-  word-break: break-word;
 }
-
 .rating-film-info p {
-  margin: 0;
-  font-size: 12px;
   color: var(--text-muted);
+  font-size: 12px;
 }
 
 .rating-score {
-  flex-shrink: 0;
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 20px;
@@ -242,18 +194,18 @@
   color: var(--gold-bright);
 }
 
-/* ------------------------------------------------------------
-   Вкладки профиля
-   ------------------------------------------------------------ */
+/* ============================================================
+   ВКЛАДКИ ПРОФИЛЯ
+   ============================================================ */
 .profile-tabs {
   margin-top: 20px;
   padding: 0;
   overflow: hidden;
-  background: var(--bg-glass);
-  border: 1px solid var(--glass-border);
   border-radius: 16px;
+  background: var(--bg-glass);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   transition: border-color 0.3s ease;
 }
 
@@ -269,25 +221,23 @@
 }
 
 .tab-btn {
-  position: relative;
   flex: 1;
-  width: auto;
-  margin: 0;
   padding: 16px 20px;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--text-secondary);
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
-  border-radius: 0;
-  box-shadow: none;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              background-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-bottom: 3px solid transparent;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  position: relative;
+  border-radius: 0;
+  width: auto;
+  margin-top: 0;
+  box-shadow: none;
 }
 
 .tab-btn:hover {
@@ -295,40 +245,42 @@
   background: rgba(168, 133, 64, 0.03);
 }
 
-.tab-btn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: -2px;
-}
-
 .tab-btn.active {
   color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.05);
   border-bottom-color: var(--gold);
+  background: rgba(168, 133, 64, 0.05);
 }
 
-/* ------------------------------------------------------------
-   Рецензии — широкая карточка: текст слева, оценка справа
-   ------------------------------------------------------------ */
-.reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+.tab-btn .tab-count {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 10px;
+  border-radius: 12px;
+  margin-left: 6px;
+  transition: all 0.3s ease;
 }
 
+.tab-btn.active .tab-count {
+  color: var(--gold-bright);
+  background: rgba(168, 133, 64, 0.08);
+}
+
+/* ============================================================
+   КАРТОЧКА РЕЦЕНЗИИ В ПРОФИЛЕ — золото
+   (без фиолетовой полосы слева)
+   ============================================================ */
 .review-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 22px;
-  align-items: stretch;
-  padding: 20px 24px;
-  overflow: visible;
   background: rgba(0, 0, 0, 0.14);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  transition: background-color 0.3s ease, border-color 0.3s ease,
-              transform 0.3s ease;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .review-item:hover {
@@ -337,83 +289,43 @@
   transform: translateY(-2px);
 }
 
-.review-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.review-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 12px;
-}
-
 .review-film-link {
-  flex: 1;
-  min-width: 0;
-  color: inherit;
   text-decoration: none;
+  color: inherit;
+  flex: 1;
 }
 
 .review-film-link:hover .review-title {
   color: var(--gold-bright);
 }
 
-.review-title {
-  margin: 0 0 4px;
-  font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
-  word-break: break-word;
-  transition: color 0.2s ease;
-}
-
 .review-film-name {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-secondary);
 }
 
-.review-text {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  white-space: pre-wrap;
-  word-break: break-word;
+.review-film-name .film-icon {
+  font-size: 16px;
 }
 
 .review-footer {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
-  margin-top: auto;
   padding-top: 14px;
   border-top: 1px solid var(--glass-border);
 }
 
-.review-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-}
-
 .review-date {
-  font-family: var(--font-mono);
   font-size: 13px;
   color: var(--text-muted);
+  font-family: var(--font-mono);
 }
 
 .review-go-to-film {
@@ -421,18 +333,15 @@
   align-items: center;
   gap: 8px;
   padding: 6px 20px;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--gold-bright);
-  text-decoration: none;
   background: rgba(168, 133, 64, 0.06);
+  color: var(--gold-bright);
   border: 1px solid rgba(168, 133, 64, 0.16);
   border-radius: 20px;
-  transition: background-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--font-sans);
 }
 
 .review-go-to-film:hover {
@@ -441,225 +350,20 @@
   transform: scale(1.03);
 }
 
-.review-go-to-film:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-/* ------------------------------------------------------------
-   Правая панель оценки
-   ------------------------------------------------------------ */
-.review-score-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  min-width: 190px;
-  max-width: 220px;
-  padding-left: 22px;
-  border-left: 1px solid var(--glass-border);
-  transition: border-color 0.3s ease;
-}
-
-.review-item:hover .review-score-panel {
-  border-left-color: rgba(168, 133, 64, 0.35);
-}
-
-.review-combined {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.review-combined-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 46px;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-
-.review-combined-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Сетка средних по блокам */
-.review-blocks {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  width: 100%;
-}
-
-.review-block-chip {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 7px 4px;
-  text-align: center;
-  background: rgba(168, 133, 64, 0.05);
-  border: 1px solid rgba(168, 133, 64, 0.16);
-  border-radius: 6px;
-  cursor: help;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.review-block-chip:hover {
-  background: rgba(168, 133, 64, 0.12);
-  border-color: rgba(168, 133, 64, 0.38);
-}
-
-.block-chip-label {
-  max-width: 100%;
-  font-size: 9.5px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.block-chip-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 14px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
-}
-
-/* ------------------------------------------------------------
-   Тултип блоков — fixed, позиционируется JS по краям экрана
-   ------------------------------------------------------------ */
-.block-tooltip {
-  z-index: 1000;
-  padding: 8px 12px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 1.4;
-  text-align: left;
-  white-space: normal;
-  word-break: break-word;
-  color: var(--text-primary);
-  background: rgba(18, 18, 22, 0.98);
-  border: 1px solid rgba(168, 133, 64, 0.45);
-  border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
-  pointer-events: none;
-  animation: blockTooltipFade 0.15s ease;
-}
-
-@keyframes blockTooltipFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ------------------------------------------------------------
-   Сортировка оценок
-   ------------------------------------------------------------ */
-.sort-controls {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.sort-btn {
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  width: auto;
-  margin: 0;
-  padding: 6px 14px;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  box-shadow: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-              color 0.2s ease;
-}
-
-.sort-btn:hover {
-  color: var(--text-primary);
-  background: rgba(168, 133, 64, 0.08);
-  border-color: rgba(168, 133, 64, 0.4);
-}
-
-.sort-btn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.sort-btn.active {
-  color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.14);
-  border-color: rgba(168, 133, 64, 0.55);
-}
-
-/* ------------------------------------------------------------
-   Достижения
-   ------------------------------------------------------------ */
-.achievements-section {
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.achievements-section:hover {
-  background: rgba(0, 0, 0, 0.18);
-  border-color: rgba(168, 133, 64, 0.4);
-}
-
-.achievements-section h3,
-.achievements-section h4 {
-  margin: 0 0 8px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.achievements-section h3 { font-size: 18px; }
-.achievements-section h4 { font-size: 16px; }
-
 /* Кнопка редактирования профиля */
 .btn-edit-profile {
   display: inline-block;
   padding: 8px 24px;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gold-bright);
-  text-decoration: none;
   background: rgba(168, 133, 64, 0.06);
+  color: var(--gold-bright);
   border: 1px solid rgba(168, 133, 64, 0.16);
   border-radius: 20px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--font-sans);
 }
 
 .btn-edit-profile:hover {
@@ -668,44 +372,138 @@
   transform: scale(1.03);
 }
 
-.btn-edit-profile:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+/* Пустое состояние */
+.profile-ratings .empty-state,
+.profile-reviews .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.profile-ratings .empty-state .empty-icon,
+.profile-reviews .empty-state .empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+.profile-ratings .empty-state p,
+.profile-reviews .empty-state p {
+  font-size: 15px;
+}
+
+/* ============================================================
+   ДОСТИЖЕНИЯ
+   ============================================================ */
+.achievements-section {
+  background: rgba(0, 0, 0, 0.14);
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.achievements-section:hover {
+  border-color: rgba(168, 133, 64, 0.4);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.achievements-section h3,
+.achievements-section h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.achievements-section h3 { font-size: 18px; }
+.achievements-section h4 { font-size: 16px; }
+
+.achievement-first-frame {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 165, 0, 0.05));
+  border: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.achievement-first-frame .achievement-icon {
+  animation: firstFrameGlow 2s ease-in-out infinite;
+}
+
+@keyframes firstFrameGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ============================================================
+   СОРТИРОВКА ОЦЕНОК (горизонтальный ряд, золото, без неона)
+   ============================================================ */
+.sort-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;      /* ← запрещаем перенос */
+  white-space: nowrap;
+}
+
+.sort-btn {
+  flex: 0 0 auto;         /* кнопки не растягиваются и не сжимаются */
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 600;       /* ← всегда одинаковый вес, чтобы не «прыгала» ширина */
+  letter-spacing: 0.01em;
+  line-height: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  box-shadow: none;
+  margin: 0;
+  width: auto;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+
+  /* ← анимируем только цвета, не размеры/вес */
+  transition: background-color 0.2s ease,
+              border-color     0.2s ease,
+              color            0.2s ease;
+}
+
+.sort-btn:hover {
+  background: rgba(168, 133, 64, 0.08);
+  border-color: rgba(168, 133, 64, 0.4);
+  color: var(--text-primary);
+}
+
+.sort-btn.active {
+  border-color: rgba(168, 133, 64, 0.55);
+  background: rgba(168, 133, 64, 0.14);
+  color: var(--gold-bright);
+  /* font-weight НЕ трогаем — иначе кнопка меняет ширину и «скачет» */
 }
 
 /* ============================================================
    АДАПТИВ
    ============================================================ */
-
-/* Планшет */
-@media (max-width: 900px) {
-  .review-score-panel {
-    min-width: 160px;
-    max-width: 180px;
-    padding-left: 18px;
-    gap: 12px;
-  }
-  .review-combined-value { font-size: 40px; }
-}
-
-/* Мобильные — оценка остаётся справа, панель сжимается */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .profile-header {
     flex-direction: column;
-    gap: 20px;
-    padding: 20px;
     text-align: center;
+    padding: 20px;
   }
-
-  .profile-info { width: 100%; }
-  .profile-stats { justify-content: center; }
-
+  .profile-stats {
+    justify-content: center;
+  }
   .rating-item {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  .rating-film-info { justify-content: center; }
+  .rating-film-info {
+    justify-content: center;
+  }
 
   .tabs-header {
     flex-direction: column;
@@ -714,16 +512,20 @@
 
   .tab-btn {
     padding: 14px 18px;
-    font-size: 14px;
-    text-align: left;
     border-bottom: none;
     border-left: 3px solid transparent;
+    text-align: left;
+    font-size: 14px;
   }
 
   .tab-btn.active {
-    background: rgba(168, 133, 64, 0.06);
     border-bottom-color: transparent;
     border-left-color: var(--gold);
+    background: rgba(168, 133, 64, 0.06);
+  }
+
+  .tab-btn .tab-count {
+    float: right;
   }
 
   .profile-ratings,
@@ -732,111 +534,104 @@
   }
 
   .review-item {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
-    padding: 14px;
+    padding: 16px 18px;
   }
 
-  .review-score-panel {
-    min-width: 106px;
-    max-width: 118px;
-    padding-left: 12px;
-    gap: 10px;
+  .review-header {
+    flex-direction: column;
   }
 
-  .review-combined-value { font-size: 32px; }
-  .review-combined-label {
-    font-size: 9.5px;
-    letter-spacing: 0.1em;
+  .review-rating {
+    align-self: flex-start;
+    font-size: 13px;
   }
 
-  /* На мобилке блоки — в столбик, чтобы панель не расширялась */
-  .review-blocks {
-    grid-template-columns: 1fr;
-    gap: 4px;
+  .review-title {
+    font-size: 16px;
   }
-
-  .review-block-chip { padding: 5px 4px; }
-  .block-chip-label { font-size: 9px; }
-  .block-chip-value { font-size: 12.5px; }
-
-  .review-title { font-size: 15px; }
-  .review-text  { font-size: 13px; }
 
   .review-footer {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
   }
-  .review-actions { justify-content: space-between; }
+
+  .review-actions {
+    justify-content: space-between;
+  }
+
   .review-go-to-film {
     justify-content: center;
-    padding: 8px 14px;
-    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .review-text {
+    font-size: 14px;
   }
 
   .profile-ratings h2,
-  .profile-reviews h2 { font-size: 18px; }
+  .profile-reviews h2 {
+    font-size: 18px;
+  }
 }
 
-/* Очень узкие экраны */
-@media (max-width: 400px) {
+@media (max-width: 480px) {
+  .tab-btn {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
   .review-item {
-    padding: 12px;
-    gap: 10px;
+    padding: 14px 14px;
   }
-
-  .review-score-panel {
-    min-width: 88px;
-    max-width: 96px;
-    padding-left: 8px;
-    gap: 8px;
+  .review-title {
+    font-size: 15px;
   }
-
-  .review-combined-value { font-size: 26px; }
-  .review-combined-label {
-    font-size: 9px;
-    letter-spacing: 0.08em;
+  .review-text {
+    font-size: 13px;
   }
-
-  .review-block-chip { padding: 4px 2px; }
-  .block-chip-label {
-    font-size: 8px;
-    letter-spacing: 0.02em;
+  .review-rating {
+    font-size: 12px;
+    padding: 2px 10px;
   }
-  .block-chip-value { font-size: 11.5px; }
-
-  .review-title { font-size: 14px; }
-  .review-text  { font-size: 12.5px; }
-
-  .block-tooltip {
-    padding: 7px 10px;
-    font-size: 11px;
+  .like-btn {
+    font-size: 13px;
+    padding: 4px 10px;
   }
-
+  .review-go-to-film {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
   .profile-ratings,
-  .profile-reviews { padding: 12px; }
+  .profile-reviews {
+    padding: 12px;
+  }
 }
 
-/* Сортировка — адаптив */
+/* ============================================================
+   АДАПТИВ: КНОПКИ СОРТИРОВКИ
+   ============================================================ */
+
+/* Планшет — ещё в строку, но компактнее */
 @media (max-width: 768px) {
-  .sort-controls { gap: 6px; }
+  .sort-controls {
+    gap: 6px;
+  }
   .sort-btn {
     padding: 6px 12px;
     font-size: 13px;
   }
 }
 
+/* Телефон — ровно 2 кнопки в строку, фиксированная ширина */
 @media (max-width: 480px) {
   .sort-controls {
-    flex-wrap: wrap;
+    flex-wrap: wrap;             /* ← разрешаем перенос */
     justify-content: flex-start;
-    width: 100%;
+    width: 100%;                 /* контейнер на всю ширину */
     gap: 6px;
   }
+
   .sort-btn {
-    flex: 1 1 calc(50% - 3px);
-    box-sizing: border-box;
+    flex: 1 1 calc(50% - 3px);   /* ← ровно 2 кнопки в строку, не зависят от текста */
     min-width: 0;
     padding: 6px 8px;
     font-size: 12px;
@@ -844,35 +639,172 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    box-sizing: border-box;
   }
 }
 
+/* Очень узкий экран — по одной в строку, ещё компактнее */
 @media (max-width: 360px) {
   .sort-btn {
-    flex: 1 1 100%;
+    flex: 1 1 100%;              /* по одной кнопке в строку */
     padding: 5px 6px;
     font-size: 11px;
   }
 }
 
-/* ------------------------------------------------------------
-   Доступность: уменьшение анимаций
-   ------------------------------------------------------------ */
-@media (prefers-reduced-motion: reduce) {
-  .profile-avatar,
-  .rating-item,
-  .review-item,
-  .review-go-to-film,
-  .btn-edit-profile,
-  .tab-btn,
-  .sort-btn {
-    transition: none;
+
+/* ============================================================
+   БЛОК СРЕДНИХ ПО КРИТЕРИЯМ В КАРТОЧКЕ РЕЦЕНЗИИ ПРОФИЛЯ
+   ============================================================ */
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.review-rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(168, 133, 64, 0.08);
+  border: 1px solid rgba(168, 133, 64, 0.22);
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Сводка: Технический / Вайб / Комбо ---------- */
+.review-criteria-summary {
+  margin: 14px 0 12px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.criteria-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.summary-pill-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.summary-pill-value {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: var(--gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-pill-suffix {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 1px;
+}
+
+/* ---------- Средние по 5 блокам ---------- */
+.criteria-blocks-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 8px;
+}
+
+.criteria-block-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 6px;
+  background: rgba(168, 133, 64, 0.05);
+  border: 1px solid rgba(168, 133, 64, 0.16);
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.criteria-block-chip:hover {
+  background: rgba(168, 133, 64, 0.10);
+  border-color: rgba(168, 133, 64, 0.32);
+}
+
+.chip-label {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.chip-value {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--gold-bright);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 480px) {
+  .review-criteria-summary {
+    padding: 10px 12px;
+    margin: 12px 0 10px;
   }
-  .review-item:hover,
-  .profile-avatar:hover,
-  .review-go-to-film:hover,
-  .btn-edit-profile:hover {
-    transform: none;
+
+  .criteria-blocks-row {
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    gap: 6px;
   }
-  .block-tooltip { animation: none; }
+
+  .criteria-block-chip {
+    padding: 6px 4px;
+  }
+
+  .chip-label {
+    font-size: 9.5px;
+  }
+
+  .chip-value {
+    font-size: 13px;
+  }
+
+  .summary-pill {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .summary-pill-label {
+    font-size: 11px;
+  }
 }
