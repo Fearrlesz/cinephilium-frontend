@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
-import { formatDate } from '../utils/ratingUtils';
+import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../utils/ratingUtils';
 import { getScoreColor } from '../utils/constants';
 import RatingDetailsModal from '../components/RatingDetailsModal';
 import './ProfilePage.css';
