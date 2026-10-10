@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/client';
 import { useNotification } from '../context/NotificationContext';
@@ -8,6 +8,18 @@ import { getScoreColor } from '../utils/constants';
 import RatingDetailsModal from '../components/RatingDetailsModal';
 import './ProfilePage.css';
 import './Architect.css';
+
+/* Текст тултипа для блока оценки — собираем максимально безопасно */
+function getBlockTooltipText(key) {
+  const info = BLOCK_CRITERIA_LABELS?.[key];
+  if (!info) return String(key);
+  if (typeof info.description === 'string' && info.description) return info.description;
+  if (Array.isArray(info.criteria) && info.criteria.length) return info.criteria.join(' • ');
+  if (typeof info.tooltip === 'string' && info.tooltip) return info.tooltip;
+  if (typeof info.label === 'string' && info.label) return info.label;
+  if (typeof info.name === 'string' && info.name) return info.name;
+  return String(key);
+}
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -20,7 +32,10 @@ function ProfilePage() {
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('ratings');
-  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'highest' | 'lowest'
+  const [sortBy, setSortBy] = useState('newest');
+
+  // Тултип блоков: { text, key, top, left, maxW, above }
+  const [blockTooltip, setBlockTooltip] = useState(null);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -34,6 +49,18 @@ function ProfilePage() {
     }
     loadProfile();
   }, [navigate]);
+
+  // Закрываем тултип при скролле/ресайзе
+  useEffect(() => {
+    if (!blockTooltip) return;
+    const close = () => setBlockTooltip(null);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [blockTooltip]);
 
   const loadAchievementProgress = useCallback(
     async (userData) => {
@@ -188,7 +215,30 @@ function ProfilePage() {
     }
   };
 
-  /* ===== СОРТИРОВКА ОЦЕНОК (по комб. баллу / дате) ===== */
+  /* ===== Тултип: расчёт позиции, чтобы не выходил за края экрана ===== */
+  const showBlockTooltip = useCallback((e, text, key) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const margin = 8;
+    const maxW = Math.min(260, window.innerWidth - margin * 2);
+    const centerX = rect.left + rect.width / 2;
+    const left = Math.max(
+      margin + maxW / 2,
+      Math.min(centerX, window.innerWidth - margin - maxW / 2)
+    );
+    const above = rect.top > 110; // хватает ли места над блоком
+    setBlockTooltip({
+      text,
+      key,
+      left,
+      maxW,
+      top: above ? rect.top - 10 : rect.bottom + 10,
+      above,
+    });
+  }, []);
+
+  const hideBlockTooltip = useCallback(() => setBlockTooltip(null), []);
+
+  /* ===== Сортировка оценок ===== */
   const sortedRatings = useMemo(() => {
     const getCombined = (r) =>
       (typeof r.combinedScore === 'number' ? r.combinedScore : null) ??
@@ -211,16 +261,11 @@ function ProfilePage() {
     }
   }, [ratings, sortBy]);
 
-  const avgRating = ratings.length
-    ? (ratings.reduce((sum, r) => sum + r.finalScore, 0) / ratings.length).toFixed(1)
-    : 'Нет';
-
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!user) return <div className="error">Не удалось загрузить профиль</div>;
 
   const isExclusive = user.isExclusive;
 
-  /* ===== UI сортировки (без эмодзи и без неона) ===== */
   const sortOptions = [
     { key: 'newest', label: 'Новые' },
     { key: 'oldest', label: 'Старые' },
@@ -351,15 +396,7 @@ function ProfilePage() {
         {/* --------- Таб: Мои оценки --------- */}
         {activeTab === 'ratings' && (
           <div className="profile-ratings">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '10px',
-              }}
-            >
+            <div className="profile-ratings-header-row">
               <h2 style={{ margin: 0 }}>Мои оценки</h2>
 
               {ratings.length > 0 && (
@@ -435,102 +472,89 @@ function ProfilePage() {
                   const blockAvgs = computeBlockAverages(rating?.scores);
                   const film = review.filmId || review.film;
                   const combinedScore = rating?.combinedScore ?? rating?.finalScore;
-                  const vibe = rating?.vibe;
-                  const technical = rating?.technicalScore;
 
                   return (
-                    <div key={review._id} className="review-item">
-                      <div className="review-header">
-                        <Link to={`/film/${film?._id}`} className="review-film-link">
-                          <h3 className="review-title">{review.title}</h3>
-                          <p className="review-film-name">
-                            🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
-                          </p>
-                        </Link>
-
-                        {combinedScore != null && (
-                          <div
-                            className="review-rating-badge"
-                            style={{ color: getScoreColor(combinedScore) }}
-                            title="Комбинированный балл"
+                    <article key={review._id} className="review-item">
+                      {/* ============ ЛЕВАЯ ЧАСТЬ: ТЕКСТ РЕЦЕНЗИИ ============ */}
+                      <div className="review-body">
+                        <div className="review-header">
+                          <Link
+                            to={`/film/${film?._id}`}
+                            className="review-film-link"
                           >
-                            ★ {combinedScore}
+                            <h3 className="review-title">{review.title}</h3>
+                            <p className="review-film-name">
+                              🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
+                            </p>
+                          </Link>
+                        </div>
+
+                        <p className="review-text">{review.text}</p>
+
+                        <div className="review-footer">
+                          <div className="review-actions">
+                            <button
+                              className="like-btn"
+                              onClick={() => likeReview(review._id)}
+                            >
+                              ❤️ {review.likes?.length || 0}
+                            </button>
+                            <span className="review-date">
+                              📅 {formatDate(review.createdAt)}
+                            </span>
                           </div>
-                        )}
+                          <Link
+                            to={`/film/${film?._id}`}
+                            className="review-go-to-film"
+                          >
+                            🎬 Перейти к фильму
+                          </Link>
+                        </div>
                       </div>
 
-                      <p className="review-text">{review.text}</p>
-
-                      {rating && (
-                        <div className="review-criteria-summary">
-                          <div className="criteria-summary-row">
-                            {technical != null && (
-                              <div className="summary-pill">
-                                <span className="summary-pill-label">Технический</span>
-                                <span
-                                  className="summary-pill-value"
-                                  style={{ color: getScoreColor(technical) }}
-                                >
-                                  {technical}
-                                </span>
+                      {/* ============ ПРАВАЯ ЧАСТЬ: ОЦЕНКА ============ */}
+                      {(combinedScore != null || blockAvgs) && (
+                        <aside className="review-score-panel">
+                          {combinedScore != null && (
+                            <div className="review-combined">
+                              <div
+                                className="review-combined-value"
+                                style={{ color: getScoreColor(combinedScore) }}
+                              >
+                                {combinedScore}
                               </div>
-                            )}
-                            <div className="summary-pill">
-                              <span className="summary-pill-label">Вайб</span>
-                              <span className="summary-pill-value">
-                                {vibe ?? '—'}
-                                {vibe != null && (
-                                  <span className="summary-pill-suffix">/10</span>
-                                )}
-                              </span>
-                            </div>
-                            {combinedScore != null && (
-                              <div className="summary-pill">
-                                <span className="summary-pill-label">Комбо</span>
-                                <span
-                                  className="summary-pill-value"
-                                  style={{ color: getScoreColor(combinedScore) }}
-                                >
-                                  {combinedScore}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {blockAvgs && (
-                            <div className="criteria-blocks-row">
-                              {Object.entries(blockAvgs).map(([key, avg]) =>
-                                avg != null ? (
-                                  <div key={key} className="criteria-block-chip">
-                                    <span className="chip-label">
-                                      {BLOCK_CRITERIA_LABELS[key].name}
-                                    </span>
-                                    <span className="chip-value">{avg}</span>
-                                  </div>
-                                ) : null
-                              )}
+                              <div className="review-combined-label">Комбо</div>
                             </div>
                           )}
-                        </div>
-                      )}
 
-                      <div className="review-footer">
-                        <div className="review-actions">
-                          <button
-                            className="like-btn"
-                            onClick={() => likeReview(review._id)}
-                          >
-                            ❤️ {review.likes?.length || 0}
-                          </button>
-                          <span className="review-date">
-                            📅 {formatDate(review.createdAt)}
-                          </span>
-                        </div>
-                        <Link to={`/film/${film?._id}`} className="review-go-to-film">
-                          🎬 Перейти к фильму
-                        </Link>
-                      </div>
-                    </div>
+                          {blockAvgs && Object.keys(blockAvgs).length > 0 && (
+                            <div className="review-blocks">
+                              {Object.entries(blockAvgs).map(([key, avg]) => {
+                                if (avg == null) return null;
+                                const info = BLOCK_CRITERIA_LABELS?.[key] || {};
+                                const label = info.name || key;
+                                const tooltipText = getBlockTooltipText(key);
+                                return (
+                                  <div
+                                    key={key}
+                                    className="review-block-chip"
+                                    onMouseEnter={(e) =>
+                                      showBlockTooltip(e, tooltipText, key)
+                                    }
+                                    onMouseLeave={hideBlockTooltip}
+                                  >
+                                    <span className="block-chip-label">
+                                      {label}
+                                    </span>
+                                    <span className="block-chip-value">{avg}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </aside>
+                      )}
+                    </article>
                   );
                 })}
               </div>
@@ -539,11 +563,28 @@ function ProfilePage() {
         )}
       </div>
 
-      {/* ===== Модалка — вне табов, на уровне контейнера ===== */}
+      {/* ===== Модалка ===== */}
       <RatingDetailsModal
         rating={selectedRating}
         onClose={() => setSelectedRating(null)}
       />
+
+      {/* ===== Тултип блоков — fixed, не выходит за края экрана ===== */}
+      {blockTooltip && (
+        <div
+          className="block-tooltip"
+          style={{
+            position: 'fixed',
+            top: blockTooltip.top,
+            left: blockTooltip.left,
+            maxWidth: `${blockTooltip.maxW}px`,
+            transform: `translate(-50%, ${blockTooltip.above ? '-100%' : '0'})`,
+          }}
+          role="tooltip"
+        >
+          {blockTooltip.text}
+        </div>
+      )}
     </div>
   );
 }
