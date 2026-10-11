@@ -6,25 +6,17 @@ import {
   PRESET_WEIGHTS,
   getScoreColor
 } from '../../../utils/constants';
+import {
+  formatDate,
+  computeBlockAverages,
+  BLOCK_CRITERIA_LABELS
+} from '../../../utils/ratingUtils';
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;
 const MAX_TEXT = 5000;
 
 /* ---------- утилиты ---------- */
-
-function formatDate(value) {
-  if (!value) return '';
-  try {
-    return new Date(value).toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  } catch {
-    return '';
-  }
-}
 
 function getWeightsArray(rating) {
   if (!rating) return [30, 25, 20, 15, 10];
@@ -45,7 +37,71 @@ function getWeightsArray(rating) {
   return [30, 25, 20, 15, 10];
 }
 
-/* ---------- блок деталей оценки ---------- */
+/* ---------- сводка оценки (как в профиле) ---------- */
+
+function RatingCriteriaSummary({ rating }) {
+  if (!rating || typeof rating !== 'object') return null;
+
+  const blockAvgs = computeBlockAverages(rating.scores);
+  const technical = rating.technicalScore;
+  const vibe      = rating.vibe;
+  const combined  = rating.combinedScore ?? rating.finalScore;
+
+  return (
+    <div className="review-criteria-summary">
+      <div className="criteria-summary-row">
+        {technical != null && (
+          <div className="summary-pill">
+            <span className="summary-pill-label">Технический</span>
+            <span
+              className="summary-pill-value"
+              style={{ color: getScoreColor(technical) }}
+            >
+              {technical}
+            </span>
+          </div>
+        )}
+
+        <div className="summary-pill">
+          <span className="summary-pill-label">Вайб</span>
+          <span className="summary-pill-value">
+            {vibe ?? '—'}
+            {vibe != null && <span className="summary-pill-suffix">/10</span>}
+          </span>
+        </div>
+
+        {combined != null && (
+          <div className="summary-pill">
+            <span className="summary-pill-label">Комбо</span>
+            <span
+              className="summary-pill-value"
+              style={{ color: getScoreColor(combined) }}
+            >
+              {combined}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {blockAvgs && Object.keys(blockAvgs).length > 0 && (
+        <div className="criteria-blocks-row">
+          {Object.entries(blockAvgs).map(([key, avg]) =>
+            avg != null ? (
+              <div key={key} className="criteria-block-chip">
+                <span className="chip-label">
+                  {BLOCK_CRITERIA_LABELS[key]?.name || key}
+                </span>
+                <span className="chip-value">{avg}</span>
+              </div>
+            ) : null
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- блок деталей оценки (раскрывающийся) ---------- */
 
 function RatingDetailsBlock({ rating }) {
   if (!rating) return null;
@@ -53,43 +109,16 @@ function RatingDetailsBlock({ rating }) {
 
   return (
     <div className="review-rating-details">
-      <div className="review-rating-summary">
-        <div className="summary-item">
-          <span className="summary-label">Технический</span>
-          <span
-            className="summary-value"
-            style={{ color: getScoreColor(rating.technicalScore || 0) }}
-          >
-            {rating.technicalScore ?? '—'}
-          </span>
-        </div>
-
-        <div className="summary-item">
-          <span className="summary-label">Вайб</span>
-          <span className="summary-value">
-            {rating.vibe ?? '—'}<span className="summary-suffix">/10</span>
-          </span>
-        </div>
-
-        <div className="summary-item">
-          <span className="summary-label">Комбо</span>
-          <span
-            className="summary-value"
-            style={{ color: getScoreColor(rating.combinedScore || 0) }}
-          >
-            {rating.combinedScore ?? '—'}
-          </span>
-        </div>
-
-        {rating.genrePreset && GENRE_LABELS[rating.genrePreset] && (
+      {rating.genrePreset && GENRE_LABELS[rating.genrePreset] && (
+        <div className="review-rating-summary">
           <div className="summary-item summary-item-wide">
             <span className="summary-label">Жанровые веса</span>
             <span className="summary-value summary-genre">
               {GENRE_LABELS[rating.genrePreset]}
             </span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="review-blocks">
         {CRITERIA_CONFIG.map((block, i) => {
@@ -238,7 +267,7 @@ function ReviewsSection({
           // итоговый балл для бейджа: комбо → техника → ничего
           const badgeScore =
             typeof rating === 'object'
-              ? (rating.combinedScore ?? rating.technicalScore)
+              ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
               : null;
 
           return (
@@ -287,6 +316,7 @@ function ReviewsSection({
                 {badgeScore != null && (
                   <div
                     className="review-rating-badge"
+                    style={{ color: getScoreColor(badgeScore) }}
                     title="Комбинированная оценка автора"
                   >
                     <span className="review-rating-star">★</span>
@@ -298,6 +328,11 @@ function ReviewsSection({
               <h4 className="review-title">{review.title}</h4>
               <div className="review-text">{review.text}</div>
 
+              {/* === Сводка оценки в стиле профиля === */}
+              {rating && typeof rating === 'object' && (
+                <RatingCriteriaSummary rating={rating} />
+              )}
+
               <footer className="review-actions">
                 {rating && typeof rating === 'object' && (
                   <button
@@ -305,7 +340,7 @@ function ReviewsSection({
                     onClick={() => toggleExpand(review._id)}
                   >
                     {expanded[review._id]
-                      ? '▲ Скрыть оценку'
+                      ? '▲ Скрыть детали'
                       : '▼ Детали оценки'}
                   </button>
                 )}
