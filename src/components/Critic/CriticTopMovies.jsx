@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getPosterUrl, handleImgError, PLACEHOLDER } from '../../utils/posterUrl';
 import { getScoreColor } from '../../utils/constants';
-import './CriticTopMovies.css';
+import './CriticTopMovies.css'; 
 
 export default function CriticTopMovies({ movies }) {
   return (
