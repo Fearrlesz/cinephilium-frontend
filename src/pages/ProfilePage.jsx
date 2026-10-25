@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/client';
+import api, { logout as logoutRequest } from '../api/client';
 import { useNotification } from '../context/NotificationContext';
 import useActivityEvents from '../hooks/useActivityEvents';
 import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../utils/ratingUtils';
@@ -39,9 +39,11 @@ function ProfilePage() {
     async (userData) => {
       try {
         const response = await api.get('/users/me/achievements');
-        if (response.data?.achievements) {
+        // Бэкенд отдаёт { earned, possible, progress }, старый формат — { achievements }.
+        const earned = response.data?.earned || response.data?.achievements || [];
+        if (earned.length > 0) {
           const oldAchievements = userData?.achievements || [];
-          const newAchievements = response.data.achievements;
+          const newAchievements = earned;
           const freshAchievements = newAchievements.filter(
             (ach) => !oldAchievements.includes(ach)
           );
@@ -98,7 +100,7 @@ function ProfilePage() {
   }, [navigate, loadAchievementProgress]);
 
   const logout = () => {
-    localStorage.removeItem('token');
+    logoutRequest();
     navigate('/');
     showNotification({
       title: 'До свидания!',

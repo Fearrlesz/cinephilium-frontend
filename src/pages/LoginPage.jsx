@@ -1,82 +1,222 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/client';
+import api, { setAccessToken, getAccessToken } from '../api/client';
+import { getErrorMessage } from '../utils/apiError';
 import { useNotification } from '../context/NotificationContext';
 import { validateEmail, validatePassword, validateNickname } from '../utils/ratingUtils';
 import './LoginPage.css';
 
+const PASSWORD_MIN = 8;
+
 function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  // login  — вход
+  // register — регистрация
+  // verify  — ввод кода подтверждения email
+  const [stage, setStage] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
+  const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (getAccessToken()) {
       navigate('/');
     }
   }, [navigate]);
+
+  const finishAuth = (accessToken) => {
+    setAccessToken(accessToken);
+    showNotification({
+      title: 'Добро пожаловать!',
+      message: 'Вы вошли в аккаунт',
+      type: 'success'
+    });
+    navigate('/');
+  };
+
+  const validateCredentials = () => {
+    if (!validateEmail(email)) {
+      setError('Введите корректный email');
+      return false;
+    }
+    if (!validatePassword(password)) {
+      setError(`Пароль должен содержать минимум ${PASSWORD_MIN} символов`);
+      return false;
+    }
+    if (stage === 'register' && !validateNickname(nickname)) {
+      setError('Никнейм должен быть от 2 до 20 символов');
+      return false;
+    }
+    return true;
+  };
+
+  const submitLogin = async () => {
+    const response = await api.post('/auth/login', { email, password });
+    const accessToken = response.data?.accessToken;
+    if (!accessToken) throw new Error('Сервер не вернул accessToken');
+    finishAuth(accessToken);
+  };
+
+  const submitRegister = async () => {
+    const response = await api.post('/auth/register', { email, password, nickname });
+    setPassword('');
+    setStage('verify');
+    setInfo(response.data?.message || 'Проверьте почту: мы отправили код подтверждения');
+    showNotification({
+      title: 'Почти готово',
+      message: 'Подтвердите email кодом из письма',
+      type: 'info'
+    });
+  };
+
+  const submitVerify = async () => {
+    if (!/^\d{6}$/.test(code.trim())) {
+      setError('Код должен состоять из 6 цифр');
+      return;
+    }
+    const response = await api.post('/auth/verify-email', { email, code: code.trim() });
+    const accessToken = response.data?.accessToken;
+    if (!accessToken) throw new Error('Сервер не вернул accessToken');
+    finishAuth(accessToken);
+  };
+
+  const resendCode = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/resend-verification', { email });
+      setInfo(response.data?.message || 'Код отправлен повторно');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Не удалось отправить код повторно'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    if (!validateEmail(email)) {
-      setError('Введите корректный email');
-      setLoading(false);
-      return;
-    }
-    if (!validatePassword(password)) {
-      setError('Пароль должен содержать минимум 6 символов');
-      setLoading(false);
-      return;
-    }
-    if (!isLogin && !validateNickname(nickname)) {
-      setError('Никнейм должен быть от 2 до 20 символов');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const data = isLogin ? { email, password } : { email, password, nickname };
-      const response = await api.post(endpoint, data);
-      localStorage.setItem('token', response.data.token);
-      navigate('/');
-      showNotification({ 
-        title: isLogin ? 'Добро пожаловать!' : 'Регистрация прошла успешно!', 
-        message: isLogin ? 'Вы вошли в аккаунт' : 'Добро пожаловать в Синефилиум!', 
-        type: 'success' 
-      });
+      if (stage === 'verify') {
+        await submitVerify();
+        return;
+      }
+      if (!validateCredentials()) return;
+      if (stage === 'login') {
+        await submitLogin();
+      } else {
+        await submitRegister();
+      }
     } catch (err) {
-      setError(err.response?.data?.error || 'Произошла ошибка');
+      setError(getErrorMessage(err, stage === 'login' ? 'Не удалось войти' : 'Не удалось зарегистрироваться'));
     } finally {
       setLoading(false);
     }
   };
 
+  const switchMode = (next) => {
+    setStage(next);
+    setError('');
+    setInfo('');
+    setCode('');
+  };
+
+  const title = stage === 'verify'
+    ? 'Подтверждение email'
+    : stage === 'login'
+      ? 'Вход в Синефилиум'
+      : 'Регистрация';
+
+  const buttonLabel = stage === 'verify'
+    ? 'Подтвердить'
+    : stage === 'login'
+      ? 'Войти'
+      : 'Зарегистрироваться';
+
   return (
     <div className="container auth-container">
       <div className="auth-box glass-card">
-        <h1>{isLogin ? 'Вход в Синефилиум' : 'Регистрация'}</h1>
+        <h1>{title}</h1>
+
         {error && <div className="error-msg">{error}</div>}
+        {info && <div className="success-msg">{info}</div>}
+
         <form onSubmit={handleSubmit}>
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          {!isLogin && (
-            <input type="text" placeholder="Никнейм" value={nickname} onChange={(e) => setNickname(e.target.value)} required minLength={2} maxLength={20} />
+          {stage === 'verify' ? (
+            <>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Код из письма"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength={6}
+                autoComplete="one-time-code"
+                required
+              />
+              <button type="submit" disabled={loading}>
+                {loading ? 'Проверяем...' : buttonLabel}
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+              {stage === 'register' && (
+                <input
+                  type="text"
+                  placeholder="Никнейм"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  required
+                  minLength={2}
+                  maxLength={20}
+                />
+              )}
+              <input
+                type="password"
+                placeholder="Пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={stage === 'login' ? 'current-password' : 'new-password'}
+                required
+                minLength={PASSWORD_MIN}
+              />
+              <button type="submit" disabled={loading}>
+                {loading ? 'Загрузка...' : buttonLabel}
+              </button>
+            </>
           )}
-          <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-          <button type="submit" disabled={loading}>{loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}</button>
         </form>
-        <p onClick={() => { setIsLogin(!isLogin); setError(''); }} className="toggle-auth">
-          {isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
-        </p>
+
+        {stage === 'verify' && (
+          <p className="toggle-auth" onClick={loading ? undefined : resendCode}>
+            Отправить код ещё раз
+          </p>
+        )}
+
+        {stage === 'verify' ? (
+          <p className="toggle-auth" onClick={() => switchMode('login')}>
+            Вернуться ко входу
+          </p>
+        ) : (
+          <p className="toggle-auth" onClick={() => switchMode(stage === 'login' ? 'register' : 'login')}>
+            {stage === 'login' ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
+          </p>
+        )}
       </div>
     </div>
   );

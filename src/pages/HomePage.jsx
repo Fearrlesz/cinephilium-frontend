@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/client';
+import api, { logout } from '../api/client';
 import Header from '../components/Header';
 import ActivityFeed from '../components/ActivityFeed';
 import useActivityEvents from '../hooks/useActivityEvents';
@@ -225,8 +225,8 @@ function HomePage() {
       reloadFromStart, loadTopFilms, sortType]); 
 
   /* ---------------- Выход ---------------- */
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem('token');
+  const handleLogout = useCallback(async () => {
+    await logout();
     setUser(null);
     navigate('/');
     showNotification({ title: 'До свидания!', message: 'Вы вышли из аккаунта', type: 'info' });

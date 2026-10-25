@@ -44,7 +44,7 @@ export function validateEmail(email) {
 }
 
 export function validatePassword(password) {
-  return password && password.length >= 6;
+  return password && password.length >= 8;
 }
 
 /* ===== Средние по блокам критериев и лейблы ===== */

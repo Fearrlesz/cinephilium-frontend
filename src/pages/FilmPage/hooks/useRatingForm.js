@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import api from '../../../api/client';
+import { getErrorMessage } from '../../../utils/apiError';
 import { CRITERIA_CONFIG, PRESET_WEIGHTS } from '../../../utils/constants';
 
 const createEmptyScores = () => Object.fromEntries(
@@ -132,7 +133,7 @@ function useRatingForm(filmId, film, userRating, currentUser, loadFilm, loadFilm
 
       showNotification({ title: 'Оценка сохранена!', message: 'Ваша оценка успешно добавлена', type: 'success' });
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.message || 'Не удалось сохранить оценку', type: 'error' });
+      showNotification({ title: 'Ошибка', message: getErrorMessage(err, 'Не удалось сохранить оценку'), type: 'error' });
     } finally {
       setIsSaving(false);
     }

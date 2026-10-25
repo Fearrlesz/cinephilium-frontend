@@ -17,7 +17,8 @@ function TopUsersPage() {
     setError('');
     try {
       const response = await api.get('/top/users');
-      setUsers(response.data || []);
+      const payload = response.data;
+      setUsers(Array.isArray(payload) ? payload : payload?.items || []);
     } catch (err) {
       console.error('Ошибка загрузки топа:', err);
       setError('Не удалось загрузить топ пользователей');
@@ -52,9 +53,9 @@ function TopUsersPage() {
               </div>
               <div className="top-user-stats">
                 <span>⭐ {user.totalPoints || 0} баллов</span>
-                <span>🎯 {user.ratingsCount || 0} оценок</span>
-                <span>📝 {user.reviewsCount || 0} рецензий</span>
-                <span>💬 {user.commentsCount || 0} комментариев</span>
+                <span>🎯 {user.counters?.ratings ?? user.ratingsCount ?? 0} оценок</span>
+                <span>📝 {user.counters?.reviewsApproved ?? user.reviewsCount ?? 0} рецензий</span>
+                <span>💬 {user.counters?.commentsApproved ?? user.commentsCount ?? 0} комментариев</span>
               </div>
             </div>
           </Link>
