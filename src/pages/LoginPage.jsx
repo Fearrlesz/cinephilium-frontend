@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api, { setAccessToken, getAccessToken } from '../api/client';
 import { getErrorMessage } from '../utils/apiError';
 import { useNotification } from '../context/NotificationContext';
@@ -7,6 +7,7 @@ import { validateEmail, validatePassword, validateNickname } from '../utils/rati
 import './LoginPage.css';
 
 const PASSWORD_MIN = 8;
+const CONSENT_VERSION = '1.0';
 
 function LoginPage() {
   // login  — вход
@@ -17,6 +18,8 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [code, setCode] = useState('');
+  const [consentPersonal, setConsentPersonal] = useState(false);
+  const [consentCookies, setConsentCookies] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,9 +51,15 @@ function LoginPage() {
       setError(`Пароль должен содержать минимум ${PASSWORD_MIN} символов`);
       return false;
     }
-    if (stage === 'register' && !validateNickname(nickname)) {
-      setError('Никнейм должен быть от 2 до 20 символов');
-      return false;
+    if (stage === 'register') {
+      if (!validateNickname(nickname)) {
+        setError('Никнейм должен быть от 2 до 20 символов');
+        return false;
+      }
+      if (!consentPersonal || !consentCookies) {
+        setError('Нужно согласие на обработку персональных данных и использование cookie');
+        return false;
+      }
     }
     return true;
   };
@@ -63,7 +72,16 @@ function LoginPage() {
   };
 
   const submitRegister = async () => {
-    const response = await api.post('/auth/register', { email, password, nickname });
+    const response = await api.post('/auth/register', {
+      email,
+      password,
+      nickname,
+      consent: {
+        personalData: true,
+        cookies: true,
+        version: CONSENT_VERSION
+      }
+    });
     setPassword('');
     setStage('verify');
     setInfo(response.data?.message || 'Проверьте почту: мы отправили код подтверждения');
@@ -195,12 +213,50 @@ function LoginPage() {
                 required
                 minLength={PASSWORD_MIN}
               />
+
+              {stage === 'register' && (
+                <div className="consent-block">
+                  <label className="consent-check">
+                    <input
+                      type="checkbox"
+                      checked={consentPersonal}
+                      onChange={(e) => setConsentPersonal(e.target.checked)}
+                    />
+                    <span>
+                      Согласен на{' '}
+                      <Link to="/privacy#personal-data" target="_blank" rel="noopener noreferrer">
+                        обработку персональных данных
+                      </Link>
+                    </span>
+                  </label>
+                  <label className="consent-check">
+                    <input
+                      type="checkbox"
+                      checked={consentCookies}
+                      onChange={(e) => setConsentCookies(e.target.checked)}
+                    />
+                    <span>
+                      Согласен на{' '}
+                      <Link to="/privacy#cookies" target="_blank" rel="noopener noreferrer">
+                        использование cookie
+                      </Link>
+                    </span>
+                  </label>
+                </div>
+              )}
+
               <button type="submit" disabled={loading}>
                 {loading ? 'Загрузка...' : buttonLabel}
               </button>
             </>
           )}
         </form>
+
+        {stage === 'login' && (
+          <p className="toggle-auth">
+            <Link to="/forgot-password">Забыли пароль?</Link>
+          </p>
+        )}
 
         {stage === 'verify' && (
           <p className="toggle-auth" onClick={loading ? undefined : resendCode}>

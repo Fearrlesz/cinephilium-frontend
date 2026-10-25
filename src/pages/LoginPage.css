@@ -116,6 +116,41 @@
 }
 
 /* ============================================================
+   СОГЛАСИЯ
+   ============================================================ */
+.consent-block {
+  margin: 2px 0 14px;
+}
+
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+/* перебиваем общий .auth-box input */
+.consent-check input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+  padding: 0;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.consent-check a {
+  color: var(--gold-bright);
+  text-decoration: underline;
+}
+
+/* ============================================================
    АДАПТИВ
    ============================================================ */
 @media (max-width: 768px) {

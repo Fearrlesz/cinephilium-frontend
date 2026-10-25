@@ -9,6 +9,9 @@ import AdminPanel from './pages/AdminPanel';
 import FilmPage from './pages/FilmPage/FilmPage';
 import CustomSelect from './components/CustomSelect';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import PrivacyPage from './pages/PrivacyPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
 import CriticPage from './pages/CriticPage/CriticPage';
@@ -48,6 +51,9 @@ function App() {
           <Route path="/critic" element={<CriticPage />} />
           <Route path="/film/:id" element={<FilmPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/user/:id" element={<UserProfilePage />} />
         </Routes>
