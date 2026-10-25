@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS, BLOCK_NAMES, TECHNICAL_MULTIPLIER, VIBE_STEP, MIN_SCORE, MAX_SCORE } from '../utils/constants';
+import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS, BLOCK_NAMES, TECHNICAL_MULTIPLIER, VIBE_STEP, MIN_SCORE, MAX_SCORE } from '../../utils/constants';
 import './AboutPage.css'; 
 
 function AboutPage() {

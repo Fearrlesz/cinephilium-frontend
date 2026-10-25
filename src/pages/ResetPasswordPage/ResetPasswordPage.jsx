@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import api from '../api/client';
-import { getErrorMessage } from '../utils/apiError';
-import './LoginPage.css';
+import api from '../../api/client';
+import { getErrorMessage } from '../../utils/apiError';
+import '../LoginPage/LoginPage.css';
 
 const PASSWORD_MIN = 8;
 
@@ -49,7 +49,7 @@ function ResetPasswordPage() {
           <h1>Сброс пароля</h1>
           <div className="error-msg">Ссылка недействительна: в ней нет токена.</div>
           <p className="toggle-auth">
-            <Link to="/forgot-password">Запросить новую ссылку</Link>
+            <Link to="/forgot-password">Как получить ссылку</Link>
           </p>
         </div>
       </div>

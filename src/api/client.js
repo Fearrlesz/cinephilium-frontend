@@ -77,7 +77,7 @@ export function refreshAccessToken() {
   return refreshPromise;
 }
 
-const AUTH_FLOW = /^\/auth\/(login|register|refresh|verify-email|resend-verification|forgot-password|reset-password|logout)/;
+const AUTH_FLOW = /^\/auth\/(login|register|refresh|reset-password|logout)/;
 
 api.interceptors.request.use(config => {
   const token = getAccessToken();

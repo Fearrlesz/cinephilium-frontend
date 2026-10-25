@@ -151,6 +151,30 @@
 }
 
 /* ============================================================
+   ПОДСКАЗКИ И ИНСТРУКЦИИ
+   ============================================================ */
+.auth-hint {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.auth-steps {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.auth-steps li + li {
+  margin-top: 6px;
+}
+
+/* ============================================================
    АДАПТИВ
    ============================================================ */
 @media (max-width: 768px) {

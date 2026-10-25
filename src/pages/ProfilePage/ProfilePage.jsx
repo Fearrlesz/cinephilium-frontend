@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
 import { useNavigate, Link } from 'react-router-dom';
-import api, { logout as logoutRequest } from '../api/client';
-import { useNotification } from '../context/NotificationContext';
-import useActivityEvents from '../hooks/useActivityEvents';
-import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../utils/ratingUtils';
-import { getScoreColor } from '../utils/constants';
-import RatingDetailsModal from '../components/RatingDetailsModal';
+import api, { logout as logoutRequest } from '../../api/client';
+import { useNotification } from '../../context/NotificationContext';
+import useActivityEvents from '../../hooks/useActivityEvents';
+import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../../utils/ratingUtils';
+import { getScoreColor } from '../../utils/constants';
+import RatingDetailsModal from '../../components/RatingDetailsModal';
 import './ProfilePage.css';
-import './Architect.css';
+import '../../styles/Architect.css';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -251,7 +251,7 @@ function ProfilePage() {
             )}
           </h1>
 
-          <p>📧 {user.email}</p>
+          {user.email && <p>📧 {user.email}</p>}
 
           <div className="profile-stats">
             <p>

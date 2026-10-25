@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api, { logout } from '../api/client';
-import Header from '../components/Header';
-import ActivityFeed from '../components/ActivityFeed';
-import useActivityEvents from '../hooks/useActivityEvents';
-import { useNotification } from '../context/NotificationContext';
-import { getScoreColor } from '../utils/constants';
+import api, { logout } from '../../api/client';
+import Header from '../../components/Header';
+import ActivityFeed from '../../components/ActivityFeed';
+import useActivityEvents from '../../hooks/useActivityEvents';
+import { useNotification } from '../../context/NotificationContext';
+import { getScoreColor } from '../../utils/constants';
 import './HomePage.css';
 
 const FILMS_PER_PAGE = 20;
