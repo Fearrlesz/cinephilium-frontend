@@ -15,6 +15,7 @@ import PrivacyPage from './pages/PrivacyPage/PrivacyPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import CriticPage from './pages/CriticPage/CriticPage';
+import ContactPage from './pages/ContactPage/ContactPage';
 import './App.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
           <Route path="/critic" element={<CriticPage />} />
           <Route path="/film/:id" element={<FilmPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

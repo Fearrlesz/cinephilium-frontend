@@ -182,6 +182,12 @@ function LoginPage() {
                   : 'Регистрация открыта, код можно не вводить.'}
               </p>
 
+              {inviteRequired && (
+                <p className="auth-hint">
+                  Нет кода? <Link to="/contact">Запросить доступ</Link>
+                </p>
+              )}
+
               <div className="consent-block">
                 <label className="consent-check">
                   <input

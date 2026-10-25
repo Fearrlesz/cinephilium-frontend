@@ -283,6 +283,29 @@
   border-color: rgba(236, 72, 153, 0.3);
 }
 
+.admin-tg-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.admin-tg-row input {
+  flex: 1 1 200px;
+  padding: 8px 14px;
+  border-radius: 30px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+.admin-tg-row input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+}
+
 /* ============================================================
    МОБИЛЬНАЯ ОБРАТНАЯ СВЯЗЬ
    ============================================================ */

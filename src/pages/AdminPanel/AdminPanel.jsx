@@ -23,6 +23,9 @@ function AdminPanel() {
   const [userQuery, setUserQuery] = useState('');
   const [foundUsers, setFoundUsers] = useState([]);
   const [resetLink, setResetLink] = useState(null);
+  const [contactRequests, setContactRequests] = useState([]);
+  const [freshInvite, setFreshInvite] = useState(null);
+  const [tgDrafts, setTgDrafts] = useState({});
   const [loading, setLoading] = useState(true);
   const { showNotification } = useNotification();
 
@@ -43,14 +46,16 @@ function AdminPanel() {
         navigate('/');
         return;
       }
-      const [commentsRes, reviewsRes, invitesRes] = await Promise.all([
+      const [commentsRes, reviewsRes, invitesRes, requestsRes] = await Promise.all([
         api.get('/admin/pending/comments'),
         api.get('/admin/pending/reviews'),
-        api.get('/admin/invites')
+        api.get('/admin/invites'),
+        api.get('/admin/contact-requests')
       ]);
       setPendingComments(commentsRes.data || []);
       setPendingReviews(reviewsRes.data || []);
       setInvites(invitesRes.data || []);
+      setContactRequests(requestsRes.data || []);
     } catch (err) {
       console.error('Ошибка загрузки админ-панели:', err);
       navigate('/');
@@ -147,6 +152,68 @@ function AdminPanel() {
     }
   };
 
+  const toggleAdmin = async (found) => {
+    const next = !found.isAdmin;
+    try {
+      const response = await api.post(`/admin/users/${found.id}/admin`, { isAdmin: next });
+      setFoundUsers(prev => prev.map(item => (
+        item.id === found.id ? { ...item, isAdmin: response.data.isAdmin } : item
+      )));
+      showNotification({
+        title: next ? 'Права выданы' : 'Права сняты',
+        message: next ? `${found.nickname} теперь администратор` : `${found.nickname} больше не администратор`,
+        type: 'success'
+      });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось изменить права', type: 'error' });
+    }
+  };
+
+  const approveRequest = async (request) => {
+    try {
+      const response = await api.post(`/admin/contact-requests/${request.id}/approve`);
+      setContactRequests(prev => prev.filter(item => item.id !== request.id));
+      setFreshInvite(response.data);
+      const list = await api.get('/admin/invites');
+      setInvites(list.data || []);
+      showNotification({
+        title: 'Инвайт создан',
+        message: `Скопируй код и отправь на ${request.contact}`,
+        type: 'success'
+      });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось одобрить заявку', type: 'error' });
+    }
+  };
+
+  const rejectRequest = async (request) => {
+    try {
+      await api.post(`/admin/contact-requests/${request.id}/reject`);
+      setContactRequests(prev => prev.filter(item => item.id !== request.id));
+      showNotification({ title: 'Заявка отклонена', message: request.nickname, type: 'info' });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось отклонить заявку', type: 'error' });
+    }
+  };
+
+  const saveTelegram = async (found) => {
+    const value = tgDrafts[found.id] ?? found.telegram ?? '';
+    try {
+      const response = await api.post(`/admin/users/${found.id}/telegram`, { telegram: value });
+      setFoundUsers(prev => prev.map(item => (
+        item.id === found.id ? { ...item, telegram: response.data.telegram } : item
+      )));
+      setTgDrafts(prev => ({ ...prev, [found.id]: undefined }));
+      showNotification({
+        title: 'Телеграм сохранён',
+        message: response.data.telegram ? `@${response.data.telegram}` : 'Контакт очищен',
+        type: 'success'
+      });
+    } catch (err) {
+      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось сохранить телеграм', type: 'error' });
+    }
+  };
+
   const copyText = async (text, label) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -163,6 +230,48 @@ function AdminPanel() {
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
       <h1 className="admin-title">🛡️ Админ-панель</h1>
       <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
+
+      <div className="admin-section glass-card">
+        <h2>📨 Заявки на регистрацию ({contactRequests.length})</h2>
+        <p className="admin-hint">
+          Заявки со страницы «Связь с админами». Одобрение сразу создаёт инвайт-код —
+          его нужно отправить по контакту из заявки.
+        </p>
+
+        {freshInvite && (
+          <div className="admin-fresh">
+            <p>
+              Код для <strong>{freshInvite.nickname}</strong> (контакт: {freshInvite.contact}):
+            </p>
+            <div className="admin-codes">
+              <code>{freshInvite.code}</code>
+            </div>
+            <button className="btn-approve" onClick={() => copyText(freshInvite.code, 'Код в буфере')}>
+              Скопировать код
+            </button>
+          </div>
+        )}
+
+        {contactRequests.length === 0 ? (
+          <p className="admin-empty">Новых заявок нет</p>
+        ) : (
+          <div className="admin-list">
+            {contactRequests.map(request => (
+              <div key={request.id} className="admin-item">
+                <div className="admin-item-header">
+                  <span className="admin-item-author">👤 {request.nickname}</span>
+                  <span className="admin-item-film">✉️ {request.contact}</span>
+                </div>
+                {request.message && <p className="admin-item-text">{request.message}</p>}
+                <div className="admin-item-actions">
+                  <button className="btn-approve" onClick={() => approveRequest(request)}>✅ Выдать инвайт</button>
+                  <button className="btn-reject" onClick={() => rejectRequest(request)}>❌ Отклонить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="admin-section glass-card">
         <h2>🎟️ Инвайт-коды</h2>
@@ -253,9 +362,22 @@ function AdminPanel() {
             <div className="admin-item-header">
               <span className="admin-item-author">👤 {found.nickname}{found.isAdmin ? ' 👑' : ''}</span>
             </div>
+            <div className="admin-tg-row">
+              <input
+                type="text"
+                placeholder="@telegram — виден на странице связи"
+                value={tgDrafts[found.id] ?? found.telegram ?? ''}
+                onChange={(e) => setTgDrafts(prev => ({ ...prev, [found.id]: e.target.value }))}
+                maxLength={33}
+              />
+              <button className="btn-approve" onClick={() => saveTelegram(found)}>Сохранить TG</button>
+            </div>
             <div className="admin-item-actions">
               <button className="btn-approve" onClick={() => issueResetLink(found.id)}>
                 Выдать ссылку
+              </button>
+              <button className="btn-approve" onClick={() => toggleAdmin(found)}>
+                {found.isAdmin ? 'Снять права' : 'Сделать админом'}
               </button>
             </div>
           </div>

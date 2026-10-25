@@ -10,6 +10,7 @@ function Header({ user, onLogout }) {
         <Link to="/about" className="btn-about">📖 Как оценивать!?</Link>
         <Link to="/critic" className="btn-critic">🇮🇹 Архитектор</Link>
         <Link to="/top" className="btn-top">🏆 Топ</Link>
+        <Link to="/contact" className="btn-about">✉️ Связь</Link>
         <a href="https://t.me/Cinephilium" target="_blank" rel="noopener noreferrer" className="btn-telegram">📱 Telegram</a>
         {user ? (
           <>
