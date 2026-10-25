@@ -1,4 +1,4 @@
-# Changelog — Cinephilium Frontend 4.0
+# Changelog — Cinephilium Frontend 3.9
 
 **Дата и время среза: 25.10.2026, 21:30 (Europe/Moscow, UTC+03:00)**
 
