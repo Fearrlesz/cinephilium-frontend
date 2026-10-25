@@ -5,6 +5,7 @@ import { useNotification } from '../../context/NotificationContext';
 import useActivityEvents from '../../hooks/useActivityEvents';
 import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../../utils/ratingUtils';
 import { getScoreColor } from '../../utils/constants';
+import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
 import './ProfilePage.css';
 import '../../styles/Architect.css';
@@ -389,13 +390,10 @@ function ProfilePage() {
                     <Link to={`/film/${rating.filmId?._id || rating.film?._id}`}>
                       <div className="rating-film-info">
                         <img
-                          src={
-                            rating.filmId?.poster ||
-                            rating.film?.poster ||
-                            '/no-poster.jpg'
-                          }
+                          src={getPosterUrl(rating.filmId?.poster || rating.film?.poster)}
                           alt={rating.filmId?.title || rating.film?.title || 'Фильм'}
                           className="rating-poster-small"
+                          onError={handleImgError}
                         />
                         <div>
                           <h4>{rating.filmId?.title || rating.film?.title || 'Фильм'}</h4>

@@ -6,6 +6,7 @@ import ActivityFeed from '../../components/ActivityFeed';
 import useActivityEvents from '../../hooks/useActivityEvents';
 import { useNotification } from '../../context/NotificationContext';
 import { getScoreColor } from '../../utils/constants';
+import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import './HomePage.css';
 
 const FILMS_PER_PAGE = 20;
@@ -280,7 +281,7 @@ function HomePage() {
           <div className="films-grid">
             {searchResults.map((film) => (
               <div key={film.id} className="film-card">
-                <img src={film.poster_path ? `https://image.tmdb.org/t/p/w200${film.poster_path}` : '/no-poster.jpg'} alt={film.title} />
+                <img src={film.poster_path ? getPosterUrl(`https://image.tmdb.org/t/p/w200${film.poster_path}`) : '/no-poster.jpg'} alt={film.title} onError={handleImgError} />
                 <div className="film-info">
                   <h4>{film.title}</h4>
                   <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
@@ -311,7 +312,7 @@ function HomePage() {
           return (
             <Link to={`/film/${film._id}`} key={film._id} className="top-card-netflix">
               <div className="top-card-poster-wrapper">
-                <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="top-card-poster" />
+                <img src={getPosterUrl(film.poster)} alt={film.title} className="top-card-poster" onError={handleImgError} />
                 <div className="top-card-rank">
                   {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
                 </div>
@@ -342,7 +343,7 @@ function HomePage() {
             {films.map((film) => (
               <Link to={`/film/${film._id}`} key={film._id} className="film-card-link">
                 <div className="film-card">
-                  <img src={film.poster || '/no-poster.jpg'} alt={film.title} />
+                  <img src={getPosterUrl(film.poster)} alt={film.title} onError={handleImgError} />
                   <div className="film-info">
                     <h3>{film.title}</h3>
                     <p>{film.year}</p>

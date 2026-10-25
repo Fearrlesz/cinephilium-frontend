@@ -1,11 +1,12 @@
 import React from 'react';
 import { getScoreColor } from '../../../utils/constants';
+import { getPosterUrl, handleImgError } from '../../../utils/posterUrl';
 import './FilmInfo.css';
 
 function FilmInfo({ film, userRating, onToggleRating, isRatingMode }) {
   return (
     <div className="film-header">
-      <img src={film.poster || '/no-poster.jpg'} alt={film.title} className="film-poster-large" />
+      <img src={getPosterUrl(film.poster)} alt={film.title} className="film-poster-large" onError={handleImgError} />
       <div className="film-details">
         <h1>{film.title}</h1>
         <p className="film-year">{film.year}</p>
