@@ -263,12 +263,16 @@ function ReviewsSection({
           const authorId = author._id;
           const rating = review.ratingId;
           const isPending = review.status === 'pending';
+          // У старых рецензий ratingId может быть null: рейтинг удалили или
+          // документ создан до появления этого поля. typeof null === 'object',
+          // поэтому одной проверки typeof недостаточно — иначе чтение
+          // rating.combinedScore роняет всю страницу фильма.
+          const hasRating = rating !== null && typeof rating === 'object';
 
           // итоговый балл для бейджа: комбо → техника → ничего
-          const badgeScore =
-            typeof rating === 'object'
-              ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
-              : null;
+          const badgeScore = hasRating
+            ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
+            : null;
 
           return (
             <article
@@ -329,12 +333,12 @@ function ReviewsSection({
               <div className="review-text">{review.text}</div>
 
               {/* === Сводка оценки в стиле профиля === */}
-              {rating && typeof rating === 'object' && (
+              {hasRating && (
                 <RatingCriteriaSummary rating={rating} />
               )}
 
               <footer className="review-actions">
-                {rating && typeof rating === 'object' && (
+                {hasRating && (
                   <button
                     className="details-toggle-btn"
                     onClick={() => toggleExpand(review._id)}
@@ -355,8 +359,7 @@ function ReviewsSection({
               </footer>
 
               {expanded[review._id] &&
-                rating &&
-                typeof rating === 'object' && (
+                hasRating && (
                   <RatingDetailsBlock rating={rating} />
                 )}
             </article>
