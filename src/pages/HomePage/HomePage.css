@@ -1,649 +1,1349 @@
 /* ============================================================
-   HomePage.css — полная переработка
-   ============================================================
-   Требуемые глобальные переменные (заданы в :root основного
-   styles.css / App.css):
-     --gold, --gold-bright, --neon-purple, --glass-border,
-     --text-primary, --text-secondary, --font-sans
-   Если какая-то из них не определена — используются fallback-значения.
+   ГЕРОЙ — стекло + золотой акцент (успокоен, читаемость выше)
    ============================================================ */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* ---------- 1. Контейнер страницы ---------- */
-.container {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px clamp(14px, 3vw, 36px) 80px;
-  box-sizing: border-box;
-  min-width: 0;             /* защита от overflow внутри flex/grid */
-}
-
-/* ---------- 2. Стеклянная карточка (используется в hero, search-results, no-films) ---------- */
-.glass-card {
-  background: linear-gradient(160deg,
-    rgba(20, 20, 40, 0.72) 0%,
-    rgba(12, 12, 30, 0.82) 100%);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  border-radius: 20px;
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-/* ---------- 3. Hero-секция + поиск ---------- */
 .hero {
-  padding: clamp(22px, 4vw, 40px);
-  margin-bottom: clamp(22px, 3vw, 36px);
   text-align: center;
+  padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 32px) clamp(28px, 4vw, 44px);
+  background: var(--bg-glass);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: clamp(28px, 4vw, 48px);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Тонкая верхняя линия — сдержанная, без «мигания» */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--gold), transparent);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .hero h2 {
-  margin: 0 0 20px;
-  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-family: var(--font-sans);
   font-weight: 700;
-  line-height: 1.35;
-  color: var(--text-primary, #fff);
+  font-size: clamp(20px, 3.2vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg,
+    var(--text-primary) 25%,
+    var(--gold-bright) 45%,
+    var(--gold) 55%,
+    var(--neon-purple) 70%,
+    var(--text-primary) 90%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: holographic 6s ease-in-out infinite;
+  position: relative;
+  display: inline-block;
+  filter: drop-shadow(0 0 24px rgba(168, 133, 64, 0.1));
+  text-wrap: balance;
 }
 
+@keyframes holographic {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Мягкий радиальный блик — теперь только на hover/focus-within, не постоянно */
+.hero h2::before {
+  content: '';
+  position: absolute;
+  inset: -8px -12px;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(168, 133, 64, 0.06),
+    transparent 65%);
+  pointer-events: none;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hero:hover h2::before,
+.hero:focus-within h2::before {
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.8; }
+}
+
+/* ============================================================
+   ПОИСК — золотой акцент
+   ============================================================ */
 .search-box {
   display: flex;
-  gap: 10px;
-  max-width: 560px;
+  max-width: 620px;
   margin: 0 auto;
-  min-width: 0;
+  gap: 10px;
+  align-items: stretch;
 }
 
 .search-box input {
-  flex: 1 1 auto;
+  flex: 1;
   min-width: 0;
-  padding: 12px 18px;
+  padding: 14px 22px;
   border-radius: 40px;
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, #fff);
-  font-family: var(--font-sans, inherit);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
-
 .search-box input::placeholder {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  color: var(--text-secondary);
+  opacity: 0.75;
 }
-
+.search-box input:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
 .search-box input:focus {
-  border-color: var(--gold, #a88540);
-  box-shadow: 0 0 0 3px rgba(168, 133, 64, 0.15);
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.1),
+    0 0 30px rgba(168, 133, 64, 0.05);
 }
 
 .search-box button {
-  flex: 0 0 auto;
-  padding: 12px 22px;
+  padding: 14px 30px;
   border-radius: 40px;
-  border: 1px solid rgba(168, 133, 64, 0.45);
-  background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.3) 0%,
-    rgba(124, 58, 237, 0.2) 100%);
-  color: var(--gold-bright, #d4af37);
-  font-family: var(--font-sans, inherit);
+  border: 1px solid rgba(168, 133, 64, 0.18);
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.14), rgba(124, 58, 237, 0.07));
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.92rem;
-  line-height: 1;
-  white-space: nowrap;
+  font-size: 14px;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.15s ease;
+  width: auto;
+  margin-top: 0;
+  white-space: nowrap;
 }
-
 .search-box button:hover {
-  box-shadow: 0 4px 20px rgba(168, 133, 64, 0.3);
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.2), rgba(124, 58, 237, 0.1));
+  box-shadow: 0 0 40px rgba(168, 133, 64, 0.08);
 }
-
 .search-box button:active {
   transform: scale(0.97);
 }
 
-/* ---------- 4. Сообщение об ошибке ---------- */
-.error-msg {
-  display: block;
-  max-width: 560px;
-  margin: 0 auto 20px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  background: rgba(220, 38, 38, 0.12);
-  border: 1px solid rgba(220, 38, 38, 0.35);
-  color: #ff8a8a;
-  font-size: 0.88rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
-/* ---------- 5. Табы сортировки — строго в одну линию ---------- */
-.sort-tabs {
-  display: flex;
-  flex-wrap: nowrap;                       /* всегда одна строка */
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-
-  width: max-content;                      /* ровно по содержимому */
-  max-width: 100%;                         /* никогда не выходит за родителя */
-  margin: 0 auto clamp(22px, 3vw, 36px);
-  padding: 6px;
-
-  box-sizing: border-box;
-  border-radius: 60px;
-
-  background: linear-gradient(160deg,
-    rgba(20, 20, 40, 0.72) 0%,
-    rgba(12, 12, 30, 0.82) 100%);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-
-  /* На очень узких экранах допускаем горизонтальный скролл,
-     но скроллбар скрываем — табы не ломаются и не переносятся */
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.sort-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.sort-tab {
-  flex: 0 0 auto;                          /* не сжимаем и не тянем */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  padding: 10px 20px;
-  border-radius: 40px;
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-
-  font-family: var(--font-sans, inherit);
-  font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  background: transparent;
-  border: 1px solid transparent;
-  transition:
-    color 0.3s ease,
-    background 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.2s ease;
-}
-
-.sort-tab:hover {
-  color: var(--text-primary, #fff);
-  background: rgba(255, 255, 255, 0.045);
-  border-color: var(--glass-border, rgba(255, 255, 255, 0.1));
-}
-
-.sort-tab:focus-visible {
-  outline: 2px solid var(--gold-bright, #d4af37);
+/* Доступность: клавиатурный фокус */
+.search-box button:focus-visible,
+.sort-select:focus-visible,
+.load-more-btn:focus-visible,
+.top-all-link-netflix:focus-visible,
+.film-card-link:focus-visible {
+  outline: 2px solid var(--gold-bright);
   outline-offset: 3px;
+  border-radius: 40px;
 }
-
-.sort-tab.active {
-  color: var(--gold-bright, #d4af37);
-  background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.22) 0%,
-    rgba(124, 58, 237, 0.14) 100%);
-  border-color: rgba(168, 133, 64, 0.45);
-  box-shadow:
-    0 4px 20px rgba(168, 133, 64, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.35);
-}
-
-.sort-tab:active {
-  transform: scale(0.97);
-}
-
-.tab-icon {
-  display: inline-flex;
-  align-items: center;
-  font-size: 1.05em;
-  line-height: 1;
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-.sort-tab:hover .tab-icon {
-  transform: scale(1.1);
-}
-
-.sort-tab.active .tab-icon {
-  filter: drop-shadow(0 0 8px rgba(168, 133, 64, 0.55));
-}
-
-.tab-label {
-  white-space: nowrap;
-}
-
-/* ---------- 6. Результаты поиска ---------- */
-.search-results {
-  padding: clamp(16px, 3vw, 24px);
-  margin-bottom: clamp(20px, 3vw, 28px);
-}
-
-.search-results h3 {
-  margin: 0 0 16px;
-  font-size: 1.05rem;
-  color: var(--text-primary, #fff);
-}
-
-/* ---------- 7. Топ-5 (Netflix-стиль, горизонтальный скролл) ---------- */
-.top-films-netflix {
-  margin-bottom: clamp(24px, 3vw, 36px);
-}
-
-.top-header-netflix {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 0 4px;
-}
-
-.top-header-netflix h3 {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary, #fff);
-}
-
-.top-scroll-container {
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-  padding: 4px 0 8px;
-}
-
-.top-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-.top-scroll-wrapper {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 14px;
-  padding: 0 4px;
-}
-
-.top-card-netflix {
-  flex: 0 0 auto;
-  width: 160px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.25s ease;
-}
-
-.top-card-netflix:hover {
-  transform: translateY(-4px);
-}
-
-.top-card-poster-wrapper {
-  position: relative;                    /* только для бейджей внутри */
-  width: 100%;
-  aspect-ratio: 2 / 3;
+.film-card-link:focus-visible {
   border-radius: 12px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  outline-offset: 4px;
 }
 
-.top-card-poster {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.top-card-rank {
-  position: absolute;
-  top: 6px;
-  left: 8px;
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
-  pointer-events: none;
-}
-
-.top-card-score {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  padding: 3px 8px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1;
-  pointer-events: none;
-}
-
-.top-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 8px;
-  padding: 0 2px;
-  min-width: 0;
-}
-
-.top-card-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary, #fff);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.top-card-year {
-  font-size: 0.75rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-}
-
-/* ---------- 8. Сетка фильмов ---------- */
+/* ============================================================
+   СЕТКА ФИЛЬМОВ — «дыхание» и адаптивность
+   ============================================================ */
 .films-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: clamp(12px, 2vw, 20px);
-  margin-bottom: clamp(24px, 3vw, 36px);
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: clamp(16px, 2vw, 26px) clamp(12px, 1.6vw, 22px);
+  padding: clamp(20px, 3vw, 34px) 0 clamp(40px, 5vw, 64px);
+  position: relative;
+}
+
+.films-grid::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  width: 90%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--neon-purple), var(--neon-cyan), var(--gold), transparent);
+  opacity: 0.22;
 }
 
 .film-card-link {
-  display: block;
   text-decoration: none;
   color: inherit;
-  min-width: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  border-radius: 12px;
+  display: block;
 }
 
-/* ---------- 9. Карточка фильма ---------- */
+.film-card-link:focus,
+.film-card-link:active,
+.film-card-link:visited {
+  outline: none;
+}
+
+/* ============================================================
+   КАРТОЧКА ФИЛЬМА — премиум-стекло
+   ============================================================ */
 .film-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border-radius: 14px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
   overflow: hidden;
-  background: rgba(20, 20, 40, 0.6);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
   transition:
-    transform 0.25s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.45s ease;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  z-index: 1;
 }
 
-.film-card-link:hover .film-card {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.15);
-  border-color: rgba(168, 133, 64, 0.35);
+/* ============================================================
+   ИНДИВИДУАЛЬНЫЙ АКЦЕНТ РЕЙТИНГА ДЛЯ КАЖДОЙ КАРТОЧКИ
+   Цикл из 5 цветов палитры сайта — золото, розовый, циан,
+   фиолет, приглушённое золото. Задаётся через nth-child,
+   поэтому HTML менять не нужно.
+   ============================================================ */
+.film-card {
+  --rating-accent: var(--gold-bright);
+  --rating-glow:   rgba(168, 133, 64, 0.22);
+  --rating-soft:   rgba(168, 133, 64, 0.10);
+}
+
+.film-card:nth-child(5n+1) {
+  --rating-accent: var(--gold-bright);
+  --rating-glow:   rgba(168, 133, 64, 0.22);
+  --rating-soft:   rgba(168, 133, 64, 0.10);
+}
+.film-card:nth-child(5n+2) {
+  --rating-accent: var(--neon-pink);
+  --rating-glow:   rgba(236, 72, 153, 0.24);
+  --rating-soft:   rgba(236, 72, 153, 0.10);
+}
+.film-card:nth-child(5n+3) {
+  --rating-accent: var(--neon-cyan);
+  --rating-glow:   rgba(34, 211, 238, 0.24);
+  --rating-soft:   rgba(34, 211, 238, 0.10);
+}
+.film-card:nth-child(5n+4) {
+  --rating-accent: var(--neon-purple);
+  --rating-glow:   rgba(124, 58, 237, 0.26);
+  --rating-soft:   rgba(124, 58, 237, 0.10);
+}
+.film-card:nth-child(5n+5) {
+  --rating-accent: var(--gold);
+  --rating-glow:   rgba(168, 133, 64, 0.20);
+  --rating-soft:   rgba(168, 133, 64, 0.09);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.film-card:nth-child(1)  { animation-delay: 0.03s; }
+.film-card:nth-child(2)  { animation-delay: 0.06s; }
+.film-card:nth-child(3)  { animation-delay: 0.09s; }
+.film-card:nth-child(4)  { animation-delay: 0.12s; }
+.film-card:nth-child(5)  { animation-delay: 0.15s; }
+.film-card:nth-child(6)  { animation-delay: 0.18s; }
+.film-card:nth-child(7)  { animation-delay: 0.21s; }
+.film-card:nth-child(8)  { animation-delay: 0.24s; }
+.film-card:nth-child(9)  { animation-delay: 0.27s; }
+.film-card:nth-child(10) { animation-delay: 0.30s; }
+.film-card:nth-child(11) { animation-delay: 0.33s; }
+.film-card:nth-child(12) { animation-delay: 0.36s; }
+
+/* ✨ Верхняя бегущая линия вместо тяжёлой conic-рамки */
+.film-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--gold) 25%,
+    var(--gold-bright) 50%,
+    var(--neon-purple) 75%,
+    transparent
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: borderSlide 4s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+.film-card:hover::before,
+.film-card-link:focus-visible .film-card::before {
+  opacity: 0.9;
+}
+
+@keyframes borderSlide {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ✨ Отражение снизу — мягкое золотое свечение */
+.film-card::after {
+  content: '';
+  position: absolute;
+  bottom: -24px;
+  left: 8%;
+  width: 84%;
+  height: 22px;
+  background: linear-gradient(to bottom, rgba(168, 133, 64, 0.22), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.film-card:hover::after,
+.film-card-link:focus-visible .film-card::after {
+  opacity: 0.55;
+}
+
+.film-card:hover,
+.film-card-link:focus-visible .film-card {
+  transform: translateY(-6px) scale(1.012);
+  border-color: var(--gold);
+  box-shadow:
+    0 20px 55px rgba(168, 133, 64, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .film-card img {
-  display: block;
   width: 100%;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  background: rgba(255, 255, 255, 0.03);
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  filter: saturate(0.95);
+}
+
+.film-card:hover img,
+.film-card-link:focus-visible .film-card img {
+  transform: scale(1.045);
+  filter: saturate(1.08);
 }
 
 .film-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1 1 auto;
-  padding: 10px 12px 12px;
-  min-width: 0;
+  padding: 14px 16px 18px;
 }
 
-.film-info h3,
-.film-info h4 {
-  margin: 0;
-  font-size: 0.92rem;
+.film-info h3 {
+  font-family: var(--font-sans);
   font-weight: 600;
-  line-height: 1.3;
-  color: var(--text-primary, #fff);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: 15px;
+  line-height: 1.35;
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.005em;
 }
 
 .film-info p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
   margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
 }
 
+/* ===== РЕЙТИНГ В КАРТОЧКЕ — цвет под фильм ===== */
+.rating-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  margin-top: 6px;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  letter-spacing: -0.02em;
+  color: var(--rating-accent);
+  text-shadow: 0 0 20px var(--rating-glow);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.film-card:hover .rating-badge,
+.film-card-link:focus-visible .rating-badge {
+  text-shadow: 0 0 30px var(--rating-glow);
+}
+
+.votes-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+  align-self: flex-start;
+  font-family: var(--font-sans);
+  line-height: 1;
+}
+
+.film-card:hover .votes-count,
+.film-card-link:focus-visible .votes-count {
+  border-color: var(--rating-soft);
+  color: var(--text-secondary);
+  background: var(--rating-soft);
+}
+
+/* ============================================================
+   БЛОК С ТРЕМЯ РЕЙТИНГАМИ — контрастные цвета
+   ============================================================ */
 .film-ratings {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 5px;
+  margin-top: 8px;
+  padding: 10px 12px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.film-card:hover .film-ratings,
+.film-card-link:focus-visible .film-ratings {
+  border-color: var(--rating-soft);
+  background: var(--rating-soft);
 }
 
 .rating-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 2px 0;
+  font-size: 0.85rem;
   gap: 8px;
-  font-size: 0.78rem;
-  line-height: 1.2;
 }
 
 .rating-label {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-  white-space: nowrap;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
 }
 
 .rating-value {
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
+  font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
+  transition: text-shadow 0.3s ease;
+  min-width: 32px;
+  text-align: right;
 }
 
-.votes-count {
+/* Все три строки рейтинга подхватывают акцент карточки */
+.rating-technical,
+.rating-vibe,
+.rating-combined {
+  color: var(--rating-accent);
+  text-shadow: 0 0 20px var(--rating-glow);
+}
+
+.rating-technical:hover,
+.rating-vibe:hover,
+.rating-combined:hover {
+  text-shadow: 0 0 30px var(--rating-glow);
+}
+
+/* ============================================================
+   ТОП-5 В СТИЛЕ NETFLIX — плавный скролл, snap, золото
+   ============================================================ */
+.top-films-netflix {
+  margin: clamp(24px, 3vw, 36px) 0 20px;
+  padding: 20px 0 12px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.top-header-netflix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px 18px 4px;
+}
+
+.top-header-netflix h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.top-header-netflix h3::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright), transparent);
   margin-top: 6px;
-  font-size: 0.72rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-  opacity: 0.85;
+  border-radius: 2px;
 }
 
-.btn-add {
-  margin-top: 8px;
-  padding: 9px 14px;
-  border-radius: 30px;
-  border: 1px solid rgba(168, 133, 64, 0.45);
-  background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.3) 0%,
-    rgba(124, 58, 237, 0.2) 100%);
-  color: var(--gold-bright, #d4af37);
-  font-family: var(--font-sans, inherit);
-  font-weight: 600;
-  font-size: 0.82rem;
+.top-all-link-netflix {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.top-all-link-netflix:hover {
+  color: var(--gold-bright);
+  border-color: rgba(168, 133, 64, 0.2);
+  background: rgba(168, 133, 64, 0.05);
+}
+
+/* ── Горизонтальный скролл-контейнер ── */
+.top-scroll-container {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  /* Мягкие «затухания» по краям — приятный кинематографичный эффект */
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.top-scroll-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 20px 16px 4px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) rgba(255, 255, 255, 0.03);
+}
+
+.top-scroll-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+.top-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+.top-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--gold), var(--neon-purple));
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(168, 133, 64, 0.2);
+}
+.top-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, var(--gold-bright), var(--neon-cyan));
+}
+
+/* ── Карточка топа ── */
+.top-card-netflix {
+  flex: 0 0 clamp(128px, 14vw, 156px);
+  width: clamp(128px, 14vw, 156px);
+  max-width: clamp(128px, 14vw, 156px);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 10px;
+  scroll-snap-align: start;
+  outline: none;
+}
+
+.top-card-netflix:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 4px;
+}
+
+.top-card-netflix:hover,
+.top-card-netflix:focus-visible {
+  transform: translateY(-4px) scale(1.03);
+  z-index: 10;
+}
+
+.top-card-netflix:hover .top-card-poster,
+.top-card-netflix:focus-visible .top-card-poster {
+  box-shadow:
+    0 12px 40px rgba(168, 133, 64, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.top-card-poster-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  background: var(--bg-deep);
+}
+
+.top-card-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: box-shadow 0.4s ease, filter 0.4s ease;
+  background: var(--bg-deep);
+  filter: saturate(0.95);
+}
+
+.top-card-netflix:hover .top-card-poster,
+.top-card-netflix:focus-visible .top-card-poster {
+  filter: saturate(1.1);
+}
+
+.top-card-rank {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid rgba(168, 133, 64, 0.25);
+  color: var(--gold-bright);
   line-height: 1;
+}
+
+.top-card-score {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.5px;
+  transition: transform 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  line-height: 1;
+  color: var(--gold-bright);
+}
+
+.top-card-netflix:hover .top-card-score,
+.top-card-netflix:focus-visible .top-card-score {
+  transform: scale(1.06);
+  border-color: rgba(168, 133, 64, 0.35);
+}
+
+.top-card-info {
+  padding: 8px 2px 2px;
+}
+
+.top-card-title {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.top-card-year {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   ПАНЕЛЬ СОРТИРОВКИ — чище и читаемее
+   ============================================================ */
+.sort-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 22px;
+  padding: 16px 24px;
+  background: linear-gradient(160deg,
+    rgba(20, 20, 40, 0.8) 0%,
+    rgba(12, 12, 30, 0.85) 40%,
+    rgba(8, 8, 20, 0.9) 100%
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  margin-bottom: 24px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Тонкая верхняя линия — статичная, не мигает */
+.sort-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.25;
+  transition: opacity 0.4s ease;
+}
+
+.sort-panel:hover::before {
+  opacity: 0.55;
+}
+
+/* Убираем conic-рамку — оставляем только тонкий контур при hover */
+.sort-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(168, 133, 64, 0.35), rgba(124, 58, 237, 0.25));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.sort-panel:hover::after {
+  opacity: 0.5;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sort-controls label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.sort-select {
+  padding: 11px 46px 11px 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23a88540' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 14px 10px;
+  min-width: 200px;
+  position: relative;
 }
 
-.btn-add:hover:not(:disabled) {
-  box-shadow: 0 4px 16px rgba(168, 133, 64, 0.3);
+.sort-select:hover {
+  border-color: rgba(168, 133, 64, 0.28);
+  background-color: rgba(255, 255, 255, 0.055);
 }
 
-.btn-add:active:not(:disabled) {
-  transform: scale(0.97);
+.sort-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 4px rgba(168, 133, 64, 0.1),
+    0 0 30px rgba(168, 133, 64, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.btn-add:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.sort-select option {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  font-weight: 400;
 }
 
-/* ---------- 10. Блок «Загрузить ещё» ---------- */
+.sort-select option:checked {
+  background: rgba(168, 133, 64, 0.18);
+  color: var(--gold-bright);
+}
+
+.sort-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  padding: 7px 16px;
+  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.sort-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-info span::before {
+  content: '🎬';
+  font-size: 14px;
+}
+
+.sort-info .count-number {
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+}
+
+.sort-info:hover {
+  border-color: rgba(168, 133, 64, 0.18);
+  background: rgba(168, 133, 64, 0.03);
+}
+
+/* ============================================================
+   КНОПКА «ЗАГРУЗИТЬ ЕЩЁ» — премиум
+   ============================================================ */
 .load-more {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin: clamp(24px, 3vw, 36px) 0;
-  text-align: center;
+  gap: 12px;
+  margin-top: 40px;
+  padding: 20px 0 30px;
+  position: relative;
+}
+
+.load-more::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.18;
 }
 
 .load-more-btn {
-  padding: 12px 32px;
-  border-radius: 40px;
-  border: 1px solid rgba(168, 133, 64, 0.45);
-  background: linear-gradient(135deg,
-    rgba(168, 133, 64, 0.25) 0%,
-    rgba(124, 58, 237, 0.15) 100%);
-  color: var(--gold-bright, #d4af37);
-  font-family: var(--font-sans, inherit);
+  padding: 14px 44px;
+  border-radius: 60px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(160deg,
+    rgba(20, 20, 40, 0.75) 0%,
+    rgba(12, 12, 30, 0.85) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    box-shadow 0.4s ease,
+    background 0.35s ease,
+    opacity 0.3s ease;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.02em;
+  min-width: 200px;
+  width: auto;
+  margin-top: 0;
+}
+
+/* Тонкая световая полоса, проходящая при hover */
+.load-more-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg,
+    transparent 30%,
+    rgba(168, 133, 64, 0.18) 50%,
+    transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.load-more-btn:hover:not(:disabled)::before {
+  transform: translateX(120%);
+}
+
+/* Тонкая рамка-подсветка при hover */
+.load-more-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(168, 133, 64, 0.5);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.load-more-btn:hover:not(:disabled)::after {
+  opacity: 1;
 }
 
 .load-more-btn:hover:not(:disabled) {
-  box-shadow: 0 4px 20px rgba(168, 133, 64, 0.3);
+  border-color: var(--gold);
+  background: linear-gradient(160deg,
+    rgba(28, 26, 52, 0.85) 0%,
+    rgba(16, 16, 35, 0.9) 100%
+  );
+  box-shadow:
+    0 10px 40px rgba(168, 133, 64, 0.12),
+    0 0 60px rgba(168, 133, 64, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transform: translateY(-3px);
 }
 
 .load-more-btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.97) translateY(0);
 }
 
 .load-more-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.35;
   cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none;
 }
 
-.load-more-end {
-  font-size: 0.88rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+.load-more-btn:disabled::before,
+.load-more-btn:disabled::after {
+  opacity: 0 !important;
 }
 
 .page-info {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-  opacity: 0.8;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
 }
 
-/* ---------- 11. Служебные состояния ---------- */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  font-size: 1.1rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-.no-films {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: 0.95rem;
+.page-info .current-page {
+  color: var(--gold-bright);
+  font-weight: 700;
 }
 
 /* ============================================================
-   Адаптив
+   ПОИСКОВЫЕ РЕЗУЛЬТАТЫ
    ============================================================ */
-
-/* Планшеты */
-@media (max-width: 900px) {
-  .top-card-netflix { width: 145px; }
-  .films-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
+.search-results {
+  margin: 30px 0;
+  padding: 22px 24px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Узкие планшеты / крупные телефоны */
-@media (max-width: 640px) {
-  .sort-tab {
-    padding: 9px 14px;
-    font-size: 0.82rem;
-    gap: 5px;
-  }
-  .sort-tabs { padding: 5px; gap: 5px; }
-
-  .top-card-netflix { width: 130px; }
-
-  .films-grid {
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-  }
+.search-results::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  opacity: 0.25;
 }
 
-/* Телефоны */
-@media (max-width: 520px) {
-  .hero { padding: 18px 16px; }
-  .hero h2 { font-size: 1.05rem; }
+.search-results h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
 
+/* ============================================================
+   АДАПТИВНОСТЬ — mobile-first, чистые breakpoints
+   ============================================================ */
+@media (max-width: 768px) {
+  .hero h2 {
+    font-size: 20px;
+    animation-duration: 5s;
+  }
+
+  .films-grid {
+    gap: 14px;
+  }
+  .film-info h3 {
+    font-size: 13px;
+  }
+
+  /* Мобильный поиск */
   .search-box {
-    flex-direction: column;    /* инпут + кнопка в столбик на телефоне */
+    flex-direction: column;
+    gap: 12px;
   }
-  .search-box button { width: 100%; }
 
-  .sort-tab {
-    padding: 8px 11px;
-    font-size: 0.76rem;
-    gap: 4px;
+  .search-box input {
+    font-size: 16px;
+    padding: 14px 20px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   }
-  .tab-icon { font-size: 0.95em; }
 
-  .top-card-netflix { width: 118px; }
-  .top-scroll-wrapper { gap: 10px; }
+  .search-box input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(168, 133, 64, 0.12);
+  }
 
-  .films-grid {
-    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  .search-box button {
+    padding: 14px 28px;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  /* Кнопка «Загрузить ещё» */
+  .load-more {
+    margin-top: 30px;
+    padding: 16px 0 24px;
     gap: 10px;
   }
-  .film-info { padding: 8px 10px 10px; }
-  .film-info h3,
-  .film-info h4 { font-size: 0.85rem; }
+
+  .load-more-btn {
+    padding: 13px 34px;
+    font-size: 0.9rem;
+    min-width: 170px;
+  }
+
+  .page-info {
+    font-size: 0.75rem;
+    padding: 5px 14px;
+  }
+
+  /* Сортировка */
+  .sort-panel {
+    padding: 16px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    border-radius: 16px;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sort-controls label {
+    font-size: 12px;
+  }
+
+  .sort-select {
+    padding: 12px 46px 12px 18px;
+    font-size: 0.9rem;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .sort-info {
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  .sort-info .count-number {
+    font-size: 0.9rem;
+  }
+
+  /* Netflix-топ */
+  .top-card-netflix {
+    flex: 0 0 130px;
+    width: 130px;
+    max-width: 130px;
+  }
+  .top-card-rank {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+  .top-card-score {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+  .top-card-title {
+    font-size: 12.5px;
+  }
+  .top-header-netflix h3 {
+    font-size: 20px;
+  }
+
+  /* Рейтинги в карточке */
+  .film-ratings {
+    padding: 8px 10px 10px;
+    gap: 4px;
+  }
+  .rating-row   { font-size: 0.8rem; }
+  .rating-label { font-size: 0.75rem; }
+  .rating-value { font-size: 0.85rem; min-width: 28px; }
+  .votes-count  { font-size: 0.7rem; padding: 3px 10px; }
+
+  /* Поисковые результаты — компактная сетка */
+  .search-results .films-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow: visible !important;
+    flex-wrap: wrap !important;
+    scroll-snap-type: none !important;
+    padding: 10px 0 20px 0 !important;
+    margin: 0 !important;
+  }
+
+  .search-results .films-grid .film-card {
+    flex: none !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    scroll-snap-align: none !important;
+  }
+
+  .search-results .films-grid .film-info h4 {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-results .films-grid .film-info p { font-size: 12px; }
+  .search-results .films-grid .btn-add { font-size: 12px; padding: 4px 12px; }
+
+  .search-results .films-grid::-webkit-scrollbar { height: 3px; }
+  .search-results .films-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+  .search-results .films-grid::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 4px;
+  }
+  .search-results .films-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-bright);
+  }
+
+  /* Основная сетка фильмов */
+  .films-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow: visible !important;
+    flex-wrap: wrap !important;
+    scroll-snap-type: none !important;
+    padding: 20px 8px 30px 8px !important;
+    margin: 0 !important;
+  }
+
+  .films-grid .film-card-link {
+    flex: none !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    scroll-snap-align: none !important;
+  }
+
+  .films-grid .film-card {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .films-grid::after {
+    display: none !important;
+  }
+
+  /* Netflix-топ — превращаем в сетку на мобилке */
+  .top-scroll-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    overflow: visible !important;
+    padding: 8px 0 16px 0 !important;
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+
+  .top-card-netflix {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Базовые */
+  body {
+    overflow-x: hidden;
+    padding: 8px 4px;
+  }
+
+  .app {
+    max-width: 100% !important;
+    padding: 0 8px;
+    overflow-x: hidden;
+  }
+
+  /* Тактильная обратная связь */
+  .film-card-link:active .film-card {
+    transform: scale(0.97);
+    transition-duration: 0.1s;
+  }
+
+  .load-more-btn:active {
+    transform: scale(0.94);
+    transition-duration: 0.1s;
+  }
+
+  .film-card-link .film-card,
+  .load-more-btn {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
-/* Очень узкие экраны */
-@media (max-width: 360px) {
-  .sort-tab {
-    padding: 7px 9px;
-    font-size: 0.7rem;
-    gap: 3px;
-  }
-  .sort-tabs { padding: 4px; gap: 3px; }
+@media (min-width: 420px) and (max-width: 768px) {
+  .films-grid              { grid-template-columns: repeat(3, 1fr) !important; }
+  .search-results .films-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .top-scroll-wrapper      { grid-template-columns: repeat(3, 1fr) !important; }
+}
 
-  .films-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+@media (max-width: 480px) {
+  .hero h2 { font-size: 16px; }
+
+  .films-grid { gap: 10px; }
+  .film-info h3 { font-size: 12px; }
+  .film-info p  { font-size: 11px; }
+  .rating-badge { font-size: 14px; }
+
+  .sort-panel { padding: 14px 16px; border-radius: 14px; }
+  .sort-select { font-size: 0.85rem; padding: 10px 42px 10px 16px; }
+  .sort-controls label { font-size: 11px; letter-spacing: 0.06em; }
+  .sort-info { font-size: 0.75rem; padding: 6px 12px; }
+
+  .top-card-netflix { flex: 0 0 110px; width: 110px; max-width: 110px; }
+  .top-card-rank  { width: 26px; height: 26px; font-size: 12px; }
+  .top-card-score { font-size: 12px; padding: 2px 10px; }
+  .top-card-title { font-size: 12px; }
+  .top-header-netflix h3 { font-size: 18px; }
+
+  .film-ratings { padding: 6px 8px 8px; }
+  .rating-row   { font-size: 0.7rem; }
+  .rating-label { font-size: 0.7rem; }
+  .rating-value { font-size: 0.75rem; min-width: 24px; }
+  .votes-count  { font-size: 0.65rem; padding: 2px 8px; }
+
+  .load-more-btn { padding: 11px 26px; font-size: 0.85rem; min-width: 150px; }
+}
+
+/* Уважение к prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero h2,
+  .film-card,
+  .film-card::before,
+  .load-more-btn::before {
+    animation: none !important;
+    transition: none !important;
   }
-  .top-card-netflix { width: 105px; }
+  .film-card { opacity: 1; }
 }
