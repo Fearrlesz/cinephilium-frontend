@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS, BLOCK_NAMES, TECHNICAL_MULTIPLIER, VIBE_STEP, MIN_SCORE, MAX_SCORE } from '../../utils/constants';
+import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS, BLOCK_NAMES, TECHNICAL_MULTIPLIER, MIN_SCORE, MAX_SCORE } from '../../utils/constants';
 import './AboutPage.css'; 
 
 function AboutPage() {
@@ -15,7 +15,9 @@ function AboutPage() {
           Каждый критерий оценивается от <strong>1 до 10</strong>.
         </p>
         <p>
-          Вашу оценку составляет «Технический Балл», который превращается в «Комбинированную оценку», умножаясь на множитель вашего личного восприятия - <strong>«Вайб»!</strong>.
+          Из оценок складывается «Технический балл» (10–100), а «Вайб» добавляет
+          к нему личное восприятие: комбинированная оценка — это 70% техники
+          и 30% вайба, переведённого в ту же шкалу.
         </p>
       </div>
 
@@ -86,29 +88,29 @@ function AboutPage() {
         <div className="formula-steps">
           <div className="formula-step">
             <span className="step-number">1.</span>
-            <span>По каждому блоку считается среднее арифметическое его критериев</span>
+            <span>По каждому блоку считается среднее арифметическое его критериев (1–10)</span>
           </div>
           <div className="formula-step">
             <span className="step-number">2.</span>
-            <span>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) × {TECHNICAL_MULTIPLIER}</span>
+            <span>Взвешенное среднее = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) / 100, где сумма весов — 100%</span>
           </div>
           <div className="formula-step">
             <span className="step-number">3.</span>
-            <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
+            <span>Технический балл (T) = взвешенное среднее × 10 — шкала от 10 до 100</span>
           </div>
           <div className="formula-step">
             <span className="step-number">4.</span>
-            <span>Вайб-множитель = 1 + (M − 1) × {VIBE_STEP}</span>
+            <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
           </div>
           <div className="formula-step">
             <span className="step-number">5.</span>
-            <span>Комбинированный балл = T × Вайб-множитель</span>
+            <span>Комбинированный балл = T × {TECHNICAL_MULTIPLIER} + M × 3 — тоже шкала от 10 до 100</span>
           </div>
         </div>
         <div className="formula-result">
           <p>Итоговая оценка всегда в диапазоне от <strong>{MIN_SCORE}</strong> до {MAX_SCORE}.</p>
           <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
-            💡 Округление происходит только в самом конце, поэтому все нюансы оценок сохраняются.
+            💡 Технический и комбинированный баллы округляются до десятых; промежуточные средние не округляются.
           </p>
         </div>
       </div>
