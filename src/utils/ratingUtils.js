@@ -80,5 +80,6 @@ export function computeBlockAverages(scores) {
 }
 
 export function validateNickname(nickname) {
-  return nickname && nickname.length >= 2 && nickname.length <= 20;
+  const value = String(nickname || '').trim();
+  return value.length >= 2 && value.length <= 50;
 }

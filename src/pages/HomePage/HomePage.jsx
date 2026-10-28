@@ -281,7 +281,7 @@ function HomePage() {
           <div className="films-grid">
             {searchResults.map((film) => (
               <div key={film.id} className="film-card">
-                <img src={film.poster_path ? getPosterUrl(`https://image.tmdb.org/t/p/w200${film.poster_path}`) : '/no-poster.jpg'} alt={film.title} onError={handleImgError} />
+                <img src={film.poster_path ? getPosterUrl(`https://image.tmdb.org/t/p/w200${film.poster_path}`) : '/no-poster.jpg'} alt={film.title} onError={handleImgError} loading="lazy" decoding="async" />
                 <div className="film-info">
                   <h4>{film.title}</h4>
                   <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
@@ -343,7 +343,7 @@ function HomePage() {
             {films.map((film) => (
               <Link to={`/film/${film._id}`} key={film._id} className="film-card-link">
                 <div className="film-card">
-                  <img src={getPosterUrl(film.poster)} alt={film.title} onError={handleImgError} />
+                  <img src={getPosterUrl(film.poster)} alt={film.title} onError={handleImgError} loading="lazy" decoding="async" />
                   <div className="film-info">
                     <h3>{film.title}</h3>
                     <p>{film.year}</p>

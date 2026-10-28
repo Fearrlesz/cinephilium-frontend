@@ -36,7 +36,7 @@ export const PRESET_WEIGHTS = {
   comedy:       [30, 30, 15, 15, 10],
   horror:       [25, 20, 20, 25, 10],
   scifi_block:  [25, 20, 25, 20, 10],
-  scifi_author: [25, 20, 20, 15, 20],
+  scifi_author: [20, 20, 25, 15, 20],
   musical:      [20, 20, 20, 30, 10],
   biopic:       [30, 30, 20, 15, 5],
   hybrid:       null
@@ -45,7 +45,6 @@ export const PRESET_WEIGHTS = {
 export const MIN_SCORE = 10;
 export const MAX_SCORE = 100;
 export const TECHNICAL_MULTIPLIER = 0.7;
-export const VIBE_STEP = 0.3;
 
 export const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add', 'achievement'];
 export const VALID_FILM_TYPES = ['view', 'like', 'rating', 'comment', 'share', 'favorite'];

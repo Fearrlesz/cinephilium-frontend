@@ -26,6 +26,11 @@ function CommentsSection({ comments, currentUser, film, onAddComment, onLikeComm
       <div className="comments-list">
         {comments.map((comment) => (
           <div key={comment._id} id={comment._id} className="comment-item">
+            {comment.status === 'pending' && (
+              <div className="comment-pending-badge">
+                ⏳ На модерации — видно только вам
+              </div>
+            )}
             <div className="comment-author">
               <span className="comment-nickname">{comment.userId?.nickname || 'Пользователь'}</span>
               {comment.userId?.isAdmin && <span className="admin-badge">👑</span>}

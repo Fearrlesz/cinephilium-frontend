@@ -73,8 +73,8 @@ function RatingForm({
     scores?.[blockKey]?.[critKey] ?? DEFAULT_SCORE;
 
   const preview = useMemo(
-    () => calculatePreview(scores, vibe, blockWeights, genrePreset),
-    [scores, vibe, blockWeights, genrePreset, calculatePreview]
+    () => calculatePreview(),
+    [calculatePreview]
   );
 
   const grade = useMemo(

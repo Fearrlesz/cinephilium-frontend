@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import api from '../../../api/client';
 import { getErrorMessage } from '../../../utils/apiError';
 import { CRITERIA_CONFIG, PRESET_WEIGHTS } from '../../../utils/constants';
+import { calculatePreview as calculatePreviewScore } from '../../../utils/scoring';
 
 const createEmptyScores = () => Object.fromEntries(
   CRITERIA_CONFIG.map(b => [b.key, Object.fromEntries(b.criteria.map(c => [c.key, 5]))])
@@ -76,25 +77,10 @@ function useRatingForm(filmId, film, userRating, currentUser, loadFilm, loadFilm
     }));
   };
 
-  const calculatePreview = useCallback(() => {
-    const s = scores;
-    const avgs = {
-      scenario: s.scenario.plot * 0.35 + s.scenario.ideas * 0.35 + s.scenario.dialogue * 0.30,
-      characters: s.characters.depth * 0.40 + s.characters.chemistry * 0.35 + s.characters.functionality * 0.25,
-      visual: (s.visual.composition + s.visual.cinematography + s.visual.pacing + s.visual.tone) / 4,
-      sound: s.sound.music * 0.40 + s.sound.design * 0.35 + s.sound.narrative * 0.25,
-      style: (s.style.originality + s.style.boldness) / 2
-    };
-    const rawTech = 
-      avgs.scenario * blockWeights[0] +
-      avgs.characters * blockWeights[1] +
-      avgs.visual * blockWeights[2] +
-      avgs.sound * blockWeights[3] +
-      avgs.style * blockWeights[4];
-    const tech = Number((rawTech / 100 * 10).toFixed(1));
-    const combined = Number((tech * 0.7 + vibe * 3).toFixed(1));
-    return { tech, vibe, combined };
-  }, [scores, vibe, blockWeights]);
+  const calculatePreview = useCallback(
+    () => calculatePreviewScore(scores, blockWeights, vibe),
+    [scores, blockWeights, vibe]
+  );
 
   const saveRating = useCallback(async () => {
     const token = localStorage.getItem('token');

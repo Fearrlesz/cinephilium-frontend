@@ -58,7 +58,7 @@ function LoginPage() {
 
   const validateCredentials = () => {
     if (!validateNickname(nickname.trim())) {
-      setError('Никнейм должен быть от 2 до 20 символов');
+      setError('Никнейм должен быть от 2 до 50 символов');
       return false;
     }
     if (!validatePassword(password)) {
@@ -152,7 +152,7 @@ function LoginPage() {
             autoComplete="username"
             required
             minLength={2}
-            maxLength={20}
+            maxLength={50}
           />
 
           <input

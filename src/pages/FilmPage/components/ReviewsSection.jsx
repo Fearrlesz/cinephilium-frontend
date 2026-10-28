@@ -14,7 +14,8 @@ import {
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;
-const MAX_TEXT = 5000;
+const MIN_TEXT = 350;
+const MAX_TEXT = 15000;
 
 /* ---------- утилиты ---------- */
 
@@ -163,7 +164,8 @@ function ReviewsSection({
   const [expanded, setExpanded] = useState({});
 
   const canPublish =
-    newReview.title.trim().length > 0 && newReview.text.trim().length > 0;
+    newReview.title.trim().length > 0 &&
+    newReview.text.trim().length >= MIN_TEXT;
 
   const handleAddReview = () => {
     if (!canPublish) return;
@@ -222,7 +224,7 @@ function ReviewsSection({
           <div className="review-textarea-wrapper">
             <textarea
               className="review-textarea"
-              placeholder="Поделитесь впечатлениями о фильме..."
+              placeholder="Поделитесь впечатлениями о фильме… (от 350 до 15 000 символов)"
               value={newReview.text}
               maxLength={MAX_TEXT}
               onChange={(e) =>
@@ -231,6 +233,9 @@ function ReviewsSection({
             />
             <span className="char-counter">
               {newReview.text.length} / {MAX_TEXT}
+              {newReview.text.trim().length < MIN_TEXT && (
+                <> · минимум {MIN_TEXT}</>
+              )}
             </span>
           </div>
 

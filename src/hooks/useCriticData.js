@@ -59,5 +59,5 @@ export default function useCriticData() {
     load();
   }, [load]);
 
-  return { critic, ratings, topMovies, reviewPosters, loading, error };
+  return { critic, ratings, topMovies, reviewPosters, loading, error, refetch: load };
 }

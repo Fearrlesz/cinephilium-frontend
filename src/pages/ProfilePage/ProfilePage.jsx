@@ -214,8 +214,12 @@ function ProfilePage() {
     }
   }, [ratings, sortBy]);
 
+  // /ratings/user отдаёт combinedScore (finalScore — легаси-поле).
   const avgRating = ratings.length
-    ? (ratings.reduce((sum, r) => sum + r.finalScore, 0) / ratings.length).toFixed(1)
+    ? (ratings.reduce((sum, r) => {
+        const score = r.combinedScore ?? r.finalScore ?? r.technicalScore ?? 0;
+        return sum + (Number.isFinite(score) ? score : 0);
+      }, 0) / ratings.length).toFixed(1)
     : 'Нет';
 
   if (loading) return <div className="loading">Загрузка...</div>;
