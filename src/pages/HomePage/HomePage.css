@@ -1,20 +1,36 @@
 /* ============================================================
-   ТАБЫ СОРТИРОВКИ — Техническая / Вайб / Общая
+   HomePage.css — полная переработка
+   ============================================================
+   Требуемые глобальные переменные (заданы в :root основного
+   styles.css / App.css):
+     --gold, --gold-bright, --neon-purple, --glass-border,
+     --text-primary, --text-secondary, --font-sans
+   Если какая-то из них не определена — используются fallback-значения.
    ============================================================ */
-.sort-tabs {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  max-width: 720px;
-  margin: 0 auto clamp(22px, 3vw, 36px);
-  padding: 8px;
-  position: relative;
-  border-radius: 60px;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---------- 1. Контейнер страницы ---------- */
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px clamp(14px, 3vw, 36px) 80px;
+  box-sizing: border-box;
+  min-width: 0;             /* защита от overflow внутри flex/grid */
+}
+
+/* ---------- 2. Стеклянная карточка (используется в hero, search-results, no-films) ---------- */
+.glass-card {
   background: linear-gradient(160deg,
     rgba(20, 20, 40, 0.72) 0%,
     rgba(12, 12, 30, 0.82) 100%);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  border-radius: 20px;
   backdrop-filter: blur(20px) saturate(120%);
   -webkit-backdrop-filter: blur(20px) saturate(120%);
   box-shadow:
@@ -22,40 +38,153 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.sort-tabs::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 20%;
-  width: 60%;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent,
-    var(--gold) 25%,
-    var(--gold-bright) 50%,
-    var(--neon-purple) 75%,
-    transparent);
-  opacity: 0.3;
-  pointer-events: none;
-  border-radius: inherit;
+/* ---------- 3. Hero-секция + поиск ---------- */
+.hero {
+  padding: clamp(22px, 4vw, 40px);
+  margin-bottom: clamp(22px, 3vw, 36px);
+  text-align: center;
+}
+
+.hero h2 {
+  margin: 0 0 20px;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary, #fff);
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  max-width: 560px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 12px 18px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #fff);
+  font-family: var(--font-sans, inherit);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-box input::placeholder {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+}
+
+.search-box input:focus {
+  border-color: var(--gold, #a88540);
+  box-shadow: 0 0 0 3px rgba(168, 133, 64, 0.15);
+}
+
+.search-box button {
+  flex: 0 0 auto;
+  padding: 12px 22px;
+  border-radius: 40px;
+  border: 1px solid rgba(168, 133, 64, 0.45);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.3) 0%,
+    rgba(124, 58, 237, 0.2) 100%);
+  color: var(--gold-bright, #d4af37);
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.search-box button:hover {
+  box-shadow: 0 4px 20px rgba(168, 133, 64, 0.3);
+}
+
+.search-box button:active {
+  transform: scale(0.97);
+}
+
+/* ---------- 4. Сообщение об ошибке ---------- */
+.error-msg {
+  display: block;
+  max-width: 560px;
+  margin: 0 auto 20px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #ff8a8a;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ---------- 5. Табы сортировки — строго в одну линию ---------- */
+.sort-tabs {
+  display: flex;
+  flex-wrap: nowrap;                       /* всегда одна строка */
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  width: max-content;                      /* ровно по содержимому */
+  max-width: 100%;                         /* никогда не выходит за родителя */
+  margin: 0 auto clamp(22px, 3vw, 36px);
+  padding: 6px;
+
+  box-sizing: border-box;
+  border-radius: 60px;
+
+  background: linear-gradient(160deg,
+    rgba(20, 20, 40, 0.72) 0%,
+    rgba(12, 12, 30, 0.82) 100%);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* На очень узких экранах допускаем горизонтальный скролл,
+     но скроллбар скрываем — табы не ломаются и не переносятся */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sort-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .sort-tab {
+  flex: 0 0 auto;                          /* не сжимаем и не тянем */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 11px 22px;
+  gap: 7px;
+
+  padding: 10px 20px;
   border-radius: 40px;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  font-family: var(--font-sans);
+
+  font-family: var(--font-sans, inherit);
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1;
   letter-spacing: 0.01em;
-  color: var(--text-secondary);
+  white-space: nowrap;
+
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
   background: transparent;
   border: 1px solid transparent;
   transition:
@@ -64,23 +193,21 @@
     border-color 0.3s ease,
     box-shadow 0.3s ease,
     transform 0.2s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 .sort-tab:hover {
-  color: var(--text-primary);
+  color: var(--text-primary, #fff);
   background: rgba(255, 255, 255, 0.045);
-  border-color: var(--glass-border);
+  border-color: var(--glass-border, rgba(255, 255, 255, 0.1));
 }
 
 .sort-tab:focus-visible {
-  outline: 2px solid var(--gold-bright);
+  outline: 2px solid var(--gold-bright, #d4af37);
   outline-offset: 3px;
 }
 
 .sort-tab.active {
-  color: var(--gold-bright);
+  color: var(--gold-bright, #d4af37);
   background: linear-gradient(135deg,
     rgba(168, 133, 64, 0.22) 0%,
     rgba(124, 58, 237, 0.14) 100%);
@@ -113,4 +240,410 @@
 
 .tab-label {
   white-space: nowrap;
+}
+
+/* ---------- 6. Результаты поиска ---------- */
+.search-results {
+  padding: clamp(16px, 3vw, 24px);
+  margin-bottom: clamp(20px, 3vw, 28px);
+}
+
+.search-results h3 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  color: var(--text-primary, #fff);
+}
+
+/* ---------- 7. Топ-5 (Netflix-стиль, горизонтальный скролл) ---------- */
+.top-films-netflix {
+  margin-bottom: clamp(24px, 3vw, 36px);
+}
+
+.top-header-netflix {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.top-header-netflix h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.top-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 8px;
+}
+
+.top-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.top-scroll-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+  padding: 0 4px;
+}
+
+.top-card-netflix {
+  flex: 0 0 auto;
+  width: 160px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease;
+}
+
+.top-card-netflix:hover {
+  transform: translateY(-4px);
+}
+
+.top-card-poster-wrapper {
+  position: relative;                    /* только для бейджей внутри */
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.top-card-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.top-card-rank {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
+  pointer-events: none;
+}
+
+.top-card-score {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.top-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 0 2px;
+  min-width: 0;
+}
+
+.top-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-card-year {
+  font-size: 0.75rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+/* ---------- 8. Сетка фильмов ---------- */
+.films-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: clamp(12px, 2vw, 20px);
+  margin-bottom: clamp(24px, 3vw, 36px);
+}
+
+.film-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+/* ---------- 9. Карточка фильма ---------- */
+.film-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(20, 20, 40, 0.6);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.film-card-link:hover .film-card {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(168, 133, 64, 0.15);
+  border-color: rgba(168, 133, 64, 0.35);
+}
+
+.film-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.film-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  padding: 10px 12px 12px;
+  min-width: 0;
+}
+
+.film-info h3,
+.film-info h4 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary, #fff);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.film-info p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.film-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rating-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.rating-label {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  white-space: nowrap;
+}
+
+.rating-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.votes-count {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  opacity: 0.85;
+}
+
+.btn-add {
+  margin-top: 8px;
+  padding: 9px 14px;
+  border-radius: 30px;
+  border: 1px solid rgba(168, 133, 64, 0.45);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.3) 0%,
+    rgba(124, 58, 237, 0.2) 100%);
+  color: var(--gold-bright, #d4af37);
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.btn-add:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(168, 133, 64, 0.3);
+}
+
+.btn-add:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- 10. Блок «Загрузить ещё» ---------- */
+.load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(24px, 3vw, 36px) 0;
+  text-align: center;
+}
+
+.load-more-btn {
+  padding: 12px 32px;
+  border-radius: 40px;
+  border: 1px solid rgba(168, 133, 64, 0.45);
+  background: linear-gradient(135deg,
+    rgba(168, 133, 64, 0.25) 0%,
+    rgba(124, 58, 237, 0.15) 100%);
+  color: var(--gold-bright, #d4af37);
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 20px rgba(168, 133, 64, 0.3);
+}
+
+.load-more-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.load-more-end {
+  font-size: 0.88rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.page-info {
+  font-size: 0.8rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  opacity: 0.8;
+}
+
+/* ---------- 11. Служебные состояния ---------- */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  font-size: 1.1rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.no-films {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: 0.95rem;
+}
+
+/* ============================================================
+   Адаптив
+   ============================================================ */
+
+/* Планшеты */
+@media (max-width: 900px) {
+  .top-card-netflix { width: 145px; }
+  .films-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+/* Узкие планшеты / крупные телефоны */
+@media (max-width: 640px) {
+  .sort-tab {
+    padding: 9px 14px;
+    font-size: 0.82rem;
+    gap: 5px;
+  }
+  .sort-tabs { padding: 5px; gap: 5px; }
+
+  .top-card-netflix { width: 130px; }
+
+  .films-grid {
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  }
+}
+
+/* Телефоны */
+@media (max-width: 520px) {
+  .hero { padding: 18px 16px; }
+  .hero h2 { font-size: 1.05rem; }
+
+  .search-box {
+    flex-direction: column;    /* инпут + кнопка в столбик на телефоне */
+  }
+  .search-box button { width: 100%; }
+
+  .sort-tab {
+    padding: 8px 11px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+  .tab-icon { font-size: 0.95em; }
+
+  .top-card-netflix { width: 118px; }
+  .top-scroll-wrapper { gap: 10px; }
+
+  .films-grid {
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    gap: 10px;
+  }
+  .film-info { padding: 8px 10px 10px; }
+  .film-info h3,
+  .film-info h4 { font-size: 0.85rem; }
+}
+
+/* Очень узкие экраны */
+@media (max-width: 360px) {
+  .sort-tab {
+    padding: 7px 9px;
+    font-size: 0.7rem;
+    gap: 3px;
+  }
+  .sort-tabs { padding: 4px; gap: 3px; }
+
+  .films-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .top-card-netflix { width: 105px; }
 }
