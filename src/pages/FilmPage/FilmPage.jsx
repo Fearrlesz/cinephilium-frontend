@@ -5,12 +5,11 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
 import { getScoreColor } from '../../utils/constants';
 import FilmInfo from './components/FilmInfo';
-import RatingForm from './components/RatingForm';
+import RatingSection from './components/RatingSection';
 import CommentsSection from './components/CommentsSection';
 import ReviewsSection from './components/ReviewsSection';
 import UsersList from './components/UsersList';
 import useFilmData from './hooks/useFilmData';
-import useRatingForm from './hooks/useRatingForm';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
 import './FilmPage.css';
 
@@ -20,7 +19,6 @@ function FilmPage() {
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
   const [selectedRating, setSelectedRating] = useState(null);
-  const [isRatingMode, setIsRatingMode] = useState(false);
   const [showUsersModal, setShowUsersModal] = useState(false);
 
   const {
@@ -41,29 +39,6 @@ function FilmPage() {
     loadReviews,
     loadCurrentUser
   } = useFilmData(id);
-
-  const ratingForm = useRatingForm(id, film, userRating, currentUser, loadFilm, loadFilmUsers, setUserRating, showNotification, navigate, addEvent);
-  const {
-    scores,
-    vibe,
-    genrePreset,
-    blockWeights,
-    textReview,
-    isSaving,
-    weightsValid,
-    calculatePreview,
-    saveRating,
-    handleGenreChange,
-    handleWeightChange,
-    handleRatingChange,
-    setVibe,
-    setTextReview,
-    resetForm
-  } = ratingForm;
-
-  useEffect(() => {
-    resetForm();
-  }, [userRating, resetForm]);
 
   useEffect(() => {
     loadFilm();
@@ -174,12 +149,6 @@ function FilmPage() {
     }
   };
 
-  const toggleRatingMode = () => setIsRatingMode(prev => !prev);
-  const handleSaveRating = async () => {
-    await saveRating();
-    setIsRatingMode(false);
-  };
-
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!film) return <div className="error">Фильм не найден</div>;
 
@@ -188,33 +157,19 @@ function FilmPage() {
       <div className="film-page">
         <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
 
-        {/* 1. Информация о фильме + ваша оценка */}
-        <FilmInfo
+        {/* 1. Информация о фильме */}
+        <FilmInfo film={film} />
+
+        {/* 2. Оценка: соцдоказательство + три балла + модалка критериев */}
+        <RatingSection
           film={film}
           userRating={userRating}
-          onToggleRating={toggleRatingMode}
-          isRatingMode={isRatingMode}
+          setUserRating={setUserRating}
+          reloadFilm={loadFilm}
+          reloadUsers={loadFilmUsers}
+          showNotification={showNotification}
+          navigate={navigate}
         />
-
-        {/* 2. Форма оценки (открывается по кнопке) */}
-        {isRatingMode && (
-          <RatingForm
-            scores={scores}
-            vibe={vibe}
-            genrePreset={genrePreset}
-            blockWeights={blockWeights}
-            textReview={textReview}
-            weightsValid={weightsValid}
-            isSaving={isSaving}
-            onScoreChange={handleRatingChange}
-            onVibeChange={setVibe}
-            onGenreChange={handleGenreChange}
-            onWeightChange={handleWeightChange}
-            onTextReviewChange={setTextReview}
-            onSave={handleSaveRating}
-            calculatePreview={calculatePreview}
-          />
-        )}
 
         {/* 3. Список оценок пользователей + детали оценки */}
         <UsersList
@@ -266,30 +221,38 @@ function FilmPage() {
             <h2>👥 Все оценки фильма</h2>
             <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
             <div className="users-modal-list">
-              {filmUsers.map((item) => (
-                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
-                  <div className="user-info">
-                    <Link to={`/user/${item.user._id}`} className="user-link">
-                      👤 {item.user.nickname || 'Пользователь'}
-                    </Link>
-                    {item.user.isAdmin && <span className="admin-badge">👑</span>}
+              {filmUsers.map((item) => {
+                // F1-fix: для vibe-only finalScore на бэке = 0, не показываем цифру.
+                const isVibeOnly = item.rating.completeness === 'vibe';
+                return (
+                  <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
+                    <div className="user-info">
+                      <Link to={`/user/${item.user._id}`} className="user-link">
+                        👤 {item.user.nickname || 'Пользователь'}
+                      </Link>
+                      {item.user.isAdmin && <span className="admin-badge">👑</span>}
+                    </div>
+                    <div className="rating-info">
+                      <span
+                        className="user-rating-score"
+                        style={{ color: isVibeOnly ? 'var(--text-muted)' : getScoreColor(item.rating.finalScore) }}
+                        title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                      >
+                        {isVibeOnly ? '—' : item.rating.finalScore}
+                      </span>
+                      <button
+                        className="details-btn"
+                        onClick={() => {
+                          setShowUsersModal(false);
+                          openRatingDetails(item.rating);
+                        }}
+                      >
+                        🔍 Детали
+                      </button>
+                    </div>
                   </div>
-                  <div className="rating-info">
-                    <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
-                      {item.rating.finalScore}
-                    </span>
-                    <button
-                      className="details-btn"
-                      onClick={() => {
-                        setShowUsersModal(false);
-                        openRatingDetails(item.rating);
-                      }}
-                    >
-                      🔍 Детали
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

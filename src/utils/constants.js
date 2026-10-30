@@ -36,7 +36,9 @@ export const PRESET_WEIGHTS = {
   comedy:       [30, 30, 15, 15, 10],
   horror:       [25, 20, 20, 25, 10],
   scifi_block:  [25, 20, 25, 20, 10],
-  scifi_author: [25, 20, 20, 15, 20],
+  // F1: значение приведено к бэкенду (src/config/scoring.js). Было [25,20,20,15,20],
+  // из-за чего preview и сохранённый балл расходились на 5% веса визуала.
+  scifi_author: [20, 20, 25, 15, 20],
   musical:      [20, 20, 20, 30, 10],
   biopic:       [30, 30, 20, 15, 5],
   hybrid:       null

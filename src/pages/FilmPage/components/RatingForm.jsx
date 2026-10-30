@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { CRITERIA_CONFIG, GENRE_LABELS, BLOCK_NAMES } from '../../../utils/constants';
+import {
+  BLOCK_COLORS,
+  WEIGHT_SLIDER_MAX,
+  formatScore,
+  getGrade
+} from '../../../utils/scoring';
 import './RatingForm.css';
 
 /* === Диапазон оценок критериев и вайба — 1–10 === */
@@ -9,133 +15,132 @@ const DEFAULT_SCORE = 5;
 const SCORE_STEP = 1;
 const RANGE = MAX_SCORE - MIN_SCORE;
 
-const fillPercent = (value) => ((value - MIN_SCORE) / RANGE) * 100;
+const fillPercent = value => ((value - MIN_SCORE) / RANGE) * 100;
 
-const BLOCK_META = {
-  scenario:   { icon: '📋', color: 'oklch(0.72 0.14 40)',  colorFrom: '#f0c862', colorTo: '#e0bc58' }, /* золото          */
-  characters: { icon: '👥', color: 'oklch(0.78 0.14 320)', colorFrom: '#d9b45f', colorTo: '#b8926a' }, /* золото→бронза   */
-  visual:     { icon: '🎥', color: 'oklch(0.72 0.13 300)', colorFrom: '#b8926a', colorTo: '#9a7590' }, /* бронза→мокко    */
-  sound:      { icon: '🔊', color: 'oklch(0.75 0.11 200)', colorFrom: '#9a7590', colorTo: '#a78bfa' }, /* мокко→фиолет    */
-  style:      { icon: '✍️', color: 'oklch(0.75 0.15 145)', colorFrom: '#a78bfa', colorTo: '#a855f7' }, /* фиолет→неон     */
+const BLOCK_ICONS = {
+  scenario: '📋',
+  characters: '👥',
+  visual: '🎥',
+  sound: '🔊',
+  style: '✍️'
 };
 
-const getGrade = (score) => {
-  if (score >= 90) return { letter: 'S', label: 'Шедевр',  color: 'oklch(0.78 0.14 320)' };
-  if (score >= 80) return { letter: 'A', label: 'Отлично', color: 'oklch(0.78 0.14 150)' };
-  if (score >= 65) return { letter: 'B', label: 'Хорошо',  color: 'oklch(0.80 0.13 100)' };
-  if (score >= 50) return { letter: 'C', label: 'Средне',  color: 'oklch(0.80 0.145 72)' };
-  if (score >= 35) return { letter: 'D', label: 'Слабо',   color: 'oklch(0.72 0.15 40)'  };
-  return              { letter: 'E', label: 'Провал',  color: 'oklch(0.63 0.20 30)'  };
-};
-
-const normalizeWeightsArray = (weights) => {
-  const total = weights.reduce((a, b) => a + b, 0);
+const normalizeWeightsArray = weights => {
+  const total = weights.reduce((sum, weight) => sum + weight, 0);
   if (total === 0) return [30, 25, 20, 15, 10];
 
-  const raw  = weights.map(w => (w / total) * 100);
-  const ints = raw.map(v => Math.floor(v));
-  const remainder = 100 - ints.reduce((a, b) => a + b, 0);
+  const raw = weights.map(weight => (weight / total) * 100);
+  const ints = raw.map(value => Math.floor(value));
+  const remainder = 100 - ints.reduce((sum, value) => sum + value, 0);
 
   const fractions = raw
-    .map((v, i) => ({ i, f: v - Math.floor(v) }))
-    .sort((a, b) => b.f - a.f);
+    .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
+    .sort((a, b) => b.fraction - a.fraction);
 
-  for (let k = 0; k < remainder; k++) ints[fractions[k % ints.length].i] += 1;
+  for (let k = 0; k < remainder; k += 1) ints[fractions[k % ints.length].index] += 1;
   return ints;
 };
 
+/**
+ * F1: содержимое модалки критериев. Компонент остаётся презентационным:
+ * состояние, confirm по весам и отправка живут в useRatingForm.
+ */
 function RatingForm({
   scores = {},
   vibe = DEFAULT_SCORE,
   genrePreset = '',
   blockWeights = [30, 25, 20, 15, 10],
-  textReview = '',
   weightsValid = false,
   isSaving = false,
+  error = '',
+  fieldErrors = {},
   onScoreChange = () => {},
   onVibeChange = () => {},
   onGenreChange = () => {},
   onWeightChange = () => {},
-  onTextReviewChange = () => {},
   onSave = () => {},
-  calculatePreview = () => ({ tech: 0, vibe: 0, combined: 0 }),
+  calculatePreview = () => ({ tech: null, vibe: 0, combined: null })
 }) {
   const [activeHint, setActiveHint] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [openBlocks, setOpenBlocks] = useState({ scenario: true });
 
-  /* === Служебное === */
   const totalWeight = useMemo(
-    () => (blockWeights || []).reduce((a, b) => a + (Number(b) || 0), 0),
+    () => (blockWeights || []).reduce((sum, weight) => sum + (Number(weight) || 0), 0),
     [blockWeights]
   );
 
-  const getScore = (blockKey, critKey) =>
-    scores?.[blockKey]?.[critKey] ?? DEFAULT_SCORE;
+  const getScore = (blockKey, criterionKey) =>
+    scores?.[blockKey]?.[criterionKey] ?? DEFAULT_SCORE;
 
   const preview = useMemo(
     () => calculatePreview(scores, vibe, blockWeights, genrePreset),
     [scores, vibe, blockWeights, genrePreset, calculatePreview]
   );
 
-  const grade = useMemo(
-    () => getGrade(preview?.combined || 0),
-    [preview]
-  );
+  const grade = useMemo(() => getGrade(preview?.combined), [preview]);
 
-  /* === Метаданные блоков (для полосок превью) === */
-  const blockScores = useMemo(() => {
-    return CRITERIA_CONFIG.map((cfg, i) => {
-      const vals = cfg.criteria.map(c => scores?.[cfg.key]?.[c.key] ?? DEFAULT_SCORE);
-      const avg  = vals.reduce((a, b) => a + b, 0) / (vals.length || 1);
-      const meta = BLOCK_META[cfg.key] || {};
-      return {
-        key: cfg.key,
-        name: cfg.name,
-        avg,
-        fillPct: (avg / MAX_SCORE) * 100,
-        color: meta.color || 'oklch(0.80 0.145 72)',
-        weight: blockWeights?.[i] ?? 0,
-      };
-    });
-  }, [scores, blockWeights]);
+  const blockScores = useMemo(() => CRITERIA_CONFIG.map((config, index) => {
+    const values = config.criteria.map(criterion => scores?.[config.key]?.[criterion.key] ?? DEFAULT_SCORE);
+    const average = values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
+    const color = BLOCK_COLORS[config.key] || BLOCK_COLORS.scenario;
+    return {
+      key: config.key,
+      name: config.name,
+      average,
+      fillPct: (average / MAX_SCORE) * 100,
+      color,
+      weight: blockWeights?.[index] ?? 0
+    };
+  }), [scores, blockWeights]);
 
   const handleNormalize = () => {
     const next = normalizeWeightsArray(blockWeights);
-    next.forEach((v, i) => onWeightChange(i, v));
+    next.forEach((value, index) => onWeightChange(index, value));
   };
 
   const isHybrid = genrePreset === 'hybrid';
 
-  /* === Подпись выбранного жанра для триггера === */
   const genreLabel = genrePreset
     ? (GENRE_LABELS?.[genrePreset] ?? genrePreset)
     : 'Без жанра (базовые веса 30/25/20/15/10)';
 
-  const handleSelectGenre = (key) => {
+  const handleSelectGenre = key => {
     onGenreChange(key);
     setIsDropdownOpen(false);
   };
 
+  const toggleBlock = key => {
+    setOpenBlocks(previous => ({ ...previous, [key]: !previous[key] }));
+  };
+
+  const fieldError = (blockKey, criterionKey) => (
+    fieldErrors?.[`${blockKey}.${criterionKey}`]
+    || fieldErrors?.[`scores.${blockKey}.${criterionKey}`]
+    || fieldErrors?.[criterionKey]
+    || ''
+  );
+
   return (
-    <>
+    <div className="rating-form rating-form--modal">
+      {error && (
+        <div className="rating-form__error" role="alert">{error}</div>
+      )}
+
       {/* ================= ЖАНР И ВЕСА ================= */}
       <div className="genre-block glass-card">
         <h3>⚙️ Жанр и веса блоков</h3>
 
-        {/* === Кастомный дропдаун вместо <select> === */}
         <div className="custom-dropdown">
           <button
             type="button"
             className={`custom-dropdown__trigger ${isDropdownOpen ? 'is-open' : ''}`}
-            onClick={() => setIsDropdownOpen(v => !v)}
+            onClick={() => setIsDropdownOpen(value => !value)}
             aria-haspopup="listbox"
             aria-expanded={isDropdownOpen}
           >
             <span className="custom-dropdown__label">{genreLabel}</span>
-            <span
-              className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`}
-              aria-hidden="true"
-            >
+            <span className={`custom-dropdown__arrow ${isDropdownOpen ? 'open' : ''}`} aria-hidden="true">
               <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
                 <path
                   d="M1 1l6 6 6-6"
@@ -161,79 +166,43 @@ function RatingForm({
                 </span>
               </li>
 
-              {Object.entries(GENRE_LABELS).map(([k, l]) => (
+              {Object.entries(GENRE_LABELS).map(([key, label]) => (
                 <li
-                  key={k}
+                  key={key}
                   role="option"
-                  aria-selected={genrePreset === k}
-                  className={`custom-dropdown__item ${genrePreset === k ? 'active' : ''}`}
-                  onClick={() => handleSelectGenre(k)}
+                  aria-selected={genrePreset === key}
+                  className={`custom-dropdown__item ${genrePreset === key ? 'active' : ''}`}
+                  onClick={() => handleSelectGenre(key)}
                 >
-                  <span className="custom-dropdown__item-text">{l}</span>
+                  <span className="custom-dropdown__item-text">{label}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
 
-        {/* Цветовая визуализация распределения весов */}
         <div className="weights-viz" role="img" aria-label="Распределение весов по блокам">
-          {BLOCK_NAMES.map((name, i) => {
-            const w     = blockWeights?.[i] ?? 0;
-            const key   = CRITERIA_CONFIG[i]?.key;
-            const meta  = BLOCK_META[key] || {};
-            const empty = w < 6;
+          {BLOCK_NAMES.map((name, index) => {
+            const weight = blockWeights?.[index] ?? 0;
+            const key = CRITERIA_CONFIG[index]?.key;
+            const color = BLOCK_COLORS[key] || BLOCK_COLORS.scenario;
             return (
               <div
-                key={i}
+                key={key}
                 className="weights-viz__seg"
-                data-empty={empty}
+                data-empty={weight < 6}
                 style={{
-                  flexGrow:   w || 0.0001,
-                  '--c-from': meta.colorFrom,
-                  '--c-to':   meta.colorTo,
+                  flexGrow: weight || 0.0001,
+                  '--c-from': color.from,
+                  '--c-to': color.to
                 }}
-                title={`${name}: ${w}%`}
+                title={`${name}: ${weight}%`}
               >
-                {w}%
+                {weight}%
               </div>
             );
           })}
         </div>
-
-        {BLOCK_NAMES.map((name, i) => {
-          const weight     = blockWeights?.[i] ?? 20;
-          const isDisabled = !isHybrid;
-          const key        = CRITERIA_CONFIG[i]?.key;
-          const meta       = BLOCK_META[key] || {};
-          const icon       = meta.icon  || '';
-
-          return (
-            <div
-              key={i}
-              className="weight-slider"
-              style={{ '--c-from': meta.colorFrom, '--c-to': meta.colorTo }}
-            >
-              <label htmlFor={`weight-${i}`}>
-                <span className="weight-dot" aria-hidden="true" />
-                {icon} {name}
-              </label>
-              <input
-                id={`weight-${i}`}
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value={weight}
-                disabled={isDisabled}
-                onChange={e => onWeightChange(i, Number(e.target.value))}
-                style={{ '--fill': `${weight}%` }}
-                aria-label={`Вес блока ${name}`}
-              />
-              <span className="value-display">{weight}%</span>
-            </div>
-          );
-        })}
 
         <div className={`weights-sum ${weightsValid ? 'valid' : 'invalid'}`}>
           <span>
@@ -242,76 +211,143 @@ function RatingForm({
           </span>
 
           {!weightsValid && isHybrid && (
-            <button
-              type="button"
-              className="normalize-btn"
-              onClick={handleNormalize}
-            >
+            <button type="button" className="normalize-btn" onClick={handleNormalize}>
               Уровнять
             </button>
           )}
         </div>
+
+        {!isHybrid ? (
+          <button
+            type="button"
+            className="weights-manual-btn"
+            onClick={() => onGenreChange('hybrid')}
+            aria-expanded={false}
+          >
+            Веса вручную
+          </button>
+        ) : (
+          <div className="weight-sliders">
+            {BLOCK_NAMES.map((name, index) => {
+              const key = CRITERIA_CONFIG[index]?.key;
+              const color = BLOCK_COLORS[key] || BLOCK_COLORS.scenario;
+              const weight = blockWeights?.[index] ?? 0;
+              // F1: слайдер 0–50, но старые ручные веса могли быть больше 50
+              // (бэкенд разрешает 0–100). Не даём браузеру молча срезать значение.
+              const sliderMax = Math.max(WEIGHT_SLIDER_MAX, weight);
+              return (
+                <div
+                  key={key}
+                  className="weight-slider"
+                  style={{ '--c-from': color.from, '--c-to': color.to }}
+                >
+                  <label htmlFor={`weight-${index}`}>
+                    <span className="weight-dot" aria-hidden="true" />
+                    {BLOCK_ICONS[key]} {name}
+                  </label>
+                  <input
+                    id={`weight-${index}`}
+                    type="range"
+                    min="0"
+                    max={sliderMax}
+                    step="1"
+                    value={weight}
+                    onChange={event => onWeightChange(index, Number(event.target.value))}
+                    style={{ '--fill': `${Math.min(100, (weight / sliderMax) * 100)}%` }}
+                    aria-label={`Вес блока ${name}`}
+                  />
+                  <span className="value-display">{weight}%</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* ================= КРИТЕРИИ (1–10) ================= */}
+      {/* ================= КРИТЕРИИ (1–10), АККОРДЕОН ================= */}
       {CRITERIA_CONFIG.map(block => {
-        const meta = BLOCK_META[block.key] || {};
+        const color = BLOCK_COLORS[block.key] || BLOCK_COLORS.scenario;
+        const isOpen = Boolean(openBlocks[block.key]);
+        const average = blockScores.find(item => item.key === block.key)?.average ?? DEFAULT_SCORE;
+
         return (
           <div
             key={block.key}
             className="criteria-block"
             style={{
-              '--block-color': meta.color || 'oklch(0.80 0.145 72)',
-              '--c-from':      meta.colorFrom,
-              '--c-to':        meta.colorTo,
+              '--block-color': color.solid,
+              '--c-from': color.from,
+              '--c-to': color.to
             }}
           >
-            <h4>{meta.icon} {block.name}</h4>
+            <button
+              type="button"
+              className="criteria-block__head"
+              onClick={() => toggleBlock(block.key)}
+              aria-expanded={isOpen}
+            >
+              <span className="criteria-block__title">
+                {BLOCK_ICONS[block.key]} {block.name}
+              </span>
+              <span className="criteria-block__avg">{average.toFixed(1)}</span>
+              <span className={`criteria-block__chevron ${isOpen ? 'is-open' : ''}`} aria-hidden="true">
+                ⌄
+              </span>
+            </button>
 
-            {block.criteria.map(crit => {
-              const value  = getScore(block.key, crit.key);
-              const hintId = `${block.key}.${crit.key}`;
+            {isOpen && (
+              <div className="criteria-block__body">
+                {block.criteria.map(criterion => {
+                  const value = getScore(block.key, criterion.key);
+                  const hintId = `${block.key}.${criterion.key}`;
+                  const currentError = fieldError(block.key, criterion.key);
 
-              return (
-                <div key={crit.key} className="criterion-slider">
-                  <label htmlFor={`crit-${hintId}`}>
-                    {crit.name}{' '}
-                    <span className="hint-wrapper">
-                      <button
-                        type="button"
-                        className="hint-icon"
-                        onClick={() =>
-                          setActiveHint(activeHint === hintId ? null : hintId)
-                        }
-                        aria-expanded={activeHint === hintId}
-                        aria-label={`Подсказка: ${crit.name}`}
-                      >
-                        ⓘ
-                      </button>
-                      {activeHint === hintId && (
-                        <span className="hint-popup" role="tooltip">
-                          {crit.hint}
-                        </span>
+                  return (
+                    <React.Fragment key={criterion.key}>
+                      <div className="criterion-slider">
+                        <label htmlFor={`crit-${hintId}`}>
+                          {criterion.name}{' '}
+                          <span className="hint-wrapper">
+                            <button
+                              type="button"
+                              className="hint-icon"
+                              onClick={() => setActiveHint(activeHint === hintId ? null : hintId)}
+                              aria-expanded={activeHint === hintId}
+                              aria-label={`Подсказка: ${criterion.name}`}
+                            >
+                              ⓘ
+                            </button>
+                            {activeHint === hintId && (
+                              <span className="hint-popup" role="tooltip">{criterion.hint}</span>
+                            )}
+                          </span>
+                        </label>
+
+                        <input
+                          id={`crit-${hintId}`}
+                          type="range"
+                          min={MIN_SCORE}
+                          max={MAX_SCORE}
+                          step={SCORE_STEP}
+                          value={value}
+                          onChange={event => onScoreChange(
+                            block.key,
+                            criterion.key,
+                            Number(event.target.value)
+                          )}
+                          style={{ '--fill': `${fillPercent(value)}%` }}
+                        />
+                        <span className="value-display">{value}</span>
+                      </div>
+
+                      {currentError && (
+                        <span className="field-error" role="alert">{currentError}</span>
                       )}
-                    </span>
-                  </label>
-
-                  <input
-                    id={`crit-${hintId}`}
-                    type="range"
-                    min={MIN_SCORE}
-                    max={MAX_SCORE}
-                    step={SCORE_STEP}
-                    value={value}
-                    onChange={e =>
-                      onScoreChange(block.key, crit.key, Number(e.target.value))
-                    }
-                    style={{ '--fill': `${fillPercent(value)}%` }}
-                  />
-                  <span className="value-display">{value}</span>
-                </div>
-              );
-            })}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            )}
           </div>
         );
       })}
@@ -328,7 +364,7 @@ function RatingForm({
           max={MAX_SCORE}
           step={SCORE_STEP}
           value={vibe}
-          onChange={e => onVibeChange(Number(e.target.value))}
+          onChange={event => onVibeChange(Number(event.target.value))}
           style={{ '--fill': `${fillPercent(vibe)}%` }}
         />
         <span className="value-display">{vibe}</span>
@@ -337,35 +373,37 @@ function RatingForm({
       {/* ================= ПРЕВЬЮ ================= */}
       <div className="preview glass-card">
         <div className="preview-head">
-          <h4>📊 Предварительный расчет</h4>
-          <div
-            className="grade-badge"
-            style={{ '--grade-color': grade.color }}
-            aria-label={`Оценка ${grade.letter} — ${grade.label}`}
-          >
-            <span className="grade-badge__letter">{grade.letter}</span>
-            <span className="grade-badge__label">{grade.label}</span>
-          </div>
+          <h4>📊 Предварительный расчёт</h4>
+          {grade && (
+            <div
+              className="grade-badge"
+              style={{ '--grade-color': grade.color }}
+              aria-label={`Оценка ${grade.letter} — ${grade.label}`}
+            >
+              <span className="grade-badge__letter">{grade.letter}</span>
+              <span className="grade-badge__label">{grade.label}</span>
+            </div>
+          )}
         </div>
 
         <div className="block-bars">
-          {blockScores.map(b => (
-            <div key={b.key} className="block-bar">
+          {blockScores.map(block => (
+            <div key={block.key} className="block-bar">
               <span className="block-bar__label">
                 <span
                   className="block-bar__dot"
-                  style={{ background: b.color, color: b.color }}
+                  style={{ background: block.color.solid, color: block.color.solid }}
                   aria-hidden="true"
                 />
-                {BLOCK_META[b.key]?.icon} {b.name}
+                {BLOCK_ICONS[block.key]} {block.name}
               </span>
               <div className="block-bar__track">
                 <div
                   className="block-bar__fill"
-                  style={{ width: `${b.fillPct}%`, background: b.color }}
+                  style={{ width: `${block.fillPct}%`, background: block.color.solid }}
                 />
               </div>
-              <span className="block-bar__value">{b.avg.toFixed(1)}</span>
+              <span className="block-bar__value">{block.average.toFixed(1)}</span>
             </div>
           ))}
         </div>
@@ -375,7 +413,7 @@ function RatingForm({
             ⚔️ Технический балл
             <small>Взвешенное среднее по блокам (10–100)</small>
           </span>
-          <strong>{preview?.tech?.toFixed(1) || '0.0'}</strong>
+          <strong>{Number.isFinite(Number(preview?.tech)) ? formatScore(preview.tech) : '—'}</strong>
         </div>
 
         <div className="preview-row">
@@ -391,7 +429,7 @@ function RatingForm({
             ⭐ Комбинированный
             <small>70% техника + 30% вайб</small>
           </span>
-          <strong>{preview?.combined?.toFixed(1) || '0.0'}</strong>
+          <strong>{Number.isFinite(Number(preview?.combined)) ? formatScore(preview.combined) : '—'}</strong>
         </div>
       </div>
 
@@ -402,7 +440,7 @@ function RatingForm({
       >
         {isSaving ? '⏳ Сохранение...' : '💾 Сохранить оценку'}
       </button>
-    </>
+    </div>
   );
 }
 

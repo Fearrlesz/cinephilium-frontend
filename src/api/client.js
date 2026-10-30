@@ -96,6 +96,10 @@ api.interceptors.response.use(
     // Бэкенд отдаёт { error: { code, message, details } }, а старый UI ждёт строку.
     // Нормализуем здесь, чтобы не править десятки мест в компонентах.
     if (data && typeof data === 'object' && data.error && typeof data.error === 'object') {
+      // F1-fix: сохраняем машинный код до нормализации в строку. Поведение
+      // существующего UI не меняется, но новый код может ловить ALREADY_FULL_RATING
+      // по code, а не по тексту сообщения.
+      data.errorCode = data.error.code;
       data.errorDetails = data.error.details;
       data.error = data.error.message || 'Ошибка';
     }

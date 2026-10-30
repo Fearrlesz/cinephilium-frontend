@@ -21,14 +21,24 @@ function UsersList({ filmUsers, usersLoading, onShowUsers, onOpenRatingDetails }
         <p className="no-users">Пока никто не оценил этот фильм. Будьте первым! ⭐</p>
       ) : (
         <div className="users-preview">
-          {filmUsers.slice(0, 5).map((item) => (
-            <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-preview">
-              <Link to={`/user/${item.user._id}`} className="user-link">👤 {item.user.nickname || 'Пользователь'}</Link>
-              <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
-                {item.rating.finalScore}
-              </span>
-            </div>
-          ))}
+          {filmUsers.slice(0, 5).map((item) => {
+            // F1-fix: /films/:id/users отдаёт finalScore: 0 для vibe-only
+            // (combinedScore на бэке = 0). Цифру не показываем; правильный
+            // фикс — на бэкенде, здесь только не врём пользователю.
+            const isVibeOnly = item.rating.completeness === 'vibe';
+            return (
+              <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-preview">
+                <Link to={`/user/${item.user._id}`} className="user-link">👤 {item.user.nickname || 'Пользователь'}</Link>
+                <span
+                  className="user-rating-score"
+                  style={{ color: isVibeOnly ? 'var(--text-muted)' : getScoreColor(item.rating.finalScore) }}
+                  title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                >
+                  {isVibeOnly ? '—' : item.rating.finalScore}
+                </span>
+              </div>
+            );
+          })}
           {filmUsers.length > 5 && (
             <div className="more-users">и ещё {filmUsers.length - 5} человек...</div>
           )}

@@ -1,115 +1,153 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import api from '../../../api/client';
 import { getErrorMessage } from '../../../utils/apiError';
 import { CRITERIA_CONFIG, PRESET_WEIGHTS } from '../../../utils/constants';
+import {
+  DEFAULT_WEIGHTS,
+  calculateCombined,
+  calculateTechnical,
+  getInitialWeights,
+  WEIGHTS_SUM
+} from '../../../utils/scoring';
 
 const createEmptyScores = () => Object.fromEntries(
-  CRITERIA_CONFIG.map(b => [b.key, Object.fromEntries(b.criteria.map(c => [c.key, 5]))])
+  CRITERIA_CONFIG.map(block => [
+    block.key,
+    Object.fromEntries(block.criteria.map(criterion => [criterion.key, 5]))
+  ])
 );
 
-function useRatingForm(filmId, film, userRating, currentUser, loadFilm, loadFilmUsers, setUserRating, showNotification, navigate, addEvent) {
-  const [scores, setScores] = useState(createEmptyScores);
-  const [vibe, setVibe] = useState(5);
-  const [genrePreset, setGenrePreset] = useState('');
-  const [blockWeights, setBlockWeights] = useState([30,25,20,15,10]);
-  const [textReview, setTextReview] = useState('');
+const cloneScores = scores => {
+  if (!scores || typeof scores !== 'object') return createEmptyScores();
+  const result = {};
+  for (const block of CRITERIA_CONFIG) {
+    result[block.key] = {};
+    for (const criterion of block.criteria) {
+      const value = Number(scores?.[block.key]?.[criterion.key]);
+      result[block.key][criterion.key] = Number.isFinite(value) ? value : 5;
+    }
+  }
+  return result;
+};
+
+const sameWeights = (a, b) => a.length === b.length && a.every((value, index) => value === b[index]);
+
+/**
+ * F1: черновик полной оценки для модалки.
+ *
+ * Отличия от старого useRatingForm:
+ *  - формула preview совпадает с бэкендом (среднее по критериям внутри блока);
+ *  - при ручных весах жанр становится `hybrid`, а смена жанра спрашивает confirm;
+ *  - сохранение отдаёт ошибку наружу, а не только в notification;
+ *  - текст короткой рецензии сохраняется, но в F1 не редактируется.
+ */
+export default function useRatingForm({ filmId, userRating, onSaved, showNotification }) {
+  const initial = (() => {
+    const scores = cloneScores(userRating?.scores);
+    const vibe = Number(userRating?.vibe) || 5;
+    const textReview = userRating?.textReview || '';
+
+    let genrePreset = userRating?.genrePreset || '';
+    const weights = getInitialWeights(userRating?.blockWeights);
+    let weightsDirty = false;
+
+    if (!genrePreset && !sameWeights(weights, DEFAULT_WEIGHTS)) {
+      genrePreset = 'hybrid';
+      weightsDirty = true;
+    }
+    if (genrePreset === 'hybrid') weightsDirty = true;
+
+    return { scores, vibe, genrePreset, weights, textReview, weightsDirty };
+  })();
+
+  const [scores, setScores] = useState(initial.scores);
+  const [vibe, setVibe] = useState(initial.vibe);
+  const [genrePreset, setGenrePreset] = useState(initial.genrePreset);
+  const [blockWeights, setBlockWeights] = useState(initial.weights);
+  const [textReview] = useState(initial.textReview);
+  const [weightsDirty, setWeightsDirty] = useState(initial.weightsDirty);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
 
-  const initializeForm = useCallback((rating) => {
-    if (rating) {
-      if (rating.scores) {
-        setScores(rating.scores);
-      } else {
-        setScores(createEmptyScores());
-      }
-      setVibe(rating.vibe || 5);
-      setGenrePreset(rating.genrePreset || '');
-      if (rating.blockWeights) {
-        const weights = [
-          rating.blockWeights.scenario || 30,
-          rating.blockWeights.characters || 25,
-          rating.blockWeights.visual || 20,
-          rating.blockWeights.sound || 15,
-          rating.blockWeights.style || 10
-        ];
-        setBlockWeights(weights);
-      } else {
-        setBlockWeights([30,25,20,15,10]);
-      }
-      setTextReview(rating.textReview || '');
-    } else {
-      setScores(createEmptyScores());
-      setVibe(5);
-      setGenrePreset('');
-      setBlockWeights([30,25,20,15,10]);
-      setTextReview('');
+  // DECISION: F1/7A — сумма весов строго 100. Фронт блокирует сохранение,
+  // а не нормализует молча: пользователь должен сам увидеть и исправить вес.
+  // Бэкенд всё равно проверяет сумму — это защита целостности, не дубль ради дубля.
+  const weightsValid = blockWeights.reduce((sum, weight) => sum + Number(weight || 0), 0) === WEIGHTS_SUM;
+
+  const handleGenreChange = useCallback(key => {
+    if (key === genrePreset) return;
+
+    if (weightsDirty && key !== 'hybrid') {
+      const confirmed = window.confirm(
+        'Вы меняли веса вручную. Сбросить их и применить выбранный жанр?'
+      );
+      if (!confirmed) return;
     }
-  }, []);
 
-  const resetForm = useCallback(() => {
-    initializeForm(userRating);
-  }, [userRating, initializeForm]);
-
-  const handleGenreChange = (key) => {
     setGenrePreset(key);
+
     if (key === '') {
-      setBlockWeights([30,25,20,15,10]);
-    } else if (key === 'hybrid') {
-      setBlockWeights([20,20,20,20,20]);
-    } else {
-      setBlockWeights(PRESET_WEIGHTS[key] || [30,25,20,15,10]);
-    }
-  };
-
-  const handleWeightChange = (i, value) => {
-    setGenrePreset('hybrid');
-    setBlockWeights(prev => prev.map((w,j) => j === i ? Number(value) : w));
-  };
-
-  const handleRatingChange = (blockKey, critKey, value) => {
-    setScores(prev => ({
-      ...prev,
-      [blockKey]: {
-        ...prev[blockKey],
-        [critKey]: Number(value)
-      }
-    }));
-  };
-
-  const calculatePreview = useCallback(() => {
-    const s = scores;
-    const avgs = {
-      scenario: s.scenario.plot * 0.35 + s.scenario.ideas * 0.35 + s.scenario.dialogue * 0.30,
-      characters: s.characters.depth * 0.40 + s.characters.chemistry * 0.35 + s.characters.functionality * 0.25,
-      visual: (s.visual.composition + s.visual.cinematography + s.visual.pacing + s.visual.tone) / 4,
-      sound: s.sound.music * 0.40 + s.sound.design * 0.35 + s.sound.narrative * 0.25,
-      style: (s.style.originality + s.style.boldness) / 2
-    };
-    const rawTech = 
-      avgs.scenario * blockWeights[0] +
-      avgs.characters * blockWeights[1] +
-      avgs.visual * blockWeights[2] +
-      avgs.sound * blockWeights[3] +
-      avgs.style * blockWeights[4];
-    const tech = Number((rawTech / 100 * 10).toFixed(1));
-    const combined = Number((tech * 0.7 + vibe * 3).toFixed(1));
-    return { tech, vibe, combined };
-  }, [scores, vibe, blockWeights]);
-
-  const saveRating = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы оценивать фильмы', type: 'warning' });
-      navigate('/login');
+      setBlockWeights([...DEFAULT_WEIGHTS]);
+      setWeightsDirty(false);
       return;
     }
 
-    if (isSaving) return;
+    if (key === 'hybrid') {
+      // «Веса вручную»: оставляем текущие значения и разрешаем их менять.
+      setWeightsDirty(true);
+      return;
+    }
+
+    const preset = PRESET_WEIGHTS[key];
+    setBlockWeights(preset ? [...preset] : [...DEFAULT_WEIGHTS]);
+    setWeightsDirty(false);
+  }, [genrePreset, weightsDirty]);
+
+  const handleWeightChange = useCallback((index, value) => {
+    setGenrePreset('hybrid');
+    setWeightsDirty(true);
+    setBlockWeights(previous => previous.map(
+      (weight, i) => (i === index ? Number(value) : weight)
+    ));
+  }, []);
+
+  const handleRatingChange = useCallback((blockKey, criterionKey, value) => {
+    setScores(previous => ({
+      ...previous,
+      [blockKey]: {
+        ...previous[blockKey],
+        [criterionKey]: Number(value)
+      }
+    }));
+  }, []);
+
+  // F1/DECISION: preview считается на фронте по формуле бэкенда и нужен только
+  // до сохранения; после сохранения панель берёт combinedScore из БД.
+  const calculatePreview = useCallback(() => {
+    const technical = calculateTechnical(scores, blockWeights);
+    return {
+      tech: technical,
+      vibe,
+      combined: calculateCombined(technical, vibe)
+    };
+  }, [scores, blockWeights, vibe]);
+
+  const saveRating = useCallback(async () => {
+    if (!weightsValid) {
+      setError('Сумма весов блоков должна быть ровно 100');
+      return false;
+    }
+
+    if (isSaving) return false;
+
     setIsSaving(true);
+    setError('');
+    setFieldErrors({});
 
     try {
       const response = await api.post('/ratings', {
-        filmId: filmId,
+        filmId,
         scores,
         vibe,
         genrePreset: genrePreset || null,
@@ -117,52 +155,51 @@ function useRatingForm(filmId, film, userRating, currentUser, loadFilm, loadFilm
         textReview
       });
 
-      setUserRating(response.data.rating);
-      await loadFilm();
-      await loadFilmUsers();
+      showNotification?.({
+        title: 'Оценка сохранена',
+        message: 'Полная оценка обновлена',
+        type: 'success'
+      });
 
-      if (currentUser && film) {
-        await addEvent({
-          type: 'rating',
-          user: currentUser.nickname,
-          film: film.title,
-          filmId: film._id,
-          score: response.data.combinedScore
-        });
+      onSaved?.(response.data.rating, response.data);
+      return true;
+    } catch (err) {
+      const details = err.response?.data?.errorDetails;
+      const nextFieldErrors = {};
+
+      if (Array.isArray(details)) {
+        for (const item of details) {
+          if (item?.field && item?.message) nextFieldErrors[item.field] = item.message;
+        }
       }
 
-      showNotification({ title: 'Оценка сохранена!', message: 'Ваша оценка успешно добавлена', type: 'success' });
-    } catch (err) {
-      showNotification({ title: 'Ошибка', message: getErrorMessage(err, 'Не удалось сохранить оценку'), type: 'error' });
+      setFieldErrors(nextFieldErrors);
+      setError(getErrorMessage(err, 'Не удалось сохранить оценку'));
+      return false;
     } finally {
       setIsSaving(false);
     }
-  }, [filmId, scores, vibe, genrePreset, blockWeights, textReview, isSaving, showNotification, navigate, currentUser, film, addEvent, setUserRating, loadFilm, loadFilmUsers]);
-
-  const weightsValid = blockWeights.reduce((a,b) => a+b, 0) === 100;
+  }, [
+    weightsValid, isSaving, filmId, scores, vibe, genrePreset,
+    blockWeights, textReview, showNotification, onSaved
+  ]);
 
   return {
     scores,
-    setScores,
     vibe,
     setVibe,
     genrePreset,
-    setGenrePreset,
     blockWeights,
-    setBlockWeights,
     textReview,
-    setTextReview,
     isSaving,
-    setIsSaving,
     weightsValid,
+    weightsDirty,
+    error,
+    fieldErrors,
     calculatePreview,
     saveRating,
     handleGenreChange,
     handleWeightChange,
-    handleRatingChange,
-    resetForm,
-    initializeForm
+    handleRatingChange
   };
 }
-
-export default useRatingForm;
