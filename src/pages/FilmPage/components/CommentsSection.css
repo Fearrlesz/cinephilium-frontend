@@ -79,6 +79,39 @@
   border: none;
 }
 
+/* F2: гейт комментариев — вместо формы без оценки.
+   Плоская строка на токенах, без карточки, стекла и новых цветов. */
+.c-gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 6px;
+}
+
+.c-gate-text {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.c-gate-cta {
+  flex: none;
+}
+
+/* 403 при уже показанной форме: тот же гейт, но над полем ввода.
+   Текст комментария остаётся в input. */
+.c-gate-inline {
+  margin-bottom: 0;
+}
+
+.c-send:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
 .c-login {
   margin: 16px 0 8px;
   font-family: var(--sans);
@@ -180,12 +213,23 @@
 }
 
 @media (max-width: 620px) {
-  .c-time {
+  .c-time,
+  .cmeta .dot {
     display: none;
   }
 }
 
 @media (max-width: 480px) {
+  .c-gate {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .c-gate-cta {
+    width: 100%;
+  }
+
   .cform {
     flex-wrap: wrap;
   }
@@ -195,7 +239,9 @@
     order: 2;
   }
 
-  .c-av {
+  /* Только аватар формы: без scoped-селектора order сдвигал аватары
+     в списке комментариев на ≤480. */
+  .cform .c-av {
     order: 1;
   }
 

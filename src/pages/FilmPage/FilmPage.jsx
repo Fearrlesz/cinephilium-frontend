@@ -55,9 +55,11 @@ function FilmPage() {
     if (!token) {
       showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы комментировать', type: 'warning' });
       navigate('/login');
-      return;
+      return { ok: false, code: 'UNAUTHORIZED', message: 'Войдите, чтобы комментировать' };
     }
     try {
+      // DECISION: API-CONTRACT.md описывает { targetType, targetId, text }, но
+      // работающий код и бэкенд используют { filmId, text }. Верил коду.
       await api.post('/comments', { filmId: id, text });
       await loadComments();
       if (currentUser && film) {
@@ -69,9 +71,34 @@ function FilmPage() {
         });
       }
       showNotification({ title: 'Комментарий добавлен', message: 'Ваш комментарий опубликован', type: 'success' });
+      return { ok: true };
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить комментарий', type: 'error' });
+      const code = err.response?.data?.errorCode;
+      const message = err.response?.data?.error || 'Не удалось добавить комментарий';
+
+      // DECISION: F2/3B — 403 ловим по errorCode, не по тексту. Inline-гейт
+      // рисует CommentsSection, поэтому глобальную модалку здесь не показываем.
+      if (code === 'RATING_REQUIRED_FOR_COMMENT') {
+        return {
+          ok: false,
+          code,
+          message: 'Чтобы комментировать, оцените фильм'
+        };
+      }
+
+      showNotification({ title: 'Ошибка', message, type: 'error' });
+      return { ok: false, code, message };
     }
+  };
+
+  // DECISION: F2/2A — «Оценить» из гейта комментариев скроллит к блоку оценки
+  // на этой же странице. RatingSection.jsx (F1) не трогаем, поэтому ищем его
+  // по существующему классу .rating-section.
+  const scrollToRating = () => {
+    const section = document.querySelector('.rating-section');
+    if (!section) return;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    section.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
   };
 
   const likeComment = async (commentId) => {
@@ -227,6 +254,7 @@ function FilmPage() {
             film={film}
             onAddComment={addComment}
             onLikeComment={likeComment}
+            onRate={scrollToRating}
           />
         </div>
 
