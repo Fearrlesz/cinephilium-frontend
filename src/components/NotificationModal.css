@@ -19,7 +19,7 @@
   position: relative;
 }
 
-/* ✨ Золотая полоса сверху */
+/*  Золотая полоса сверху */
 .modal-glass::before {
   content: '';
   position: absolute;
@@ -64,27 +64,27 @@
 }
 
 .modal-glass .modal-icon.success {
-  background: rgba(168, 133, 64, 0.06);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
+  background: rgba(91, 155, 213, 0.06);
+  box-shadow: 0 0 40px rgba(91, 155, 213, 0.05);
 }
 .modal-glass .modal-icon.success span {
-  filter: drop-shadow(0 0 10px rgba(168, 133, 64, 0.3));
+  filter: drop-shadow(0 0 10px rgba(91, 155, 213, 0.3));
 }
 
 .modal-glass .modal-icon.error {
-  background: rgba(236, 72, 153, 0.06);
-  box-shadow: 0 0 40px rgba(236, 72, 153, 0.05);
+  background: rgba(214, 138, 166, 0.06);
+  box-shadow: 0 0 40px rgba(214, 138, 166, 0.05);
 }
 .modal-glass .modal-icon.error span {
-  filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.3));
+  filter: drop-shadow(0 0 10px rgba(214, 138, 166, 0.3));
 }
 
 .modal-glass .modal-icon.info {
-  background: rgba(168, 133, 64, 0.04);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
+  background: rgba(91, 155, 213, 0.04);
+  box-shadow: 0 0 40px rgba(91, 155, 213, 0.03);
 }
 .modal-glass .modal-icon.info span {
-  filter: drop-shadow(0 0 10px rgba(168, 133, 64, 0.2));
+  filter: drop-shadow(0 0 10px rgba(91, 155, 213, 0.2));
 }
 
 .modal-glass .modal-icon.warning {
@@ -123,12 +123,12 @@
 }
 
 .modal-glass .btn-modal.btn-primary {
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.06));
+  background: linear-gradient(135deg, rgba(91, 155, 213, 0.12), rgba(95, 201, 212, 0.06));
   color: var(--text-primary);
-  border: 1px solid rgba(168, 133, 64, 0.15);
+  border: 1px solid rgba(91, 155, 213, 0.15);
 }
 .modal-glass .btn-modal.btn-primary:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.05);
+  box-shadow: 0 0 40px rgba(91, 155, 213, 0.05);
   transform: translateY(-1px);
 }

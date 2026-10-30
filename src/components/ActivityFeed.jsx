@@ -7,7 +7,7 @@ function ActivityFeed({ events, loading }) {
   if (loading) {
     return (
       <div className="activity-feed">
-        <h3>📰 Последние события</h3>
+        <h3> Последние события</h3>
         <div className="feed-loading" style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-secondary)' }}>
           Загрузка событий...
         </div>
@@ -18,14 +18,14 @@ function ActivityFeed({ events, loading }) {
   if (!events || events.length === 0) {
     return (
       <div className="activity-feed">
-        <h3>📰 Последние события</h3>
+        <h3> Последние события</h3>
         <div className="feed-empty" style={{
           textAlign: 'center',
           padding: '30px 20px',
           color: 'var(--text-muted)',
           fontSize: '14px'
         }}>
-          <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}>🌊</span>
+          <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}></span>
           Пока нет событий в сообществе.<br />
           Оцените фильм, напишите рецензию или комментарий!
         </div>
@@ -35,20 +35,20 @@ function ActivityFeed({ events, loading }) {
 
   const getEventIcon = (type) => {
     const icons = {
-      'rating': '⭐',
-      'review': '📝',
-      'comment': '💬',
-      'film_add': '🎬',
-      'achievement': '🏆'
+      'rating': '',
+      'review': '',
+      'comment': '',
+      'film_add': '',
+      'achievement': ''
     };
-    return icons[type] || '📌';
+    return icons[type] || '';
   };
 
   const getEventText = (event) => {
     const user = sanitizeText(event.user || 'Кто-то');
     if (event.type === 'achievement') {
       const list = event.metadata?.achievements?.join(', ') || '';
-      return `🏆 ${user} получил достижение: ${list}`;
+      return ` ${user} получил достижение: ${list}`;
     }
     const film = sanitizeText(event.film || 'фильм');
     const score = event.score || '';
@@ -65,7 +65,7 @@ function ActivityFeed({ events, loading }) {
 
   return (
     <div className="activity-feed">
-      <h3>📰 Последние события</h3>
+      <h3> Последние события</h3>
       <div className="feed-list">
         {events.slice(0, 10).map((event, index) => {
           const hasFilmId = event.filmId && event.filmId !== 'undefined' && event.filmId !== 'system' && event.filmId !== null && event.filmId !== 'null';

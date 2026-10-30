@@ -28,7 +28,7 @@
 .about-page .glass-card:hover {
   border-color: var(--gold);
   background: var(--bg-glass-hover);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.03);
+  box-shadow: 0 0 40px rgba(91, 155, 213, 0.03);
 }
 
 .about-page .about-block {
@@ -45,7 +45,7 @@
 }
 
 .about-page .about-criterion:hover {
-  background: rgba(168, 133, 64, 0.03);
+  background: rgba(91, 155, 213, 0.03);
   border-left-color: var(--gold-bright);
   transform: translateX(2px);
 }
@@ -119,7 +119,7 @@
 }
 
 .about-page .formula-step:hover {
-  background: rgba(168, 133, 64, 0.03);
+  background: rgba(91, 155, 213, 0.03);
 }
 
 .about-page .step-number {
@@ -129,13 +129,13 @@
   min-width: 28px;
   height: 28px;
   background: linear-gradient(135deg, var(--gold), var(--neon-purple));
-  color: #0a0a12;
+  color: #0a0709;
   font-weight: 700;
   border-radius: 50%;
   font-size: 14px;
   flex-shrink: 0;
   font-family: var(--font-mono);
-  box-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
+  box-shadow: 0 0 20px rgba(91, 155, 213, 0.1);
 }
 
 .about-page .formula-step span:last-child {
@@ -151,16 +151,16 @@
 .about-page .formula-result {
   margin-top: 20px;
   padding: 16px 20px;
-  background: rgba(168, 133, 64, 0.04);
+  background: rgba(91, 155, 213, 0.04);
   border-radius: 10px;
   text-align: center;
-  border: 1px solid rgba(168, 133, 64, 0.08);
+  border: 1px solid rgba(91, 155, 213, 0.08);
   transition: all 0.3s ease;
 }
 
 .about-page .formula-result:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
+  box-shadow: 0 0 30px rgba(91, 155, 213, 0.03);
 }
 
 .about-page .formula-result p {
@@ -224,7 +224,7 @@
 }
 
 .about-genre-weights:hover {
-  border-color: rgba(168, 133, 64, 0.10);
+  border-color: rgba(91, 155, 213, 0.10);
   box-shadow:
     0 16px 60px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -301,8 +301,8 @@
 }
 
 .about-genre-weights .preset-item:hover {
-  border-color: rgba(168, 133, 64, 0.10);
-  background: rgba(168, 133, 64, 0.02);
+  border-color: rgba(91, 155, 213, 0.10);
+  background: rgba(91, 155, 213, 0.02);
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
@@ -325,14 +325,14 @@
 }
 
 .about-genre-weights .preset-total {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono);
   font-weight: 700;
   font-size: 14px;
   color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.06);
+  background: rgba(91, 155, 213, 0.06);
   padding: 2px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(168, 133, 64, 0.06);
+  border: 1px solid rgba(91, 155, 213, 0.06);
 }
 
 .about-genre-weights .preset-bars {
@@ -377,7 +377,7 @@
   border-radius: 6px;
   background: linear-gradient(90deg, var(--gold), var(--gold-bright), var(--neon-cyan));
   transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 16px rgba(168, 133, 64, 0.06);
+  box-shadow: 0 0 16px rgba(91, 155, 213, 0.06);
   position: relative;
 }
 
@@ -398,7 +398,7 @@
 }
 
 .about-genre-weights .preset-bar-value {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
   color: var(--gold-bright);
@@ -409,29 +409,29 @@
 
 .about-genre-weights .preset-bar-row:hover .preset-bar-value {
   transform: scale(1.05);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.06);
+  text-shadow: 0 0 20px rgba(91, 155, 213, 0.06);
 }
 
-/* ★ БЛОК РУЧНОЙ НАСТРОЙКИ ★ */
+/*  БЛОК РУЧНОЙ НАСТРОЙКИ  */
 .about-genre-weights .hybrid-note {
   position: relative;
   padding: 20px 28px;
-  background: rgba(34, 211, 238, 0.02);
+  background: rgba(95, 201, 212, 0.02);
   border-radius: 14px;
-  border: 1px dashed rgba(34, 211, 238, 0.06);
+  border: 1px dashed rgba(95, 201, 212, 0.06);
   transition: all 0.3s ease;
   box-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.02),
-    0 8px 24px rgba(34, 211, 238, 0.02);
+    0 0 0 1px rgba(95, 201, 212, 0.02),
+    0 8px 24px rgba(95, 201, 212, 0.02);
 }
 
 .about-genre-weights .hybrid-note::before {
-  content: "⚙";
+  content: "";
   position: absolute;
   top: -10px;
   right: 18px;
   font-size: 18px;
-  color: rgba(34, 211, 238, 0.15);
+  color: rgba(95, 201, 212, 0.15);
   transition: all 0.4s ease;
   transform: rotate(0deg);
   filter: blur(0.5px);
@@ -446,34 +446,34 @@
   width: 3px;
   background: linear-gradient(
     to bottom,
-    rgba(34, 211, 238, 0.0),
-    rgba(34, 211, 238, 0.25),
-    rgba(34, 211, 238, 0.0)
+    rgba(95, 201, 212, 0.0),
+    rgba(95, 201, 212, 0.25),
+    rgba(95, 201, 212, 0.0)
   );
   border-radius: 0 3px 3px 0;
   transition: all 0.4s ease;
 }
 
 .about-genre-weights .hybrid-note:hover {
-  border-color: rgba(34, 211, 238, 0.15);
-  background: rgba(34, 211, 238, 0.03);
+  border-color: rgba(95, 201, 212, 0.15);
+  background: rgba(95, 201, 212, 0.03);
   box-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.06),
-    0 8px 32px rgba(34, 211, 238, 0.04),
-    inset 0 0 40px rgba(34, 211, 238, 0.01);
+    0 0 0 1px rgba(95, 201, 212, 0.06),
+    0 8px 32px rgba(95, 201, 212, 0.04),
+    inset 0 0 40px rgba(95, 201, 212, 0.01);
 }
 
 .about-genre-weights .hybrid-note:hover::before {
-  color: rgba(34, 211, 238, 0.30);
+  color: rgba(95, 201, 212, 0.30);
   transform: rotate(60deg) scale(1.05);
 }
 
 .about-genre-weights .hybrid-note:hover::after {
   background: linear-gradient(
     to bottom,
-    rgba(34, 211, 238, 0.0),
-    rgba(34, 211, 238, 0.50),
-    rgba(34, 211, 238, 0.0)
+    rgba(95, 201, 212, 0.0),
+    rgba(95, 201, 212, 0.50),
+    rgba(95, 201, 212, 0.0)
   );
   width: 4px;
 }
@@ -490,7 +490,7 @@
 .about-genre-weights .hybrid-note p strong {
   color: var(--neon-cyan);
   font-weight: 600;
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.08);
+  text-shadow: 0 0 12px rgba(95, 201, 212, 0.08);
 }
 
 /* ============================================================

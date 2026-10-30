@@ -1,22 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  CRITERIA_CONFIG,
-  GENRE_LABELS,
-  PRESET_WEIGHTS,
-  getScoreColor
-} from '../../../utils/constants';
-import {
-  formatDate,
-  computeBlockAverages,
-  BLOCK_CRITERIA_LABELS
-} from '../../../utils/ratingUtils';
+import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS } from '../../../utils/constants';
+import { formatDate } from '../../../utils/ratingUtils';
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;
 const MAX_TEXT = 5000;
-
-/* ---------- утилиты ---------- */
 
 function getWeightsArray(rating) {
   if (!rating) return [30, 25, 20, 15, 10];
@@ -27,116 +16,44 @@ function getWeightsArray(rating) {
   if (rating.blockWeights) {
     const w = rating.blockWeights;
     return [
-      w.scenario   ?? 30,
+      w.scenario ?? 30,
       w.characters ?? 25,
-      w.visual     ?? 20,
-      w.sound      ?? 15,
-      w.style      ?? 10
+      w.visual ?? 20,
+      w.sound ?? 15,
+      w.style ?? 10
     ];
   }
   return [30, 25, 20, 15, 10];
 }
-
-/* ---------- сводка оценки (как в профиле) ---------- */
-
-function RatingCriteriaSummary({ rating }) {
-  if (!rating || typeof rating !== 'object') return null;
-
-  const blockAvgs = computeBlockAverages(rating.scores);
-  const technical = rating.technicalScore;
-  const vibe      = rating.vibe;
-  const combined  = rating.combinedScore ?? rating.finalScore;
-
-  return (
-    <div className="review-criteria-summary">
-      <div className="criteria-summary-row">
-        {technical != null && (
-          <div className="summary-pill">
-            <span className="summary-pill-label">Технический</span>
-            <span
-              className="summary-pill-value"
-              style={{ color: getScoreColor(technical) }}
-            >
-              {technical}
-            </span>
-          </div>
-        )}
-
-        <div className="summary-pill">
-          <span className="summary-pill-label">Вайб</span>
-          <span className="summary-pill-value">
-            {vibe ?? '—'}
-            {vibe != null && <span className="summary-pill-suffix">/10</span>}
-          </span>
-        </div>
-
-        {combined != null && (
-          <div className="summary-pill">
-            <span className="summary-pill-label">Комбо</span>
-            <span
-              className="summary-pill-value"
-              style={{ color: getScoreColor(combined) }}
-            >
-              {combined}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {blockAvgs && Object.keys(blockAvgs).length > 0 && (
-        <div className="criteria-blocks-row">
-          {Object.entries(blockAvgs).map(([key, avg]) =>
-            avg != null ? (
-              <div key={key} className="criteria-block-chip">
-                <span className="chip-label">
-                  {BLOCK_CRITERIA_LABELS[key]?.name || key}
-                </span>
-                <span className="chip-value">{avg}</span>
-              </div>
-            ) : null
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ---------- блок деталей оценки (раскрывающийся) ---------- */
 
 function RatingDetailsBlock({ rating }) {
   if (!rating) return null;
   const weights = getWeightsArray(rating);
 
   return (
-    <div className="review-rating-details">
+    <div className="rev-details">
       {rating.genrePreset && GENRE_LABELS[rating.genrePreset] && (
-        <div className="review-rating-summary">
-          <div className="summary-item summary-item-wide">
-            <span className="summary-label">Жанровые веса</span>
-            <span className="summary-value summary-genre">
-              {GENRE_LABELS[rating.genrePreset]}
-            </span>
-          </div>
+        <div className="rev-details-genre">
+          <span className="lbl">Жанровые веса</span>
+          <span>{GENRE_LABELS[rating.genrePreset]}</span>
         </div>
       )}
 
-      <div className="review-blocks">
+      <div className="rev-blocks">
         {CRITERIA_CONFIG.map((block, i) => {
           const blockScores = rating.scores?.[block.key];
           if (!blockScores) return null;
           return (
-            <div key={block.key} className="review-block">
-              <div className="review-block-header">
-                <span className="review-block-name">{block.name}</span>
-                <span className="review-block-weight">{weights[i]}%</span>
+            <div key={block.key} className="rev-block">
+              <div className="rev-block-head">
+                <span>{block.name}</span>
+                <span>{weights[i]}%</span>
               </div>
-              <ul className="review-criteria-list">
-                {block.criteria.map((crit) => (
-                  <li key={crit.key} className="review-criterion">
-                    <span className="criterion-name">{crit.name}</span>
-                    <span className="criterion-score">
-                      {blockScores[crit.key] ?? '—'}
-                    </span>
+              <ul>
+                {block.criteria.map(crit => (
+                  <li key={crit.key}>
+                    <span>{crit.name}</span>
+                    <b>{blockScores[crit.key] ?? '—'}</b>
                   </li>
                 ))}
               </ul>
@@ -148,8 +65,6 @@ function RatingDetailsBlock({ rating }) {
   );
 }
 
-/* ---------- основной компонент ---------- */
-
 function ReviewsSection({
   reviews,
   currentUser,
@@ -160,7 +75,8 @@ function ReviewsSection({
 }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({ title: '', text: '' });
-  const [expanded, setExpanded] = useState({});
+  const [expandedText, setExpandedText] = useState({});
+  const [expandedDetails, setExpandedDetails] = useState({});
 
   const canPublish =
     newReview.title.trim().length > 0 && newReview.text.trim().length > 0;
@@ -177,193 +93,152 @@ function ReviewsSection({
     setShowReviewForm(false);
   };
 
-  const toggleExpand = (id) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleText = id =>
+    setExpandedText(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const toggleDetails = id =>
+    setExpandedDetails(prev => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="reviews-section glass-card">
-      <div className="reviews-header">
-        <h3>
-          📝 Рецензии
-          <span className="reviews-count">{reviews.length}</span>
-        </h3>
+    <section className="film-reviews">
+      <div className="sec-head">
+        <h2 className="sec-title">
+          Рецензии <span className="sec-count">{reviews.length}</span>
+        </h2>
         {currentUser && (
           <button
-            className={`btn-add-review ${showReviewForm ? 'active' : ''}`}
-            onClick={() => setShowReviewForm((p) => !p)}
+            type="button" className="link-btn" onClick={() => setShowReviewForm(value => !value)}
           >
-            {showReviewForm ? '✕ Отменить' : '✎ Написать рецензию'}
+            {showReviewForm ? 'Отменить' : 'Написать рецензию'}
           </button>
         )}
       </div>
 
       {showReviewForm && (
         <div className="review-form">
-          <div className="review-form-header">
-            <span className="review-form-title">Новая рецензия</span>
+          <div className="review-form-head">
+            <span className="lbl">Новая рецензия</span>
             {!userRating && (
-              <span className="review-form-hint">
-                ⚠ Чтобы опубликовать, сначала оцените фильм
-              </span>
+              <span className="review-form-hint">Сначала оцените фильм</span>
             )}
           </div>
 
           <input
-            type="text"
-            className="review-input"
-            placeholder="Заголовок рецензии"
-            value={newReview.title}
+            type="text" className="review-input" placeholder="Заголовок рецензии" value={newReview.title}
             maxLength={MAX_TITLE}
-            onChange={(e) =>
-              setNewReview({ ...newReview, title: e.target.value })
-            }
+            onChange={event => setNewReview({ ...newReview, title: event.target.value })}
           />
 
-          <div className="review-textarea-wrapper">
+          <div className="review-textarea-wrap">
             <textarea
-              className="review-textarea"
-              placeholder="Поделитесь впечатлениями о фильме..."
-              value={newReview.text}
+              className="review-textarea" placeholder="Поделитесь впечатлениями о фильме…" value={newReview.text}
               maxLength={MAX_TEXT}
-              onChange={(e) =>
-                setNewReview({ ...newReview, text: e.target.value })
-              }
+              onChange={event => setNewReview({ ...newReview, text: event.target.value })}
             />
-            <span className="char-counter">
-              {newReview.text.length} / {MAX_TEXT}
-            </span>
+            <span className="char-counter">{newReview.text.length} / {MAX_TEXT}</span>
           </div>
 
-          <div className="review-form-footer">
-            <button className="btn-cancel" onClick={handleCancel}>
+          <div className="review-form-foot">
+            <button type="button" className="btn-ghost" onClick={handleCancel}>
               Отмена
             </button>
             <button
-              className="btn-publish"
-              onClick={handleAddReview}
+              type="button" className="btn-primary" onClick={handleAddReview}
               disabled={!canPublish}
             >
-              Опубликовать рецензию
+              Опубликовать
             </button>
           </div>
         </div>
       )}
 
-      <div className="reviews-list">
+      <div className="rev-list">
         {reviews.length === 0 && (
-          <div className="reviews-empty">
-            Пока нет рецензий. Будьте первым!
-          </div>
+          <p className="empty-line">Пока нет рецензий. Будьте первым.</p>
         )}
 
-        {reviews.map((review) => {
+        {reviews.map(review => {
           const author = review.userId || {};
           const nickname = author.nickname || 'Пользователь';
           const initial = nickname.charAt(0).toUpperCase();
           const authorId = author._id;
           const rating = review.ratingId;
           const isPending = review.status === 'pending';
+          const isTextOpen = Boolean(expandedText[review._id]);
+          const isDetailsOpen = Boolean(expandedDetails[review._id]);
 
-          // итоговый балл для бейджа: комбо → техника → ничего
-          const badgeScore =
-            typeof rating === 'object'
-              ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
-              : null;
+          const badgeScore = typeof rating === 'object'
+            ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
+            : null;
 
           return (
-            <article
-              key={review._id}
-              id={review._id}
-              className="review-card"
-            >
-              {isPending && (
-                <div className="review-pending-badge">
-                  ⏳ На модерации — видно только вам
-                </div>
-              )}
+            <article className="rev" key={review._id} id={review._id}>
+              {isPending && <p className="rev-pending">На модерации — видно только вам</p>}
 
-              <header className="review-header">
-                <div className="review-author">
-                  <span className="review-avatar">{initial}</span>
-                  <div className="review-author-info">
-                    {authorId ? (
-                      <Link
-                        to={`/user/${authorId}`}
-                        className="review-nickname review-nickname-link"
-                        title="Открыть профиль"
-                      >
-                        {nickname}
-                        {author.isAdmin && (
-                          <span className="admin-badge" title="Администратор">👑</span>
-                        )}
-                      </Link>
-                    ) : (
-                      <span className="review-nickname">
-                        {nickname}
-                        {author.isAdmin && (
-                          <span className="admin-badge">👑</span>
-                        )}
-                      </span>
-                    )}
+              <header className="rev-head">
+                <span className="rev-av" aria-hidden="true">{initial}</span>
+
+                <div className="rev-id">
+                  {authorId ? (
+                    <Link to={`/user/${authorId}`} className="rev-author">
+                      {nickname}
+                      {author.isAdmin && <span className="badge-admin">админ</span>}
+                    </Link>
+                  ) : (
+                    <span className="rev-author">
+                      {nickname}
+                      {author.isAdmin && <span className="badge-admin">админ</span>}
+                    </span>
+                  )}
+                  <span className="rev-sub">
+                    <span className="rev-handle">@{nickname}</span>
                     {review.createdAt && (
-                      <span className="review-date">
-                        {formatDate(review.createdAt)}
-                      </span>
+                      <span className="rev-date">{formatDate(review.createdAt)}</span>
                     )}
-                  </div>
+                  </span>
                 </div>
 
                 {badgeScore != null && (
-                  <div
-                    className="review-rating-badge"
-                    style={{ color: getScoreColor(badgeScore) }}
-                    title="Комбинированная оценка автора"
-                  >
-                    <span className="review-rating-star">★</span>
-                    <span className="review-rating-value">{badgeScore}</span>
+                  <div className="rev-score">
+                    {badgeScore}<span>/100</span>
                   </div>
                 )}
               </header>
 
-              <h4 className="review-title">{review.title}</h4>
-              <div className="review-text">{review.text}</div>
+              <p className="rev-key">{review.title}</p>
+              <p className={`rev-body ${isTextOpen ? 'is-open' : ''}`}>{review.text}</p>
 
-              {/* === Сводка оценки в стиле профиля === */}
-              {rating && typeof rating === 'object' && (
-                <RatingCriteriaSummary rating={rating} />
+              {review.text && review.text.length > 260 && (
+                <button type="button" className="rev-more" onClick={() => toggleText(review._id)}>
+                  Показать полностью {isTextOpen ? '−' : '+'}
+                </button>
               )}
 
-              <footer className="review-actions">
-                {rating && typeof rating === 'object' && (
-                  <button
-                    className="details-toggle-btn"
-                    onClick={() => toggleExpand(review._id)}
-                  >
-                    {expanded[review._id]
-                      ? '▲ Скрыть детали'
-                      : '▼ Детали оценки'}
-                  </button>
-                )}
-
+              <div className="rev-actions">
                 <button
-                  className="like-btn"
-                  onClick={() => onLikeReview(review._id)}
+                  type="button" className="rev-action" onClick={() => onLikeReview(review._id)}
                   title="Полезная рецензия"
                 >
-                  ❤️ <span>{review.likes?.length || 0}</span>
+                  Полезно <span>{review.likes?.length || 0}</span>
                 </button>
-              </footer>
 
-              {expanded[review._id] &&
-                rating &&
-                typeof rating === 'object' && (
-                  <RatingDetailsBlock rating={rating} />
+                {rating && typeof rating === 'object' && (
+                  <button
+                    type="button" className="rev-action" onClick={() => toggleDetails(review._id)}
+                  >
+                    {isDetailsOpen ? 'Скрыть детали' : 'Детали оценки'}
+                  </button>
                 )}
+              </div>
+
+              {isDetailsOpen && rating && typeof rating === 'object' && (
+                <RatingDetailsBlock rating={rating} />
+              )}
             </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
 

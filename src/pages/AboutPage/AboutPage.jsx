@@ -7,7 +7,7 @@ function AboutPage() {
   return (
     <div className="container about-page">
       <Link to="/" className="back-btn">← На главную</Link>
-      <h1 className="about-title">📖 О системе оценки</h1>
+      <h1 className="about-title"> О системе оценки</h1>
 
       <div className="about-intro glass-card">
         <p className="neon-text">
@@ -37,7 +37,7 @@ function AboutPage() {
 
       <div className="about-genre-weights glass-card">
         <header className="section-header">
-          <h2>⚖️ Жанровые веса</h2>
+          <h2> Жанровые веса</h2>
           <p>
             В системе предусмотрены <strong>жанровые пресеты</strong>, 
             которые автоматически распределяют веса между пятью блоками оценки.
@@ -75,14 +75,14 @@ function AboutPage() {
         </div>
         <div className="hybrid-note">
           <p>
-            <strong>🎛 Свои веса</strong> — вы можете вручную задать распределение весов 
+            <strong>Свои веса</strong> — вы можете вручную задать распределение весов
             под конкретный фильм, если ни один из жанровых пресетов не подходит.
           </p>
         </div>
       </div>
 
       <div className="about-formula glass-card">
-        <h2>🔢 Формула расчёта</h2>
+        <h2> Формула расчёта</h2>
         <div className="formula-steps">
           <div className="formula-step">
             <span className="step-number">1.</span>
@@ -108,7 +108,7 @@ function AboutPage() {
         <div className="formula-result">
           <p>Итоговая оценка всегда в диапазоне от <strong>{MIN_SCORE}</strong> до {MAX_SCORE}.</p>
           <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
-            💡 Округление происходит только в самом конце, поэтому все нюансы оценок сохраняются.
+             Округление происходит только в самом конце, поэтому все нюансы оценок сохраняются.
           </p>
         </div>
       </div>

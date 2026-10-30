@@ -1,965 +1,461 @@
 /* ============================================================
-   РЕЦЕНЗИИ — золото (дополнение и улучшение)
+   REVIEWS — разделители, без карточек и свечений
    ============================================================ */
 
-/* ---------- Заголовок секции ---------- */
-.reviews-section {
-  margin: 30px 0;
-  padding: 24px 28px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 18px;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+.film-reviews {
+  margin-top: 46px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-faint);
 }
 
-.reviews-header {
+.sec-head {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(168, 133, 64, 0.18);
+  gap: 16px;
+  margin-bottom: 6px;
 }
 
-.reviews-header h3 {
+.sec-head .sec-title {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 10px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.02em;
 }
 
-.reviews-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 24px;
-  padding: 0 8px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.28), rgba(168, 133, 64, 0.1));
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  color: var(--gold-bright);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
+.sec-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
 }
 
-/* ---------- Кнопка «Написать рецензию» ---------- */
-.btn-add-review {
-  padding: 9px 22px;
-  border-radius: 40px;
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  background: rgba(212, 175, 55, 0.06);
-  color: var(--gold-bright);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
-  width: auto;
-  margin-top: 0;
-  box-shadow: none;
-  letter-spacing: 0.01em;
-}
-
-.btn-add-review:hover {
-  border-color: var(--gold-bright);
-  background: rgba(212, 175, 55, 0.14);
-  color: #ffe9a8;
-  box-shadow: 0 0 24px rgba(212, 175, 55, 0.22);
-  transform: translateY(-1px);
-}
-
-.btn-add-review.active {
-  background: linear-gradient(135deg, rgba(220, 60, 60, 0.18), rgba(180, 40, 40, 0.1));
-  border-color: rgba(240, 100, 100, 0.55);
-  color: #ffb3b3;
-}
-
-.btn-add-review.active:hover {
-  box-shadow: 0 0 24px rgba(240, 100, 100, 0.25);
-}
-
-/* ============================================================
-   ФОРМА РЕЦЕНЗИИ
-   ============================================================ */
-.review-form {
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.04), rgba(255, 255, 255, 0.015));
-  border-radius: 16px;
-  padding: 20px 22px;
-  margin-bottom: 22px;
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 6px 24px rgba(0, 0, 0, 0.2);
-  animation: reviewFormIn 0.3s ease;
-}
-
-@keyframes reviewFormIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.review-form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.review-form-title {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--gold-bright);
-  letter-spacing: 0.02em;
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--azure-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-btn:hover {
+  background: none;
+  color: var(--ink);
+}
+
+/* ── форма ────────────────────────────────────────────────── */
+.review-form {
+  margin: 18px 0 8px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-faint);
+  border-bottom: 1px solid var(--line-faint);
+}
+
+.review-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .review-form-hint {
-  font-size: 12.5px;
-  color: #ffb86b;
-  background: rgba(255, 150, 50, 0.08);
-  border: 1px solid rgba(255, 150, 50, 0.25);
-  padding: 4px 10px;
-  border-radius: 30px;
-  font-weight: 500;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pink);
 }
 
 .review-input,
 .review-textarea {
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(10, 12, 18, 0.55);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  transition: all 0.25s ease;
-  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease);
 }
 
 .review-input {
-  margin-bottom: 12px;
-  font-weight: 600;
-  font-size: 15px;
+  margin-bottom: 10px;
 }
 
 .review-input::placeholder,
 .review-textarea::placeholder {
-  color: var(--text-muted);
+  color: var(--ink-faint);
 }
 
 .review-input:focus,
 .review-textarea:focus {
-  outline: none;
-  border-color: var(--gold-bright);
-  background: rgba(10, 12, 18, 0.75);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12), 0 0 30px rgba(212, 175, 55, 0.08);
+  border-color: var(--azure-line);
+  background: rgba(91, 155, 213, 0.04);
 }
 
-.review-textarea-wrapper {
+.review-textarea-wrap {
   position: relative;
 }
 
 .review-textarea {
   min-height: 130px;
-  resize: vertical;
-  line-height: 1.6;
   padding-bottom: 28px;
+  line-height: 1.7;
+  resize: vertical;
 }
 
-.char-counter {
-  position: absolute;
-  right: 12px;
-  bottom: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  background: rgba(10, 12, 18, 0.7);
-  padding: 2px 8px;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.review-form-footer {
+.review-form-foot {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 14px;
-}
-
-.btn-cancel,
-.btn-publish {
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border: 1px solid transparent;
-  width: auto;
-  margin-top: 0;
-}
-
-.btn-cancel {
-  background: transparent;
-  border-color: var(--glass-border);
-  color: var(--text-secondary);
-}
-
-.btn-cancel:hover {
-  border-color: rgba(180, 180, 200, 0.5);
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.btn-publish {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.9), rgba(180, 140, 40, 0.9));
-  color: #1a1408;
-  border-color: rgba(255, 220, 120, 0.6);
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.28);
-  letter-spacing: 0.02em;
-}
-
-.btn-publish:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(212, 175, 55, 0.45);
-  background: linear-gradient(135deg, #f0c850, #d4af37);
-}
-
-.btn-publish:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none;
-  filter: grayscale(0.4);
-}
-
-/* ============================================================
-   СПИСОК РЕЦЕНЗИЙ
-   ============================================================ */
-.reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.reviews-empty {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
-  font-style: italic;
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px dashed var(--glass-border);
-  border-radius: 14px;
-}
-
-/* ---------- Карточка рецензии ---------- */
-.review-card {
-  position: relative;
-  padding: 18px 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012));
-  border-radius: 14px;
-  border: 1px solid rgba(168, 133, 64, 0.22);
-  border-left: 3px solid var(--gold);
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.review-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.review-card:hover {
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.06), rgba(255, 255, 255, 0.02));
-  border-color: rgba(212, 175, 55, 0.45);
-  border-left-color: var(--gold-bright);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28), 0 0 40px rgba(212, 175, 55, 0.05);
-  transform: translateY(-1px);
-}
-
-.review-card:hover::before {
-  opacity: 1;
-}
-
-/* ---------- Бейдж «на модерации» ---------- */
-.review-pending-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffce6b;
-  background: rgba(255, 180, 60, 0.1);
-  border: 1px solid rgba(255, 180, 60, 0.35);
-  padding: 4px 12px;
-  border-radius: 30px;
-  margin-bottom: 12px;
-  letter-spacing: 0.01em;
-}
-
-/* ---------- Шапка карточки ---------- */
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.review-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.review-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(140, 100, 30, 0.4));
-  border: 1.5px solid rgba(212, 175, 55, 0.55);
-  color: #ffe9a8;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 16px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 16px rgba(212, 175, 55, 0.18);
-}
-
-.review-author-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.review-nickname {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--gold-bright);
-  letter-spacing: 0.005em;
-}
-
-.review-nickname-link {
-  text-decoration: none;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.review-nickname-link:hover {
-  color: #ffe9a8;
-  text-shadow: 0 0 14px rgba(212, 175, 55, 0.5);
-}
-
-.admin-badge {
-  font-size: 13px;
-  filter: drop-shadow(0 0 6px rgba(255, 200, 60, 0.6));
-}
-
-.review-date {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-}
-
-/* ---------- Бейдж оценки ---------- */
-.review-rating-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  border-radius: 30px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(140, 100, 30, 0.12));
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 15px;
-  color: #ffe9a8;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  flex-shrink: 0;
-}
-
-.review-rating-star {
-  color: var(--gold-bright);
-  font-size: 15px;
-  filter: drop-shadow(0 0 6px rgba(255, 200, 60, 0.7));
-}
-
-.review-rating-value {
-  color: #fff2c4;
-}
-
-/* ---------- Заголовок и текст рецензии ---------- */
-.review-title {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--text-primary);
-  margin: 6px 0 10px;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-}
-
-.review-text {
-  color: #c8ccd8;
-  font-size: 14.5px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: 12px;
-}
-
-/* ---------- Действия под рецензией ---------- */
-.review-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(168, 133, 64, 0.14);
-  flex-wrap: wrap;
 }
 
-.details-toggle-btn {
-  padding: 6px 14px;
-  border-radius: 30px;
-  border: 1px solid rgba(34, 211, 238, 0.28);
-  background: rgba(34, 211, 238, 0.05);
-  color: #7fe3f5;
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  width: auto;
-  margin-top: 0;
-}
-
-.details-toggle-btn:hover {
-  border-color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.12);
-  color: #b8f3ff;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
-}
-
-.like-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 30px;
-  border: 1px solid rgba(240, 90, 120, 0.28);
-  background: rgba(240, 90, 120, 0.05);
-  color: #ff8aa3;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  margin-left: auto;
-  width: auto;
-  margin-top: 0;
-}
-
-.like-btn span {
-  font-family: var(--font-mono);
-}
-
-.like-btn:hover {
-  border-color: #ff5b7f;
-  background: rgba(240, 90, 120, 0.14);
-  color: #ffb3c4;
-  box-shadow: 0 0 20px rgba(240, 90, 120, 0.22);
-  transform: translateY(-1px);
-}
-
-.like-btn:active {
-  transform: scale(0.94);
-}
-
-/* ============================================================
-   БЛОК ДЕТАЛЕЙ ОЦЕНКИ
-   ============================================================ */
-.review-rating-details {
-  margin-top: 14px;
-  padding: 16px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(10, 12, 18, 0.6), rgba(10, 12, 18, 0.35));
-  border: 1px solid rgba(34, 211, 238, 0.18);
-  animation: detailsIn 0.3s ease;
-}
-
-@keyframes detailsIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------- Сводка ---------- */
-.review-rating-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px dashed rgba(34, 211, 238, 0.18);
-}
-
-.summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.summary-item-wide {
-  grid-column: span 1;
-}
-
-.summary-label {
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-muted);
+.btn-ghost {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.summary-value {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+.btn-ghost:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: transparent;
 }
 
-.summary-suffix {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-left: 2px;
-}
-
-.summary-genre {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--gold-bright);
-}
-
-/* ---------- Блоки критериев ---------- */
-.review-blocks {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.review-block {
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.25s ease;
-}
-
-.review-block:hover {
-  background: rgba(34, 211, 238, 0.035);
-  border-color: rgba(34, 211, 238, 0.22);
-}
-
-.review-block-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.review-block-name {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 13px;
-  color: #9fe6f5;
-  letter-spacing: 0.01em;
-}
-
-.review-block-weight {
-  font-family: var(--font-mono);
+.btn-primary {
+  height: 38px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--sans);
   font-size: 11px;
   font-weight: 600;
-  color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.28);
-  padding: 2px 8px;
-  border-radius: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.review-criteria-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.btn-primary:hover:not(:disabled) {
+  background: var(--azure-bright);
+  color: var(--void);
+}
+
+.btn-primary:disabled {
+  opacity: 0.42;
+}
+
+/* ── список ───────────────────────────────────────────────── */
+.rev-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-.review-criterion {
+.empty-line {
+  margin: 0;
+  padding: 26px 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink-faint);
+}
+
+.rev {
+  padding: 26px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.rev:first-child {
+  border-top: none;
+  padding-top: 20px;
+}
+
+.rev-pending {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pink);
+}
+
+.rev-head {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.rev-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--highlight), var(--surface));
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.rev-id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.rev-author {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rev-author:hover {
+  color: var(--azure-bright);
+}
+
+.badge-admin {
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-sub {
+  display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  padding: 3px 0;
+  flex-wrap: wrap;
 }
 
-.criterion-name {
-  color: var(--text-secondary);
-  font-family: var(--font-sans);
-  overflow: hidden;
-  text-overflow: ellipsis;
+.rev-handle,
+.rev-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.rev-score {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
   white-space: nowrap;
 }
 
-.criterion-score {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 14px;
-  color: #ffe9a8;
-  flex-shrink: 0;
-  min-width: 22px;
-  text-align: right;
+.rev-score span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-faint);
 }
 
-/* ============================================================
-   АДАПТИВ
-   ============================================================ */
+.rev-key {
+  margin: 18px 0 0;
+  padding-left: 13px;
+  border-left: 1px solid var(--azure-line);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.rev-body {
+  display: -webkit-box;
+  max-width: 64ch;
+  margin: 12px 0 0;
+  overflow: hidden;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.rev-body.is-open {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.rev-more {
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-more:hover {
+  background: none;
+  color: var(--azure-bright);
+}
+
+.rev-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.rev-action {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-action:hover {
+  background: none;
+  color: var(--ink);
+}
+
+.rev-action span {
+  color: var(--ink-muted);
+}
+
+/* ── детали ───────────────────────────────────────────────── */
+.rev-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.rev-details-genre {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.rev-blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px 28px;
+}
+
+.rev-block-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line-faint);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rev-block-head span:last-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.rev-block ul {
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.rev-block li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.rev-block li b {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
 @media (max-width: 768px) {
-  .reviews-section {
-    padding: 18px 16px;
-    border-radius: 14px;
+  .film-reviews {
+    margin-top: 36px;
+    padding-top: 22px;
   }
 
-  .reviews-header h3 { font-size: 17px; }
-
-  .review-card {
-    padding: 14px 14px;
+  .rev {
+    padding: 22px 0;
   }
 
-  .review-title { font-size: 15.5px; }
-  .review-text  { font-size: 13.5px; }
-
-  .review-form {
-    padding: 16px 16px;
-  }
-
-  .review-form-footer {
-    flex-direction: column-reverse;
-  }
-
-  .btn-cancel,
-  .btn-publish {
-    width: 100%;
-    padding: 11px 20px;
-  }
-
-  .review-blocks {
-    grid-template-columns: 1fr;
-  }
-
-  .review-rating-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .like-btn { margin-left: 0; }
-}
-
-@media (max-width: 480px) {
-  .reviews-section {
-    padding: 14px 12px;
-    margin: 20px 0;
-  }
-
-  .reviews-header {
-    gap: 8px;
-  }
-
-  .reviews-header h3 { font-size: 15px; }
-
-  .btn-add-review {
-    width: 100%;
-    text-align: center;
-    font-size: 13px;
-    padding: 9px 16px;
-  }
-
-  .review-card {
-    padding: 12px 12px;
-    border-radius: 12px;
-  }
-
-  .review-avatar {
-    width: 34px;
-    height: 34px;
+  .rev-key {
     font-size: 14px;
   }
 
-  .review-nickname { font-size: 14px; }
-
-  .review-rating-badge {
-    padding: 5px 10px;
-    font-size: 13px;
+  .rev-body {
+    font-size: 13.5px;
   }
 
-  .review-title { font-size: 14.5px; }
-
-  .review-text {
-    font-size: 13px;
-    line-height: 1.6;
+  .rev-blocks {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
-  .review-actions {
-    gap: 8px;
+  .review-form-foot {
+    flex-direction: column-reverse;
   }
 
-  .details-toggle-btn,
-  .like-btn {
-    font-size: 12px;
-    padding: 6px 12px;
-  }
-
-  .review-rating-summary {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .summary-value { font-size: 17px; }
-
-  .review-form { padding: 14px 12px; }
-
-  .review-form-title { font-size: 13px; }
-  .review-form-hint  { font-size: 11.5px; }
-
-  .review-input  { font-size: 14px; padding: 11px 14px; }
-  .review-textarea { font-size: 13.5px; min-height: 110px; }
-
-  .review-block { padding: 10px 12px; }
-  .review-block-name { font-size: 12.5px; }
-  .review-criterion  { font-size: 12.5px; }
-}
-
-/* ============================================================
-   СВОДКА ОЦЕНКИ (компактная, в стиле профиля)
-   ============================================================ */
-.review-criteria-summary {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.035), rgba(10, 12, 18, 0.35));
-  border: 1px solid rgba(34, 211, 238, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  animation: criteriaSummaryIn 0.3s ease;
-}
-
-@keyframes criteriaSummaryIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------- Ряд «таблеток»: технический / вайб / комбо ---------- */
-.criteria-summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.summary-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 30px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(140, 100, 30, 0.06));
-  border: 1px solid rgba(212, 175, 55, 0.28);
-  transition: all 0.25s ease;
-}
-
-.summary-pill:hover {
-  border-color: rgba(212, 175, 55, 0.5);
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(140, 100, 30, 0.1));
-  box-shadow: 0 0 18px rgba(212, 175, 55, 0.14);
-  transform: translateY(-1px);
-}
-
-.summary-pill-label {
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.summary-pill-value {
-  font-family: var(--font-mono);
-  font-size: 15px;
-  font-weight: 700;
-  color: #ffe9a8;
-  line-height: 1;
-  letter-spacing: -0.01em;
-}
-
-.summary-pill-suffix {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-left: 2px;
-}
-
-/* ---------- Ряд чипов блоков (сценарий / персонажи / ...) ---------- */
-.criteria-blocks-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(34, 211, 238, 0.16);
-}
-
-.criteria-block-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border-radius: 30px;
-  background: rgba(34, 211, 238, 0.05);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  transition: all 0.25s ease;
-  cursor: default;
-}
-
-.criteria-block-chip:hover {
-  border-color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.12);
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.18);
-  transform: translateY(-1px);
-}
-
-.chip-label {
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #9fe6f5;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-.chip-value {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffe9a8;
-  min-width: 20px;
-  text-align: right;
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
-}
-
-/* ============================================================
-   АДАПТИВ — дополнение
-   ============================================================ */
-@media (max-width: 768px) {
-  .review-criteria-summary {
-    padding: 10px 12px;
-  }
-
-  .criteria-summary-row {
-    gap: 6px;
-  }
-
-  .summary-pill {
-    padding: 5px 10px;
-    gap: 6px;
-  }
-
-  .summary-pill-value { font-size: 14px; }
-
-  .criteria-blocks-row { gap: 6px; }
-
-  .criteria-block-chip {
-    padding: 4px 10px;
-    gap: 6px;
+  .review-form-foot > * {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .review-criteria-summary {
-    padding: 9px 10px;
-    border-radius: 12px;
+  .rev-head {
+    flex-wrap: wrap;
   }
 
-  .criteria-summary-row {
-    gap: 6px;
-    margin-bottom: 8px;
+  .rev-score {
+    margin-left: 0;
   }
 
-  .summary-pill {
-    padding: 4px 9px;
-    gap: 5px;
-    flex: 1 1 calc(50% - 3px);
-    justify-content: space-between;
+  .rev-actions {
+    gap: 12px;
   }
-
-  .summary-pill-label { font-size: 10.5px; }
-  .summary-pill-value { font-size: 13.5px; }
-
-  .criteria-blocks-row {
-    gap: 6px;
-    padding-top: 8px;
-  }
-
-  .criteria-block-chip {
-    padding: 4px 9px;
-    gap: 5px;
-    flex: 1 1 calc(50% - 3px);
-    justify-content: space-between;
-  }
-
-  .chip-label { font-size: 11px; }
-  .chip-value { font-size: 12.5px; }
 }

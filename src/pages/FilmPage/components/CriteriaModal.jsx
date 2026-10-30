@@ -7,9 +7,6 @@ import './CriteriaModal.css';
  * F1: модалка полной оценки. Черновик и preview живут внутри;
  * сохранение — full-payload (включая vibe), поэтому full-оценка
  * редактируется здесь целиком, а не отдельным vibe-запросом.
- *
- * DECISION: F1/6A — full read-only в панели, изменения только здесь:
- * vibe и 15 критериев уходят одним POST /ratings.
  */
 export default function CriteriaModal({
   film,
@@ -46,27 +43,23 @@ export default function CriteriaModal({
   }, [onClose]);
 
   return (
-    <div className="modal-overlay criteria-modal-overlay" onClick={() => onClose?.()}>
+    <div className="modal-overlay criteria-overlay" onClick={() => onClose?.()}>
       <div
-        className="modal-content criteria-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="criteriaModalTitle"
-        onClick={event => event.stopPropagation()}
+        className="modal-content criteria-modal" role="dialog" aria-modal="true" aria-labelledby="criteriaModalTitle" onClick={event => event.stopPropagation()}
       >
         <button
-          type="button"
-          className="modal-close"
-          onClick={() => onClose?.()}
+          type="button" className="modal-close" onClick={() => onClose?.()}
           aria-label="Закрыть"
         >
-          ✕
+          ×
         </button>
 
-        <div className="criteria-modal__head">
-          <p className="criteria-modal__kicker">Философия Cinephilium</p>
-          <h2 className="criteria-modal__title" id="criteriaModalTitle">Авторская система</h2>
-          <p className="criteria-modal__sub">15 критериев · 5 блоков · веса</p>
+        <div className="modal-head">
+          <p className="modal-kicker">Оценка фильма</p>
+          <h2 className="modal-title" id="criteriaModalTitle">{film?.title || 'Фильм'}</h2>
+          <p className="modal-sub">
+            {[film?.year, film?.director].filter(Boolean).join('· ')}
+          </p>
         </div>
 
         <RatingForm
@@ -83,6 +76,7 @@ export default function CriteriaModal({
           onGenreChange={form.handleGenreChange}
           onWeightChange={form.handleWeightChange}
           onSave={handleSave}
+          onClose={onClose}
           calculatePreview={form.calculatePreview}
         />
       </div>

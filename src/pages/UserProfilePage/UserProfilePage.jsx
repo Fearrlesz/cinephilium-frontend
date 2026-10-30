@@ -125,7 +125,7 @@ function UserProfilePage() {
       <div className="container">
         <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
         <div className="error-msg" style={{ textAlign: 'center', padding: '40px' }}>
-          <h2>😕 Пользователь не найден</h2>
+          <h2> Пользователь не найден</h2>
           <p>Возможно, этот пользователь был удалён или вы перешли по неверной ссылке.</p>
         </div>
       </div>
@@ -153,23 +153,23 @@ function UserProfilePage() {
         <div className="profile-info">
           <h1>
             {user.nickname || 'Пользователь'}
-            {user.isAdmin && <span className="admin-badge"> 👑</span>}
+            {user.isAdmin && <span className="admin-badge"> </span>}
             {isExclusive && (
-              <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
+              <span className="exclusive-badge">  Архитектор Синефилиума</span>
             )}
           </h1>
-          <p>📅 Зарегистрирован: {formatDate(user.registeredAt)}</p>
-          <p>⭐ Всего оценок: <strong>{ratings.length}</strong></p>
-          <p>📝 Рецензий: <strong>{reviews.length}</strong></p>
-          <p>🏆 Баллов: <strong>{user.totalPoints || 0}</strong></p>
+          <p> Зарегистрирован: {formatDate(user.registeredAt)}</p>
+          <p> Всего оценок: <strong>{ratings.length}</strong></p>
+          <p> Рецензий: <strong>{reviews.length}</strong></p>
+          <p> Баллов: <strong>{user.totalPoints || 0}</strong></p>
 
           <div className="achievements-section" style={{ marginTop: '15px' }}>
-            <h4>🏅 Достижения</h4>
+            <h4> Достижения</h4>
             {user.achievements?.length > 0 ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
                 {user.achievements.map(ach => (
                   <span key={ach} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: '20px', fontSize: '13px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    🏅 {ach}
+                     {ach}
                   </span>
                 ))}
               </div>
@@ -186,13 +186,13 @@ function UserProfilePage() {
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
-            ⭐ Оценки ({ratings.length})
+             Оценки ({ratings.length})
           </button>
           <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            📝 Рецензии ({reviews.length})
+             Рецензии ({reviews.length})
           </button>
         </div>
 
@@ -243,7 +243,7 @@ function UserProfilePage() {
             >
               {rating.combinedScore ?? rating.finalScore}
             </div>
-            <button className="details-btn" onClick={() => openRatingDetails(rating)}>🔍 Детали</button>
+            <button className="details-btn" onClick={() => openRatingDetails(rating)}> Детали</button>
           </div>
         ))}
       </div>
@@ -272,7 +272,7 @@ function UserProfilePage() {
                 <Link to={`/film/${film?._id}`} className="review-film-link">
                   <h3 className="review-title">{review.title}</h3>
                   <p className="review-film-name">
-                    🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
+                     {film?.title || 'Фильм'} ({film?.year || 'N/A'})
                   </p>
                 </Link>
 
@@ -282,7 +282,7 @@ function UserProfilePage() {
                     style={{ color: getScoreColor(combinedScore) }}
                     title="Комбинированный балл"
                   >
-                    ★ {combinedScore}
+                     {combinedScore}
                   </div>
                 )}
               </div>
@@ -343,14 +343,14 @@ function UserProfilePage() {
               <div className="review-footer">
                 <div className="review-actions">
                   <button className="like-btn" onClick={() => likeReview(review._id)}>
-                    ❤️ {review.likes?.length || 0}
+                     {review.likes?.length || 0}
                   </button>
                   <span className="review-date">
-                    📅 {formatDate(review.createdAt)}
+                     {formatDate(review.createdAt)}
                   </span>
                 </div>
                 <Link to={`/film/${film?._id}`} className="review-go-to-film">
-                  🎬 Перейти к фильму
+                   Перейти к фильму
                 </Link>
               </div>
             </div>

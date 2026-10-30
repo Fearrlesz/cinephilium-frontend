@@ -1,80 +1,46 @@
 /* ============================================================
-   ИНФОРМАЦИЯ О ФИЛЬМЕ — золото
+   HERO INFO — только текст, без карточек
    ============================================================ */
-.film-details h1 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 32px;
-  margin-bottom: 6px;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+
+.hero-info {
+  min-width: 0;
 }
 
-.film-year {
-  color: var(--text-secondary);
-  font-size: 16px;
-  margin-bottom: 16px;
-  font-family: var(--font-mono);
-}
-
-.film-description {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 16px;
-}
-
-.film-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0;
-}
-
-.genre-tag {
-  padding: 4px 14px;
-  border-radius: 20px;
+.tagline {
+  margin: 0 0 14px;
+  font-family: var(--mono);
   font-size: 12px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  color: var(--gold);
-  border: 1px solid rgba(168, 133, 64, 0.15);
-  background: rgba(168, 133, 64, 0.04);
-  transition: all 0.3s ease;
+  line-height: 1.5;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
 }
 
-.genre-tag:hover {
-  border-color: var(--gold);
-  background: rgba(168, 133, 64, 0.08);
+.hero-title {
+  margin: 0;
 }
 
-.film-rating-stats {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin: 16px 0;
+.hero-meta {
+  margin: 16px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
-.avg-rating {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 32px;
-  font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
-  text-shadow: 0 0 20px rgba(168, 133, 64, 0.1);
+.hero-synopsis {
+  max-width: 62ch;
+  margin: 18px 0 0;
 }
 
-.your-rating {
-  margin: 12px 0;
-  padding: 8px 16px;
-  background: rgba(168, 133, 64, 0.04);
-  border-radius: 10px;
-  border-left: 3px solid var(--gold);
-}
+@media (max-width: 768px) {
+  .hero-meta {
+    font-size: 10px;
+  }
 
-.user-rating-display {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 24px;
-  font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
+  .hero-synopsis {
+    margin-top: 14px;
+  }
 }

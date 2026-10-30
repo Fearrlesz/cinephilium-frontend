@@ -77,7 +77,7 @@ function ContactPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span className="contact-admin-avatar">{admin.nickname ? admin.nickname[0] : '🛡'}</span>
+                <span className="contact-admin-avatar">{admin.nickname ? admin.nickname[0] : ''}</span>
                 <span className="contact-admin-text">
                   <strong>{admin.nickname || 'Администратор'}</strong>
                   <span>@{admin.telegram}</span>

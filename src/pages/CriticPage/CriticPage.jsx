@@ -36,7 +36,7 @@ function CriticPageError({ message, onRetry }) {
     <main className="container critic-page">
       <BackLink />
       <div className="error-msg" role="alert">
-        <h2>😕 {message}</h2>
+        <h2> {message}</h2>
         <p>Не удалось загрузить данные критика. Попробуйте ещё раз.</p>
         {onRetry && (
           <button type="button" className="retry-btn" onClick={onRetry}>

@@ -181,7 +181,7 @@ function ProfilePage() {
       setAdminSecret('');
       showNotification({
         title: 'Поздравляем!',
-        message: 'Вы стали администратором! 👑',
+        message: 'Вы стали администратором! ',
         type: 'success',
       });
     } catch (err) {
@@ -246,29 +246,29 @@ function ProfilePage() {
         <div className="profile-info">
           <h1>
             {user.nickname || 'Пользователь'}
-            {user.isAdmin && <span className="admin-badge"> 👑</span>}
+            {user.isAdmin && <span className="admin-badge"> </span>}
             {isExclusive && (
-              <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
+              <span className="exclusive-badge">  Архитектор Синефилиума</span>
             )}
           </h1>
 
-          {user.email && <p>📧 {user.email}</p>}
+          {user.email && <p> {user.email}</p>}
 
           <div className="profile-stats">
             <p>
-              🏆 Всего оценок: <strong>{ratings.length}</strong>
+               Всего оценок: <strong>{ratings.length}</strong>
             </p>
             <p>
-              📝 Рецензий: <strong>{reviews.length}</strong>
+               Рецензий: <strong>{reviews.length}</strong>
             </p>
             <p>
-              ⭐ Баллов: <strong>{user.totalPoints || 0}</strong>
+               Баллов: <strong>{user.totalPoints || 0}</strong>
             </p>
           </div>
 
           {/* --------- Достижения --------- */}
           <div className="achievements-section" style={{ marginTop: '20px' }}>
-            <h3>🏅 Достижения</h3>
+            <h3> Достижения</h3>
             {user.achievements?.length > 0 ? (
               <div
                 style={{
@@ -291,7 +291,7 @@ function ProfilePage() {
                       border: '1px solid rgba(255,255,255,0.1)',
                     }}
                   >
-                    <span style={{ fontSize: '24px' }}>🏅</span>
+                    <span style={{ fontSize: '24px' }}></span>
                     <div>
                       <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{ach}</div>
                     </div>
@@ -308,7 +308,7 @@ function ProfilePage() {
           {/* --------- Активация админа --------- */}
           {!user.isAdmin && (
             <div className="admin-activation glass-card">
-              <h4>🔑 Стать администратором</h4>
+              <h4> Стать администратором</h4>
               <p className="admin-hint">
                 Введите секретный ключ, чтобы получить права администратора
               </p>
@@ -320,7 +320,7 @@ function ProfilePage() {
                   onChange={(e) => setAdminSecret(e.target.value)}
                 />
                 <button onClick={activateAdmin} disabled={adminLoading}>
-                  {adminLoading ? 'Проверка...' : '👑 Активировать'}
+                  {adminLoading ? 'Проверка...' : ' Активировать'}
                 </button>
               </div>
               {adminError && <div className="error-msg">{adminError}</div>}
@@ -329,7 +329,7 @@ function ProfilePage() {
           )}
 
           <button onClick={logout} className="logout-btn">
-            🚪 Выйти
+             Выйти
           </button>
         </div>
       </div>
@@ -341,13 +341,13 @@ function ProfilePage() {
             className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ratings')}
           >
-            ⭐ Мои оценки ({ratings.length})
+             Мои оценки ({ratings.length})
           </button>
           <button
             className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            📝 Мои рецензии ({reviews.length})
+             Мои рецензии ({reviews.length})
           </button>
         </div>
 
@@ -413,7 +413,7 @@ function ProfilePage() {
                       className="details-btn"
                       onClick={() => openRatingDetails(rating)}
                     >
-                      🔍 Детали
+                       Детали
                     </button>
                   </div>
                 ))}
@@ -444,7 +444,7 @@ function ProfilePage() {
                         <Link to={`/film/${film?._id}`} className="review-film-link">
                           <h3 className="review-title">{review.title}</h3>
                           <p className="review-film-name">
-                            🎬 {film?.title || 'Фильм'} ({film?.year || 'N/A'})
+                             {film?.title || 'Фильм'} ({film?.year || 'N/A'})
                           </p>
                         </Link>
 
@@ -454,7 +454,7 @@ function ProfilePage() {
                             style={{ color: getScoreColor(combinedScore) }}
                             title="Комбинированный балл"
                           >
-                            ★ {combinedScore}
+                             {combinedScore}
                           </div>
                         )}
                       </div>
@@ -520,14 +520,14 @@ function ProfilePage() {
                             className="like-btn"
                             onClick={() => likeReview(review._id)}
                           >
-                            ❤️ {review.likes?.length || 0}
+                             {review.likes?.length || 0}
                           </button>
                           <span className="review-date">
-                            📅 {formatDate(review.createdAt)}
+                             {formatDate(review.createdAt)}
                           </span>
                         </div>
                         <Link to={`/film/${film?._id}`} className="review-go-to-film">
-                          🎬 Перейти к фильму
+                           Перейти к фильму
                         </Link>
                       </div>
                     </div>

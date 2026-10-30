@@ -27,6 +27,7 @@
 - [✨ Возможности — без вранья](#-возможности--без-вранья)
   - [⚠️ Честно о том, чего нет](#️-честно-о-том-чего-нет)
 - [🛠 Технологии](#-технологии)
+- [🎨 Дизайн-система (F-DESIGN-1)](#-дизайн-система-f-design-1)
 - [🧠 Наша философия](#-наша-философия)
 - [🚀 Для пользователя — быстро и без лишних слов](#-для-пользователя--быстро-и-без-лишних-слов)
 - [📅 Ближайшие планы](#-ближайшие-планы)
@@ -250,9 +251,40 @@ Popcornmeter для зрителей с 2019 года учитывает тол�
 | Слой | Стек |
 |------|------|
 | **Бэкенд** | [Node.js](https://nodejs.org/) 24.x + [Express](https://expressjs.com/) 4.x + [MongoDB](https://www.mongodb.com/) 6.x + [Mongoose](https://mongoosejs.com/) + [JWT](https://jwt.io/) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js) |
-| **Фронтенд** | [React](https://reactjs.org/) 18.x + [Axios](https://axios-http.com/) + [React Router](https://reactrouter.com/) + кастомный CSS с Glassmorphism |
+| **Фронтенд** | [React](https://reactjs.org/) 18.x + [Axios](https://axios-http.com/) + [React Router](https://reactrouter.com/) + кастомный CSS: тёмная кинематографическая тема (бордо + azure/cyan) |
 | **Внешние API** | [TMDB API](https://www.themoviedb.org/documentation/api) |
 | **Хостинг** | [Vercel](https://vercel.com/) (фронт) + [Render](https://render.com/) (бэк) + [MongoDB Atlas](https://www.mongodb.com/atlas) |
+
+---
+
+## 🎨 Дизайн-система (F-DESIGN-1)
+
+Единый слой стилей для задач F2–F9. Новые компоненты не хардкодят цвета,
+шрифты, радиусы и отступы — они берут значения из токенов.
+
+| Файл | Что внутри |
+|------|------------|
+| `src/styles/tokens.css` | `:root`-токены: фоны, текст, линии, акценты, 5 блоков критериев, шрифты, радиусы, `--wrap`, easing/длительности |
+| `src/styles/base.css` | `body` + градиент, SVG-шум, сброс, `::selection`, `:focus-visible`, скроллбар |
+| `src/styles/typography.css` | `.h1`, `.h-section`, `.body`, `.body-review`, `.synopsis`, `.num-big`, `.lbl`, `.tagline`, `.divider` |
+
+Порядок подключения в `src/index.js`: `tokens.css` → `base.css` → `typography.css` → `App.css`.
+
+**Брейкпоинты** (CRA 5 без PostCSS-плагина — только `media queries`):
+**1024 / 860 / 768 / 620 / 520 / 480**. Новые брейкпоинты не придумывать.
+
+**Шрифты:** Instrument Serif (заголовки), Inter (текст), IBM Plex Mono (цифры/лейблы).
+Подключены в `public/index.html` через Google Fonts с `display=swap`.
+
+### Страница фильма
+
+Герой на 55vh, постер 2/3, панель трёх оценок, рецензии и комментарии —
+плоскими секциями на разделителях, без стеклянных карточек, неона и эмодзи.
+Хедер фиксированный, 56px. Все числа и лейблы — IBM Plex Mono, предложения — Inter,
+имя фильма — Instrument Serif.
+
+Точные значения палитры, типографики и компонентов — в
+[DESIGN_HANDOFF.md](DESIGN_HANDOFF.md).
 
 ---
 

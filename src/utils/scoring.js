@@ -46,11 +46,11 @@ export function getGrade(score) {
   const value = Number(score);
   if (!Number.isFinite(value)) return null;
   if (value >= 90) return { letter: 'S', label: 'Шедевр',  color: '#d68aa6' };
-  if (value >= 80) return { letter: 'A', label: 'Отлично', color: '#5b9bd5' };
+  if (value >= 80) return { letter: 'A', label: 'Отлично', color: '#7dd9e3' };
   if (value >= 65) return { letter: 'B', label: 'Хорошо',  color: '#5fc9d4' };
-  if (value >= 50) return { letter: 'C', label: 'Средне',  color: '#4fb8c4' };
+  if (value >= 50) return { letter: 'C', label: 'Средне',  color: '#5b9bd5' };
   if (value >= 35) return { letter: 'D', label: 'Слабо',   color: '#8f8289' };
-  return { letter: 'E', label: 'Провал', color: '#d97a7a' };
+  return { letter: 'E', label: 'Провал', color: '#a86a72' };
 }
 
 export function roundTenth(value) {

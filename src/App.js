@@ -16,7 +16,6 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import CriticPage from './pages/CriticPage/CriticPage';
 import ContactPage from './pages/ContactPage/ContactPage';
-import './App.css';
 
 function App() {
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });

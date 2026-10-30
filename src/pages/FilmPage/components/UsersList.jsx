@@ -1,50 +1,55 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getScoreColor } from '../../../utils/constants';
 import './UsersList.css';
 
-function UsersList({ filmUsers, usersLoading, onShowUsers, onOpenRatingDetails }) {
+function UsersList({ filmUsers, usersLoading, onShowUsers }) {
   return (
-    <div className="film-users glass-card">
-      <div className="film-users-header">
-        <h3>👥 Оценили фильм: <strong>{filmUsers.length}</strong> человек</h3>
+    <section className="film-users">
+      <div className="sec-head">
+        <h2 className="sec-title">
+          Оценили фильм <span className="sec-count">{filmUsers.length}</span>
+        </h2>
         {filmUsers.length > 0 && (
-          <button className="btn-show-users" onClick={onShowUsers}>
-            👁️ Подробнее
+          <button type="button" className="link-btn" onClick={onShowUsers}>
+            Все оценки
           </button>
         )}
       </div>
-      
+
       {usersLoading ? (
-        <div className="loading-users">Загрузка...</div>
+        <p className="empty-line">Загрузка…</p>
       ) : filmUsers.length === 0 ? (
-        <p className="no-users">Пока никто не оценил этот фильм. Будьте первым! ⭐</p>
+        <p className="empty-line">Пока никто не оценил этот фильм.</p>
       ) : (
-        <div className="users-preview">
-          {filmUsers.slice(0, 5).map((item) => {
-            // F1-fix: /films/:id/users отдаёт finalScore: 0 для vibe-only
-            // (combinedScore на бэке = 0). Цифру не показываем; правильный
-            // фикс — на бэкенде, здесь только не врём пользователю.
+        <div className="users-row">
+          {filmUsers.slice(0, 5).map(item => {
+            const nickname = item.user.nickname || 'Пользователь';
+            // F1-fix: /films/:id/users отдаёт finalScore: 0 для vibe-only.
             const isVibeOnly = item.rating.completeness === 'vibe';
             return (
-              <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-preview">
-                <Link to={`/user/${item.user._id}`} className="user-link">👤 {item.user.nickname || 'Пользователь'}</Link>
+              <Link
+                to={`/user/${item.user._id}`}
+                className="user-chip" key={`${item.user._id}-${item.rating._id}`}
+              >
+                <span className="user-av" aria-hidden="true">
+                  {nickname.charAt(0).toUpperCase()}
+                </span>
+                <span className="user-name">{nickname}</span>
                 <span
-                  className="user-rating-score"
-                  style={{ color: isVibeOnly ? 'var(--text-muted)' : getScoreColor(item.rating.finalScore) }}
-                  title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                  className="user-score" title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
                 >
                   {isVibeOnly ? '—' : item.rating.finalScore}
                 </span>
-              </div>
+              </Link>
             );
           })}
+
           {filmUsers.length > 5 && (
-            <div className="more-users">и ещё {filmUsers.length - 5} человек...</div>
+            <span className="users-more">и ещё {filmUsers.length - 5}</span>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 

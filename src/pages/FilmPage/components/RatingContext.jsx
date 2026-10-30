@@ -2,14 +2,11 @@ import React from 'react';
 import { formatDelta, formatScore, roundTenth } from '../../../utils/scoring';
 
 /**
- * F1: соцдоказательство — одна строка, только комбинированный балл.
+ * F1: соцдоказательство — компактная пилюля.
  *
  * DECISION: F1-fix — «Ваша» существует только для full: vibe-only даёт
  * combinedScore = 0 на бэке, и фронт не доизобретает vibe × 10.
- * DECISION: F1/4A — не добавляем сюда вайб/технику: строка сравнивает
- * «что народ думает» с «что думаешь ты» одной цифрой.
  * Delta выводится только когда есть и «Сообщество», и «Ваша» (full).
- * Прочерк, а не 0, когда данных нет.
  */
 export default function RatingContext({ community = null, yours = null }) {
   const hasCommunity = Number.isFinite(Number(community)) && Number(community) > 0;
@@ -28,7 +25,9 @@ export default function RatingContext({ community = null, yours = null }) {
     <div className="rating-context" aria-label="Сравнение с сообществом">
       <div className="rc-item">
         <span className="rc-label">Сообщество</span>
-        <span className="rc-val rc-val--community">{hasCommunity ? formatScore(community) : '—'}</span>
+        <span className="rc-val rc-val--community">
+          {hasCommunity ? formatScore(community) : '—'}
+        </span>
       </div>
 
       <span className="rc-sep" aria-hidden="true" />
@@ -40,8 +39,11 @@ export default function RatingContext({ community = null, yours = null }) {
         </span>
       </div>
 
-      <div className={`rc-delta ${deltaClass}`} aria-live="polite">
-        {delta !== null ? formatDelta(delta) : ''}
+      <div className={`rc-item rc-item--delta ${deltaClass}`} aria-live="polite">
+        <span className="rc-label">Дельта</span>
+        <span className="rc-delta">
+          {delta !== null ? formatDelta(delta) : '—'}
+        </span>
       </div>
     </div>
   );

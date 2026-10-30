@@ -51,7 +51,7 @@
     rgba(40, 15, 25, 0.6) 0%,
     rgba(20, 8, 15, 0.8) 100%
   );
-  border: 1px solid rgba(236, 72, 153, 0.2);
+  border: 1px solid rgba(214, 138, 166, 0.2);
   border-radius: var(--radius-xl);
   box-shadow:
     var(--shadow-card-3d),
@@ -157,8 +157,8 @@ a.back-btn:visited {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--neon-pink);
-  background: rgba(236, 72, 153, 0.08);
-  border: 1px solid rgba(236, 72, 153, 0.35);
+  background: rgba(214, 138, 166, 0.08);
+  border: 1px solid rgba(214, 138, 166, 0.35);
   padding: 10px 26px;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -169,11 +169,11 @@ a.back-btn:visited {
 
 .retry-btn:hover {
   color: #fff;
-  background: rgba(236, 72, 153, 0.18);
+  background: rgba(214, 138, 166, 0.18);
   border-color: var(--neon-pink);
   box-shadow:
     0 6px 24px rgba(0, 0, 0, 0.5),
-    0 0 22px rgba(236, 72, 153, 0.45);
+    0 0 22px rgba(214, 138, 166, 0.45);
   transform: translateY(-1px);
 }
 

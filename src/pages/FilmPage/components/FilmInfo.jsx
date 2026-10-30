@@ -1,34 +1,29 @@
 import React from 'react';
-import { getPosterUrl, handleImgError } from '../../../utils/posterUrl';
 import './FilmInfo.css';
 
 /**
- * F1: из шапки убраны старые averageRating/votesCount, «Ваша оценка»
- * и кнопка «Оценить фильм» — их заменяет RatingSection. Здесь остаются
- * постер, заголовок и метаданные фильма.
+ * Информационный блок героя: тэглайн, название, мета, синопсис.
+ * Постер и панель оценок живут рядом, в FilmPage.
  */
-function FilmInfo({ film }) {
-  return (
-    <div className="film-header">
-      <img
-        src={getPosterUrl(film.poster)}
-        alt={film.title}
-        className="film-poster-large"
-        onError={handleImgError}
-      />
+function FilmInfo({ film, children }) {
+  const genres = film.genres || [];
+  const meta = [film.year, film.director, genres.join(', ')]
+    .filter(Boolean)
+    .join('· ');
 
-      <div className="film-details">
-        <h1>{film.title}</h1>
-        <p className="film-year">{film.year}</p>
-        <p className="film-description">{film.description}</p>
-        <p><strong>Режиссёр:</strong> {film.director}</p>
-        <p><strong>Актёры:</strong> {film.actors?.join(', ') || 'Нет данных'}</p>
-        <div className="film-genres">
-          {film.genres?.map((genre, index) => (
-            <span key={index} className="genre-tag">{genre}</span>
-          ))}
-        </div>
-      </div>
+  return (
+    <div className="hero-info">
+      <p className="tagline">{genres.length ? genres.join('· ') : 'Кино'}</p>
+
+      <h1 className="h1 hero-title">{film.title}</h1>
+
+      {meta && <p className="hero-meta">{meta}</p>}
+
+      {film.description && (
+        <p className="synopsis hero-synopsis">{film.description}</p>
+      )}
+
+      {children}
     </div>
   );
 }

@@ -85,7 +85,7 @@
 .btn-approve {
   padding: 4px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(34, 211, 238, 0.2);
+  border: 1px solid rgba(95, 201, 212, 0.2);
   background: transparent;
   color: var(--neon-cyan);
   cursor: pointer;
@@ -96,13 +96,13 @@
   box-shadow: none;
 }
 .btn-approve:hover {
-  background: rgba(34, 211, 238, 0.08);
+  background: rgba(95, 201, 212, 0.08);
 }
 
 .btn-reject {
   padding: 4px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(236, 72, 153, 0.2);
+  border: 1px solid rgba(214, 138, 166, 0.2);
   background: transparent;
   color: var(--neon-pink);
   cursor: pointer;
@@ -113,17 +113,17 @@
   box-shadow: none;
 }
 .btn-reject:hover {
-  background: rgba(236, 72, 153, 0.08);
+  background: rgba(214, 138, 166, 0.08);
 }
 
 /* ============================================================
    АКТИВАЦИЯ АДМИНА
    ============================================================ */
 .admin-activation {
-  background: rgba(124, 58, 237, 0.04);
+  background: rgba(95, 201, 212, 0.04);
   padding: 16px 20px;
   border-radius: 12px;
-  border: 1px solid rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(95, 201, 212, 0.08);
   margin: 12px 0;
 }
 
@@ -158,13 +158,13 @@
 }
 .admin-form input:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.2);
+  border-color: rgba(95, 201, 212, 0.2);
 }
 .admin-form button {
   padding: 8px 24px;
   border-radius: 40px;
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(34, 211, 238, 0.05));
+  border: 1px solid rgba(95, 201, 212, 0.2);
+  background: linear-gradient(135deg, rgba(95, 201, 212, 0.1), rgba(95, 201, 212, 0.05));
   color: var(--text-primary);
   font-weight: 600;
   cursor: pointer;
@@ -175,7 +175,7 @@
 }
 .admin-form button:hover {
   border-color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.05);
+  background: rgba(95, 201, 212, 0.05);
 }
 .admin-form button:disabled {
   opacity: 0.4;
@@ -219,8 +219,8 @@
   margin: 4px 0 16px;
   padding: 14px 16px;
   border-radius: 12px;
-  border: 1px dashed rgba(34, 211, 238, 0.35);
-  background: rgba(34, 211, 238, 0.04);
+  border: 1px dashed rgba(95, 201, 212, 0.35);
+  background: rgba(95, 201, 212, 0.04);
 }
 
 .admin-fresh p {
@@ -269,18 +269,18 @@
 
 .invite-active {
   color: var(--neon-cyan);
-  border-color: rgba(34, 211, 238, 0.35);
+  border-color: rgba(95, 201, 212, 0.35);
 }
 
 .invite-used {
   color: var(--gold-bright);
-  border-color: rgba(168, 133, 64, 0.35);
+  border-color: rgba(91, 155, 213, 0.35);
 }
 
 .invite-expired,
 .invite-revoked {
   color: var(--neon-pink);
-  border-color: rgba(236, 72, 153, 0.3);
+  border-color: rgba(214, 138, 166, 0.3);
 }
 
 .admin-tg-row {

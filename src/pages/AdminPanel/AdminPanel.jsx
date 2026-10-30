@@ -228,11 +228,11 @@ function AdminPanel() {
   return (
     <div className="container admin-panel">
       <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
-      <h1 className="admin-title">🛡️ Админ-панель</h1>
+      <h1 className="admin-title"> Админ-панель</h1>
       <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
 
       <div className="admin-section glass-card">
-        <h2>📨 Заявки на регистрацию ({contactRequests.length})</h2>
+        <h2> Заявки на регистрацию ({contactRequests.length})</h2>
         <p className="admin-hint">
           Заявки со страницы «Связь с админами». Одобрение сразу создаёт инвайт-код —
           его нужно отправить по контакту из заявки.
@@ -259,13 +259,13 @@ function AdminPanel() {
             {contactRequests.map(request => (
               <div key={request.id} className="admin-item">
                 <div className="admin-item-header">
-                  <span className="admin-item-author">👤 {request.nickname}</span>
-                  <span className="admin-item-film">✉️ {request.contact}</span>
+                  <span className="admin-item-author"> {request.nickname}</span>
+                  <span className="admin-item-film"> {request.contact}</span>
                 </div>
                 {request.message && <p className="admin-item-text">{request.message}</p>}
                 <div className="admin-item-actions">
-                  <button className="btn-approve" onClick={() => approveRequest(request)}>✅ Выдать инвайт</button>
-                  <button className="btn-reject" onClick={() => rejectRequest(request)}>❌ Отклонить</button>
+                  <button className="btn-approve" onClick={() => approveRequest(request)}> Выдать инвайт</button>
+                  <button className="btn-reject" onClick={() => rejectRequest(request)}> Отклонить</button>
                 </div>
               </div>
             ))}
@@ -274,7 +274,7 @@ function AdminPanel() {
       </div>
 
       <div className="admin-section glass-card">
-        <h2>🎟️ Инвайт-коды</h2>
+        <h2> Инвайт-коды</h2>
         <p className="admin-hint">
           Один код — один аккаунт. Коды показываются один раз, в списке остаётся только префикс.
         </p>
@@ -341,7 +341,7 @@ function AdminPanel() {
       </div>
 
       <div className="admin-section glass-card">
-        <h2>🔑 Сброс пароля</h2>
+        <h2> Сброс пароля</h2>
         <p className="admin-hint">
           Письма сайт не отправляет: ссылку нужно передать пользователю самому.
         </p>
@@ -360,7 +360,7 @@ function AdminPanel() {
         {foundUsers.map(found => (
           <div key={found.id} className="admin-item">
             <div className="admin-item-header">
-              <span className="admin-item-author">👤 {found.nickname}{found.isAdmin ? ' 👑' : ''}</span>
+              <span className="admin-item-author"> {found.nickname}{found.isAdmin ? ' ' : ''}</span>
             </div>
             <div className="admin-tg-row">
               <input
@@ -398,7 +398,7 @@ function AdminPanel() {
       </div>
 
       <div className="admin-section glass-card">
-        <h2>💬 Комментарии на модерации ({pendingComments.length})</h2>
+        <h2> Комментарии на модерации ({pendingComments.length})</h2>
         {pendingComments.length === 0 ? (
           <p className="admin-empty">Нет комментариев для проверки</p>
         ) : (
@@ -406,13 +406,13 @@ function AdminPanel() {
             {pendingComments.map(c => (
               <div key={c._id} className="admin-item">
                 <div className="admin-item-header">
-                  <span className="admin-item-author">👤 {c.userId?.nickname || 'Пользователь'}</span>
-                  <span className="admin-item-film">🎬 {c.filmId?.title || 'Фильм'}</span>
+                  <span className="admin-item-author"> {c.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film"> {c.filmId?.title || 'Фильм'}</span>
                 </div>
                 <p className="admin-item-text">{c.text}</p>
                 <div className="admin-item-actions">
-                  <button className="btn-approve" onClick={() => approveComment(c._id)}>✅ Одобрить</button>
-                  <button className="btn-reject" onClick={() => rejectComment(c._id)}>❌ Отклонить</button>
+                  <button className="btn-approve" onClick={() => approveComment(c._id)}> Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectComment(c._id)}> Отклонить</button>
                 </div>
               </div>
             ))}
@@ -421,7 +421,7 @@ function AdminPanel() {
       </div>
 
       <div className="admin-section glass-card">
-        <h2>📝 Рецензии на модерации ({pendingReviews.length})</h2>
+        <h2> Рецензии на модерации ({pendingReviews.length})</h2>
         {pendingReviews.length === 0 ? (
           <p className="admin-empty">Нет рецензий для проверки</p>
         ) : (
@@ -429,14 +429,14 @@ function AdminPanel() {
             {pendingReviews.map(r => (
               <div key={r._id} className="admin-item">
                 <div className="admin-item-header">
-                  <span className="admin-item-author">👤 {r.userId?.nickname || 'Пользователь'}</span>
-                  <span className="admin-item-film">🎬 {r.filmId?.title || 'Фильм'}</span>
+                  <span className="admin-item-author"> {r.userId?.nickname || 'Пользователь'}</span>
+                  <span className="admin-item-film"> {r.filmId?.title || 'Фильм'}</span>
                 </div>
                 <h4 className="admin-item-title">{r.title}</h4>
                 <p className="admin-item-text">{r.text}</p>
                 <div className="admin-item-actions">
-                  <button className="btn-approve" onClick={() => approveReview(r._id)}>✅ Одобрить</button>
-                  <button className="btn-reject" onClick={() => rejectReview(r._id)}>❌ Отклонить</button>
+                  <button className="btn-approve" onClick={() => approveReview(r._id)}> Одобрить</button>
+                  <button className="btn-reject" onClick={() => rejectReview(r._id)}> Отклонить</button>
                 </div>
               </div>
             ))}

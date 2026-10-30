@@ -148,8 +148,7 @@ export default function RatingPanel({
                   <span className="rp-spectrum__name">{BLOCK_NAMES[index]}</span>
                   <span className="rp-spectrum__track">
                     <span
-                      className="rp-spectrum__fill"
-                      style={{
+                      className="rp-spectrum__fill" style={{
                         width: `${width}%`,
                         background: `linear-gradient(90deg, ${color.from}, ${color.to})`
                       }}
@@ -170,8 +169,7 @@ export default function RatingPanel({
           </button>
         ) : (
           <button
-            type="button"
-            className={`rp-cta ${hasVibe ? 'rp-cta--accent' : ''}`}
+            type="button" className={`rp-cta ${hasVibe ? 'rp-cta--accent' : ''}`}
             onClick={authenticated ? onOpenCriteria : onRequireAuth}
           >
             {authenticated ? 'Оценить' : 'Войти и оценить'}
@@ -199,7 +197,11 @@ export default function RatingPanel({
 
         <div className="rp-formula">
           {isFull && technical && combined ? (
-            <>0.7 × {formatScore(technical)} + 0.3 × {formatScore(Number(vibe) * 10)} = {formatScore(combined)}</>
+            <>
+              <span>0.7 × {formatScore(technical)}</span>
+              <span>+ 0.3 × {formatScore(Number(vibe) * 10)}</span>
+              <b>= {formatScore(combined)}</b>
+            </>
           ) : (!isFull && hasVibe) ? (
             // Vibe-only: combined не вычисляется. Никакой формулы/подписи
             // «на основе вайба» — только прочерк и мета ниже.

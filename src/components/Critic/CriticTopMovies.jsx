@@ -37,10 +37,10 @@ export default function CriticTopMovies({ movies }) {
                       className="critic-top__score"
                       style={{ color: getScoreColor(r.combinedScore) }}
                     >
-                      ⭐ {r.combinedScore}
+                       {r.combinedScore}
                     </span>
                     <span className="critic-top__sub">
-                      ТБ {r.technicalScore} · 💫 {r.vibe}
+                      ТБ {r.technicalScore} ·  {r.vibe}
                     </span>
                   </div>
                 </div>

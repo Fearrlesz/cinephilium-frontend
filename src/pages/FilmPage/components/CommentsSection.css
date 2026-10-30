@@ -1,159 +1,211 @@
 /* ============================================================
-   КОММЕНТАРИИ — золото
+   COMMENTS — форма-пилюля и список без карточки
    ============================================================ */
-.comments-section {
-  margin: 30px 0;
-  padding: 20px 24px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
+
+.film-comments {
+  margin-top: 46px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-faint);
 }
 
-.comments-section h3 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
-}
-
-.comments-list {
+.film-comments .sec-title {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
 }
 
-.comment-item {
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  border-left: 3px solid var(--gold);
-  transition: all 0.3s ease;
+.cform {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 6px;
 }
 
-.comment-item:hover {
-  background: rgba(168, 133, 64, 0.03);
+.c-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--highlight), var(--surface));
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-soft);
 }
 
-.comment-author {
+.c-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.c-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.c-input:focus {
+  border-color: var(--azure-line);
+  background: rgba(91, 155, 213, 0.04);
+}
+
+.c-send {
+  flex: none;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 100px;
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.c-send:hover:not(:disabled) {
+  background: var(--azure-bright);
+  color: var(--void);
+  border: none;
+}
+
+.c-login {
+  margin: 16px 0 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.c-login a {
+  color: var(--azure-bright);
+}
+
+.c-error {
+  margin: 6px 0 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--pink);
+}
+
+.clist {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citem {
+  display: flex;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.citem:first-child {
+  border-top: none;
+}
+
+.citem .c-av {
+  width: 26px;
+  height: 26px;
+  font-size: 9px;
+}
+
+.cmain {
+  min-width: 0;
+}
+
+.cname {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.cmeta {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
 }
 
-.comment-nickname {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--gold-bright);
+.cmeta .dot {
+  opacity: 0.5;
 }
 
-.comment-text {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin: 4px 0;
+.ctext {
+  margin: 5px 0 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.comment-actions {
-  display: flex;
-  gap: 12px;
+.c-like {
   margin-top: 6px;
-}
-
-.like-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
+  padding: 0;
   border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  width: auto;
-  margin-top: 0;
-}
-.like-btn:hover {
-  color: var(--neon-pink);
-  background: rgba(236, 72, 153, 0.06);
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
-.like-btn.liked {
-  color: var(--neon-pink);
+.c-like:hover {
+  background: none;
+  color: var(--ink);
 }
 
-.like-btn .like-icon {
-  font-size: 18px;
-  transition: transform 0.3s ease;
+.c-like span {
+  color: var(--ink-muted);
 }
 
-.like-btn:hover .like-icon {
-  transform: scale(1.2);
+@media (max-width: 620px) {
+  .c-time {
+    display: none;
+  }
 }
 
-.like-btn .like-count {
-  font-weight: 600;
-  min-width: 20px;
-  text-align: center;
-}
+@media (max-width: 480px) {
+  .cform {
+    flex-wrap: wrap;
+  }
 
-.comment-form {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
+  .c-input {
+    flex: 1 1 100%;
+    order: 2;
+  }
 
-.comment-form input {
-  flex: 1;
-  padding: 10px 16px;
-  border-radius: 40px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  transition: all 0.3s;
-}
-.comment-form input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
-}
+  .c-av {
+    order: 1;
+  }
 
-.comment-form button {
-  padding: 10px 20px;
-  border-radius: 40px;
-  border: 1px solid var(--glass-border);
-  background: var(--bg-glass);
-  color: var(--text-primary);
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.3s;
-  width: auto;
-  margin-top: 0;
-  font-weight: 400;
-  box-shadow: none;
-}
-.comment-form button:hover {
-  border-color: var(--gold);
-  background: rgba(168, 133, 64, 0.05);
-}
+  .c-send {
+    order: 3;
+    flex: 1;
+  }
 
-/* ============================================================
-   МОБИЛЬНАЯ ОБРАТНАЯ СВЯЗЬ
-   ============================================================ */
-@media (max-width: 768px) {
-  .like-btn:active,
-  .comment-form button:active {
-    transform: scale(0.92);
-    transition-duration: 0.08s;
+  .film-comments {
+    margin-top: 36px;
+    padding-top: 22px;
   }
 }

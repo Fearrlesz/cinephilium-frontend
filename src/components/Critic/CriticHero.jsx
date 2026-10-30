@@ -10,7 +10,7 @@ export default function CriticHero({ critic, tagline, bio }) {
         <h1>
           {critic?.nickname}
           {critic?.isExclusive && (
-            <span className="exclusive-badge"> 🇮🇹 Архитектор Синефилиума</span>
+            <span className="exclusive-badge">  Архитектор Синефилиума</span>
           )}
         </h1>
         {tagline && <p className="critic-hero__tagline">«{tagline}»</p>}

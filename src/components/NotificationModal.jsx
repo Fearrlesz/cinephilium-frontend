@@ -5,10 +5,10 @@ function NotificationModal({ isOpen, onClose, title, message, type = 'success' }
   if (!isOpen) return null;
 
   const icons = {
-    success: '✅',
-    error: '❌',
-    info: 'ℹ️',
-    warning: '⚠️'
+    success: '',
+    error: '',
+    info: 'ℹ',
+    warning: ''
   };
 
   const typeLabels = {
@@ -28,10 +28,10 @@ function NotificationModal({ isOpen, onClose, title, message, type = 'success' }
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-glass" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button className="modal-close" onClick={onClose}></button>
         <div className="modal-content">
           <div className={`modal-icon ${type}`}>
-            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ️'}</span>
+            <span style={{ fontSize: '32px' }}>{icons[type] || 'ℹ'}</span>
           </div>
           <h3 className="modal-title">{title || typeLabels[type] || 'Уведомление'}</h3>
           <p className="modal-message">{message}</p>

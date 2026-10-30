@@ -256,20 +256,20 @@ function HomePage() {
             onChange={(e) => { setSearchQuery(e.target.value); setSearchError(''); }}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
-          <button onClick={handleSearch}>🔍 Найти</button>
+          <button onClick={handleSearch}> Найти</button>
         </div>
         {searchError && <div className="error-msg">{searchError}</div>}
       </div>
 
       <div className="sort-tabs">
         <div className={`sort-tab ${sortType === 'technical' ? 'active' : ''}`} onClick={() => handleSortChange('technical')}>
-          <span className="tab-icon">🎯</span><span className="tab-label">Техническая</span>
+          <span className="tab-icon"></span><span className="tab-label">Техническая</span>
         </div>
         <div className={`sort-tab ${sortType === 'vibe' ? 'active' : ''}`} onClick={() => handleSortChange('vibe')}>
-          <span className="tab-icon">💫</span><span className="tab-label">Вайб</span>
+          <span className="tab-icon"></span><span className="tab-label">Вайб</span>
         </div>
         <div className={`sort-tab ${sortType === 'combined' ? 'active' : ''}`} onClick={() => handleSortChange('combined')}>
-          <span className="tab-icon">⭐</span><span className="tab-label">Общая</span>
+          <span className="tab-icon"></span><span className="tab-label">Общая</span>
         </div>
       </div>
 
@@ -286,7 +286,7 @@ function HomePage() {
                   <h4>{film.title}</h4>
                   <p>{film.release_date?.split('-')[0] || 'N/A'}</p>
                   <button onClick={() => importFilm(film.id, film.title)} disabled={isImporting} className="btn-add">
-                    {isImporting ? 'Добавление...' : '➕ Добавить'}
+                    {isImporting ? 'Добавление...' : ' Добавить'}
                   </button>
                 </div>
               </div>
@@ -314,7 +314,7 @@ function HomePage() {
               <div className="top-card-poster-wrapper">
                 <img src={getPosterUrl(film.poster)} alt={film.title} className="top-card-poster" onError={handleImgError} />
                 <div className="top-card-rank">
-                  {i === 0 && '👑'}{i === 1 && '🥇'}{i === 2 && '🥈'}{i === 3 && '🥉'}{i >= 4 && `#${i + 1}`}
+                  {i === 0 && ''}{i === 1 && ''}{i === 2 && ''}{i === 3 && ''}{i >= 4 && `#${i + 1}`}
                 </div>
                 <div className="top-card-score" style={{ color: getScoreColor(value) }}>
                   {Number.isFinite(value) ? value.toFixed(1) : '—'}
@@ -349,25 +349,25 @@ function HomePage() {
                     <p>{film.year}</p>
                     <div className="film-ratings">
                       <div className="rating-row">
-                        <span className="rating-label">🎯 Тех.:</span>
+                        <span className="rating-label"> Тех.:</span>
                         <span className="rating-value" style={{ color: getScoreColor(film.averageRating) }}>
                           {film.averageRating?.toFixed(1) || '—'}
                         </span>
                       </div>
                       <div className="rating-row">
-                        <span className="rating-label">💫 Вайб:</span>
+                        <span className="rating-label"> Вайб:</span>
                         <span className="rating-value" style={{ color: getScoreColor(film.averageVibe) }}>
                           {film.averageVibe?.toFixed(1) || '—'}
                         </span>
                       </div>
                       <div className="rating-row">
-                        <span className="rating-label">⭐ Общий:</span>
+                        <span className="rating-label"> Общий:</span>
                         <span className="rating-value" style={{ color: getScoreColor(film.averageCombined) }}>
                           {film.averageCombined?.toFixed(1) || '—'}
                         </span>
                       </div>
                     </div>
-                    <span className="votes-count">👥 {film.votesCount || 0} оценок</span>
+                    <span className="votes-count"> {film.votesCount || 0} оценок</span>
                   </div>
                 </div>
               </Link>

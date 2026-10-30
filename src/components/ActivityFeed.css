@@ -14,7 +14,7 @@
   transition: all 0.3s ease;
 }
 
-/* ✨ Золотая полоса сверху */
+/*  Золотая полоса сверху */
 .activity-feed::before {
   content: '';
   position: absolute;
@@ -28,7 +28,7 @@
 
 .activity-feed:hover {
   border-color: var(--gold);
-  box-shadow: 0 0 40px rgba(168, 133, 64, 0.02);
+  box-shadow: 0 0 40px rgba(91, 155, 213, 0.02);
 }
 
 .activity-feed h3 {
@@ -69,7 +69,7 @@
 }
 
 .feed-item:hover {
-  background: rgba(168, 133, 64, 0.03);
+  background: rgba(91, 155, 213, 0.03);
   border-left-color: var(--gold);
   transform: translateX(4px);
 }
@@ -98,7 +98,7 @@
   font-weight: 600;
 }
 
-/* ⚠️ Обратная совместимость */
+/*  Обратная совместимость */
 .feed-text .highlight-gold {
   color: var(--gold-bright);
   font-weight: 600;

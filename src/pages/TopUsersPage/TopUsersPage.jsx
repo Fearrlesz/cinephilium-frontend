@@ -31,14 +31,14 @@ function TopUsersPage() {
   if (error) return <div className="error-msg">{error}</div>;
 
   const getMedal = (index) => {
-    const medals = ['👑', '🥇', '🥈', '🥉'];
+    const medals = ['', '', '', ''];
     return medals[index] || `#${index + 1}`;
   };
 
   return (
     <div className="container top-page">
       <Link to="/" className="back-btn">← На главную</Link>
-      <h1 className="top-title">🏆 Топ пользователей</h1>
+      <h1 className="top-title"> Топ пользователей</h1>
       <div className="top-users-list">
         {users.map((user, index) => (
           <Link to={`/user/${user._id}`} key={user._id} className="top-user-item">
@@ -49,13 +49,13 @@ function TopUsersPage() {
             <div className="top-user-info">
               <div className="top-user-name">
                 {user.nickname || 'Пользователь'}
-                {user.isAdmin && <span className="admin-badge">👑</span>}
+                {user.isAdmin && <span className="admin-badge"></span>}
               </div>
               <div className="top-user-stats">
-                <span>⭐ {user.totalPoints || 0} баллов</span>
-                <span>🎯 {user.counters?.ratings ?? user.ratingsCount ?? 0} оценок</span>
-                <span>📝 {user.counters?.reviewsApproved ?? user.reviewsCount ?? 0} рецензий</span>
-                <span>💬 {user.counters?.commentsApproved ?? user.commentsCount ?? 0} комментариев</span>
+                <span> {user.totalPoints || 0} баллов</span>
+                <span> {user.counters?.ratings ?? user.ratingsCount ?? 0} оценок</span>
+                <span> {user.counters?.reviewsApproved ?? user.reviewsCount ?? 0} рецензий</span>
+                <span> {user.counters?.commentsApproved ?? user.commentsCount ?? 0} комментариев</span>
               </div>
             </div>
           </Link>
