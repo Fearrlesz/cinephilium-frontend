@@ -1,16 +1,16 @@
 # Контекст фронтенда Cinephilium
 
-**Дата среза:** 30.10.2026  
+**Дата среза:** 01.11.2026  
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.2.0)
+**Документация версии:** `CHANGELOG.md` (4.4.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, какие решения
-зафиксированы и что нельзя сломать. Это не README: корневой `README.md` — витрина
-проекта, а не инструкция по разработке.
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2 и F3, какие
+решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
+витрина проекта, а не инструкция по разработке.
 
 ---
 
@@ -169,6 +169,52 @@ FilmPage.jsx
 - `400 VALIDATION_ERROR` — сообщение из `errorDetails`, field-errors под критериями;
   форма не сбрасывается.
 
+### F2 — гейтинг комментариев (закрыт)
+
+- `CommentsSection` имеет три состояния: неавторизован → «Войдите, чтобы
+  комментировать» + ссылка `/login`; авторизован без Rating → «Чтобы
+  комментировать, оцените фильм» + CTA «Оценить» (скролл к `.rating-section`);
+  авторизован с любой оценкой (vibe или full) → форма.
+- Гейт читает `film.userRating`; после сохранения vibe он обновляется через
+  существующий `reloadFilm({ silent: true })`, форма разблокируется без reload.
+  `RatingSection`, `useVibeRating`, `useRatingForm` не менялись.
+- `403 RATING_REQUIRED_FOR_COMMENT` ловится по `errorCode`. `FilmPage.addComment`
+  возвращает `{ ok, code, message }`; `CommentsSection` ждёт результат, показывает
+  inline-сообщение над формой и не теряет введённый текст.
+- Лайк комментария не гейтится: `POST /comments/:id/like` работает без оценки.
+- Зафиксировано: **F2/1A, 2A, 3B, 4A, 5A, 6A**; B3/2A (weight 0 не блокирует),
+  B3/3B (админ не exempt), B3/4A+4C (`userRating` — подсказка, 403 — гейт),
+  B3/5A (`POST /ratings` → `POST /comments`, без ретраев).
+- Проверка: production-сборка + mock API + Chrome headless, 22/22 сценария;
+  скриншоты — `screenshots/f2-comments/`. Живой прод-прогон не выполнялся:
+  Vercel preview закрыт Vercel Authentication, Render из среды недоступен.
+
+### F3 — рецензии: full + spoiler (закрыт)
+
+- `ReviewsSection` имеет три состояния: неавторизован → «Войдите, чтобы написать
+  рецензию» + `/login`; авторизован без **полной** оценки (нет оценки или только
+  vibe) → «Рецензия доступна после полной оценки — 15 критериев» + CTA «Оценить
+  подробно»; авторизован с full → кнопка «Написать рецензию» и форма.
+- CTA открывает `CriteriaModal`. Чтобы не трогать `RatingSection`, в
+  `ReviewsSection` рендерится второй экземпляр того же компонента; после сохранения
+  `handleRatingSaved` делает `setUserRating` + `reloadFilm({ silent: true })` +
+  `loadFilmUsers()`, поэтому гейт снимается без перезагрузки.
+- Чекбокс «Содержит спойлеры» → `isSpoiler: true` в теле
+  `POST /api/reviews`. `ratingId` больше **не отправляется**: по B4 сервер сам
+  берёт Rating пользователя.
+- В списке при `isSpoiler: true` скрыто только тело; заголовок, автор, дата,
+  оценка и лайки видны. Плашка «Спойлер» — toggle «Показать» / «Скрыть»,
+  состояние локальное, без персиста.
+- `403 FULL_RATING_REQUIRED_FOR_REVIEW` ловится по `errorCode`: inline-гейт над
+  формой, текст и чекбокс сохраняются.
+- Длина: минимум **350** (бэкенд; по решению B продублирован в форме),
+  максимум **15000** (и фронт, и бэкенд; `MAX_TEXT = 15000`).
+- Зафиксировано: **F3/1A, 2A, 3A, 4A, 5B, 6A, 7**; `API-CONTRACT.md` приведён
+  к фактическому телу запроса.
+- Проверка: production-сборка + mock API + Chrome headless, 29/29 сценариев;
+  скриншоты — `screenshots/f3-reviews/`. Живой прод-прогон — `[UNVERIFIED]`
+  по той же причине, что F2.
+
 ---
 
 ## 6. Контракт бэкенда (фактический)
@@ -214,20 +260,46 @@ userRating: {
 - для vibe-only `finalScore: 0` — **известное ограничение бэкенда**. Фронт скрывает
   цифру, если `completeness === 'vibe'`; правильный фикс — на бэкенде.
 
+`POST /api/comments`:
+
+- Фронт F2 отправляет `{ filmId, text }`; B8 считает отсутствие `targetType`
+  комментарием к фильму и берёт `targetId` из `targetId ?? filmId`.
+- Без Rating — `403 RATING_REQUIRED_FOR_COMMENT`; лайки не гейтятся.
+
+`GET /api/reviews/:filmId`:
+
+- массив рецензий; `isSpoiler` — boolean, `text` 350..15000 символов;
+  свой `pending` видит автор, остальные — только `approved`.
+
+`POST /api/reviews`:
+
+- Тело F3: `{ filmId, title, text, isSpoiler }`. `ratingId` не нужен: B4 берёт
+  свою Rating пользователя; без `completeness: 'full'` — `403
+  FULL_RATING_REQUIRED_FOR_REVIEW`. Успех — `200` (не 201).
+
 ---
 
 ## 7. Что ещё не обновлено под vibe/full
 
-F1 закрыл только блок оценки на странице фильма. Вне F1 остаются:
+F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии. Вне этой
+тройки остаются:
 
 - `ProfilePage` и `UserProfilePage` — используют старые `/ratings/user`,
   `/reviews/user` и профильные ответы; вкладки B9 (`/users/:id/ratings` и т.д.)
   фронт ещё не потребляет.
 - `HomePage`, карточки фильмов, топы — старые поля (`averageRating`/`finalScore`).
 - `RatingDetailsModal` — легаси-поля `finalScore`/`base1`.
-- Комментарии к рецензиям (B8) и выбор vibe в комментариях — следующие задачи.
-- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.1.1;
+- Комментарии к рецензиям (B8) и выбор vibe в комментариях — следующие задачи;
+  F7 не начинать в рамках F2/F3.
+- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.4.0;
   ориентируйся на CHANGELOG.
+
+### Живая проверка F2/F3
+
+Формы и ошибки подтверждены на production-сборке с mock API в Chrome headless:
+F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполнялся: Vercel preview
+закрыт Vercel Authentication, Render из среды недоступен. Статус live-проверки —
+`[UNVERIFIED]`; это не блокер деплоя F2/F3, но и не подтверждение реального API.
 
 ---
 
@@ -252,14 +324,14 @@ F1 закрыл только блок оценки на странице фил�
 
 ---
 
-## 9. Карта файлов F1
+## 9. Карта файлов F1–F3
 
 | Файл | Что важно |
 |---|---|
 | `src/api/client.js` | JWT, refresh, нормализация ошибок, `errorCode`/`errorDetails` |
 | `src/utils/constants.js` | `CRITERIA_CONFIG`, `PRESET_WEIGHTS`, `scifi_author` |
 | `src/utils/scoring.js` | grade, слова вайба, средние по блокам, technical/combined, форматирование |
-| `src/pages/FilmPage/FilmPage.jsx` | страница, `RatingSection`, модалки, рецензии/комментарии |
+| `src/pages/FilmPage/FilmPage.jsx` | страница, `RatingSection`, модалки, рецензии/комментарии, результаты `addComment`/`addReview` |
 | `src/pages/FilmPage/components/FilmInfo.jsx` | шапка фильма без дублей оценки |
 | `src/pages/FilmPage/components/RatingSection.jsx` | контейнер блока оценки |
 | `src/pages/FilmPage/components/RatingContext.jsx` | соцдоказательство, только full для «Ваша» |
@@ -270,11 +342,16 @@ F1 закрыл только блок оценки на странице фил�
 | `src/pages/FilmPage/components/CriteriaModal.css` | оболочка модалки, аккордеон, ошибки полей |
 | `src/pages/FilmPage/components/RatingForm.jsx` | жанр, веса, критерии, preview, save |
 | `src/pages/FilmPage/components/UsersList.jsx` | «Оценили фильм», скрытие `finalScore` для vibe |
+| `src/pages/FilmPage/components/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта |
+| `src/pages/FilmPage/components/CommentsSection.css` | F2: гейт, адаптив 480/620 |
+| `src/pages/FilmPage/components/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
+| `src/pages/FilmPage/components/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1 и 4.1.1: что и почему |
+| `CHANGELOG.md` | 4.1–4.4: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/` | скриншоты F2/F3 |
 
 ---
 
@@ -282,13 +359,16 @@ F1 закрыл только блок оценки на странице фил�
 
 1. `git status` — не в чужой ли ветке; ожидаем `feature/f1-vibe-rating` или новую
    `feature/...`.
-2. Прочитать §5–§6: combined/technical — только full; vibe-only — прочерки.
+2. Прочитать §5: F1 — combined/technical только full; F2 — комментарий с любой
+   оценкой; F3 — рецензия только с full + spoiler.
 3. Сверить ключи `scores` и названия счётчиков с бэкендом, не с прототипом.
 4. Не показывать `0` как результат там, где это маркер «не вычислено».
 5. `npm run build` — собирается.
 6. Ручной сценарий: нет оценки → vibe → full; проверить `Ваша`, delta, CTA,
    список «Оценили фильм».
-7. Если меняешь `client.js` — только точечно и без изменения поведения.
+7. F2/F3: 403 ловить по `errorCode`, текст формы не терять; `POST /reviews` —
+   без `ratingId`, с `isSpoiler`; длина рецензии 350..15000.
+8. Если меняешь `client.js` — только точечно и без изменения поведения.
 
 ---
 
