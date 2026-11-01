@@ -116,23 +116,21 @@ function FilmPage() {
     }
   };
 
-  const addReview = async (title, text) => {
+  const addReview = async (title, text, isSpoiler = false) => {
     const token = localStorage.getItem('token');
     if (!token) {
       showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы написать рецензию', type: 'warning' });
       navigate('/login');
-      return;
-    }
-    if (!userRating) {
-      showNotification({ title: 'Сначала оцените фильм', message: 'Чтобы написать рецензию, нужно оценить фильм', type: 'warning' });
-      return;
+      return { ok: false, code: 'UNAUTHORIZED', message: 'Войдите, чтобы написать рецензию' };
     }
     try {
+      // DECISION: F3/7 — ratingId убран: по B4 сервер сам берёт Rating
+      // пользователя. isSpoiler — B4, булево в теле POST /api/reviews.
       await api.post('/reviews', {
         filmId: id,
-        ratingId: userRating._id,
         title,
-        text
+        text,
+        isSpoiler: Boolean(isSpoiler)
       });
       await loadReviews();
       if (currentUser && film) {
@@ -144,9 +142,32 @@ function FilmPage() {
         });
       }
       showNotification({ title: 'Рецензия добавлена!', message: 'Ваша рецензия опубликована', type: 'success' });
+      return { ok: true };
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить рецензию', type: 'error' });
+      const code = err.response?.data?.errorCode;
+      const message = err.response?.data?.error || 'Не удалось добавить рецензию';
+
+      // DECISION: F3/3A — 403 ловим по errorCode, не по тексту. Inline-гейт
+      // рисует ReviewsSection, поэтому глобальную модалку здесь не показываем.
+      if (code === 'FULL_RATING_REQUIRED_FOR_REVIEW') {
+        return {
+          ok: false,
+          code,
+          message: 'Рецензия доступна после полной оценки — 15 критериев'
+        };
+      }
+
+      showNotification({ title: 'Ошибка', message, type: 'error' });
+      return { ok: false, code, message };
     }
+  };
+
+  // F3/2A: после сохранения полной оценки из модалки ReviewsSection
+  // обновляем film.userRating и список оценивших, чтобы гейт снялся без reload.
+  const handleRatingSaved = (rating) => {
+    setUserRating(rating);
+    loadFilm({ silent: true });
+    loadFilmUsers();
   };
 
   const likeReview = async (reviewId) => {
@@ -246,6 +267,8 @@ function FilmPage() {
             userRating={userRating}
             onAddReview={addReview}
             onLikeReview={likeReview}
+            onRatingSaved={handleRatingSaved}
+            showNotification={showNotification}
           />
 
           <CommentsSection
