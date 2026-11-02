@@ -7,7 +7,7 @@ const NAV = [
   { to: '/', label: 'Фильмы' },
   { to: '/critic', label: 'Архитектор' },
   { to: '/top', label: 'Топ' },
-  { to: '/contact', label: 'Связь' },
+  { to: '/contact', label: 'Связь с админами', contact: true },
   { to: '/about', label: 'О системе' }
 ];
 
@@ -38,14 +38,28 @@ function Header({ user, onLogout }) {
             <Link
               key={item.to}
               to={item.to}
-              className={`nav-link ${location.pathname === item.to ? 'is-active' : ''}`}
+              className={`nav-link ${item.contact ? 'nav-link--contact' : ''} ${location.pathname === item.to ? 'is-active' : ''}`}
+              aria-label={item.contact ? 'Связь с админами' : undefined}
             >
-              {item.label}
+              {item.contact ? (
+                <>
+                  <span className="nav-contact-full">{item.label}</span>
+                  <span className="nav-contact-short">Админы</span>
+                </>
+              ) : item.label}
             </Link>
           ))}
         </nav>
 
         <div className="tools">
+          <Link
+            to="/contact"
+            className="tool-link tool-link--contact"
+            aria-label="Связь с админами"
+          >
+            <span className="tool-contact-dot" aria-hidden="true" />
+            Админы
+          </Link>
           {user ? (
             <>
               <Link

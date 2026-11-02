@@ -11,8 +11,18 @@ function ForgotPasswordPage() {
 
         <p className="auth-hint">
           Пароль меняется по одноразовой ссылке. Письма сайт не отправляет,
-          ссылку выдаёт администратор.
+          ссылку выдаёт администратор вручную.
         </p>
+
+        <div className="auth-admin-callout">
+          <p>
+            Кому писать: открой страницу «Связь с админами» — там живые
+            Telegram-контакты администраторов.
+          </p>
+          <Link to="/contact" className="auth-admin-cta">
+            Связь с админами
+          </Link>
+        </div>
 
         <ol className="auth-steps">
           <li>Напиши администратору свой никнейм.</li>

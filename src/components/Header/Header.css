@@ -146,6 +146,44 @@
   background: var(--azure);
 }
 
+/* Контакт с админами — единственный выделенный пункт навигации. */
+.nav-link--contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--azure-line);
+  border-radius: var(--r-sm);
+  background: var(--azure-soft);
+  color: var(--ink-soft);
+}
+
+.nav-link--contact::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--azure-bright);
+}
+
+.nav-link--contact:hover {
+  border-color: var(--azure-bright);
+  color: var(--ink);
+}
+
+.nav-link--contact.is-active {
+  color: var(--ink);
+}
+
+.nav-link--contact.is-active::after {
+  display: none;
+}
+
+.nav-contact-short {
+  display: none;
+}
+
 /* ── Инструменты ──────────────────────────────────────────── */
 .tools {
   display: flex;
@@ -174,6 +212,32 @@
   border: none;
 }
 
+/* На мобиле основная навигация скрыта — контакт с админами остаётся в шапке. */
+.tool-link--contact {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid var(--azure-line);
+  border-radius: var(--r-sm);
+  background: var(--azure-soft);
+  color: var(--ink-soft);
+}
+
+.tool-link--contact:hover {
+  border-color: var(--azure-bright);
+  background: var(--azure-soft);
+  color: var(--ink);
+}
+
+.tool-contact-dot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--azure-bright);
+}
+
 .avatar {
   display: inline-flex;
   align-items: center;
@@ -198,6 +262,20 @@
 }
 
 /* ── Адаптив ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .nav {
+    gap: 18px;
+  }
+
+  .nav-contact-full {
+    display: none;
+  }
+
+  .nav-contact-short {
+    display: inline;
+  }
+}
+
 @media (max-width: 768px) {
   .hdr-in {
     gap: 16px;
@@ -206,6 +284,10 @@
 
   .nav {
     display: none;
+  }
+
+  .tool-link--contact {
+    display: inline-flex;
   }
 
   .brand {

@@ -175,6 +175,65 @@
 }
 
 /* ============================================================
+   СВЯЗЬ С АДМИНАМИ
+   ============================================================ */
+.auth-admin-inline {
+  margin: -2px 0 14px;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  text-align: left;
+}
+
+.auth-admin-inline a {
+  color: var(--azure-bright);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-admin-callout {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid var(--azure-line);
+  border-radius: var(--r-sm);
+  background: var(--azure-soft);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-align: left;
+}
+
+.auth-admin-callout p {
+  margin: 0 0 10px;
+}
+
+.auth-admin-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.auth-admin-cta:hover {
+  background: var(--azure-bright);
+  color: var(--void);
+}
+
+/* ============================================================
    АДАПТИВ
    ============================================================ */
 @media (max-width: 768px) {
