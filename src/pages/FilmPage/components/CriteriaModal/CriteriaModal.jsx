@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import useRatingForm from '../hooks/useRatingForm';
-import RatingForm from './RatingForm';
+import useRatingForm from '../../hooks/useRatingForm';
+import RatingForm from '../RatingForm/RatingForm';
 import './CriteriaModal.css';
 
 /**

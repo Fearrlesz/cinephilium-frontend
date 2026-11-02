@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NotificationContext from './context/NotificationContext';
-import NotificationModal from './components/NotificationModal';
+import NotificationModal from './components/NotificationModal/NotificationModal';
 import HomePage from './pages/HomePage/HomePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import TopUsersPage from './pages/TopUsersPage/TopUsersPage';
 import AdminPanel from './pages/AdminPanel/AdminPanel';
 import FilmPage from './pages/FilmPage/FilmPage';
-import CustomSelect from './components/CustomSelect';
+import CustomSelect from './components/CustomSelect/CustomSelect';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage/ResetPasswordPage';

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api/client';
-import { getPosterUrl, handleImgError } from '../utils/posterUrl';
+import api from '../../api/client';
+import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import './ProfileGalleries.css';
 
 const PAGE_SIZE = 12;

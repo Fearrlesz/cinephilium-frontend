@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { sanitizeText } from '../utils/ratingUtils';
+import { sanitizeText } from '../../utils/ratingUtils';
 import './ActivityFeed.css';
 
 function ActivityFeed({ events, loading }) {

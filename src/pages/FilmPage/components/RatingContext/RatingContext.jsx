@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDelta, formatScore, roundTenth } from '../../../utils/scoring';
+import { formatDelta, formatScore, roundTenth } from '../../../../utils/scoring';
 
 /**
  * F1: соцдоказательство — компактная пилюля.

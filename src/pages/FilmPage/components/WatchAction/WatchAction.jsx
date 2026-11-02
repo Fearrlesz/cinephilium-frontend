@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../../api/client';
-import WatchModal from './WatchModal';
+import api from '../../../../api/client';
+import WatchModal from '../WatchModal/WatchModal';
 
 /**
  * F4: «Просмотрено» на странице фильма.

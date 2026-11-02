@@ -1,5 +1,5 @@
 import React from 'react';
-import { BLOCK_NAMES } from '../../../utils/constants';
+import { BLOCK_NAMES } from '../../../../utils/constants';
 import {
   BLOCK_COLORS,
   BLOCK_KEYS,
@@ -8,8 +8,8 @@ import {
   formatScore,
   getGrade,
   getVibeWord
-} from '../../../utils/scoring';
-import VibeTrack from './VibeTrack';
+} from '../../../../utils/scoring';
+import VibeTrack from '../VibeTrack/VibeTrack';
 
 function CommunityHint({ value }) {
   // DECISION: F1/community-hint — в тихой справке показываем среднее

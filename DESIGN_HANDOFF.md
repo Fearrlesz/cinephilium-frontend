@@ -32,15 +32,15 @@
 | `src/styles/base.css` | `body`, фон-градиент, SVG-шум, reset, selection, focus, скроллбар |
 | `src/styles/typography.css` | `.h1`, `.h-section`, `.body`, `.body-review`, `.synopsis`, `.num-big`, `.lbl`, `.tagline`, `.divider` |
 | `src/App.css` | глобальные алиасы старых токенов, `.container`, плоские `.glass-card`, кнопки, generic modal |
-| `src/components/Header.jsx/.css` | фиксированный хедер, бренд-аура, навигация |
+| `src/components/Header/Header.jsx/.css` | фиксированный хедер, бренд-аура, навигация |
 | `src/pages/FilmPage/FilmPage.jsx/.css` | герой, постер, layout, сайдбар, users-modal |
-| `src/pages/FilmPage/components/FilmInfo.jsx/.css` | тэглайн, h1, мета, синопсис |
-| `.../RatingPanel.jsx/.css` | соцдоказательство, три колонки, вайб-трек, спектр |
-| `.../CriteriaModal.jsx/.css` | оболочка модалки критериев |
-| `.../RatingForm.jsx/.css` | жанр, веса, критерии, preview, save |
-| `.../ReviewsSection.jsx/.css` | рецензии без карточки |
-| `.../CommentsSection.jsx/.css` | комментарии без карточки |
-| `.../UsersList.jsx/.css` | «Оценили фильм» компактным рядом |
+| `src/pages/FilmPage/components/FilmInfo/FilmInfo.jsx/.css` | тэглайн, h1, мета, синопсис |
+| `.../RatingPanel/RatingPanel.jsx/.css` | соцдоказательство, три колонки, вайб-трек, спектр |
+| `.../CriteriaModal/CriteriaModal.jsx/.css` | оболочка модалки критериев |
+| `.../RatingForm/RatingForm.jsx/.css` | жанр, веса, критерии, preview, save |
+| `.../ReviewsSection/ReviewsSection.jsx/.css` | рецензии без карточки |
+| `.../CommentsSection/CommentsSection.jsx/.css` | комментарии без карточки |
+| `.../UsersList/UsersList.jsx/.css` | «Оценили фильм» компактным рядом |
 | `src/utils/scoring.js` | грейды S/A/B/C/D/E и цвета |
 
 Порядок подключения в `src/index.js`:
@@ -216,7 +216,7 @@ CSS-переменные в media queries CRA 5 не поддерживает.
 
 ## 8. Хедер
 
-`src/components/Header.jsx/.css`, класс `.hdr`.
+`src/components/Header/Header.jsx/.css`, класс `.hdr`.
 
 - fixed, height `56px`, z-index `800`.
 - фон `rgba(19, 13, 17, 0.74)`, `backdrop-filter: blur(14px) saturate(1.1)`,

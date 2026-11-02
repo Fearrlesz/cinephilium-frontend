@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../../utils/ratingUtils';
+import { formatDate } from '../../../../utils/ratingUtils';
 import './CommentsSection.css';
 
 /**

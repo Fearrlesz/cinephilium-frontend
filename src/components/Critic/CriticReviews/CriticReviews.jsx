@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getPosterUrl, handleImgError, PLACEHOLDER } from '../../utils/posterUrl';
+import { getPosterUrl, handleImgError, PLACEHOLDER } from '../../../utils/posterUrl';
 import './CriticReviews.css';
 
 export default function CriticReviews({ reviews, posters = {} }) {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import api from '../../../api/client';
-import WatchAction from './WatchAction';
+import api from '../../../../api/client';
+import WatchAction from '../WatchAction/WatchAction';
 import './FilmActions.css';
 
 const ERROR_TIMEOUT = 4000;

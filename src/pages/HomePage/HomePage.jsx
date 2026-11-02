@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { logout } from '../../api/client';
-import Header from '../../components/Header';
-import ActivityFeed from '../../components/ActivityFeed';
+import Header from '../../components/Header/Header';
+import ActivityFeed from '../../components/ActivityFeed/ActivityFeed';
 import useActivityEvents from '../../hooks/useActivityEvents';
 import { useNotification } from '../../context/NotificationContext';
 import { getScoreColor } from '../../utils/constants';

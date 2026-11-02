@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS } from '../../../utils/constants';
-import { formatDate } from '../../../utils/ratingUtils';
-import CriteriaModal from './CriteriaModal';
+import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS } from '../../../../utils/constants';
+import { formatDate } from '../../../../utils/ratingUtils';
+import CriteriaModal from '../CriteriaModal/CriteriaModal';
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;

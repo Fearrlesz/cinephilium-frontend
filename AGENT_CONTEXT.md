@@ -56,8 +56,9 @@ REACT_APP_API_URL=http://127.0.0.1:3000/api npm start
 ```
 src/
   api/                 client.js, films.js, critics.js
-  components/          Header, NotificationModal, ActivityFeed, RatingDetailsModal,
-                       CustomSelect, ProfileGalleries, ProfileDiary, Critic/*
+  components/          <Name>/<Name>.jsx: Header, NotificationModal, ActivityFeed,
+                       RatingDetailsModal, CustomSelect, ProfileGalleries,
+                       ProfileDiary; Critic/<Name>/<Name>.jsx
   context/             NotificationContext
   hooks/               useActivityEvents, useCriticData
   pages/
@@ -74,8 +75,9 @@ src/
   App.css              legacy-токены и стили старых страниц/F1
 ```
 
-Страницы лежат в папках `<Name>/<Name>.jsx` + `<Name>.css`; компоненты страницы —
-в `components/`, хуки — в `hooks/`.
+Страницы лежат в папках `<Name>/<Name>.jsx` + `<Name>.css`; компоненты —
+в одноимённых папках `<Name>/<Name>.jsx` (+ `<Name>.css`), страничные компоненты
+FilmPage — в `components/<Name>/`, хуки — в `hooks/`.
 
 ---
 
@@ -103,19 +105,19 @@ src/
 
 ```
 FilmPage.jsx
-  FilmInfo.jsx                 постер, заголовок, описание, мета
-  RatingSection.jsx            контейнер: соцдоказательство + панель + модалка
-    RatingContext.jsx          «Сообщество / Ваша / delta»
-    RatingPanel.jsx            три колонки
-      VibeTrack.jsx            drag-трек / 10 сегментов
-    CriteriaModal.jsx          модалка полной оценки
-      RatingForm.jsx           жанр, веса, аккордеон, preview, save
-  FilmActions.jsx              сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
-    WatchAction.jsx            кнопка и модалка просмотра
-    WatchModal.jsx             дата, пересмотр, теги
-  UsersList.jsx                «Оценили фильм»
-  ReviewsSection.jsx
-  CommentsSection.jsx
+  FilmInfo/FilmInfo.jsx        постер, заголовок, описание, мета
+  RatingSection/RatingSection.jsx  контейнер: соцдоказательство + панель + модалка
+    RatingContext/RatingContext.jsx  «Сообщество / Ваша / delta»
+    RatingPanel/RatingPanel.jsx      три колонки
+      VibeTrack/VibeTrack.jsx        drag-трек / 10 сегментов
+    CriteriaModal/CriteriaModal.jsx  модалка полной оценки
+      RatingForm/RatingForm.jsx      жанр, веса, аккордеон, preview, save
+  FilmActions/FilmActions.jsx  сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
+    WatchAction/WatchAction.jsx  кнопка и модалка просмотра
+    WatchModal/WatchModal.jsx    дата, пересмотр, теги
+  UsersList/UsersList.jsx      «Оценили фильм»
+  ReviewsSection/ReviewsSection.jsx
+  CommentsSection/CommentsSection.jsx
 ```
 
 Хуки:
@@ -461,35 +463,40 @@ Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Жи
 | `src/utils/constants.js` | `CRITERIA_CONFIG`, `PRESET_WEIGHTS`, `scifi_author` |
 | `src/utils/scoring.js` | grade, слова вайба, средние по блокам, technical/combined, форматирование |
 | `src/pages/FilmPage/FilmPage.jsx` | страница, `RatingSection`, модалки, рецензии/комментарии, результаты `addComment`/`addReview`, `FilmActions`, `requireAuth` |
-| `src/pages/FilmPage/components/FilmInfo.jsx` | шапка фильма без дублей оценки |
-| `src/pages/FilmPage/components/RatingSection.jsx` | контейнер блока оценки |
-| `src/pages/FilmPage/components/RatingContext.jsx` | соцдоказательство, только full для «Ваша» |
-| `src/pages/FilmPage/components/RatingPanel.jsx` | три колонки, combined только full |
-| `src/pages/FilmPage/components/RatingPanel.css` | стили панели и трека |
-| `src/pages/FilmPage/components/VibeTrack.jsx` | drag / сегменты, клавиатура, no-op |
-| `src/pages/FilmPage/components/CriteriaModal.jsx` | модалка критериев |
-| `src/pages/FilmPage/components/CriteriaModal.css` | оболочка модалки, аккордеон, ошибки полей |
-| `src/pages/FilmPage/components/RatingForm.jsx` | жанр, веса, критерии, preview, save |
-| `src/pages/FilmPage/components/UsersList.jsx` | «Оценили фильм», скрытие `finalScore` для vibe |
-| `src/pages/FilmPage/components/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта |
-| `src/pages/FilmPage/components/CommentsSection.css` | F2: гейт, адаптив 480/620 |
-| `src/pages/FilmPage/components/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
-| `src/pages/FilmPage/components/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
-| `src/pages/FilmPage/components/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения; F4: слот «Просмотрено» |
-| `src/pages/FilmPage/components/FilmActions.css` | F5/F6: кнопки действий, ошибка, адаптив 480; F4: `film-watch-total`, full-width на 480 |
-| `src/pages/FilmPage/components/WatchAction.jsx` | F4: кнопка «Просмотрено», счётчик `watchesCount`, активность через `/watches/me`, модалка |
-| `src/pages/FilmPage/components/WatchModal.jsx` | F4: дата, пересмотр, теги, inline-ошибки, `POST /watches` |
-| `src/pages/FilmPage/components/WatchModal.css` | F4: модалка и поля, нейтральная ошибка, адаптив 620/480 |
-| `src/components/ProfileGalleries.jsx` | F5/F6: «Понравившиеся» / «Хочу посмотреть», пагинация, удаление, 404 |
-| `src/components/ProfileGalleries.css` | F5/F6: сетка 6/5/4/3/2, hover, мобильные подписи, пустые состояния |
-| `src/components/ProfileDiary.jsx` | F4: дневник по месяцам, пагинация, удаление, приватность, пустые состояния |
-| `src/components/ProfileDiary.css` | F4: карточка записи, плашка «Пересмотр», теги, hover-удаление, адаптив 620/480 |
+| `src/pages/FilmPage/components/FilmInfo/FilmInfo.jsx` | шапка фильма без дублей оценки |
+| `src/pages/FilmPage/components/RatingSection/RatingSection.jsx` | контейнер блока оценки |
+| `src/pages/FilmPage/components/RatingContext/RatingContext.jsx` | соцдоказательство, только full для «Ваша» |
+| `src/pages/FilmPage/components/RatingPanel/RatingPanel.jsx` | три колонки, combined только full |
+| `src/pages/FilmPage/components/RatingPanel/RatingPanel.css` | стили панели и трека |
+| `src/pages/FilmPage/components/VibeTrack/VibeTrack.jsx` | drag / сегменты, клавиатура, no-op |
+| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.jsx` | модалка критериев |
+| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.css` | оболочка модалки, аккордеон, ошибки полей |
+| `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр, веса, критерии, preview, save |
+| `src/pages/FilmPage/components/UsersList/UsersList.jsx` | «Оценили фильм», скрытие `finalScore` для vibe |
+| `src/pages/FilmPage/components/CommentsSection/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта |
+| `src/pages/FilmPage/components/CommentsSection/CommentsSection.css` | F2: гейт, адаптив 480/620 |
+| `src/pages/FilmPage/components/ReviewsSection/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
+| `src/pages/FilmPage/components/ReviewsSection/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
+| `src/pages/FilmPage/components/FilmActions/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения; F4: слот «Просмотрено» |
+| `src/pages/FilmPage/components/FilmActions/FilmActions.css` | F5/F6: кнопки действий, ошибка, адаптив 480; F4: `film-watch-total`, full-width на 480 |
+| `src/pages/FilmPage/components/WatchAction/WatchAction.jsx` | F4: кнопка «Просмотрено», счётчик `watchesCount`, активность через `/watches/me`, модалка |
+| `src/pages/FilmPage/components/WatchModal/WatchModal.jsx` | F4: дата, пересмотр, теги, inline-ошибки, `POST /watches` |
+| `src/pages/FilmPage/components/WatchModal/WatchModal.css` | F4: модалка и поля, нейтральная ошибка, адаптив 620/480 |
+| `src/components/ProfileGalleries/ProfileGalleries.jsx` | F5/F6: «Понравившиеся» / «Хочу посмотреть», пагинация, удаление, 404 |
+| `src/components/ProfileGalleries/ProfileGalleries.css` | F5/F6: сетка 6/5/4/3/2, hover, мобильные подписи, пустые состояния |
+| `src/components/ProfileDiary/ProfileDiary.jsx` | F4: дневник по месяцам, пагинация, удаление, приватность, пустые состояния |
+| `src/components/ProfileDiary/ProfileDiary.css` | F4: карточка записи, плашка «Пересмотр», теги, hover-удаление, адаптив 620/480 |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
 | `CHANGELOG.md` | 4.1–4.6: что и почему |
 | `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/` | скриншоты F2/F3/F4/F5/F6 |
+
+Все компоненты сгруппированы в одноимённые папки: `X/X.jsx` и, если есть,
+`X/X.css`. Это касается `src/components`, `src/components/Critic`
+(`CriticHero`, `CriticReviews`, `CriticTopMovies`) и
+`src/pages/FilmPage/components`. Плоских `.jsx`/`.css` в этих каталогах нет.
 
 ---
 

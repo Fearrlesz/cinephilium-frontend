@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { getAccessToken } from '../../../api/client';
-import { communityValue, yourCombined } from '../../../utils/scoring';
-import usePointerCoarse from '../hooks/usePointerCoarse';
-import useVibeRating from '../hooks/useVibeRating';
-import RatingContext from './RatingContext';
-import RatingPanel from './RatingPanel';
-import CriteriaModal from './CriteriaModal';
-import './RatingPanel.css';
+import { getAccessToken } from '../../../../api/client';
+import { communityValue, yourCombined } from '../../../../utils/scoring';
+import usePointerCoarse from '../../hooks/usePointerCoarse';
+import useVibeRating from '../../hooks/useVibeRating';
+import RatingContext from '../RatingContext/RatingContext';
+import RatingPanel from '../RatingPanel/RatingPanel';
+import CriteriaModal from '../CriteriaModal/CriteriaModal';
+import '../RatingPanel/RatingPanel.css';
 
 /**
  * F1: контейнер блока оценки. Держит vibe-состояние и модалку,

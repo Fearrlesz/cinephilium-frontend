@@ -6,9 +6,9 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../../utils/ratingUtils';
 import { getScoreColor } from '../../utils/constants';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
-import RatingDetailsModal from '../../components/RatingDetailsModal';
-import ProfileGalleries from '../../components/ProfileGalleries';
-import ProfileDiary from '../../components/ProfileDiary';
+import RatingDetailsModal from '../../components/RatingDetailsModal/RatingDetailsModal';
+import ProfileGalleries from '../../components/ProfileGalleries/ProfileGalleries';
+import ProfileDiary from '../../components/ProfileDiary/ProfileDiary';
 import './ProfilePage.css';
 import '../../styles/Architect.css';
 

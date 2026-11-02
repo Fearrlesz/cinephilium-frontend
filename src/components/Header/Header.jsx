@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { logout as apiLogout } from '../api/client';
+import { logout as apiLogout } from '../../api/client';
 import './Header.css';
 
 const NAV = [

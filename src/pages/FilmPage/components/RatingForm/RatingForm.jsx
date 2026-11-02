@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { CRITERIA_CONFIG, GENRE_LABELS } from '../../../utils/constants';
+import { CRITERIA_CONFIG, GENRE_LABELS } from '../../../../utils/constants';
 import {
   BLOCK_COLORS,
   WEIGHT_SLIDER_MAX,
   formatScore,
   getGrade
-} from '../../../utils/scoring';
+} from '../../../../utils/scoring';
 import './RatingForm.css';
 
 const MIN_SCORE = 1;

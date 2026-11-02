@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import useCriticData from '../../hooks/useCriticData';
-import CriticHero from '../../components/Critic/CriticHero';
-import CriticTopMovies from '../../components/Critic/CriticTopMovies';
-import CriticReviews from '../../components/Critic/CriticReviews';
+import CriticHero from '../../components/Critic/CriticHero/CriticHero';
+import CriticTopMovies from '../../components/Critic/CriticTopMovies/CriticTopMovies';
+import CriticReviews from '../../components/Critic/CriticReviews/CriticReviews';
 import { CRITIC_META, CRITIC_REVIEWS } from '../../utils/mockCriticData';
 import './CriticPage.css';
 

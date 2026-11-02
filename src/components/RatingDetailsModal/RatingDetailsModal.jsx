@@ -1,5 +1,5 @@
 import React from 'react';
-import { CRITERIA_CONFIG, GENRE_LABELS } from '../utils/constants';
+import { CRITERIA_CONFIG, GENRE_LABELS } from '../../utils/constants';
 
 function RatingDetailsModal({ rating, onClose }) {
   if (!rating) return null;

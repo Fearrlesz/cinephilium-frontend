@@ -5,15 +5,15 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
 import { getGrade } from '../../utils/scoring';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
-import Header from '../../components/Header';
-import FilmInfo from './components/FilmInfo';
-import FilmActions from './components/FilmActions';
-import RatingSection from './components/RatingSection';
-import CommentsSection from './components/CommentsSection';
-import ReviewsSection from './components/ReviewsSection';
-import UsersList from './components/UsersList';
+import Header from '../../components/Header/Header';
+import FilmInfo from './components/FilmInfo/FilmInfo';
+import FilmActions from './components/FilmActions/FilmActions';
+import RatingSection from './components/RatingSection/RatingSection';
+import CommentsSection from './components/CommentsSection/CommentsSection';
+import ReviewsSection from './components/ReviewsSection/ReviewsSection';
+import UsersList from './components/UsersList/UsersList';
 import useFilmData from './hooks/useFilmData';
-import RatingDetailsModal from '../../components/RatingDetailsModal';
+import RatingDetailsModal from '../../components/RatingDetailsModal/RatingDetailsModal';
 import './FilmPage.css';
 
 function FilmPage() {
