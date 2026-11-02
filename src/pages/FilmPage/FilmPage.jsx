@@ -7,6 +7,7 @@ import { getGrade } from '../../utils/scoring';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import Header from '../../components/Header';
 import FilmInfo from './components/FilmInfo';
+import FilmActions from './components/FilmActions';
 import RatingSection from './components/RatingSection';
 import CommentsSection from './components/CommentsSection';
 import ReviewsSection from './components/ReviewsSection';
@@ -99,6 +100,15 @@ function FilmPage() {
     if (!section) return;
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     section.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  };
+
+  const requireAuth = () => {
+    showNotification({
+      title: 'Доступ запрещён',
+      message: 'Войдите, чтобы сохранять фильмы',
+      type: 'warning'
+    });
+    navigate('/login');
   };
 
   const likeComment = async (commentId) => {
@@ -235,6 +245,12 @@ function FilmPage() {
               reloadUsers={loadFilmUsers}
               showNotification={showNotification}
               navigate={navigate}
+            />
+
+            <FilmActions
+              film={film}
+              currentUser={currentUser}
+              onRequireAuth={requireAuth}
             />
           </FilmInfo>
         </div>

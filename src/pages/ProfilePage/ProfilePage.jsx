@@ -7,6 +7,7 @@ import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../../u
 import { getScoreColor } from '../../utils/constants';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
+import ProfileGalleries from '../../components/ProfileGalleries';
 import './ProfilePage.css';
 import '../../styles/Architect.css';
 
@@ -264,6 +265,12 @@ function ProfilePage() {
             <p>
                Баллов: <strong>{user.totalPoints || 0}</strong>
             </p>
+            <p>
+               Понравилось: <strong>{user.counters?.filmLikes || 0}</strong>
+            </p>
+            <p>
+               Хочу посмотреть: <strong>{user.counters?.watchlist || 0}</strong>
+            </p>
           </div>
 
           {/* --------- Достижения --------- */}
@@ -333,6 +340,27 @@ function ProfilePage() {
           </button>
         </div>
       </div>
+
+      <ProfileGalleries
+        key={user._id || user.id}
+        userId={user._id || user.id}
+        isOwnProfile
+        counters={user.counters}
+        hidden={false}
+        onWatchlistRemoved={() => {
+          setUser(prev => (
+            prev
+              ? {
+                  ...prev,
+                  counters: {
+                    ...(prev.counters || {}),
+                    watchlist: Math.max(0, (prev.counters?.watchlist || 0) - 1)
+                  }
+                }
+              : prev
+          ));
+        }}
+      />
 
       {/* ===================== ТАБЫ ===================== */}
       <div className="profile-tabs glass-card">

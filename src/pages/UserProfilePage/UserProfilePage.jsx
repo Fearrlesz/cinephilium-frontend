@@ -6,6 +6,7 @@ import { formatDate, computeBlockAverages, BLOCK_CRITERIA_LABELS } from '../../u
 import { getScoreColor } from '../../utils/constants';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
+import ProfileGalleries from '../../components/ProfileGalleries';
 import '../ProfilePage/ProfilePage.css';
 import './UserProfilePage.css';
 import '../../styles/Architect.css';
@@ -132,7 +133,9 @@ function UserProfilePage() {
     );
   }
 
-  const isOwnProfile = currentUser?._id === user._id;
+  const targetUserId = user._id || user.id;
+  const isOwnProfile = Boolean(currentUser)
+    && String(currentUser._id || currentUser.id) === String(targetUserId);
   const isExclusive = user.isExclusive;
 
   const sortOptions = [
@@ -162,6 +165,8 @@ function UserProfilePage() {
           <p> Всего оценок: <strong>{ratings.length}</strong></p>
           <p> Рецензий: <strong>{reviews.length}</strong></p>
           <p> Баллов: <strong>{user.totalPoints || 0}</strong></p>
+          <p> Понравилось: <strong>{user.counters?.filmLikes || 0}</strong></p>
+          <p> Хочу посмотреть: <strong>{user.counters?.watchlist || 0}</strong></p>
 
           <div className="achievements-section" style={{ marginTop: '15px' }}>
             <h4> Достижения</h4>
@@ -179,6 +184,27 @@ function UserProfilePage() {
           </div>
         </div>
       </div>
+
+      <ProfileGalleries
+        key={targetUserId}
+        userId={targetUserId}
+        isOwnProfile={isOwnProfile}
+        counters={user.counters}
+        hidden={user.isHidden === true}
+        onWatchlistRemoved={() => {
+          setUser(prev => (
+            prev
+              ? {
+                  ...prev,
+                  counters: {
+                    ...(prev.counters || {}),
+                    watchlist: Math.max(0, (prev.counters?.watchlist || 0) - 1)
+                  }
+                }
+              : prev
+          ));
+        }}
+      />
 
       <div className="profile-tabs glass-card">
         <div className="tabs-header">
