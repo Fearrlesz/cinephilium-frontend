@@ -8,6 +8,7 @@ import { getScoreColor } from '../../utils/constants';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import RatingDetailsModal from '../../components/RatingDetailsModal';
 import ProfileGalleries from '../../components/ProfileGalleries';
+import ProfileDiary from '../../components/ProfileDiary';
 import './ProfilePage.css';
 import '../../styles/Architect.css';
 
@@ -355,6 +356,27 @@ function ProfilePage() {
                   counters: {
                     ...(prev.counters || {}),
                     watchlist: Math.max(0, (prev.counters?.watchlist || 0) - 1)
+                  }
+                }
+              : prev
+          ));
+        }}
+      />
+
+      <ProfileDiary
+        key={`diary-${user._id || user.id}`}
+        userId={user._id || user.id}
+        isOwnProfile
+        counters={user.counters}
+        hidden={false}
+        onWatchRemoved={() => {
+          setUser(prev => (
+            prev
+              ? {
+                  ...prev,
+                  counters: {
+                    ...(prev.counters || {}),
+                    watches: Math.max(0, (prev.counters?.watches || 0) - 1)
                   }
                 }
               : prev

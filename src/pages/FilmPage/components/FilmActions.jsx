@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../../../api/client';
+import WatchAction from './WatchAction';
 import './FilmActions.css';
 
 const ERROR_TIMEOUT = 4000;
@@ -191,14 +192,11 @@ export default function FilmActions({ film, currentUser, onRequireAuth }) {
           <span>{inWatchlist ? 'В списке' : 'Хочу посмотреть'}</span>
         </button>
 
-        <button
-          type="button"
-          className="film-action film-action--soon"
-          disabled
-          title="Скоро"
-        >
-          Просмотрено
-        </button>
+        <WatchAction
+          film={film}
+          currentUser={currentUser}
+          onRequireAuth={onRequireAuth}
+        />
       </div>
 
       {error && <p className="film-actions-error" role="alert">{error}</p>}

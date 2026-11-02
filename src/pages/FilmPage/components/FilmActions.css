@@ -68,10 +68,13 @@
   color: var(--azure-bright);
 }
 
-.film-action--soon {
-  border-color: var(--line-faint);
+.film-watch-total {
+  padding-left: 2px;
   color: var(--ink-faint);
-  opacity: 0.5;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .film-action-error {
@@ -95,7 +98,13 @@
     padding: 8px 10px;
   }
 
-  .film-action--soon {
+  .film-action--watch {
     flex-basis: 100%;
+  }
+
+  .film-watch-total {
+    flex-basis: 100%;
+    padding: 2px 0 0;
+    text-align: center;
   }
 }

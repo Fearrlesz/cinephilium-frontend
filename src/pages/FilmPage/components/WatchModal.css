@@ -1,0 +1,124 @@
+/* ============================================================
+   F4 — «Отметить просмотр»
+   Модалка поверх .modal-overlay/.modal-content; свои только
+   поля формы. Цвета и типографика — из токенов.
+   ============================================================ */
+
+.watch-overlay {
+  padding: 24px;
+}
+
+.watch-modal {
+  max-width: 480px;
+  padding: 26px;
+}
+
+.watch-modal .modal-title {
+  font-family: var(--sans);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.watch-modal .modal-sub {
+  margin-top: 5px;
+  font-size: 12.5px;
+}
+
+.watch-form {
+  display: grid;
+  gap: 18px;
+}
+
+.watch-field {
+  display: grid;
+  gap: 8px;
+}
+
+.watch-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.4;
+  color-scheme: dark;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.watch-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.watch-input:focus {
+  outline: none;
+  border-color: var(--azure-line);
+}
+
+.watch-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.watch-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--azure);
+}
+
+.watch-hint {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.watch-error {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-strong);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.watch-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+@media (max-width: 620px) {
+  .watch-overlay {
+    padding: 8px;
+  }
+
+  .watch-modal {
+    max-height: 96vh;
+    padding: 22px 16px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .watch-foot {
+    flex-direction: column-reverse;
+  }
+
+  .watch-foot .btn-primary,
+  .watch-foot .btn-ghost {
+    width: 100%;
+  }
+}
