@@ -1,7 +1,113 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../../../../api/client';
 import { formatDate } from '../../../../utils/ratingUtils';
 import './CommentsSection.css';
+
+// F7: комментарии к рецензии — отдельный слой обсуждения текста. Оценка
+// фильма здесь не нужна: B8 разрешает отвечать автору рецензии без Rating.
+const REVIEW_PAGE_SIZE = 5;
+const MAX_COMMENT = 1000;
+
+function pluralComments(count) {
+  const value = Math.abs(Number(count) || 0);
+  const mod100 = value % 100;
+  const mod10 = value % 10;
+  if (mod100 >= 11 && mod100 <= 14) return 'комментариев';
+  if (mod10 === 1) return 'комментарий';
+  if (mod10 >= 2 && mod10 <= 4) return 'комментария';
+  return 'комментариев';
+}
+
+function likeCount(comment) {
+  if (typeof comment.likesCount === 'number') return comment.likesCount;
+  return Array.isArray(comment.likes) ? comment.likes.length : 0;
+}
+
+function setLikeCount(items, commentId, likes) {
+  return items.map(item => {
+    let next = item;
+    if (String(item._id) === String(commentId)) {
+      next = {
+        ...item,
+        likesCount: typeof likes === 'number' ? likes : likeCount(item) + 1
+      };
+    }
+    if (Array.isArray(next.replies) && next.replies.length > 0) {
+      next = { ...next, replies: setLikeCount(next.replies, commentId, likes) };
+    }
+    return next;
+  });
+}
+
+function ReviewCommentItem({ comment, currentUser, onLike, onReply, isReply = false }) {
+  const author = comment.userId || {};
+  const nickname = author.nickname || 'Пользователь';
+  const initial = nickname.charAt(0).toUpperCase();
+  const isPending = comment.status === 'pending';
+  const likes = likeCount(comment);
+
+  return (
+    <li className={`citem ${isReply ? 'citem--reply' : ''}`} id={comment._id}>
+      <span className="c-av" aria-hidden="true">{initial}</span>
+      <div className="cmain">
+        <div className="cname">
+          {nickname}
+          {author.isAdmin && <span className="badge-admin">админ</span>}
+        </div>
+        <div className="cmeta">
+          <span>@{nickname}</span>
+          {comment.createdAt && (
+            <>
+              <span className="dot">·</span>
+              <span className="c-time">{formatDate(comment.createdAt)}</span>
+            </>
+          )}
+        </div>
+
+        {isPending && (
+          <p className="c-pending">На модерации — видно только вам</p>
+        )}
+
+        <p className="ctext">{comment.text}</p>
+
+        <div className="c-actions">
+          {currentUser ? (
+            <button
+              className="c-like" type="button" onClick={() => onLike(comment._id)}
+              aria-label="Полезный комментарий"
+            >
+              Полезно <span>{likes}</span>
+            </button>
+          ) : (
+            <span className="c-like">Полезно <span>{likes}</span></span>
+          )}
+
+          {!isReply && currentUser && comment.status === 'approved' && (
+            <button className="c-like" type="button" onClick={() => onReply(comment)}>
+              Ответить
+            </button>
+          )}
+        </div>
+
+        {Array.isArray(comment.replies) && comment.replies.length > 0 && (
+          <ul className="creplies">
+            {comment.replies.map(reply => (
+              <ReviewCommentItem
+                key={reply._id}
+                comment={reply}
+                currentUser={currentUser}
+                onLike={onLike}
+                onReply={onReply}
+                isReply
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    </li>
+  );
+}
 
 /**
  * F2: гейтинг комментариев к фильму.
@@ -22,8 +128,8 @@ import './CommentsSection.css';
  * страницы. F1 (RatingSection/useVibeRating/useRatingForm) не менялся.
  * DECISION: F2/6A — текст при 403 остаётся в state и очищается только
  * успешной отправкой.
- * DECISION: F2/7 — формы ответа на комментарий в CommentsSection нет,
- * поэтому не добавляем её (это F7).
+ * DECISION: F2/7 — формы ответа на комментарий в F2 не было. F7 добавляет
+ * ответы только в режиме рецензии, чтобы не менять поведение фильма.
  *
  * DECISION: B3/2A — weight: 0 не блокирует комментирование: гейт проверяет
  * наличие Rating (vibe или full), вес не учитывается.
@@ -33,20 +139,50 @@ import './CommentsSection.css';
  * DECISION: B3/5A — последовательность POST /ratings → POST /comments;
  * на 403 честно показываем гейт, без ретраев и без RATING_NOT_READY.
  * DECISION: B3 — лайк комментария не гейтится: «Полезно» работает без оценки.
+ *
+ * F7: один компонент и два режима.
+ * DECISION: F7/1 — inline-блок под каждой рецензией. Отдельной ReviewPage в
+ * коде нет, поэтому новый маршрут не создаём.
+ * DECISION: F7/2 — в режиме рецензии блок свёрнут до кнопки «N комментариев»
+ * и загружает список только после клика; в режиме фильма поведение F2
+ * остаётся прежним (родитель передаёт comments и колбэки).
+ * DECISION: F7/3 — GET /api/comments?targetType=review&targetId=... с
+ * пагинацией; POST /api/comments с targetType/targetId/parentId. Старый
+ * GET /api/comments/:filmId и режим film не трогаем.
+ * DECISION: F7/4 — ответы только один уровень: форма отвечает на корневой
+ * комментарий, вложенные ответы не получают кнопку «Ответить».
+ * DECISION: F7/5 — pending показывает только сервер (approved для чужих,
+ * плюс свои pending и всё для админа); фронт ничего не фильтрует.
+ * DECISION: F7/6 — комментарий к рецензии не гейтится userRating: это
+ * обсуждение текста, а не фильма (B8).
  */
 function CommentsSection({
-  comments,
+  comments = [],
   currentUser,
   film,
   onAddComment,
   onLikeComment,
-  onRate
+  onRate,
+  targetType = 'film',
+  targetId = null
 }) {
   const [commentText, setCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
   const [rateRequired, setRateRequired] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [reviewExpanded, setReviewExpanded] = useState(false);
+  const [reviewItems, setReviewItems] = useState([]);
+  const [reviewPagination, setReviewPagination] = useState(null);
+  const [reviewCount, setReviewCount] = useState(null);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewError, setReviewError] = useState('');
+  const [reviewThreadError, setReviewThreadError] = useState('');
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
+
+  const isReviewMode = targetType === 'review' && Boolean(targetId);
   const initial = (currentUser?.nickname || '?').charAt(0).toUpperCase();
 
   // F2/5A: читаем именно film.userRating — после vibe он обновляется
@@ -58,6 +194,221 @@ function CommentsSection({
   useEffect(() => {
     if (userRating) setRateRequired(false);
   }, [userRating]);
+
+  // F7: счётчик нужен до раскрытия, поэтому первый запрос берёт limit=1.
+  // Отдельного commentsCount у рецензии нет; pagination.total — авторитетный
+  // источник, уже отфильтрованный сервером по видимости.
+  useEffect(() => {
+    if (!isReviewMode) return undefined;
+
+    let active = true;
+    setReviewCount(null);
+    api.get('/comments', {
+      params: { targetType, targetId, page: 1, limit: 1 }
+    }).then(response => {
+      if (!active) return;
+      const total = response.data?.pagination?.total;
+      setReviewCount(typeof total === 'number' ? total : (response.data?.items?.length || 0));
+    }).catch(() => {
+      if (active) setReviewCount(0);
+    });
+
+    return () => { active = false; };
+  }, [isReviewMode, targetId, targetType]);
+
+  const loadReviewPage = async (page, { replace = false, limit = REVIEW_PAGE_SIZE } = {}) => {
+    setReviewLoading(true);
+    setReviewThreadError('');
+    try {
+      const response = await api.get('/comments', {
+        params: { targetType, targetId, page, limit }
+      });
+      const data = response.data || {};
+      const nextItems = Array.isArray(data.items) ? data.items : [];
+      setReviewItems(prev => (replace ? nextItems : [...prev, ...nextItems]));
+      setReviewPagination(data.pagination || null);
+      if (typeof data.pagination?.total === 'number') setReviewCount(data.pagination.total);
+    } catch (err) {
+      setReviewThreadError(err.response?.data?.error || 'Не удалось загрузить комментарии');
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const handleToggleReview = () => {
+    if (reviewExpanded) {
+      setReviewExpanded(false);
+      return;
+    }
+    setReviewExpanded(true);
+    if (reviewItems.length === 0 && !reviewLoading) {
+      loadReviewPage(1, { replace: true });
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (reviewLoading) return;
+    const nextPage = (reviewPagination?.page || 1) + 1;
+    loadReviewPage(nextPage);
+  };
+
+  const handleReviewLike = async commentId => {
+    if (!currentUser) return;
+    try {
+      const response = await api.post(`/comments/${commentId}/like`);
+      setReviewItems(prev => setLikeCount(prev, commentId, response.data?.likes));
+    } catch (err) {
+      setReviewThreadError(err.response?.data?.error || 'Не удалось поставить лайк');
+    }
+  };
+
+  const handleReviewSubmit = async event => {
+    event.preventDefault();
+    if (reviewSubmitting) return;
+
+    const trimmed = reviewText.trim();
+    if (!trimmed) {
+      setReviewError('Введите текст комментария');
+      return;
+    }
+    if (trimmed.length < 2) {
+      setReviewError('Комментарий должен содержать минимум 2 символа');
+      return;
+    }
+    if (trimmed.length > MAX_COMMENT) {
+      setReviewError(`Комментарий не длиннее ${MAX_COMMENT} символов`);
+      return;
+    }
+
+    setReviewError('');
+    setReviewSubmitting(true);
+
+    try {
+      const payload = { targetType: 'review', targetId, text: trimmed };
+      if (replyTo?._id) payload.parentId = replyTo._id;
+
+      await api.post('/comments', payload);
+      setReviewText('');
+      setReplyTo(null);
+
+      // Перезагружаем столько же корневых комментариев, сколько уже открыто,
+      // чтобы новый комментарий не сдвинул загруженные страницы.
+      const limit = Math.min(100, Math.max(REVIEW_PAGE_SIZE, reviewItems.length + 1));
+      await loadReviewPage(1, { replace: true, limit });
+    } catch (err) {
+      setReviewError(err.response?.data?.error || 'Не удалось добавить комментарий');
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  const countLabel = reviewCount === null
+    ? 'Комментарии'
+    : `${reviewCount} ${pluralComments(reviewCount)}`;
+
+  const reviewThread = isReviewMode ? (
+    <section className="film-comments film-comments--review">
+      {!reviewExpanded ? (
+        <button
+          type="button"
+          className="link-btn c-toggle"
+          onClick={handleToggleReview}
+          aria-expanded="false"
+        >
+          {countLabel}
+        </button>
+      ) : (
+        <div className="c-thread">
+          <div className="c-thread-head">
+            <span className="lbl">Комментарии · {reviewCount ?? 0}</span>
+            <button type="button" className="link-btn" onClick={handleToggleReview}>
+              Свернуть
+            </button>
+          </div>
+
+          {reviewThreadError && (
+            <p className="c-error" role="alert">{reviewThreadError}</p>
+          )}
+
+          {reviewLoading && reviewItems.length === 0 && (
+            <p className="c-login">Загрузка комментариев…</p>
+          )}
+
+          {!reviewLoading && reviewItems.length === 0 && (
+            <p className="c-empty">Пока никто не комментировал</p>
+          )}
+
+          {!currentUser && (
+            <p className="c-login">
+              <Link to="/login">Войдите</Link>, чтобы комментировать.
+            </p>
+          )}
+
+          {reviewItems.length > 0 && (
+            <ul className="clist">
+              {reviewItems.map(comment => (
+                <ReviewCommentItem
+                  key={comment._id}
+                  comment={comment}
+                  currentUser={currentUser}
+                  onLike={handleReviewLike}
+                  onReply={setReplyTo}
+                />
+              ))}
+            </ul>
+          )}
+
+          {reviewPagination && reviewPagination.page < reviewPagination.pages && (
+            <button
+              type="button" className="link-btn c-more"
+              onClick={handleLoadMore} disabled={reviewLoading}
+            >
+              {reviewLoading ? 'Загрузка…' : 'Загрузить ещё'}
+            </button>
+          )}
+
+          {currentUser && (
+            <>
+              {replyTo && (
+                <div className="c-reply-note">
+                  <span>Ответ на @{replyTo.userId?.nickname || 'Пользователь'}</span>
+                  <button
+                    type="button" className="link-btn"
+                    onClick={() => setReplyTo(null)}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              )}
+
+              <form className="cform" onSubmit={handleReviewSubmit}>
+                <span className="c-av" aria-hidden="true">{initial}</span>
+                <input
+                  className="c-input" type="text"
+                  placeholder={replyTo ? 'Написать ответ…' : 'Написать комментарий…'}
+                  value={reviewText}
+                  maxLength={MAX_COMMENT}
+                  onChange={event => {
+                    setReviewText(event.target.value);
+                    setReviewError('');
+                  }}
+                  aria-label="Текст комментария к рецензии"
+                />
+                <button
+                  className="c-send" type="submit"
+                  disabled={reviewSubmitting || !reviewText.trim()}
+                >
+                  Отправить
+                </button>
+              </form>
+
+              {reviewError && <p className="c-error" role="alert">{reviewError}</p>}
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  ) : null;
 
   const handleAddComment = async () => {
     if (isSubmitting) return;
@@ -111,6 +462,8 @@ function CommentsSection({
       </button>
     </div>
   );
+
+  if (isReviewMode) return reviewThread;
 
   return (
     <section className="film-comments">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS } from '../../../../utils/constants';
 import { formatDate } from '../../../../utils/ratingUtils';
 import CriteriaModal from '../CriteriaModal/CriteriaModal';
+import CommentsSection from '../CommentsSection/CommentsSection';
 import './ReviewsSection.css';
 
 const MAX_TITLE = 100;
@@ -410,6 +411,14 @@ function ReviewsSection({
               {isDetailsOpen && rating && typeof rating === 'object' && (
                 <RatingDetailsBlock rating={rating} />
               )}
+
+              {/* DECISION: F7/1 — отдельной ReviewPage нет, поэтому блок
+                  комментариев живёт inline под каждой рецензией. */}
+              <CommentsSection
+                targetType="review"
+                targetId={review._id}
+                currentUser={currentUser}
+              />
             </article>
           );
         })}

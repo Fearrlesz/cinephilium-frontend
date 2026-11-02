@@ -212,6 +212,100 @@
   color: var(--ink-muted);
 }
 
+/* F7: комментарии к рецензии — тот же список и форма, но компактнее
+   и без заголовка секции: блок живёт внутри статьи-рецензии. */
+.film-comments--review {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.c-toggle {
+  margin-top: 2px;
+}
+
+.c-thread {
+  min-width: 0;
+}
+
+.c-thread-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.c-more {
+  margin-top: 8px;
+}
+
+.c-empty {
+  margin: 14px 0 2px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.c-pending {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.c-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.c-actions .c-like {
+  margin-top: 0;
+}
+
+.creplies {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citem--reply {
+  padding: 10px 0 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.citem--reply:first-child {
+  padding-top: 4px;
+  border-top: none;
+}
+
+.citem--reply .c-av {
+  width: 22px;
+  height: 22px;
+  font-size: 8px;
+}
+
+.citem--reply .ctext {
+  font-size: 13px;
+}
+
+.c-reply-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
 @media (max-width: 620px) {
   .c-time,
   .cmeta .dot {
@@ -253,5 +347,17 @@
   .film-comments {
     margin-top: 36px;
     padding-top: 22px;
+  }
+
+  .film-comments--review {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+
+  .c-thread-head,
+  .c-reply-note {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
