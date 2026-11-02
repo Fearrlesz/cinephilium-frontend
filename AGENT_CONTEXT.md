@@ -1,15 +1,15 @@
 # Контекст фронтенда Cinephilium
 
-**Дата среза:** 01.11.2026  
+**Дата среза:** 02.11.2026
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.4.0)
+**Документация версии:** `CHANGELOG.md` (4.5.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2 и F3, какие
-решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F5 и F6,
+какие решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
 витрина проекта, а не инструкция по разработке.
 
 ---
@@ -57,7 +57,7 @@ REACT_APP_API_URL=http://127.0.0.1:3000/api npm start
 src/
   api/                 client.js, films.js, critics.js
   components/          Header, NotificationModal, ActivityFeed, RatingDetailsModal,
-                       CustomSelect, Critic/*
+                       CustomSelect, ProfileGalleries, Critic/*
   context/             NotificationContext
   hooks/               useActivityEvents, useCriticData
   pages/
@@ -110,6 +110,7 @@ FilmPage.jsx
       VibeTrack.jsx            drag-трек / 10 сегментов
     CriteriaModal.jsx          модалка полной оценки
       RatingForm.jsx           жанр, веса, аккордеон, preview, save
+  FilmActions.jsx              сердечко + watchlist (F5/F6)
   UsersList.jsx                «Оценили фильм»
   ReviewsSection.jsx
   CommentsSection.jsx
@@ -215,6 +216,38 @@ FilmPage.jsx
   скриншоты — `screenshots/f3-reviews/`. Живой прод-прогон — `[UNVERIFIED]`
   по той же причине, что F2.
 
+### F5/F6 — сердечко и watchlist, галереи профиля (закрыт)
+
+- `FilmActions` стоит в `FilmInfo` сразу под `RatingSection`: сердечко с
+  `likesCount` и кнопка «Хочу посмотреть» / «В списке». Лайк — `liked/likesCount`
+  из `GET /api/films/:id`, переключается `POST` / `DELETE /api/films/:id/like`.
+  Watchlist при загрузке проверяется отдельно: `GET /api/watchlist/check/:filmId`
+  (в фильме нет `inWatchlist`), добавление — `POST /api/watchlist { filmId }`.
+- У `DELETE /api/watchlist/:id` параметр — `_id` записи WatchlistItem, а не
+  `filmId`. Поэтому удаление ищет запись через `GET /api/watchlist/user`
+  (постранично, limit 100) и вызывает DELETE с её `_id`.
+- Кнопки оптимистичные: значение и счётчик меняются сразу, при ошибке — откат и
+  inline-сообщение на 4 секунды. Без авторизации клик ведёт на `/login`.
+- «Просмотрено» показывается disabled с `title="Скоро"`: функциональный Watch —
+  задача F4, здесь его нет. Лайк и watchlist не гейтятся ни оценкой, ни ролью.
+- `ProfileGalleries` на своём и чужом профиле, до старых вкладок:
+  «Понравившиеся» — `GET /api/users/me/likes` (свой) или
+  `GET /api/users/:id/likes` (чужой); «Хочу посмотреть» —
+  `GET /api/watchlist/user` или `GET /api/users/:id/watchlist`. Конверт —
+  `{ items, pagination }`, по 12 на страницу.
+- Сетка 6/5/4/3/2 колонок; на desktop имя и год — в hover-оверлее поверх
+  градиента, на мобиле — всегда под постером. Крестик удаления — только у своего
+  watchlist; на desktop появляется по hover, на touch виден всегда. Удаление
+  оптимистичное, ошибка откатывается. Пустые секции — CTA «Найти фильмы».
+  Для скрытого профиля галереи не рендерятся (404 личных разделов).
+- Счётчики `counters.filmLikes` / `counters.watchlist` выводятся в шапке профиля
+  и обновляются после удаления из watchlist через `onWatchlistRemoved`; счётчик
+  секции меняется оптимистично.
+- Зафиксировано: **F5+F6/1B, 2A, 3A, 4B, 5A, 6A, 7A, 8A, 9A, 10A, 11A**.
+  F1/F2/F3-компоненты не менялись; вкладки профиля B9 не трогались (это F8).
+- Проверка: production-сборка + mock API + Chrome headless, 19/19 сценариев;
+  скриншоты — `screenshots/f5-f6/`. Живой прод-прогон — `[UNVERIFIED]`.
+
 ---
 
 ## 6. Контракт бэкенда (фактический)
@@ -277,29 +310,65 @@ userRating: {
   свою Rating пользователя; без `completeness: 'full'` — `403
   FULL_RATING_REQUIRED_FOR_REVIEW`. Успех — `200` (не 201).
 
+`GET /api/films/:id` дополнительно отдаёт `liked` и `likesCount`; поля
+`inWatchlist` в фильме нет.
+
+`POST` / `DELETE /api/films/:id/like`:
+
+- ответ `{ liked: boolean, likesCount: number }`; `likesCount` — публичный
+  взвешенный агрегат, не `counters.filmLikes`.
+
+`GET /api/watchlist/check/:filmId`:
+
+- `{ inWatchlist: boolean, filmId }`.
+
+`POST /api/watchlist`:
+
+- тело `{ filmId }`; `200`/`201`, ответ `{ inWatchlist: true, filmId, addedAt }`.
+
+`GET /api/watchlist/user`, `GET /api/users/:id/watchlist`:
+
+- `{ items, pagination }`; элемент — WatchlistItem:
+  `{ _id, addedAt, filmId: { _id, title, poster, year } }`.
+
+`DELETE /api/watchlist/:id`:
+
+- `:id` — `_id` записи WatchlistItem, **не** `filmId`. Идемпотентный `200`,
+  ответ `{ inWatchlist: false }`. Фронт ищет `_id` через `GET /watchlist/user`.
+
+`GET /api/users/me/likes`, `GET /api/users/:id/likes`:
+
+- `{ items, pagination }`; элемент — FilmLike:
+  `{ _id, addedAt, filmId: { _id, title, poster, year } }`. `weight` наружу не
+  отдаётся.
+
+`counters.filmLikes` и `counters.watchlist` приходят в `GET /api/auth/me` и
+`GET /api/users/:id`; это счётчики действий, а не публичный `Film.likesCount`.
+
 ---
 
 ## 7. Что ещё не обновлено под vibe/full
 
-F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии. Вне этой
-тройки остаются:
+F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии, F5/F6 — лайк,
+watchlist и галереи профиля. Вне этих задач остаются:
 
-- `ProfilePage` и `UserProfilePage` — используют старые `/ratings/user`,
-  `/reviews/user` и профильные ответы; вкладки B9 (`/users/:id/ratings` и т.д.)
-  фронт ещё не потребляет.
+- `ProfilePage` и `UserProfilePage` — старые вкладки и профильные ответы
+  (`/ratings/user`, `/reviews/user`); вкладки B9 (`/users/:id/ratings` и т.д.)
+  фронт ещё не потребляет — это F8. Галереи F5/F6 добавлены отдельно, до вкладок.
 - `HomePage`, карточки фильмов, топы — старые поля (`averageRating`/`finalScore`).
 - `RatingDetailsModal` — легаси-поля `finalScore`/`base1`.
 - Комментарии к рецензиям (B8) и выбор vibe в комментариях — следующие задачи;
   F7 не начинать в рамках F2/F3.
-- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.4.0;
+- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.5.0;
   ориентируйся на CHANGELOG.
 
-### Живая проверка F2/F3
+### Живая проверка F2/F3/F5/F6
 
-Формы и ошибки подтверждены на production-сборке с mock API в Chrome headless:
-F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполнялся: Vercel preview
-закрыт Vercel Authentication, Render из среды недоступен. Статус live-проверки —
-`[UNVERIFIED]`; это не блокер деплоя F2/F3, но и не подтверждение реального API.
+Формы, кнопки и галереи подтверждены на production-сборке с mock API в Chrome
+headless: F2 — 22/22, F3 — 29/29, F5/F6 — 19/19. Живой прод-прогон не
+выполнялся: Vercel preview закрыт Vercel Authentication, Render из среды
+недоступен. Статус live-проверки — `[UNVERIFIED]`; это не блокер деплоя, но и не
+подтверждение реального API.
 
 ---
 
@@ -324,14 +393,14 @@ F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполня
 
 ---
 
-## 9. Карта файлов F1–F3
+## 9. Карта файлов F1–F6
 
 | Файл | Что важно |
 |---|---|
 | `src/api/client.js` | JWT, refresh, нормализация ошибок, `errorCode`/`errorDetails` |
 | `src/utils/constants.js` | `CRITERIA_CONFIG`, `PRESET_WEIGHTS`, `scifi_author` |
 | `src/utils/scoring.js` | grade, слова вайба, средние по блокам, technical/combined, форматирование |
-| `src/pages/FilmPage/FilmPage.jsx` | страница, `RatingSection`, модалки, рецензии/комментарии, результаты `addComment`/`addReview` |
+| `src/pages/FilmPage/FilmPage.jsx` | страница, `RatingSection`, модалки, рецензии/комментарии, результаты `addComment`/`addReview`, `FilmActions`, `requireAuth` |
 | `src/pages/FilmPage/components/FilmInfo.jsx` | шапка фильма без дублей оценки |
 | `src/pages/FilmPage/components/RatingSection.jsx` | контейнер блока оценки |
 | `src/pages/FilmPage/components/RatingContext.jsx` | соцдоказательство, только full для «Ваша» |
@@ -346,12 +415,16 @@ F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполня
 | `src/pages/FilmPage/components/CommentsSection.css` | F2: гейт, адаптив 480/620 |
 | `src/pages/FilmPage/components/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
 | `src/pages/FilmPage/components/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
+| `src/pages/FilmPage/components/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения |
+| `src/pages/FilmPage/components/FilmActions.css` | F5/F6: кнопки действий, ошибка, адаптив 480 |
+| `src/components/ProfileGalleries.jsx` | F5/F6: «Понравившиеся» / «Хочу посмотреть», пагинация, удаление, 404 |
+| `src/components/ProfileGalleries.css` | F5/F6: сетка 6/5/4/3/2, hover, мобильные подписи, пустые состояния |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1–4.4: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/` | скриншоты F2/F3 |
+| `CHANGELOG.md` | 4.1–4.5: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f5-f6/` | скриншоты F2/F3/F5/F6 |
 
 ---
 
@@ -360,7 +433,8 @@ F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполня
 1. `git status` — не в чужой ли ветке; ожидаем `feature/f1-vibe-rating` или новую
    `feature/...`.
 2. Прочитать §5: F1 — combined/technical только full; F2 — комментарий с любой
-   оценкой; F3 — рецензия только с full + spoiler.
+   оценкой; F3 — рецензия только с full + spoiler; F5/F6 — лайк и watchlist без
+   гейта, галереи профиля.
 3. Сверить ключи `scores` и названия счётчиков с бэкендом, не с прототипом.
 4. Не показывать `0` как результат там, где это маркер «не вычислено».
 5. `npm run build` — собирается.
@@ -368,7 +442,10 @@ F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполня
    список «Оценили фильм».
 7. F2/F3: 403 ловить по `errorCode`, текст формы не терять; `POST /reviews` —
    без `ratingId`, с `isSpoiler`; длина рецензии 350..15000.
-8. Если меняешь `client.js` — только точечно и без изменения поведения.
+8. F5/F6: лайк — `liked/likesCount` из фильма; watchlist проверять отдельно;
+   удалять запись по `_id` WatchlistItem, а не по `filmId`; счётчики
+   `counters.filmLikes/watchlist` держать синхронными с секциями.
+9. Если меняешь `client.js` — только точечно и без изменения поведения.
 
 ---
 
@@ -384,5 +461,9 @@ F2 — 22/22, F3 — 29/29. Живой прод-прогон не выполня
   секции с разделителями, без `.glass-card`, blur и цветных свечений.
 - Модалка критериев: `.modal-overlay` + `.modal-content`, внутри `.rating-form`
   (select жанра, полоса весов, аккордеон `.crit`, 2px-слайдеры, preview).
+- F5/F6: `.film-actions` — плоские pill-кнопки под панелью оценки; активное
+  состояние — azure, счётчик mono. `.pg-grid` — постеры 2/3 без карточек, hover-
+  оверлей на градиенте, на мобиле подписи под постером. Новых hex/шрифтов/
+  брейкпоинтов нет.
 - Черновик/сохранение полной оценки остаются в `useRatingForm`, vibe-only — в
   `useVibeRating`. Визуальный слой не меняет формулы и контракт.

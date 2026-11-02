@@ -1,6 +1,63 @@
-# Changelog — Cinephilium Frontend 4.4.0
+# Changelog — Cinephilium Frontend 4.5.0
 
-**Дата и время среза: 01.11.2026 (Europe/Moscow, UTC+03:00)**
+**Дата и время среза: 02.11.2026 (Europe/Moscow, UTC+03:00)**
+
+## 4.5 — F5/F6: сердечко, watchlist и галереи профиля
+
+**Дата: 02.11.2026.**
+
+### Смысл
+
+На странице фильма появились два действия без гейта по оценке: лайк фильма
+(сердечко) и «Хочу посмотреть» (watchlist). В профиле — две галереи постеров:
+«Понравившиеся» и «Хочу посмотреть», у своего и чужого профиля. Лайк и watchlist
+не требуют ни vibe, ни full: это отдельные действия, а не оценка. «Просмотрено»
+показывается disabled — функциональный Watch остаётся F4.
+
+### Что изменено
+
+- `FilmActions.jsx/css` — новый блок под `RatingSection`: сердечко с
+  `likesCount`, кнопка «Хочу посмотреть» / «В списке», disabled «Просмотрено»
+  с `title="Скоро"`. Лайк — `POST`/`DELETE /api/films/:id/like`; watchlist —
+  `GET /api/watchlist/check/:filmId`, `POST /api/watchlist { filmId }`.
+- `FilmPage.jsx` — `FilmActions` внутри `FilmInfo`; `requireAuth` показывает
+  уведомление и ведёт на `/login`; F1/F2/F3-компоненты не менялись.
+- `ProfileGalleries.jsx/css` — «Понравившиеся» и «Хочу посмотреть», пагинация
+  по 12, пустые состояния с CTA «Найти фильмы», сетка 6/5/4/3/2, hover-оверлей
+  на desktop и подписи под постером на мобиле.
+- `ProfilePage.jsx`, `UserProfilePage.jsx` — галереи до старых вкладок; счётчики
+  `counters.filmLikes` / `counters.watchlist` в шапке; `onWatchlistRemoved`
+  синхронизирует счётчик шапки после удаления; `isOwnProfile` сравнивает
+  `_id`/`id` строками; скрытый профиль не рендерит галереи.
+
+### Зафиксированные решения
+
+- **F5+F6/1B** — отдельный блок под `RatingSection`, не в шапке фильма.
+- **2A** — «Просмотрено» disabled, без фейкового Watch (F4).
+- **3A** — ошибка лайка/watchlist inline, с откатом; **4B** — без авторизации
+  клик ведёт на `/login`.
+- **5A** — watchlist проверяется отдельным `GET /watchlist/check`, потому что
+  `inWatchlist` в фильме нет.
+- **6A** — галереи до старых вкладок; **7A** — сетка 6/5/4/3/2.
+- **8A** — пустые секции с CTA «Найти фильмы».
+- **9A** — крестик удаления только у своего watchlist.
+- **10A** — на мобиле имя и год под постером.
+- **11A** — hover-оверлей на градиенте на desktop.
+- **Расхождение с промптом:** `DELETE /api/watchlist/:id` принимает `_id`
+  WatchlistItem, а не `filmId`; фронт ищет `_id` через `GET /watchlist/user`.
+  Лайк — две операции (`POST`/`DELETE`), а не один toggle. Верили коду бэкенда.
+
+### Проверка
+
+- `npm run build` — `Compiled successfully`; production: 119.02 kB JS / 24.59 kB CSS.
+- Production-сборка + mock API + Chrome headless: 19/19 сценариев: лайк
+  10→11→10, watchlist on/off, inline-ошибка, свои галереи 14/5, удаление
+  watchlist (секция и шапка 4), пагинация (2-я страница — 2), мобильные
+  2 колонки/подписи/крестик, пустые CTA, чужой профиль 8/3 без крестиков,
+  скрытый профиль без галерей.
+- Скриншоты: `screenshots/f5-f6/`.
+- Живой прод-прогон — `[UNVERIFIED]`: Vercel preview закрыт Vercel Authentication,
+  Render из среды недоступен.
 
 ## 4.4 — F3: рецензии, спойлер и гейтинг по полной оценке
 

@@ -17,6 +17,13 @@
 `{ filmId, title, text, isSpoiler }`); живые ответы прода по-прежнему
 `[UNVERIFIED]`.
 
+**Обновление 2026-11-02:** формы F5/F6 проверены кодом бэкенда и браузером на
+mock API (лайк `POST`/`DELETE /films/:id/like`, watchlist
+`POST /watchlist { filmId }`, `DELETE /watchlist/:id` по `_id` WatchlistItem,
+галереи `/users/me/likes`, `/users/:id/likes`, `/watchlist/user`,
+`/users/:id/watchlist` → `{ items, pagination }`); живые ответы прода —
+`[UNVERIFIED]`.
+
 Обозначения:
 
 - `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT]` — форма описана в репо,
@@ -24,6 +31,8 @@
 - `[UNVERIFIED: API недоступен; форма не описана]` — поля/конверт неизвестны.
 - `[UNVERIFIED: прод; мутация не выполнялась]` — POST/PUT/DELETE, которые нельзя
   дергать на проде.
+- `[UNVERIFIED live; форма из кода]` — форма выведена из кода бэкенда и
+  проверена на mock API, живой ответ не получен.
 
 ---
 
@@ -77,7 +86,7 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 | Эндпоинт | Форма / поля | Статус |
 |---|---|---|
 | `GET /films?limit=1` | Каталог. Точный конверт (`items`/`pagination`/`total`) неизвестен. B2: в каталоге отсутствующие средние — `null`, `averageRating` — алиас `averageTechnical`. | `[UNVERIFIED: API недоступен; конверт не описан]` |
-| `GET /films/:id` | См. §2.1. | `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT §6]` |
+| `GET /films/:id` | См. §2.1; дополнительно `liked: boolean`, `likesCount: number`, без `inWatchlist`. | `[UNVERIFIED live; форма из кода Films/Presenter]` |
 | `GET /films/:id/users` | Массив оценок; `rating.completeness`, `technicalScore`, `combinedScore`, `finalScore`. Для vibe-only `finalScore: 0` — известное ограничение. | `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT §6]` |
 | `GET /comments/:filmId` | Список комментариев к фильму. B8: у комментария есть `targetType: 'film' \| 'review'` и `targetId`; для фильма `targetType: 'film'`. Точные поля/конверт не описаны. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /reviews/:filmId` | Список рецензий. B4: `isSpoiler`, текст 350..15000; точные поля/конверт не описаны. | `[UNVERIFIED: API недоступен; форма не описана]` |
@@ -96,6 +105,8 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
   "votesCount": 128,
   "vibesCount": 52,
   "fullCount": 76,
+  "liked": false,
+  "likesCount": 10,
   "userRating": {
     "completeness": "full",
     "vibe": 9,
@@ -125,6 +136,9 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 - `votesCount` — все оценки, `vibesCount` — только vibe, `fullCount` — только full.
 - `averageRating` — алиас `averageTechnical` (B2), но в каталоге отсутствующие
   средние — `null`, на странице фильма — `0`.
+- `liked` и `likesCount` — публичный агрегат лайков фильма; `likesCount` считает
+  только лайки с `weight > 0`. `inWatchlist` в ответе нет: его даёт отдельный
+  `GET /watchlist/check/:filmId`.
 
 ---
 
@@ -140,11 +154,12 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 | `GET /users/:id/reviews` | Вкладка рецензий (B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /users/:id/comments` | Вкладка комментариев (B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /users/:id/watches` | Вкладка Watch (B5/B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/:id/watchlist` | Watchlist пользователя (B6/B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/:id/likes` | Лайки фильмов (B7/B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
+| `GET /users/:id/watchlist` | Watchlist пользователя: `{ items, pagination }`; элемент — WatchlistItem `{ _id, addedAt, filmId: { _id, title, poster, year } }`. 404 `PROFILE_HIDDEN` для скрытого профиля. | `[UNVERIFIED live; форма из watchlistQuery.js]` |
+| `GET /users/me/likes` | «Понравившиеся» текущего пользователя: `{ items, pagination }`; элемент — FilmLike `{ _id, addedAt, filmId: { _id, title, poster, year } }`. | `[UNVERIFIED live; форма из filmLikesQuery.js]` |
+| `GET /users/:id/likes` | «Понравившиеся» пользователя: `{ items, pagination }`; элемент — FilmLike `{ _id, addedAt, filmId: { _id, title, poster, year } }`. 404 `PROFILE_HIDDEN` для скрытого профиля. | `[UNVERIFIED live; форма из filmLikesQuery.js]` |
 | `GET /users/:id/achievements` | Достижения. В CHANGELOG 3.0 упомянуты `earned`/`possible`; точная форма не подтверждена. | `[UNVERIFIED: API недоступен; нет токена]` |
-| `GET /watchlist/user` | Watchlist текущего пользователя. Конверт не описан. | `[UNVERIFIED: API недоступен; нет токена]` |
-| `GET /watchlist/check/:filmId` | Проверка фильма в watchlist. Вероятное поле `inWatchlist`, но не описано. | `[UNVERIFIED: API недоступен; форма не описана]` |
+| `GET /watchlist/user` | Watchlist текущего пользователя: `{ items, pagination }`; элемент — WatchlistItem `{ _id, addedAt, filmId: { _id, title, poster, year } }`. | `[UNVERIFIED live; форма из watchlistQuery.js]` |
+| `GET /watchlist/check/:filmId` | `{ inWatchlist: boolean, filmId }`. | `[UNVERIFIED live; форма из watchlist.routes.js]` |
 | `GET /watches/user` | Watch текущего пользователя. Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /users/me/pinned-achievement` | Закреплённое достижение (B9). Ожидается `pinnedAchievement`; точная форма не описана. | `[UNVERIFIED: API недоступен; нет токена]` |
 
@@ -209,17 +224,28 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 
 ### 4.4 Watch / Watchlist / Likes / достижения
 
-| Метод | Путь | Ожидание | Статус |
+| Метод | Путь | Тело / ответ | Статус |
 |---|---|---|---|
 | POST | `/watches` | запись Watch (B5); точный путь/тело не описаны | `[UNVERIFIED: прод; мутация не выполнялась]` |
-| POST | `/watchlist` | добавить в watchlist (B6); ответ `201`/`200` не подтверждён | `[UNVERIFIED: прод; мутация не выполнялась]` |
-| DELETE | `/watchlist/:filmId` | удалить из watchlist (B6); точный путь не подтверждён | `[UNVERIFIED: прод; мутация не выполнялась]` |
-| POST | `/films/:id/like` | лайк фильма (B7); точный путь не подтверждён | `[UNVERIFIED: прод; мутация не выполнялась]` |
-| DELETE | `/films/:id/like` | снять лайк (B7); точный путь не подтверждён | `[UNVERIFIED: прод; мутация не выполнялась]` |
+| POST | `/watchlist` | `{ filmId }` → `200`/`201` `{ inWatchlist: true, filmId, addedAt }` | `[UNVERIFIED live; форма из watchlist.routes.js]` |
+| DELETE | `/watchlist/:id` | `:id` — `_id` WatchlistItem, не `filmId`; идемпотентный `200` `{ inWatchlist: false }` | `[UNVERIFIED live; форма из watchlist.routes.js]` |
+| POST | `/films/:id/like` | → `{ liked: true, likesCount: number }` | `[UNVERIFIED live; форма из films.routes.js]` |
+| DELETE | `/films/:id/like` | → `{ liked: false, likesCount: number }` | `[UNVERIFIED live; форма из films.routes.js]` |
 | PUT | `/users/me/pinned-achievement` | закрепить достижение (B9); тело/ответ не описаны | `[UNVERIFIED: прод; мутация не выполнялась]` |
 
 `ACHIEVEMENT_NOT_EARNED` — ожидаемая ошибка при попытке закрепить недостигнутое
 достижение; точный статус не подтверждён. `[UNVERIFIED: прод; мутация не выполнялась]`
+
+F5/F6 использует эти ответы так:
+
+- `GET /auth/me` и `GET /users/:id` отдают `counters.filmLikes` и
+  `counters.watchlist` — счётчики действий человека (не публичный
+  `Film.likesCount`).
+- Список галереи — `{ items, pagination }`; фронт листает по 12.
+- Скрытый профиль для чужого зрителя отдаёт `404 PROFILE_HIDDEN` на
+  `/users/:id/likes` и `/users/:id/watchlist`; фронт в этом случае не рендерит
+  секции.
+- Удаление из watchlist идёт по `_id` записи; `filmId` для DELETE не подходит.
 
 ---
 
@@ -251,17 +277,34 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 - Все публичные GET: API недоступен из среды.
 - Все авторизованные GET: нет `TEST_ACCESS_TOKEN` / тестового аккаунта, API недоступен.
 - Все POST/PUT/DELETE: нельзя выполнять на проде; тестового окружения нет.
-- Точные конверты списков (`items`/`pagination`/`total`) и поля профилей,
-  комментариев, рецензий, watchlist, likes, достижений — не описаны в репо.
+- Точные конверты остальных списков (`items`/`pagination`/`total`) и поля
+  профилей, комментариев, рецензий, достижений — не описаны в репо.
 - `RATING_REQUIRED_FOR_COMMENT`, `FULL_RATING_REQUIRED_FOR_REVIEW`,
   `ALREADY_FULL_RATING`, `VIBE_LIMIT_REACHED`, `PROFILE_HIDDEN`,
   `ACHIEVEMENT_NOT_EARNED` — ожидания из DECISION, но не живые ответы.
-- Формы F2/F3 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`)
-  подтверждены кодом и браузером на mock API; живые ответы прода — нет.
+- Формы F2/F3/F5/F6 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`,
+  `{ filmId }` для watchlist, DELETE по `_id` WatchlistItem) подтверждены кодом
+  бэкенда и браузером на mock API; живые ответы прода — нет.
 
 ---
 
 ## 7. Changelog верификации
+
+### 2026-11-02 — F5/F6
+
+- **Формы подтверждены в браузере на mock API:** F5/F6 — 19/19 сценариев.
+  Это проверяет фронт, но не живой прод.
+- **Лайк:** `POST`/`DELETE /api/films/:id/like`; состояние и счётчик
+  `liked/likesCount` приходят из `GET /films/:id`, ответы — `{liked, likesCount}`.
+- **Watchlist:** `GET /watchlist/check/:filmId` → `{inWatchlist, filmId}`;
+  `POST /watchlist {filmId}` → `{inWatchlist:true, filmId, addedAt}`;
+  `DELETE /watchlist/:id` принимает `_id` WatchlistItem, не `filmId`;
+  список — `{items,pagination}` с `filmId:{_id,title,poster,year}`.
+- **Галереи:** `/users/me/likes`, `/users/:id/likes`, `/watchlist/user`,
+  `/users/:id/watchlist` → `{items,pagination}`; скрытый профиль — 404.
+- **Счётчики:** `counters.filmLikes` и `counters.watchlist` в шапке профиля;
+  удаление из watchlist обновляет и секцию, и шапку.
+- **Живой API:** по-прежнему недоступен; статусы live-проверок — `[UNVERIFIED]`.
 
 ### 2026-11-01 — F2/F3
 
