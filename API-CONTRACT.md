@@ -24,6 +24,13 @@ mock API (лайк `POST`/`DELETE /films/:id/like`, watchlist
 `/users/:id/watchlist` → `{ items, pagination }`); живые ответы прода —
 `[UNVERIFIED]`.
 
+**Обновление 2026-11-02 (F4):** дневник проверен кодом `watches.routes.js` и
+браузером на mock API: `POST /watches { filmId, watchedAt, isRewatch, tags }`,
+`GET /watches/me`, `GET /users/:id/watches` → `{ items, pagination }`,
+`DELETE /watches/:id` по `_id` записи. Счётчик — `film.watchesCount` из
+`GET /films/:id`; отдельный `GET /watches/:filmId/count` существует, но фронт
+его не вызывает. Живые ответы прода — `[UNVERIFIED]`.
+
 Обозначения:
 
 - `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT]` — форма описана в репо,
@@ -226,7 +233,11 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 
 | Метод | Путь | Тело / ответ | Статус |
 |---|---|---|---|
-| POST | `/watches` | запись Watch (B5); точный путь/тело не описаны | `[UNVERIFIED: прод; мутация не выполнялась]` |
+| POST | `/watches` | `{ filmId, watchedAt, isRewatch?, tags? }` → `201` Watch; дата `YYYY-MM-DD`, не будущая; теги ≤10×30 | `[UNVERIFIED live; форма из watches.routes.js]` |
+| GET | `/watches/me` | свой дневник → `{ items, pagination }`; элемент — Watch с populated `filmId { _id, title, poster, year }` | `[UNVERIFIED live; форма из diaryQuery.js]` |
+| GET | `/users/:id/watches` | чужой дневник → `{ items, pagination }`; `404 PROFILE_HIDDEN`, `403 DIARY_PRIVATE` | `[UNVERIFIED live; форма из users.routes.js]` |
+| GET | `/watches/:filmId/count` | `{ filmId, count }`; фронт F4 не использует, счётчик берёт из фильма | `[UNVERIFIED live]` |
+| DELETE | `/watches/:id` | своя запись по `_id`; ответ `{ deleted: true, id }`; чужая/нет — `404` | `[UNVERIFIED live; форма из watches.routes.js]` |
 | POST | `/watchlist` | `{ filmId }` → `200`/`201` `{ inWatchlist: true, filmId, addedAt }` | `[UNVERIFIED live; форма из watchlist.routes.js]` |
 | DELETE | `/watchlist/:id` | `:id` — `_id` WatchlistItem, не `filmId`; идемпотентный `200` `{ inWatchlist: false }` | `[UNVERIFIED live; форма из watchlist.routes.js]` |
 | POST | `/films/:id/like` | → `{ liked: true, likesCount: number }` | `[UNVERIFIED live; форма из films.routes.js]` |
@@ -236,16 +247,21 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 `ACHIEVEMENT_NOT_EARNED` — ожидаемая ошибка при попытке закрепить недостигнутое
 достижение; точный статус не подтверждён. `[UNVERIFIED: прод; мутация не выполнялась]`
 
-F5/F6 использует эти ответы так:
+F4/F5/F6 использует эти ответы так:
 
-- `GET /auth/me` и `GET /users/:id` отдают `counters.filmLikes` и
-  `counters.watchlist` — счётчики действий человека (не публичный
-  `Film.likesCount`).
-- Список галереи — `{ items, pagination }`; фронт листает по 12.
+- `GET /films/:id` отдаёт `watchesCount`, `liked` и `likesCount`; полей
+  `inWatchlist` и «смотрел ли текущий пользователь» нет.
+- `GET /auth/me` и `GET /users/:id` отдают `counters.filmLikes`,
+  `counters.watchlist` и `counters.watches` — счётчики действий человека (не
+  публичный `Film.likesCount`).
+- Список галереи — `{ items, pagination }`; фронт листает по 12. Дневник —
+  тот же конверт, по 10 на страницу, сортировка `watchedAt` desc.
 - Скрытый профиль для чужого зрителя отдаёт `404 PROFILE_HIDDEN` на
-  `/users/:id/likes` и `/users/:id/watchlist`; фронт в этом случае не рендерит
-  секции.
-- Удаление из watchlist идёт по `_id` записи; `filmId` для DELETE не подходит.
+  `/users/:id/likes`, `/users/:id/watchlist` и `/users/:id/watches`; закрытый
+  дневник — `403 DIARY_PRIVATE`. Фронт в этих случаях не рендерит секции или
+  показывает сообщение.
+- Удаление из watchlist идёт по `_id` записи WatchlistItem; удаление просмотра —
+  по `_id` записи Watch; `filmId` для DELETE не подходит.
 
 ---
 
@@ -282,13 +298,27 @@ F5/F6 использует эти ответы так:
 - `RATING_REQUIRED_FOR_COMMENT`, `FULL_RATING_REQUIRED_FOR_REVIEW`,
   `ALREADY_FULL_RATING`, `VIBE_LIMIT_REACHED`, `PROFILE_HIDDEN`,
   `ACHIEVEMENT_NOT_EARNED` — ожидания из DECISION, но не живые ответы.
-- Формы F2/F3/F5/F6 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`,
-  `{ filmId }` для watchlist, DELETE по `_id` WatchlistItem) подтверждены кодом
-  бэкенда и браузером на mock API; живые ответы прода — нет.
+- Формы F2/F3/F4/F5/F6 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`,
+  `{ filmId, watchedAt, isRewatch, tags }`, `{ filmId }` для watchlist,
+  DELETE по `_id` WatchlistItem/Watch) подтверждены кодом бэкенда и браузером
+  на mock API; живые ответы прода — нет.
 
 ---
 
 ## 7. Changelog верификации
+
+### 2026-11-02 — F4
+
+- **Форма подтверждена в браузере на mock API:** F4 — 40/40 сценариев.
+- **Watch:** `POST /api/watches { filmId, watchedAt, isRewatch, tags }` → `201`;
+  дата `YYYY-MM-DD`, не будущая; теги ≤10×30; `GET /watches/me` и
+  `GET /users/:id/watches` → `{items, pagination}`; `DELETE /watches/:id` по `_id`
+  записи → `{deleted:true,id}`.
+- **Счётчик:** `film.watchesCount` из `GET /films/:id`; отдельный
+  `GET /watches/:filmId/count` фронт не вызывает.
+- **Приватность:** `404 PROFILE_HIDDEN` для скрытого профиля,
+  `403 DIARY_PRIVATE` для закрытого дневника.
+- **Живой API:** по-прежнему недоступен; статусы live-проверок — `[UNVERIFIED]`.
 
 ### 2026-11-02 — F5/F6
 

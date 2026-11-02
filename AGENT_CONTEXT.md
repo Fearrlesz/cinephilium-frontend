@@ -4,11 +4,11 @@
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.5.0)
+**Документация версии:** `CHANGELOG.md` (4.6.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F5 и F6,
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5 и F6,
 какие решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
 витрина проекта, а не инструкция по разработке.
 
@@ -57,7 +57,7 @@ REACT_APP_API_URL=http://127.0.0.1:3000/api npm start
 src/
   api/                 client.js, films.js, critics.js
   components/          Header, NotificationModal, ActivityFeed, RatingDetailsModal,
-                       CustomSelect, ProfileGalleries, Critic/*
+                       CustomSelect, ProfileGalleries, ProfileDiary, Critic/*
   context/             NotificationContext
   hooks/               useActivityEvents, useCriticData
   pages/
@@ -110,7 +110,9 @@ FilmPage.jsx
       VibeTrack.jsx            drag-трек / 10 сегментов
     CriteriaModal.jsx          модалка полной оценки
       RatingForm.jsx           жанр, веса, аккордеон, preview, save
-  FilmActions.jsx              сердечко + watchlist (F5/F6)
+  FilmActions.jsx              сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
+    WatchAction.jsx            кнопка и модалка просмотра
+    WatchModal.jsx             дата, пересмотр, теги
   UsersList.jsx                «Оценили фильм»
   ReviewsSection.jsx
   CommentsSection.jsx
@@ -228,8 +230,8 @@ FilmPage.jsx
   (постранично, limit 100) и вызывает DELETE с её `_id`.
 - Кнопки оптимистичные: значение и счётчик меняются сразу, при ошибке — откат и
   inline-сообщение на 4 секунды. Без авторизации клик ведёт на `/login`.
-- «Просмотрено» показывается disabled с `title="Скоро"`: функциональный Watch —
-  задача F4, здесь его нет. Лайк и watchlist не гейтятся ни оценкой, ни ролью.
+- «Просмотрено» стало функциональным в F4 (см. ниже); лайк и watchlist
+  по-прежнему не гейтятся ни оценкой, ни ролью.
 - `ProfileGalleries` на своём и чужом профиле, до старых вкладок:
   «Понравившиеся» — `GET /api/users/me/likes` (свой) или
   `GET /api/users/:id/likes` (чужой); «Хочу посмотреть» —
@@ -247,6 +249,40 @@ FilmPage.jsx
   F1/F2/F3-компоненты не менялись; вкладки профиля B9 не трогались (это F8).
 - Проверка: production-сборка + mock API + Chrome headless, 19/19 сценариев;
   скриншоты — `screenshots/f5-f6/`. Живой прод-прогон — `[UNVERIFIED]`.
+
+### F4 — дневник просмотров (закрыт)
+
+- Кнопка «Просмотрено» в `FilmActions` больше не disabled: она открывает
+  `WatchModal` с датой (по умолчанию сегодня), чекбоксом «Повторный просмотр» и
+  тегами через запятую. Пустая и будущая дата проверяются на клиенте, ошибка
+  показывается inline; серверные 400 также inline, поля не теряются.
+- `POST /api/watches` — тело `{ filmId, watchedAt, isRewatch, tags }`; успех
+  `201`. Теги: до 10, каждый до 30 символов, дубликаты без учёта регистра
+  схлопываются на клиенте. После успеха модалка закрывается, кнопка становится
+  активной, счётчик увеличивается оптимистично.
+- Счётчик рядом с кнопкой — `film.watchesCount` из `GET /api/films/:id`
+  (`// DECISION: F4/2C`, отдельный `/watches/:filmId/count` не нужен).
+- Признака «я смотрел» в фильме нет. `WatchAction` при загрузке листает
+  `GET /api/watches/me?page&limit=100`, пока не найдёт `filmId`; это осознанный
+  обход отсутствующего per-film флага (`// DECISION`). При большом дневнике это
+  несколько запросов; кнопка disabled, пока проверка не закончилась.
+- `ProfileDiary` — отдельная секция после `ProfileGalleries`, до старых вкладок:
+  свой профиль `GET /api/watches/me`, чужой `GET /api/users/:id/watches`;
+  конверт `{ items, pagination }`, по 10 на страницу, «Загрузить ещё».
+  Скрытый профиль (`404 PROFILE_HIDDEN`) не рендерит секцию; закрытый дневник
+  (`403 DIARY_PRIVATE`) показывает «Пользователь закрыл свой дневник просмотров».
+- Записи группируются по месяцу (`// DECISION: F4/5A`); карточка — постер 2/3,
+  название и год, дата, нейтральная плашка «Пересмотр», теги, ссылки на оценку
+  и рецензию. Удаление — только у своего профиля, по hover на desktop и всегда
+  на touch (`// DECISION: F4/8A`); `DELETE /api/watches/:id` по `_id` записи,
+  оптимистично, с откатом при ошибке.
+- После удаления `ProfileDiary` перечитывает уже открытые страницы: иначе
+  offset-пагинация сдвигается и «Загрузить ещё» пропускает запись. На время
+  удаления кнопка «Загрузить ещё» скрыта, чтобы не было гонки.
+- Зафиксировано: **F4/1A, 2C, 3A, 4A, 5A, 6A, 7A, 8A, 9A, 10A**. Watch не создаёт
+  Rating/Review автоматически (`F4/10A`); вкладки профиля не трогались.
+- Проверка: production-сборка + mock API + Chrome headless, 40/40 сценариев;
+  скриншоты — `screenshots/f4-diary/`. Живой прод-прогон — `[UNVERIFIED]`.
 
 ---
 
@@ -310,8 +346,8 @@ userRating: {
   свою Rating пользователя; без `completeness: 'full'` — `403
   FULL_RATING_REQUIRED_FOR_REVIEW`. Успех — `200` (не 201).
 
-`GET /api/films/:id` дополнительно отдаёт `liked` и `likesCount`; поля
-`inWatchlist` в фильме нет.
+`GET /api/films/:id` дополнительно отдаёт `liked`, `likesCount` и `watchesCount`;
+поля `inWatchlist` и «смотрел ли текущий пользователь» в фильме нет.
 
 `POST` / `DELETE /api/films/:id/like`:
 
@@ -342,15 +378,39 @@ userRating: {
   `{ _id, addedAt, filmId: { _id, title, poster, year } }`. `weight` наружу не
   отдаётся.
 
-`counters.filmLikes` и `counters.watchlist` приходят в `GET /api/auth/me` и
-`GET /api/users/:id`; это счётчики действий, а не публичный `Film.likesCount`.
+`counters.filmLikes`, `counters.watchlist` и `counters.watches` приходят в
+`GET /api/auth/me` и `GET /api/users/:id`; это счётчики действий, а не публичный
+`Film.likesCount`.
+
+`POST /api/watches`:
+
+- Тело F4: `{ filmId, watchedAt, isRewatch, tags }`, `watchedAt` — `YYYY-MM-DD`;
+  успех `201`, ответ — созданная запись Watch. Будущая дата — `400`; теги —
+  до 10, каждый до 30 символов.
+- Создаёт только Watch: Rating/Review автоматически не появляются.
+
+`GET /api/watches/me`, `GET /api/users/:id/watches`:
+
+- `{ items, pagination }`; элемент — `{ _id, userId, watchedAt, isRewatch, tags,
+  ratingId, reviewId, createdAt, filmId: { _id, title, poster, year } }`,
+  сортировка `watchedAt` desc. Свой путь — `/watches/me`, чужой —
+  `/users/:id/watches`.
+- Чужой скрытый профиль — `404 PROFILE_HIDDEN`; закрытый дневник —
+  `403 DIARY_PRIVATE`.
+- `GET /api/watches/:filmId/count` существует (`{ filmId, count }`), но фронт
+  F4 берёт `watchesCount` из фильма и этот путь не вызывает.
+
+`DELETE /api/watches/:id`:
+
+- Удаляет свою запись по `_id`; чужая/несуществующая — `404`. Ответ
+  `{ deleted: true, id }`; `counters.watches` уменьшается на бэкенде.
 
 ---
 
 ## 7. Что ещё не обновлено под vibe/full
 
-F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии, F5/F6 — лайк,
-watchlist и галереи профиля. Вне этих задач остаются:
+F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии, F4 — дневник
+просмотров, F5/F6 — лайк, watchlist и галереи профиля. Вне этих задач остаются:
 
 - `ProfilePage` и `UserProfilePage` — старые вкладки и профильные ответы
   (`/ratings/user`, `/reviews/user`); вкладки B9 (`/users/:id/ratings` и т.д.)
@@ -359,13 +419,13 @@ watchlist и галереи профиля. Вне этих задач оста�
 - `RatingDetailsModal` — легаси-поля `finalScore`/`base1`.
 - Комментарии к рецензиям (B8) и выбор vibe в комментариях — следующие задачи;
   F7 не начинать в рамках F2/F3.
-- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.5.0;
+- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.6.0;
   ориентируйся на CHANGELOG.
 
-### Живая проверка F2/F3/F5/F6
+### Живая проверка F2/F3/F4/F5/F6
 
-Формы, кнопки и галереи подтверждены на production-сборке с mock API в Chrome
-headless: F2 — 22/22, F3 — 29/29, F5/F6 — 19/19. Живой прод-прогон не
+Формы, кнопки, дневник и галереи подтверждены на production-сборке с mock API в
+Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Живой прод-прогон не
 выполнялся: Vercel preview закрыт Vercel Authentication, Render из среды
 недоступен. Статус live-проверки — `[UNVERIFIED]`; это не блокер деплоя, но и не
 подтверждение реального API.
@@ -415,16 +475,21 @@ headless: F2 — 22/22, F3 — 29/29, F5/F6 — 19/19. Живой прод-пр�
 | `src/pages/FilmPage/components/CommentsSection.css` | F2: гейт, адаптив 480/620 |
 | `src/pages/FilmPage/components/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
 | `src/pages/FilmPage/components/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
-| `src/pages/FilmPage/components/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения |
-| `src/pages/FilmPage/components/FilmActions.css` | F5/F6: кнопки действий, ошибка, адаптив 480 |
+| `src/pages/FilmPage/components/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения; F4: слот «Просмотрено» |
+| `src/pages/FilmPage/components/FilmActions.css` | F5/F6: кнопки действий, ошибка, адаптив 480; F4: `film-watch-total`, full-width на 480 |
+| `src/pages/FilmPage/components/WatchAction.jsx` | F4: кнопка «Просмотрено», счётчик `watchesCount`, активность через `/watches/me`, модалка |
+| `src/pages/FilmPage/components/WatchModal.jsx` | F4: дата, пересмотр, теги, inline-ошибки, `POST /watches` |
+| `src/pages/FilmPage/components/WatchModal.css` | F4: модалка и поля, нейтральная ошибка, адаптив 620/480 |
 | `src/components/ProfileGalleries.jsx` | F5/F6: «Понравившиеся» / «Хочу посмотреть», пагинация, удаление, 404 |
 | `src/components/ProfileGalleries.css` | F5/F6: сетка 6/5/4/3/2, hover, мобильные подписи, пустые состояния |
+| `src/components/ProfileDiary.jsx` | F4: дневник по месяцам, пагинация, удаление, приватность, пустые состояния |
+| `src/components/ProfileDiary.css` | F4: карточка записи, плашка «Пересмотр», теги, hover-удаление, адаптив 620/480 |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1–4.5: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f5-f6/` | скриншоты F2/F3/F5/F6 |
+| `CHANGELOG.md` | 4.1–4.6: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/` | скриншоты F2/F3/F4/F5/F6 |
 
 ---
 
@@ -445,7 +510,10 @@ headless: F2 — 22/22, F3 — 29/29, F5/F6 — 19/19. Живой прод-пр�
 8. F5/F6: лайк — `liked/likesCount` из фильма; watchlist проверять отдельно;
    удалять запись по `_id` WatchlistItem, а не по `filmId`; счётчики
    `counters.filmLikes/watchlist` держать синхронными с секциями.
-9. Если меняешь `client.js` — только точечно и без изменения поведения.
+9. F4: `POST /watches` — дата/пересмотр/теги, счётчик из `film.watchesCount`;
+   чужой дневник — `/users/:id/watches`, удаление по `_id` Watch; не создавать
+   Rating/Review автоматически; при удалении перечитывать открытые страницы.
+10. Если меняешь `client.js` — только точечно и без изменения поведения.
 
 ---
 
@@ -464,6 +532,11 @@ headless: F2 — 22/22, F3 — 29/29, F5/F6 — 19/19. Живой прод-пр�
 - F5/F6: `.film-actions` — плоские pill-кнопки под панелью оценки; активное
   состояние — azure, счётчик mono. `.pg-grid` — постеры 2/3 без карточек, hover-
   оверлей на градиенте, на мобиле подписи под постером. Новых hex/шрифтов/
+  брейкпоинтов нет.
+- F4: «Просмотрено» — тот же `.film-action`, счётчик `.film-watch-total`;
+  модалка использует `.modal-overlay`/`.modal-content`, поля `.watch-input`.
+  `.diary-*` — плоская лента с месячными mono-заголовками, постер 2/3,
+  нейтральная плашка «Пересмотр», hover-удаление. Новых hex/шрифтов/
   брейкпоинтов нет.
 - Черновик/сохранение полной оценки остаются в `useRatingForm`, vibe-only — в
   `useVibeRating`. Визуальный слой не меняет формулы и контракт.
