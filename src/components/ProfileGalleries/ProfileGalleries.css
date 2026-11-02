@@ -16,6 +16,12 @@
   margin-top: 0;
 }
 
+.pg-section--embedded {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .pg-head {
   display: flex;
   align-items: baseline;

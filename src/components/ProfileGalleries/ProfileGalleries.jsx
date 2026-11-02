@@ -6,7 +6,7 @@ import './ProfileGalleries.css';
 
 const PAGE_SIZE = 12;
 
-function useGallery(endpoint, { enabled = true, removable = false } = {}) {
+export function useGallery(endpoint, { enabled = true, removable = false } = {}) {
   const [items, setItems] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
@@ -100,7 +100,7 @@ function filmFromItem(item) {
   return film;
 }
 
-function PosterGallerySection({
+export function PosterGallerySection({
   title,
   items,
   count,
@@ -111,17 +111,23 @@ function PosterGallerySection({
   page,
   onPageChange,
   removable = false,
-  onRemove
+  onRemove,
+  hideHead = false
 }) {
   const pages = Number(pagination?.pages) || 1;
   const showEmpty = !loading && !error && items.length === 0;
 
   return (
-    <section className="pg-section" aria-label={title}>
-      <div className="pg-head">
-        <h2 className="h-section pg-title">{title}</h2>
-        <span className="pg-count">{count}</span>
-      </div>
+    <section
+      className={`pg-section${hideHead ? ' pg-section--embedded' : ''}`}
+      aria-label={title}
+    >
+      {!hideHead && (
+        <div className="pg-head">
+          <h2 className="h-section pg-title">{title}</h2>
+          <span className="pg-count">{count}</span>
+        </div>
+      )}
 
       {loading && items.length === 0 && (
         <p className="pg-loading">Загрузка…</p>

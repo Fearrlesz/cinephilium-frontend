@@ -61,7 +61,8 @@ export default function ProfileDiary({
   isOwnProfile,
   counters,
   hidden,
-  onWatchRemoved
+  onWatchRemoved,
+  embedded = false
 }) {
   const [items, setItems] = useState([]);
   const [pagination, setPagination] = useState(null);
@@ -210,7 +211,10 @@ export default function ProfileDiary({
   const groups = groupByMonth(items);
 
   return (
-    <section className="diary-section" aria-labelledby="profileDiaryTitle">
+    <section
+      className={`diary-section${embedded ? ' diary-section--embedded' : ''}`}
+      aria-labelledby="profileDiaryTitle"
+    >
       <div className="diary-head">
         <h2 className="h-section" id="profileDiaryTitle">Дневник</h2>
         <span className="diary-count">{total}</span>

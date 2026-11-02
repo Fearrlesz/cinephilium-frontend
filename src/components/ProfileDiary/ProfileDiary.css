@@ -9,6 +9,12 @@
   border-top: 1px solid var(--line-faint);
 }
 
+.diary-section--embedded {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .diary-head {
   display: flex;
   align-items: baseline;
