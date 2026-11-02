@@ -1,14 +1,14 @@
 # Контекст фронтенда Cinephilium
 
-**Дата среза:** 02.11.2026
+**Дата среза:** 03.11.2026
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.7.1)
+**Документация версии:** `CHANGELOG.md` (4.8.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5, F6 и F7,
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5, F6, F7 и F8,
 какие решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
 витрина проекта, а не инструкция по разработке.
 
@@ -248,7 +248,8 @@ FilmPage.jsx
   и обновляются после удаления из watchlist через `onWatchlistRemoved`; счётчик
   секции меняется оптимистично.
 - Зафиксировано: **F5+F6/1B, 2A, 3A, 4B, 5A, 6A, 7A, 8A, 9A, 10A, 11A**.
-  F1/F2/F3-компоненты не менялись; вкладки профиля B9 не трогались (это F8).
+  F1/F2/F3-компоненты не менялись; вкладки профиля B9 тогда не трогались — их
+  адаптация сделана в F8.
 - Проверка: production-сборка + mock API + Chrome headless, 19/19 сценариев;
   скриншоты — `screenshots/f5-f6/`. Живой прод-прогон — `[UNVERIFIED]`.
 
@@ -336,6 +337,46 @@ FilmPage.jsx
   forgot-password, переход на `/contact`, загрузка админов, шапка 1440/1024/860/768/480,
   валидный и невалидный вход, отсутствие горизонтального overflow); скриншоты —
   `screenshots/login-admin/`.
+
+### F8 — вкладки профиля и плоский дизайн (закрыт)
+
+- Карточка профиля компактная: аватар-инициал, ник, дата регистрации, шесть
+  счётчиков (`ratings+vibes`, `reviewsApproved`, `commentsApproved`, `watches`,
+  `watchlist`, `filmLikes`), `pinnedAchievement` (одно значение) и
+  `achievementsCount`. Кнопка «Редактировать» — disabled-заглушка: страницы и
+  API редактирования профиля в коде нет.
+- Семь вкладок в порядке: Оценки, Рецензии, Комментарии, Дневник, Watchlist,
+  Понравившиеся, Достижения. Активная вкладка — `?tab=<key>`, default `ratings`;
+  переключение через `useSearchParams`, браузерный «назад» восстанавливает вкладку.
+- Каждая вкладка грузит свой эндпоинт и имеет собственные skeleton/empty/error/
+  «Загрузить ещё». Оценки — `/users/:id/ratings` (12), рецензии —
+  `/users/:id/reviews` (10), комментарии — `/users/:id/comments` (15), дневник —
+  `/users/:id/watches` (10, `ProfileDiary embedded`), watchlist/лайки —
+  `/users/:id/watchlist|likes` (12, `PosterGallerySection hideHead`), достижения —
+  `/users/:id/achievements`.
+- Свои вкладки идут через `:id = currentUser._id`; отдельные `/me/ratings` и т.п.
+  на фронте не создавались. `ProfilePage` получает себя через `/auth/me` и передаёт
+  `initialUser`; `UserProfilePage` при наличии токена тоже грузит `/auth/me`,
+  иначе работает по `:id`.
+- Закрепление: только своё; `PUT /users/me/pinned-achievement`
+  `{ achievement: string | null }`. После успеха карточка обновляется, старое
+  значение заменяется; `400 ACHIEVEMENT_NOT_EARNED` показывается inline.
+- Приватность: скрытый профиль отдаёт `{ user: hiddenProfileStub }`; карточка
+  показывает заглушку (ник/аватар/`isHidden`), вкладки не рендерятся. 404 вкладок
+  скрывает секцию, `403 DIARY_PRIVATE` показывает сообщение.
+- Плоский дизайн только профиля: `ProfilePage.css` переписан на токены; убраны
+  `box-shadow`, `backdrop-filter`, многослойные тени, `translate/scale` на hover,
+  анимации появления и transitions >0.16s. Разделители — `border`/`line-faint`,
+  поверхности — `void`/`surface`, hover — только цвет. Компоненты F4/F5+F6
+  переиспользованы, их поведение не менялось. `Architect.css` (золотая тема)
+  больше не импортируется профилем.
+- Зафиксировано: **F8/1A** карточка + вкладки; **F8/2A** порядок и `?tab=`;
+  **F8/3A** свои вкладки через `:id`; **F8/4A** одно закреплённое достижение;
+  **F8/5A** плоский дизайн только профиля; **F8/6A** переиспользование F4/F5+F6/F7.
+- Проверка: production-сборка + mock API + Chrome headless, 47/47 сценариев
+  (карточка, все семь вкладок, pinned/unpin, пагинация, удаление, приватность,
+  пусто/ошибка, URL/back, 480/620/768/1024, плоские computed styles); скриншоты —
+  `screenshots/f8-profile/`. Живой прод-прогон — `[UNVERIFIED]`.
 
 ---
 
@@ -476,23 +517,19 @@ userRating: {
 
 F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии, F4 — дневник
 просмотров, F5/F6 — лайк, watchlist и галереи профиля, F7 — комментарии к
-рецензиям. Вне этих задач остаются:
+рецензиям, F8 — вкладки профиля и плоский дизайн профиля. Вне этих задач остаются:
 
-- `ProfilePage` и `UserProfilePage` — старые вкладки и профильные ответы
-  (`/ratings/user`, `/reviews/user`); вкладки B9 (`/users/:id/ratings` и т.д.)
-  фронт ещё не потребляет — это F8. Галереи F5/F6 и дневник F4 добавлены отдельно,
-  до вкладок.
 - `HomePage`, карточки фильмов, топы — старые поля (`averageRating`/`finalScore`).
 - `RatingDetailsModal` — легаси-поля `finalScore`/`base1`.
 - Выбор vibe в комментариях — не входит в F7; отдельных задач под него нет.
-- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.7.0;
+- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.8.0;
   ориентируйся на CHANGELOG.
 
-### Живая проверка F2/F3/F4/F5/F6/F7
+### Живая проверка F2/F3/F4/F5/F6/F7/F8
 
-Формы, кнопки, дневник, галереи и комментарии к рецензиям подтверждены на
-production-сборке с mock API в Chrome headless: F2 — 22/22, F3 — 29/29,
-F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон не
+Формы, кнопки, дневник, галереи, комментарии к рецензиям и вкладки профиля
+подтверждены на production-сборке с mock API в Chrome headless: F2 — 22/22,
+F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Живой прод-прогон не
 выполнялся: Vercel preview закрыт Vercel Authentication, Render из среды
 недоступен. Статус live-проверки — `[UNVERIFIED]`; это не блокер деплоя, но и не
 подтверждение реального API.
@@ -520,7 +557,7 @@ F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон н
 
 ---
 
-## 9. Карта файлов F1–F6
+## 9. Карта файлов F1–F8
 
 | Файл | Что важно |
 |---|---|
@@ -549,14 +586,19 @@ F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон н
 | `src/pages/FilmPage/components/WatchModal/WatchModal.css` | F4: модалка и поля, нейтральная ошибка, адаптив 620/480 |
 | `src/components/ProfileGalleries/ProfileGalleries.jsx` | F5/F6: «Понравившиеся» / «Хочу посмотреть», пагинация, удаление, 404 |
 | `src/components/ProfileGalleries/ProfileGalleries.css` | F5/F6: сетка 6/5/4/3/2, hover, мобильные подписи, пустые состояния |
-| `src/components/ProfileDiary/ProfileDiary.jsx` | F4: дневник по месяцам, пагинация, удаление, приватность, пустые состояния |
-| `src/components/ProfileDiary/ProfileDiary.css` | F4: карточка записи, плашка «Пересмотр», теги, hover-удаление, адаптив 620/480 |
+| `src/components/ProfileDiary/ProfileDiary.jsx` | F4: дневник по месяцам, пагинация, удаление, приватность, пустые состояния; F8: `embedded` для вкладки |
+| `src/components/ProfileDiary/ProfileDiary.css` | F4: карточка записи, плашка «Пересмотр», теги, hover-удаление, адаптив 620/480; F8: `.diary-section--embedded` |
+| `src/pages/ProfilePage/ProfilePage.jsx` | F8: `/auth/me` + `ProfileView`, свой профиль |
+| `src/pages/ProfilePage/ProfileView.jsx` | F8: `/users/:id`, skeleton/error, карточка + вкладки, обновление счётчиков и pinned |
+| `src/pages/ProfilePage/ProfileCard.jsx` | F8: карточка, счётчики, pinned, achievementsCount, disabled edit |
+| `src/pages/ProfilePage/ProfileTabs.jsx` | F8: семь вкладок, `?tab=`, `usePagedList`, tab-компоненты и достижения |
+| `src/pages/ProfilePage/ProfilePage.css` | F8: плоская карточка/вкладки/сетки/скилетоны, адаптив 1024/768/620/480 |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1–4.7: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/` | скриншоты F2/F3/F4/F5+F6/F7 |
+| `CHANGELOG.md` | 4.1–4.8: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/`, `screenshots/f8-profile/` | скриншоты F2/F3/F4/F5+F6/F7/F8 |
 
 Все компоненты сгруппированы в одноимённые папки: `X/X.jsx` и, если есть,
 `X/X.css`. Это касается `src/components`, `src/components/Critic`
@@ -586,7 +628,10 @@ F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон н
 9. F4: `POST /watches` — дата/пересмотр/теги, счётчик из `film.watchesCount`;
    чужой дневник — `/users/:id/watches`, удаление по `_id` Watch; не создавать
    Rating/Review автоматически; при удалении перечитывать открытые страницы.
-10. Если меняешь `client.js` — только точечно и без изменения поведения.
+10. F8: вкладки — только `?tab=`, default `ratings`; свои — через `:id = currentUser._id`,
+    не `/me/*`; карточка `GET /users/:id` возвращает `{ user }`; pinned — одно
+    значение, `PUT /users/me/pinned-achievement`; плоские стили только профиля.
+11. Если меняешь `client.js` — только точечно и без изменения поведения.
 
 ---
 
@@ -611,5 +656,10 @@ F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон н
   `.diary-*` — плоская лента с месячными mono-заголовками, постер 2/3,
   нейтральная плашка «Пересмотр», hover-удаление. Новых hex/шрифтов/
   брейкпоинтов нет.
+- F8: профиль — плоская карточка `.profile-card`, счётчики mono, pinned-бейдж,
+  строка вкладок `.profile-tab` (mono 11 uppercase, активная — ink + azure
+  underline), сетка оценок 5/4/3/2, плоские рецензии/комментарии/достижения.
+  Никаких `box-shadow`, `backdrop-filter`, `translate/scale`, анимаций появления
+  и transitions >0.16s. Новых hex/шрифтов/брейкпоинтов нет.
 - Черновик/сохранение полной оценки остаются в `useRatingForm`, vibe-only — в
   `useVibeRating`. Визуальный слой не меняет формулы и контракт.

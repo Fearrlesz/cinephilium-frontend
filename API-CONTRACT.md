@@ -39,6 +39,15 @@ targetId=...&page=&limit=` → `{ items, pagination }`, у корней есть
 `GET /comments/:filmId` остаётся массивом комментариев к фильму. Живые ответы
 прода — `[UNVERIFIED]`.
 
+**Обновление 2026-11-03 (F8):** вкладки профиля проверены кодом `users.routes.js`,
+`profileTabsQuery.js` и браузером на mock API: `GET /users/:id` →
+`{ user }` с `counters`, `pinnedAchievement`, `achievementsCount`;
+`/users/:id/{ratings,reviews,comments,watches,watchlist,likes,achievements}` →
+`{ items, pagination }` (кроме achievements — `{ earned, possible, ... }`);
+`PUT /users/me/pinned-achievement { achievement: string|null }` заменяет одно
+значение, недостигнутое → `400 ACHIEVEMENT_NOT_EARNED`. Живые ответы прода —
+`[UNVERIFIED]`.
+
 Обозначения:
 
 - `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT]` — форма описана в репо,
@@ -165,19 +174,19 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 | Эндпоинт | Ожидаемая форма | Статус |
 |---|---|---|
 | `GET /auth/me` | Текущий пользователь. Точные поля не описаны. | `[UNVERIFIED: API недоступен; нет токена]` |
-| `GET /users/:id` | Карточка пользователя. B9: legacy-массивы `ratings/reviews/comments/watches/achievements` **убраны**; есть `pinnedAchievement`, `achievementsCount`. Остальные поля не описаны. | `[UNVERIFIED: API недоступен; нет токена]` |
-| `GET /users/:id/ratings` | Вкладка оценок (B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/:id/reviews` | Вкладка рецензий (B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/:id/comments` | Вкладка комментариев (B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/:id/watches` | Вкладка Watch (B5/B9). Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
+| `GET /users/:id` | Карточка профиля: `{ user: { id, nickname, avatar, registeredAt, isAdmin, totalPoints, counters, diaryPrivate, pinnedAchievement, achievementsCount, isHidden? } }`. B9: legacy-массивы `ratings/reviews/comments/watches/achievements` **убраны**. Скрытый профиль — `{ user: hiddenProfileStub }` с `isHidden:true`. | `[UNVERIFIED live; форма из users.routes.js]` |
+| `GET /users/:id/ratings` | Вкладка оценок B9: `{ items, pagination }`; элемент — `{ id, film, technicalScore, combinedScore, vibe, completeness, genrePreset, blockWeights, scores, textReview, createdAt }`; vibe имеет `combinedScore:null`, `completeness:'vibe'`. | `[UNVERIFIED live; форма из profileTabsQuery.js]` |
+| `GET /users/:id/reviews` | Вкладка рецензий B9: `{ items, pagination }`; элемент — `{ _id, id, film, filmId, ratingId, title, text, isSpoiler, status, likes, createdAt }`; чужие — только approved, свои — все статусы. | `[UNVERIFIED live; форма из profileTabsQuery.js]` |
+| `GET /users/:id/comments` | Вкладка комментариев B9: `{ items, pagination }`; элемент — `{ id, film, text, targetType, targetId, target, parentId, likes, status, createdAt }`; для review `target` — `{ id,title,text,isSpoiler,status,createdAt }`. | `[UNVERIFIED live; форма из profileTabsQuery.js]` |
+| `GET /users/:id/watches` | Дневник: `{ items, pagination }`; элемент — Watch с populated `filmId { _id,title,poster,year }`. `404 PROFILE_HIDDEN`, `403 DIARY_PRIVATE`. | `[UNVERIFIED live; форма из diaryQuery.js]` |
 | `GET /users/:id/watchlist` | Watchlist пользователя: `{ items, pagination }`; элемент — WatchlistItem `{ _id, addedAt, filmId: { _id, title, poster, year } }`. 404 `PROFILE_HIDDEN` для скрытого профиля. | `[UNVERIFIED live; форма из watchlistQuery.js]` |
 | `GET /users/me/likes` | «Понравившиеся» текущего пользователя: `{ items, pagination }`; элемент — FilmLike `{ _id, addedAt, filmId: { _id, title, poster, year } }`. | `[UNVERIFIED live; форма из filmLikesQuery.js]` |
 | `GET /users/:id/likes` | «Понравившиеся» пользователя: `{ items, pagination }`; элемент — FilmLike `{ _id, addedAt, filmId: { _id, title, poster, year } }`. 404 `PROFILE_HIDDEN` для скрытого профиля. | `[UNVERIFIED live; форма из filmLikesQuery.js]` |
-| `GET /users/:id/achievements` | Достижения. В CHANGELOG 3.0 упомянуты `earned`/`possible`; точная форма не подтверждена. | `[UNVERIFIED: API недоступен; нет токена]` |
+| `GET /users/:id/achievements` | `{ nickname, earned, possible, totalPoints, progress }`; `earned` — строки достижений. | `[UNVERIFIED live; форма из users.routes.js]` |
 | `GET /watchlist/user` | Watchlist текущего пользователя: `{ items, pagination }`; элемент — WatchlistItem `{ _id, addedAt, filmId: { _id, title, poster, year } }`. | `[UNVERIFIED live; форма из watchlistQuery.js]` |
 | `GET /watchlist/check/:filmId` | `{ inWatchlist: boolean, filmId }`. | `[UNVERIFIED live; форма из watchlist.routes.js]` |
 | `GET /watches/user` | Watch текущего пользователя. Конверт не описан. | `[UNVERIFIED: API недоступен; форма не описана]` |
-| `GET /users/me/pinned-achievement` | Закреплённое достижение (B9). Ожидается `pinnedAchievement`; точная форма не описана. | `[UNVERIFIED: API недоступен; нет токена]` |
+| `GET /users/me/pinned-achievement` | `{ pinnedAchievement: string | null }`; значение возвращается только если оно есть в `user.achievements`, иначе `null`. | `[UNVERIFIED live; форма из users.routes.js]` |
 
 ### 3.1 Privacy (B-PRIVACY)
 
@@ -258,7 +267,7 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 | DELETE | `/watchlist/:id` | `:id` — `_id` WatchlistItem, не `filmId`; идемпотентный `200` `{ inWatchlist: false }` | `[UNVERIFIED live; форма из watchlist.routes.js]` |
 | POST | `/films/:id/like` | → `{ liked: true, likesCount: number }` | `[UNVERIFIED live; форма из films.routes.js]` |
 | DELETE | `/films/:id/like` | → `{ liked: false, likesCount: number }` | `[UNVERIFIED live; форма из films.routes.js]` |
-| PUT | `/users/me/pinned-achievement` | закрепить достижение (B9); тело/ответ не описаны | `[UNVERIFIED: прод; мутация не выполнялась]` |
+| PUT | `/users/me/pinned-achievement` | `{ achievement: string | null }`; `null` снимает закрепление; строка должна точно совпадать с полученным достижением, иначе `400 ACHIEVEMENT_NOT_EARNED` | `[UNVERIFIED live; форма из users.routes.js]` |
 
 `ACHIEVEMENT_NOT_EARNED` — ожидаемая ошибка при попытке закрепить недостигнутое
 достижение; точный статус не подтверждён. `[UNVERIFIED: прод; мутация не выполнялась]`
@@ -325,6 +334,22 @@ F4/F5/F6 использует эти ответы так:
 ---
 
 ## 7. Changelog верификации
+
+### 2026-11-03 — F8
+
+- **Формы подтверждены в браузере на mock API:** F8 — 47/47 сценариев.
+  Это проверяет фронт, но не живой прод.
+- **Карточка:** `GET /users/:id` → `{ user }`; `pinnedAchievement` — одно значение,
+  `achievementsCount` — число; legacy-массивов нет.
+- **Вкладки:** `/users/:id/{ratings,reviews,comments,watches,watchlist,likes,
+  achievements}` → `{items, pagination}` (кроме achievements); свои — `:id=me`,
+  но фронт использует `currentUser._id`.
+- **Pinned:** `GET /users/me/pinned-achievement` → `{pinnedAchievement}`;
+  `PUT /users/me/pinned-achievement {achievement}` заменяет значение или снимает
+  `null`; недостигнутое — `400 ACHIEVEMENT_NOT_EARNED`.
+- **Приватность:** скрытый профиль — `{user: hiddenProfileStub}`, вкладки не
+  рендерятся; 404 на вкладках скрывает секцию, `403 DIARY_PRIVATE` — сообщение.
+- **Живой API:** по-прежнему недоступен; статусы live-проверок — `[UNVERIFIED]`.
 
 ### 2026-11-02 — F4
 
