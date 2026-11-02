@@ -31,6 +31,14 @@ mock API (лайк `POST`/`DELETE /films/:id/like`, watchlist
 `GET /films/:id`; отдельный `GET /watches/:filmId/count` существует, но фронт
 его не вызывает. Живые ответы прода — `[UNVERIFIED]`.
 
+**Обновление 2026-11-02 (F7):** комментарии к рецензиям проверены кодом
+`comments.routes.js` и браузером на mock API: `GET /comments?targetType=review&
+targetId=...&page=&limit=` → `{ items, pagination }`, у корней есть `replies[]`;
+`POST /comments { targetType: 'review', targetId, text, parentId? }` без гейта
+по оценке; `POST /comments/:id/like` → `{ liked, likes }`. Старый
+`GET /comments/:filmId` остаётся массивом комментариев к фильму. Живые ответы
+прода — `[UNVERIFIED]`.
+
 Обозначения:
 
 - `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT]` — форма описана в репо,
@@ -81,10 +89,10 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 
 ### Пагинация
 
-Точный конверт не подтверждён. Для части списков в CHANGELOG 3.0 зафиксирован
-`{ items, pagination }` (например, топ пользователей), но для фильмов,
-комментариев, рецензий и профильных вкладок это **не проверено**.
-См. `[UNVERIFIED]` у конкретных эндпоинтов.
+Для F4–F7 списки проверены кодом и mock API и используют
+`{ items, pagination }`; для фильмов, рецензий и старых профильных вкладок
+конверт по-прежнему **не подтверждён**. См. `[UNVERIFIED]` у конкретных
+эндпоинтов.
 
 ---
 
@@ -95,7 +103,8 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 | `GET /films?limit=1` | Каталог. Точный конверт (`items`/`pagination`/`total`) неизвестен. B2: в каталоге отсутствующие средние — `null`, `averageRating` — алиас `averageTechnical`. | `[UNVERIFIED: API недоступен; конверт не описан]` |
 | `GET /films/:id` | См. §2.1; дополнительно `liked: boolean`, `likesCount: number`, без `inWatchlist`. | `[UNVERIFIED live; форма из кода Films/Presenter]` |
 | `GET /films/:id/users` | Массив оценок; `rating.completeness`, `technicalScore`, `combinedScore`, `finalScore`. Для vibe-only `finalScore: 0` — известное ограничение. | `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT §6]` |
-| `GET /comments/:filmId` | Список комментариев к фильму. B8: у комментария есть `targetType: 'film' \| 'review'` и `targetId`; для фильма `targetType: 'film'`. Точные поля/конверт не описаны. | `[UNVERIFIED: API недоступен; форма не описана]` |
+| `GET /comments?targetType=film\|review&targetId=&page=&limit=` | Единый список с пагинацией: `{ items, pagination }`; корень содержит `replies[]` (один уровень). Видимость: approved всем, свои pending автору, всё админу. Без `targetType` — 400. | `[UNVERIFIED live; форма из comments.routes.js]` |
+| `GET /comments/:filmId` | Legacy-список комментариев к фильму: массив корней с `replies[]`; только `targetType: film` (B8/3A). Формат не менялся. | `[UNVERIFIED live; форма из comments.routes.js]` |
 | `GET /reviews/:filmId` | Список рецензий. B4: `isSpoiler`, текст 350..15000; точные поля/конверт не описаны. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /watches/:filmId/count` | Счётчик просмотров/записей Watch. Вероятное поле `count`, но точная форма не описана. | `[UNVERIFIED: API недоступен; форма не описана]` |
 | `GET /users/nickname/:nickname` | Публичная карточка пользователя. Точные поля не описаны. | `[UNVERIFIED: API недоступен; форма не описана]` |
@@ -216,17 +225,24 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 - `POST /api/comments` — комментарий.
   - Фронт F2 отправляет `{ filmId, text }`. B8: без `targetType` это комментарий
     к фильму, `targetId` берётся как `targetId ?? filmId`.
-  - Альтернативный B8-формат: `{ targetType: 'film' | 'review', targetId, text }`.
-  - Без Rating — `403 RATING_REQUIRED_FOR_COMMENT`; лайк не гейтится.
+  - F7 отправляет `{ targetType: 'review', targetId, text, parentId? }`; для
+    рецензии гейт по Rating **не применяется** (B8).
+  - Без Rating для фильма — `403 RATING_REQUIRED_FOR_COMMENT`; для неопубликованной
+    рецензии — `404` посторонним или `403 REVIEW_NOT_PUBLISHED` автору/админу.
+  - `parentId` — только на опубликованный корень, один уровень; текст до 1000.
+  - Комментарий создаётся со `status: 'pending'`; лайк не гейтится.
   - `[UNVERIFIED: прод; мутация не выполнялась]`
+- `GET /api/comments?targetType=film|review&targetId=&page=&limit=` — список
+  `{ items, pagination }`; у корней `replies[]`. `targetType` обязателен.
+- `GET /api/comments/:filmId` — legacy-массив только для фильма, с `replies[]`.
 - `POST /api/reviews` — рецензия.
   - Тело F3: `{ filmId, title, text, isSpoiler }`. `ratingId` не отправляется:
     B4 берёт свою Rating пользователя.
   - Текст 350..15000; без `completeness: 'full'` —
     `403 FULL_RATING_REQUIRED_FOR_REVIEW`; успех — `200` (не 201).
   - `[UNVERIFIED: прод; мутация не выполнялась]`
-- `POST /api/comments/:id/like`, `POST /api/reviews/:id/like` — лайки; используются
-  фронтендом, но форма ответа не описана.
+- `POST /api/comments/:id/like` — `{ liked: true, likes: number }`; свой комментарий
+  лайкать нельзя. `POST /api/reviews/:id/like` — форма ответа не описана.
 - `[UNVERIFIED: прод; мутация не выполнялась]`
 
 ### 4.4 Watch / Watchlist / Likes / достижения
@@ -294,12 +310,15 @@ F4/F5/F6 использует эти ответы так:
 - Все авторизованные GET: нет `TEST_ACCESS_TOKEN` / тестового аккаунта, API недоступен.
 - Все POST/PUT/DELETE: нельзя выполнять на проде; тестового окружения нет.
 - Точные конверты остальных списков (`items`/`pagination`/`total`) и поля
-  профилей, комментариев, рецензий, достижений — не описаны в репо.
+  профилей, рецензий, достижений — не описаны в репо; комментарии F2/F7 описаны
+  выше и проверены на mock API.
 - `RATING_REQUIRED_FOR_COMMENT`, `FULL_RATING_REQUIRED_FOR_REVIEW`,
   `ALREADY_FULL_RATING`, `VIBE_LIMIT_REACHED`, `PROFILE_HIDDEN`,
-  `ACHIEVEMENT_NOT_EARNED` — ожидания из DECISION, но не живые ответы.
-- Формы F2/F3/F4/F5/F6 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`,
+  `ACHIEVEMENT_NOT_EARNED`, `REVIEW_NOT_PUBLISHED` — ожидания из DECISION
+  и/или кода бэкенда, но не живые ответы.
+- Формы F2/F3/F4/F5+F6/F7 (`{ filmId, text }`, `{ filmId, title, text, isSpoiler }`,
   `{ filmId, watchedAt, isRewatch, tags }`, `{ filmId }` для watchlist,
+  `{ targetType: 'review', targetId, text, parentId? }`,
   DELETE по `_id` WatchlistItem/Watch) подтверждены кодом бэкенда и браузером
   на mock API; живые ответы прода — нет.
 
@@ -339,12 +358,21 @@ F4/F5/F6 использует эти ответы так:
 ### 2026-11-01 — F2/F3
 
 - **Формы подтверждены в браузере на mock API:** F2 — 22/22 сценария,
-  F3 — 29/29. Это проверяет фронт, но не живой прод.
+  F3 — 29/29, F4 — 40/40, F5+F6 — 19/19, F7 — 16/16. Это проверяет фронт,
+  но не живой прод.
 - **F2:** `POST /api/comments` уходит как `{ filmId, text }`; 403
   `RATING_REQUIRED_FOR_COMMENT` ловится по `errorCode`, текст сохраняется.
 - **F3:** `POST /api/reviews` уходит как `{ filmId, title, text, isSpoiler }`;
   `ratingId` отсутствует; 403 `FULL_RATING_REQUIRED_FOR_REVIEW` ловится по
   `errorCode`, текст и чекбокс сохраняются.
+- **F4:** `POST /api/watches` уходит как `{ filmId, watchedAt, isRewatch, tags }`;
+  `GET /watches/me` и `/users/:id/watches` — `{ items, pagination }`.
+- **F5+F6:** лайк — `POST`/`DELETE /films/:id/like`; watchlist —
+  `POST /watchlist { filmId }`, `DELETE /watchlist/:id` по `_id`; отдельный
+  `GET /watchlist/check/:filmId`.
+- **F7:** `GET /comments?targetType=review&targetId=...` — `{ items, pagination }`;
+  `POST /comments` — `{ targetType: 'review', targetId, text, parentId? }`;
+  гейта по `userRating` нет, лайк — `POST /comments/:id/like`.
 - **Длина:** 350..15000; фронт `MAX_TEXT = 15000`.
 - **Живой API:** по-прежнему недоступен (`cinephilium-backend.onrender.com` —
   TLS reset; Vercel preview закрыт Vercel Authentication). Статусы live-проверок

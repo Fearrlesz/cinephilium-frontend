@@ -4,11 +4,11 @@
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.6.0)
+**Документация версии:** `CHANGELOG.md` (4.7.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5 и F6,
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5, F6 и F7,
 какие решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
 витрина проекта, а не инструкция по разработке.
 
@@ -286,6 +286,38 @@ FilmPage.jsx
 - Проверка: production-сборка + mock API + Chrome headless, 40/40 сценариев;
   скриншоты — `screenshots/f4-diary/`. Живой прод-прогон — `[UNVERIFIED]`.
 
+### F7 — комментарии к рецензиям (закрыт)
+
+- Отдельной `ReviewPage` в коде нет, поэтому блок inline: внутри каждой
+  `<article className="rev">` после оценки и спойлер-плашки. `ReviewsSection`
+  рендерит `<CommentsSection targetType="review" targetId={review._id} />`;
+  F3-гейт и spoiler-логика не тронуты.
+- `CommentsSection` сохраняет режим фильма (F2) и получает режим рецензии через
+  пропсы `targetType` / `targetId`. В режиме фильма по-прежнему родитель передаёт
+  `comments` и колбэки, используется старый `GET /api/comments/:filmId`; старый
+  рендер и гейт не менялись.
+- В режиме рецензии компонент сам грузит данные: счётчик — `GET /api/comments?
+  targetType=review&targetId=...&limit=1` → `pagination.total`; раскрытие — страница
+  по 5 корневых комментариев, «Загрузить ещё» — следующая страница. После отправки
+  перечитываются уже открытые страницы, чтобы новый комментарий не сдвинул список.
+- Блок свёрнут до кнопки «N комментариев»; клик раскрывает список и форму.
+  Форма — под списком, как в F2. Неавторизованному вместо формы показывается
+  «Войдите, чтобы комментировать» + `/login`; список остаётся видимым.
+- Комментарий к рецензии **не гейтится** `userRating`: можно писать без оценки
+  фильма. `POST /api/comments` получает `{ targetType: 'review', targetId, text }`,
+  для ответа добавляется `parentId`. Один уровень ответов: у вложенного ответа нет
+  кнопки «Ответить». Лайк — `POST /api/comments/:id/like`.
+- Pending не фильтруется на клиенте: сервер отдаёт approved всем, плюс свои pending
+  автору и всё админу. Свой pending помечен «На модерации — видно только вам».
+  Пустое состояние — «Пока никто не комментировал» + форма.
+- Зафиксировано: **F7/1** inline, **F7/2** свёрнутый блок, **F7/3** переиспользование
+  пропсами + query/POST, **F7/4** один уровень, **F7/5** видимость на сервере,
+  **F7/6** без гейта по оценке. Отдельный маршрут рецензии не создавался.
+- Проверка: production-сборка + mock API + Chrome headless, 16/16 сценариев
+  (свёрнуто/раскрыто, пост без оценки и с оценкой, pending автора/чужого,
+  ответ, лайк, пусто, пагинация, режим фильма, 480/620/768/1024); скриншоты —
+  `screenshots/f7-review-comments/`. Живой прод-прогон — `[UNVERIFIED]`.
+
 ---
 
 ## 6. Контракт бэкенда (фактический)
@@ -335,7 +367,19 @@ userRating: {
 
 - Фронт F2 отправляет `{ filmId, text }`; B8 считает отсутствие `targetType`
   комментарием к фильму и берёт `targetId` из `targetId ?? filmId`.
-- Без Rating — `403 RATING_REQUIRED_FOR_COMMENT`; лайки не гейтятся.
+- F7 отправляет `{ targetType: 'review', targetId, text, parentId? }`; для
+  рецензии Rating не требуется — это обсуждение текста (B8).
+- Для фильма без Rating — `403 RATING_REQUIRED_FOR_COMMENT`; для неопубликованной
+  рецензии — `404` посторонним или `403 REVIEW_NOT_PUBLISHED` автору/админу.
+- `parentId` — только на опубликованный корень, один уровень; текст до 1000.
+- Новый комментарий создаётся `pending`; лайки не гейтятся.
+
+`GET /api/comments?targetType=film|review&targetId=&page=&limit=`:
+
+- `{ items, pagination }`; каждый корень содержит `replies[]` (один уровень).
+- `targetType` обязателен; без него `400`.
+- Видимость: `approved` всем, свои `pending` автору, всё админу.
+- Старый `GET /api/comments/:filmId` — массив только для фильма, с `replies[]`.
 
 `GET /api/reviews/:filmId`:
 
@@ -412,22 +456,24 @@ userRating: {
 ## 7. Что ещё не обновлено под vibe/full
 
 F1 закрыл блок оценки, F2 — комментарии к фильму, F3 — рецензии, F4 — дневник
-просмотров, F5/F6 — лайк, watchlist и галереи профиля. Вне этих задач остаются:
+просмотров, F5/F6 — лайк, watchlist и галереи профиля, F7 — комментарии к
+рецензиям. Вне этих задач остаются:
 
 - `ProfilePage` и `UserProfilePage` — старые вкладки и профильные ответы
   (`/ratings/user`, `/reviews/user`); вкладки B9 (`/users/:id/ratings` и т.д.)
-  фронт ещё не потребляет — это F8. Галереи F5/F6 добавлены отдельно, до вкладок.
+  фронт ещё не потребляет — это F8. Галереи F5/F6 и дневник F4 добавлены отдельно,
+  до вкладок.
 - `HomePage`, карточки фильмов, топы — старые поля (`averageRating`/`finalScore`).
 - `RatingDetailsModal` — легаси-поля `finalScore`/`base1`.
-- Комментарии к рецензиям (B8) и выбор vibe в комментариях — следующие задачи;
-  F7 не начинать в рамках F2/F3.
-- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.6.0;
+- Выбор vibe в комментариях — не входит в F7; отдельных задач под него нет.
+- `package.json` version `2.0.0` не синхронизирован с `CHANGELOG.md` 4.7.0;
   ориентируйся на CHANGELOG.
 
-### Живая проверка F2/F3/F4/F5/F6
+### Живая проверка F2/F3/F4/F5/F6/F7
 
-Формы, кнопки, дневник и галереи подтверждены на production-сборке с mock API в
-Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Живой прод-прогон не
+Формы, кнопки, дневник, галереи и комментарии к рецензиям подтверждены на
+production-сборке с mock API в Chrome headless: F2 — 22/22, F3 — 29/29,
+F4 — 40/40, F5/F6 — 19/19, F7 — 16/16. Живой прод-прогон не
 выполнялся: Vercel preview закрыт Vercel Authentication, Render из среды
 недоступен. Статус live-проверки — `[UNVERIFIED]`; это не блокер деплоя, но и не
 подтверждение реального API.
@@ -473,8 +519,8 @@ Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Жи
 | `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.css` | оболочка модалки, аккордеон, ошибки полей |
 | `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр, веса, критерии, preview, save |
 | `src/pages/FilmPage/components/UsersList/UsersList.jsx` | «Оценили фильм», скрытие `finalScore` для vibe |
-| `src/pages/FilmPage/components/CommentsSection/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта |
-| `src/pages/FilmPage/components/CommentsSection/CommentsSection.css` | F2: гейт, адаптив 480/620 |
+| `src/pages/FilmPage/components/CommentsSection/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта; F7: режим рецензии через `targetType`/`targetId`, пагинация, ответы одного уровня |
+| `src/pages/FilmPage/components/CommentsSection/CommentsSection.css` | F2: гейт, адаптив 480/620; F7: свёрнутый блок, ответы, pending |
 | `src/pages/FilmPage/components/ReviewsSection/ReviewsSection.jsx` | F3: full-гейт, `CriteriaModal`, спойлер, 403, 350/15000 |
 | `src/pages/FilmPage/components/ReviewsSection/ReviewsSection.css` | F3: гейт, плашка спойлера, чекбокс, адаптив 480 |
 | `src/pages/FilmPage/components/FilmActions/FilmActions.jsx` | F5/F6: сердечко, watchlist, `GET /watchlist/check`, оптимистичные переключения; F4: слот «Просмотрено» |
@@ -490,8 +536,8 @@ Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Жи
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1–4.6: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/` | скриншоты F2/F3/F4/F5/F6 |
+| `CHANGELOG.md` | 4.1–4.7: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/` | скриншоты F2/F3/F4/F5+F6/F7 |
 
 Все компоненты сгруппированы в одноимённые папки: `X/X.jsx` и, если есть,
 `X/X.css`. Это касается `src/components`, `src/components/Critic`
@@ -504,9 +550,10 @@ Chrome headless: F2 — 22/22, F3 — 29/29, F4 — 40/40, F5/F6 — 19/19. Жи
 
 1. `git status` — не в чужой ли ветке; ожидаем `feature/f1-vibe-rating` или новую
    `feature/...`.
-2. Прочитать §5: F1 — combined/technical только full; F2 — комментарий с любой
-   оценкой; F3 — рецензия только с full + spoiler; F5/F6 — лайк и watchlist без
-   гейта, галереи профиля.
+2. Прочитать §5: F1 — combined/technical только full; F2 — комментарий к фильму
+   с любой оценкой; F3 — рецензия только с full + spoiler; F5/F6 — лайк и
+   watchlist без гейта, галереи профиля; F7 — комментарии к рецензиям без гейта
+   по `userRating`.
 3. Сверить ключи `scores` и названия счётчиков с бэкендом, не с прототипом.
 4. Не показывать `0` как результат там, где это маркер «не вычислено».
 5. `npm run build` — собирается.
