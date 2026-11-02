@@ -165,6 +165,13 @@ function LoginPage() {
             minLength={PASSWORD_MIN}
           />
 
+          {stage === 'login' && (
+            <p className="auth-admin-inline">
+              Нет доступа к аккаунту?{' '}
+              <Link to="/contact">Связь с админами</Link>
+            </p>
+          )}
+
           {stage === 'register' && (
             <>
               <input
@@ -184,7 +191,7 @@ function LoginPage() {
 
               {inviteRequired && (
                 <p className="auth-hint">
-                  Нет кода? <Link to="/contact">Запросить доступ</Link>
+                  Нет кода? <Link to="/contact">Связь с админами</Link>
                 </p>
               )}
 

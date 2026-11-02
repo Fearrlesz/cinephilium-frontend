@@ -121,6 +121,29 @@
 }
 
 /* ============================================================
+   КНОПКА «СВЯЗЬ С АДМИНАМИ» — выделена рамкой
+   ============================================================ */
+.btn-contact-admin {
+  padding: 8px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--gold-bright);
+  border: 1px solid var(--gold);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-contact-admin:hover {
+  border-color: var(--gold-bright);
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+}
+
+/* ============================================================
    КНОПКА «ПРОФИЛЬ» — золото
    ============================================================ */
 .btn-profile {

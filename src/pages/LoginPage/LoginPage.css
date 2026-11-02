@@ -175,6 +175,65 @@
 }
 
 /* ============================================================
+   СВЯЗЬ С АДМИНАМИ
+   ============================================================ */
+.auth-admin-inline {
+  margin: -2px 0 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.auth-admin-inline a {
+  color: var(--gold-bright);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-admin-callout {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.auth-admin-callout p {
+  margin: 0 0 10px;
+}
+
+.auth-admin-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 40px;
+  background: var(--gold-bright);
+  color: var(--bg-deep);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
+}
+
+.auth-admin-cta:hover {
+  background: var(--gold);
+  color: var(--bg-deep);
+}
+
+/* ============================================================
    АДАПТИВ
    ============================================================ */
 @media (max-width: 768px) {
