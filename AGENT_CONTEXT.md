@@ -1,14 +1,14 @@
-# Контекст фронтенда Cinephilium
+﻿# Контекст фронтенда Cinephilium
 
 **Дата среза:** 03.11.2026
 **Ветка:** `feature/f1-vibe-rating`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.8.0)
+**Документация версии:** `CHANGELOG.md` (4.9.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
-Это рабочая карта фронтенда: как он устроен, что уже сделано в F1, F2, F3, F4, F5, F6, F7 и F8,
+Это рабочая карта фронтенда: как он устроен, что уже сделано в F1–F9,
 какие решения зафиксированы и что нельзя сломать. Это не README: корневой `README.md` —
 витрина проекта, а не инструкция по разработке.
 
@@ -343,8 +343,9 @@ FilmPage.jsx
 - Карточка профиля компактная: аватар-инициал, ник, дата регистрации, шесть
   счётчиков (`ratings+vibes`, `reviewsApproved`, `commentsApproved`, `watches`,
   `watchlist`, `filmLikes`), `pinnedAchievement` (одно значение) и
-  `achievementsCount`. Кнопка «Редактировать» — disabled-заглушка: страницы и
-  API редактирования профиля в коде нет.
+  `achievementsCount`. В 4.9 disabled-кнопка «Редактировать» заменена на
+  «Настройки» с inline-панелью приватности (см. F9); страницы редактирования
+  профиля по-прежнему нет.
 - Семь вкладок в порядке: Оценки, Рецензии, Комментарии, Дневник, Watchlist,
   Понравившиеся, Достижения. Активная вкладка — `?tab=<key>`, default `ratings`;
   переключение через `useSearchParams`, браузерный «назад» восстанавливает вкладку.
@@ -377,6 +378,52 @@ FilmPage.jsx
   (карточка, все семь вкладок, pinned/unpin, пагинация, удаление, приватность,
   пусто/ошибка, URL/back, 480/620/768/1024, плоские computed styles); скриншоты —
   `screenshots/f8-profile/`. Живой прод-прогон — `[UNVERIFIED]`.
+
+### F9 — каталог, глобальная навигация и плоский редизайн (закрыт)
+
+- **Каталог отдельно от Home.** `/` — редакционная главная: заголовок, поиск,
+  топ-5, «Новые в каталоге» (10), лента событий и CTA «Весь каталог». Полная
+  сетка снята с главной. `/catalog` — вся библиотека: поиск, фильтры, сортировка,
+  активные чипы, сетка 5/4/3/2, «Загрузить ещё», пусто/ошибка.
+- **Поиск не отдельная страница.** Поиск встроен в каталог; header-иконка ведёт
+  на `/catalog?focus=search`. TMDB-добавление — плоская модалка внутри каталога.
+  После импорта (нового или `alreadyExists`) сразу `navigate('/film/:id')`;
+  фронтовый дубль `film_add` удалён, единственное событие создаёт бэкенд.
+- **URL — состояние каталога:** `?q=&genre=&yearFrom=&yearTo=&rated=&sort=&page=`.
+  `sort`: `technical|vibe|combined|new|title`; `rated`: `with|without`
+  (`1|0` тоже принимаются). Страница и фильтры восстанавливаются по Back.
+- **Backend-фильтры.** `GET /api/films` принимает `q` (regex по title,
+  экранированный), `genre` (Film.genres), `yearFrom/yearTo`, `rated`,
+  `sort`, `page`, `limit`; `pagination.total` считается после фильтров.
+  `GET /api/films/facets` → `{ genres: [{value,count}], years: {min,max} }`;
+  объявлен до `/:id`.
+- **Навигация.** `src/components/Header/Header.jsx` — самостоятельный: сам грузит
+  `/auth/me`, сам разлогинивает; пункты Каталог, Архитектор, Топ, О системе;
+  справа поиск, «Связь с админами», аватар/вход. `SiteLayout` рендерит Header +
+  `Outlet`; публичные маршруты — под ним, auth-страницы — минимальный `AuthLayout`,
+  `/admin` — отдельно. Публичные «← На главную» удалены.
+- **Auth.** `AuthLayout` — две колонки на десктопе (редакционный aside + форма),
+  одна на ≤860; подчёркнутые поля, azure-кнопка, inline-ошибки. `/register` —
+  отдельный маршрут `<LoginPage initialStage="register" />`.
+- **Приватность профиля.** «Настройки» на своей карточке открывает inline-панель:
+  `GET /users/me/privacy`, переключатели `hideProfile`/`hideFromFeed`,
+  оптимистичный `PUT /users/me/privacy` с откатом при ошибке. Свой скрытый
+  профиль владелец видит; другим отдаётся stub и вкладки не рендерятся.
+- **Плоский язык.** Только токены: без `box-shadow`, `backdrop-filter`, glow,
+  градиентных заливок, `translate/scale` на hover и декоративных анимаций;
+  transitions только цвет/прозрачность 0.12–0.16s; радиусы 0–6px; сетка 1180.
+  Заголовки страниц — Instrument Serif, служебные подписи — IBM Plex Mono,
+  интерфейс — Inter. Azure — действие/активное, cyan — значения.
+- **Страницы 4.9.** About — редакционная статья с блоками 01–05; TopUsers —
+  таблица-лидерборд (топ-3 azure, без медалей); Privacy — документ с якорями;
+  Contact — две колонки (админы + заявка); Admin — плотный служебный layout,
+  нейтральные кнопки отклонения.
+- **Проверка:** production build `Compiled successfully`
+  (126.64 kB JS / 21.76 kB CSS); mock API + Chrome 46/46 сценариев: импорт-редирект,
+  header desktop/mobile, каталог (фильтры/фасеты/поиск/добавление/URL/Back),
+  Home, auth 1440/480, приватность профиля, About/Privacy/Contact/Top/Admin,
+  адаптив 480/620/768/1024, отсутствие horizontal overflow. Живой прод —
+  `[UNVERIFIED]`. Скриншоты — `screenshots/design-mopup/`.
 
 ---
 
@@ -460,6 +507,19 @@ userRating: {
 - ответ `{ liked: boolean, likesCount: number }`; `likesCount` — публичный
   взвешенный агрегат, не `counters.filmLikes`.
 
+`GET /api/films` (каталог, 4.9):
+
+- query: `q` (поиск по title, экранированный regex, до 100), `genre`
+  (значение из `Film.genres`), `yearFrom`, `yearTo`, `rated`
+  (`with|without`, также `1|0`), `sort` (`technical|vibe|combined|new|title`),
+  `page`, `limit`.
+- ответ: `{ films, pagination: { page, limit, total, pages }, sort }`;
+  `total` — после всех фильтров. В элементах — те же агрегаты, что у каталога:
+  `title`, `year`, `poster`, средние, `votesCount`/`fullCount` (нет средних —
+  `null`). Фронт читает `films` и `pagination`.
+- `GET /api/films/facets` → `{ genres: [{ value, count }], years: { min, max } }`.
+  В Express объявлен до `/:id`.
+
 `GET /api/watchlist/check/:filmId`:
 
 - `{ inWatchlist: boolean, filmId }`.
@@ -477,6 +537,14 @@ userRating: {
 
 - `:id` — `_id` записи WatchlistItem, **не** `filmId`. Идемпотентный `200`,
   ответ `{ inWatchlist: false }`. Фронт ищет `_id` через `GET /watchlist/user`.
+
+`GET /api/users/me/privacy`, `PUT /api/users/me/privacy` (4.9):
+
+- GET → `{ hideProfile: boolean, hideFromFeed: boolean }`.
+- PUT принимает одно или оба поля; ответ — актуальный объект приватности.
+- `hideProfile` скрывает профиль от других (`isHidden` в `/auth/me` и
+  `/users/:id`), `hideFromFeed` исключает действия из ленты. Владелец свой
+  скрытый профиль видит полностью.
 
 `GET /api/users/me/likes`, `GET /api/users/:id/likes`:
 
@@ -557,7 +625,7 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 
 ---
 
-## 9. Карта файлов F1–F8
+## 9. Карта файлов F1–F9
 
 | Файл | Что важно |
 |---|---|
@@ -592,13 +660,33 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/pages/ProfilePage/ProfileView.jsx` | F8: `/users/:id`, skeleton/error, карточка + вкладки, обновление счётчиков и pinned |
 | `src/pages/ProfilePage/ProfileCard.jsx` | F8: карточка, счётчики, pinned, achievementsCount, disabled edit |
 | `src/pages/ProfilePage/ProfileTabs.jsx` | F8: семь вкладок, `?tab=`, `usePagedList`, tab-компоненты и достижения |
-| `src/pages/ProfilePage/ProfilePage.css` | F8: плоская карточка/вкладки/сетки/скилетоны, адаптив 1024/768/620/480 |
+| `src/pages/ProfilePage/ProfilePage.css` | F8: плоская карточка/вкладки/сетки/скилетоны, адаптив 1024/768/620/480; F9: настройки приватности |
+| `src/pages/ProfilePage/ProfileSettings.jsx` | F9: inline-панель `GET/PUT /users/me/privacy`, переключатели hideProfile/hideFromFeed |
+| `src/components/Header/Header.jsx` | F9: самостоятельный глобальный header, `/auth/me`, logout, desktop/mobile nav |
+| `src/components/Header/Header.css` | F9: плоский header, azure active, мобильная панель |
+| `src/components/SiteLayout/SiteLayout.jsx` | F9: общий публичный layout (Header + Outlet) |
+| `src/components/AuthLayout/AuthLayout.jsx` | F9: минимальная оболочка login/register/forgot/reset, две колонки |
+| `src/components/AuthLayout/AuthLayout.css` | F9: auth-формы, aside, документальные auth-страницы |
+| `src/pages/CatalogPage/CatalogPage.jsx` | F9: поиск, фильтры, сортировка, URL state, пагинация, TMDB-модалка |
+| `src/pages/CatalogPage/CatalogPage.css` | F9: плоский каталог, чипы, сетка, модалка, адаптив |
+| `src/pages/HomePage/HomePage.jsx` | F9: редакционная главная, топ-5, 10 новинок, импорт-редирект |
+| `src/pages/HomePage/HomePage.css` | F9: плоский hero, текстовые табы, сетки топ/новинок |
+| `src/pages/AboutPage/AboutPage.jsx` | F9: редакционная статья, блоки 01–05, пресеты, формула |
+| `src/pages/AboutPage/AboutPage.css` | F9: плоская статья, якоря, таблицы весов |
+| `src/pages/TopUsersPage/TopUsersPage.jsx` | F9: таблица-лидерборд, mono-ранги, топ-3 azure |
+| `src/pages/TopUsersPage/TopUsersPage.css` | F9: плоская таблица, адаптив |
+| `src/pages/PrivacyPage/PrivacyPage.jsx` | F9: документ с якорями, без auth-box/LoginPage.css |
+| `src/pages/PrivacyPage/PrivacyPage.css` | F9: документная типографика, адаптив |
+| `src/pages/ContactPage/ContactPage.jsx` | F9: две колонки — админы и заявка |
+| `src/pages/ContactPage/ContactPage.css` | F9: flat contact grid, поля, успех/ошибка |
+| `src/pages/AdminPanel/AdminPanel.jsx` | F9: служебный layout, `.admin-back`, без glass |
+| `src/pages/AdminPanel/AdminPanel.css` | F9: плоские таблицы/секции, нейтральные reject-кнопки |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
 | `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
-| `CHANGELOG.md` | 4.1–4.8: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/`, `screenshots/f8-profile/` | скриншоты F2/F3/F4/F5+F6/F7/F8 |
+| `CHANGELOG.md` | 4.1–4.9: что и почему |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/`, `screenshots/f8-profile/`, `screenshots/design-mopup/` | скриншоты F2/F3/F4/F5+F6/F7/F8 и глобального редизайна 4.9 |
 
 Все компоненты сгруппированы в одноимённые папки: `X/X.jsx` и, если есть,
 `X/X.css`. Это касается `src/components`, `src/components/Critic`
@@ -631,7 +719,13 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 10. F8: вкладки — только `?tab=`, default `ratings`; свои — через `:id = currentUser._id`,
     не `/me/*`; карточка `GET /users/:id` возвращает `{ user }`; pinned — одно
     значение, `PUT /users/me/pinned-achievement`; плоские стили только профиля.
-11. Если меняешь `client.js` — только точечно и без изменения поведения.
+11. F9: каталог — отдельный `/catalog`, Home — редакционная; фильтры идут в
+    `GET /films` (`q/genre/yearFrom/yearTo/rated/sort/page`), фасеты — в
+    `/films/facets`. Header один на публичных страницах, auth — `AuthLayout`.
+    После импорта — сразу `/film/:id`, без дубля `film_add`. В профиле
+    «Настройки» → `GET/PUT /users/me/privacy`; свой скрытый профиль виден
+    владельцу. Новые стили — только токены, без теней/glass/transform/анимаций.
+12. Если меняешь `client.js` — только точечно и без изменения поведения.
 
 ---
 

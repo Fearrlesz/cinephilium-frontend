@@ -39,6 +39,16 @@ targetId=...&page=&limit=` → `{ items, pagination }`, у корней есть
 `GET /comments/:filmId` остаётся массивом комментариев к фильму. Живые ответы
 прода — `[UNVERIFIED]`.
 
+**Обновление 2026-11-03 (4.9):** каталог проверен кодом `films.routes.js` и
+mock API: `GET /films` принимает `q`, `genre`, `yearFrom`, `yearTo`, `rated`
+(`with|without`, также `1|0`), `sort` (`technical|vibe|combined|new|title`),
+`page`, `limit` и возвращает `{ films, pagination, sort }`; `pagination.total`
+считается после фильтров. `GET /films/facets` → `{ genres: [{value,count}],
+years: {min,max} }`, объявлен до `/:id`. Импорт фильма пишет единственное
+событие `film_add` на бэкенде, фронт после успеха сразу ведёт на `/film/:id`.
+`GET/PUT /users/me/privacy` → `{ hideProfile, hideFromFeed }`; PUT принимает
+одно или оба поля. Живые ответы прода — `[UNVERIFIED]`.
+
 **Обновление 2026-11-03 (F8):** вкладки профиля проверены кодом `users.routes.js`,
 `profileTabsQuery.js` и браузером на mock API: `GET /users/:id` →
 `{ user }` с `counters`, `pinnedAchievement`, `achievementsCount`;
@@ -99,9 +109,9 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 ### Пагинация
 
 Для F4–F7 списки проверены кодом и mock API и используют
-`{ items, pagination }`; для фильмов, рецензий и старых профильных вкладок
-конверт по-прежнему **не подтверждён**. См. `[UNVERIFIED]` у конкретных
-эндпоинтов.
+`{ items, pagination }`; каталог `GET /films` использует `{ films, pagination,
+sort }` (поле `films`, не `items`). Для рецензий и части старых ответов конверт
+по-прежнему **не подтверждён**. См. `[UNVERIFIED]` у конкретных эндпоинтов.
 
 ---
 
@@ -109,7 +119,8 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 
 | Эндпоинт | Форма / поля | Статус |
 |---|---|---|
-| `GET /films?limit=1` | Каталог. Точный конверт (`items`/`pagination`/`total`) неизвестен. B2: в каталоге отсутствующие средние — `null`, `averageRating` — алиас `averageTechnical`. | `[UNVERIFIED: API недоступен; конверт не описан]` |
+| `GET /films?q=&genre=&yearFrom=&yearTo=&rated=&sort=&page=&limit=` | Каталог: `{ films, pagination: {page,limit,total,pages}, sort }`; `total` после фильтров. `q` — regex по title, `genre` — значение `Film.genres`, `rated` — `with\|without` (`1\|0`), `sort` — `technical\|vibe\|combined\|new\|title`. B2: отсутствующие средние — `null`, `averageRating` — алиас `averageTechnical`. | `[UNVERIFIED live; форма из films.routes.js + mock API]` |
+| `GET /films/facets` | `{ genres: [{ value, count }], years: { min, max } }` для фильтров каталога. Объявлен до `GET /films/:id`. | `[UNVERIFIED live; форма из films.routes.js + mock API]` |
 | `GET /films/:id` | См. §2.1; дополнительно `liked: boolean`, `likesCount: number`, без `inWatchlist`. | `[UNVERIFIED live; форма из кода Films/Presenter]` |
 | `GET /films/:id/users` | Массив оценок; `rating.completeness`, `technicalScore`, `combinedScore`, `finalScore`. Для vibe-only `finalScore: 0` — известное ограничение. | `[UNVERIFIED: API недоступен; форма из AGENT_CONTEXT §6]` |
 | `GET /comments?targetType=film\|review&targetId=&page=&limit=` | Единый список с пагинацией: `{ items, pagination }`; корень содержит `replies[]` (один уровень). Видимость: approved всем, свои pending автору, всё админу. Без `targetType` — 400. | `[UNVERIFIED live; форма из comments.routes.js]` |
@@ -190,10 +201,14 @@ REACT_APP_API_URL || https://cinephilium-backend.onrender.com/api
 
 ### 3.1 Privacy (B-PRIVACY)
 
-- `hideProfile`, `hideFromFeed`, `canViewProfile` — поля профиля/карточки.
+- `GET /users/me/privacy` → `{ hideProfile, hideFromFeed }`.
+- `PUT /users/me/privacy` принимает одно или оба поля, возвращает актуальный
+  объект. Фронт сохраняет оптимистично и откатывает при ошибке.
+- `hideProfile` скрывает профиль от других (`isHidden` / stub), `hideFromFeed`
+  исключает действия из ленты; владелец свой скрытый профиль видит полностью.
 - Для личных разделов скрытого профиля API отдаёт `404` (а не пустой список).
-- Точные имена полей и код ошибки `PROFILE_HIDDEN` не подтверждены.
-- `[UNVERIFIED: API недоступен; нет токена]`
+- Живые ответы прода — `[UNVERIFIED]`; формы подтверждены mock API и браузером
+  4.9.
 
 ---
 
@@ -334,6 +349,21 @@ F4/F5/F6 использует эти ответы так:
 ---
 
 ## 7. Changelog верификации
+
+### 2026-11-03 — 4.9 каталог и навигация
+
+- **Формы подтверждены в браузере на mock API:** 46/46 сценариев
+  (`screenshots/design-mopup/`), плюс отдельный backend-тест фильтров 5/5 на
+  in-memory MongoDB. Живой прод не проверялся.
+- **Каталог:** `GET /films` с `q/genre/yearFrom/yearTo/rated/sort/page/limit` →
+  `{ films, pagination, sort }`; `total` после фильтров; `GET /films/facets` →
+  `{ genres, years }`.
+- **Импорт:** фронт не создаёт `film_add`; единственное событие — на бэкенде
+  (`films.routes.js`); после `POST /films/import` фронт сразу открывает
+  `/film/:id`.
+- **Privacy:** `GET/PUT /users/me/privacy` → `{ hideProfile, hideFromFeed }`;
+  inline-панель в профиле, сохранение и откат.
+- **Живой API:** по-прежнему недоступен; все live-статусы — `[UNVERIFIED]`.
 
 ### 2026-11-03 — F8
 
