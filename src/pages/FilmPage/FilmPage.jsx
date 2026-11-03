@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
-import { getGrade } from '../../utils/scoring';
+import { getGrade, formatVibe } from '../../utils/scoring';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import FilmInfo from './components/FilmInfo/FilmInfo';
 import FilmActions from './components/FilmActions/FilmActions';
@@ -350,10 +350,11 @@ function FilmPage() {
                     </Link>
                     <div className="rating-info">
                       <span
-                        className="user-rating-score" style={{ color: isVibeOnly ? 'var(--ink-faint)' : (getGrade(item.rating.finalScore)?.color || 'var(--ink)') }}
-                        title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                        className={`user-rating-score${isVibeOnly ? ' is-vibe' : ''}`}
+                        style={{ color: isVibeOnly ? 'var(--cyan)' : (getGrade(item.rating.finalScore)?.color || 'var(--ink)') }}
+                        title={isVibeOnly ? 'Только вайб — технический и комбинированный не вычислены' : undefined}
                       >
-                        {isVibeOnly ? '—' : item.rating.finalScore}
+                        {isVibeOnly ? formatVibe(item.rating.vibe) : item.rating.finalScore}
                       </span>
                       <button
                         className="details-btn" onClick={() => {

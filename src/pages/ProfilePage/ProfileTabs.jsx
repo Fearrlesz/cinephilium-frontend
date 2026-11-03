@@ -4,6 +4,7 @@ import api from '../../api/client';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
 import { getScoreColor } from '../../utils/constants';
 import { formatDate } from '../../utils/ratingUtils';
+import { formatVibe } from '../../utils/scoring';
 import ProfileDiary from '../../components/ProfileDiary/ProfileDiary';
 import {
   useGallery,
@@ -184,7 +185,8 @@ function RatingsTab({ userId, isOwnProfile }) {
 
             const filmId = film._id || film.id;
             const title = film.title || 'Фильм';
-            const score = rating.completeness === 'vibe'
+            const isVibe = rating.completeness === 'vibe';
+            const score = isVibe
               ? null
               : (rating.combinedScore ?? rating.technicalScore);
             const poster = getPosterUrl(film.poster || film.posterUrl);
@@ -205,10 +207,10 @@ function RatingsTab({ userId, isOwnProfile }) {
                 <span className="profile-rating-title">{title}</span>
                 {film.year && <span className="profile-rating-year">{film.year}</span>}
                 <span
-                  className={`profile-rating-score${score == null ? ' is-empty' : ''}`}
+                  className={`profile-rating-score${isVibe ? ' is-vibe' : ''}${score == null && !isVibe ? ' is-empty' : ''}`}
                   style={score == null ? undefined : { color: getScoreColor(score) }}
                 >
-                  {score == null ? '—' : score}
+                  {isVibe ? formatVibe(rating.vibe) : score == null ? '—' : score}
                 </span>
               </Link>
             );

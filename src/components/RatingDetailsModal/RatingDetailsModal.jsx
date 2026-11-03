@@ -1,8 +1,11 @@
 import React from 'react';
 import { CRITERIA_CONFIG, GENRE_LABELS } from '../../utils/constants';
+import { formatVibe } from '../../utils/scoring';
 
 function RatingDetailsModal({ rating, onClose }) {
   if (!rating) return null;
+
+  const isVibeOnly = rating.completeness === 'vibe';
 
   const weights = rating.blockWeights || {
     scenario: 30, characters: 25, visual: 20, sound: 15, style: 10
@@ -13,7 +16,9 @@ function RatingDetailsModal({ rating, onClose }) {
   ];
 
   const score = value => (
-    Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '—'
+    Number.isFinite(Number(value)) && Number(value) > 0
+      ? Number(value).toFixed(1)
+      : '—'
   );
 
   return (
@@ -39,21 +44,29 @@ function RatingDetailsModal({ rating, onClose }) {
             </div>
           </div>
 
+          {isVibeOnly && (
+            <p className="modal-sub">
+              {formatVibe(rating.vibe)} / 10 · технический и комбинированный не вычислены
+            </p>
+          )}
+
           <p className="modal-user">{rating.userId?.nickname || rating.userName || 'Пользователь'}</p>
 
           {rating.genrePreset && (
             <p>Жанровые веса: <strong>{GENRE_LABELS[rating.genrePreset] || rating.genrePreset}</strong></p>
           )}
 
-          <div className="modal-weights">
-            <h4>Веса блоков</h4>
-            {['Сценарий', 'Персонажи', 'Визуал', 'Звук', 'Стиль'].map((name, i) => (
-              <div key={name} className="modal-weight-item">
-                <span>{name}</span>
-                <span>{weightValues[i] || 0}%</span>
-              </div>
-            ))}
-          </div>
+          {!isVibeOnly && (
+            <div className="modal-weights">
+              <h4>Веса блоков</h4>
+              {['Сценарий', 'Персонажи', 'Визуал', 'Звук', 'Стиль'].map((name, i) => (
+                <div key={name} className="modal-weight-item">
+                  <span>{name}</span>
+                  <span>{weightValues[i] || 0}%</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {rating.textReview && (
             <div className="modal-review">
@@ -62,21 +75,23 @@ function RatingDetailsModal({ rating, onClose }) {
           )}
         </div>
 
-        <div className="modal-criteria-blocks">
-          {CRITERIA_CONFIG.map(block => (
-            <div key={block.key} className="modal-criteria-block">
-              <h4>{block.name}</h4>
-              {block.criteria.map(crit => (
-                <div key={crit.key} className="modal-criterion">
-                  <span title={crit.hint}>{crit.name}</span>
-                  <span className="modal-criterion-score">
-                    {rating.scores?.[block.key]?.[crit.key] ?? '—'} / 10
-                  </span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        {!isVibeOnly && (
+          <div className="modal-criteria-blocks">
+            {CRITERIA_CONFIG.map(block => (
+              <div key={block.key} className="modal-criteria-block">
+                <h4>{block.name}</h4>
+                {block.criteria.map(crit => (
+                  <div key={crit.key} className="modal-criterion">
+                    <span title={crit.hint}>{crit.name}</span>
+                    <span className="modal-criterion-score">
+                      {rating.scores?.[block.key]?.[crit.key] ?? '—'} / 10
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

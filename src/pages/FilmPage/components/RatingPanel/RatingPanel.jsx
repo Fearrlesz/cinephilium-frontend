@@ -6,6 +6,7 @@ import {
   blockAverages,
   communityValue,
   formatScore,
+  formatVibe,
   getGrade,
   getVibeWord
 } from '../../../../utils/scoring';
@@ -54,10 +55,12 @@ export default function RatingPanel({
   onVibeInput,
   onVibeCommit,
   isSavingVibe,
+  isCancellingVibe,
   vibeError,
   vibeLocked,
   onOpenCriteria,
-  onRequireAuth
+  onRequireAuth,
+  onCancelVibe
 }) {
   const isFull = (userRating?.completeness || '') === 'full';
   const hasVibe = Number(vibe) >= 1;
@@ -78,7 +81,10 @@ export default function RatingPanel({
   const communityCombined = communityValue(film?.averageCombined, film?.fullCount);
 
   const vibeReadOnly = isFull;
-  const vibeDisabled = !authenticated || Boolean(vibeLocked) || isSavingVibe;
+  const vibeBusy = Boolean(isSavingVibe || isCancellingVibe);
+  const vibeDisabled = !authenticated || Boolean(vibeLocked) || vibeBusy;
+  const vibeLabel = hasVibe ? formatVibe(vibe) : '';
+  const isVibeOnly = hasVibe && !isFull;
 
   return (
     <div className="rating-panel" role="group" aria-label="Три балла фильма">
@@ -112,6 +118,17 @@ export default function RatingPanel({
           {isSavingVibe && <span className="rp-saving">сохраняем…</span>}
         </div>
 
+        {hasVibe && !isFull && authenticated && (
+          <button
+            type="button"
+            className="rp-link rp-cancel"
+            onClick={onCancelVibe}
+            disabled={vibeBusy}
+          >
+            {isCancellingVibe ? 'Отменяем…' : 'Отменить вайб'}
+          </button>
+        )}
+
         {!authenticated && (
           <button type="button" className="rp-link" onClick={onRequireAuth}>
             Войдите, чтобы оценить
@@ -129,11 +146,15 @@ export default function RatingPanel({
         </div>
 
         <div className="rp-val">
-          <span className={`rp-num ${hasTechnical ? '' : 'is-empty'}`}>
-            {hasTechnical ? formatScore(technical) : '—'}
+          <span className={`rp-num ${hasTechnical || isVibeOnly ? '' : 'is-empty'}`}>
+            {hasTechnical ? formatScore(technical) : (isVibeOnly ? vibeLabel : '—')}
           </span>
-          <span className="rp-max">/ 100</span>
+          <span className="rp-max">{hasTechnical ? '/ 100' : (isVibeOnly ? '/ 10' : '/ 100')}</span>
         </div>
+
+        {!isFull && hasVibe && (
+          <span className="rp-vibe-note">технический не вычислен</span>
+        )}
 
         <GradeBadge grade={technicalGrade} />
 
@@ -187,11 +208,15 @@ export default function RatingPanel({
         </div>
 
         <div className="rp-val">
-          <span className={`rp-num ${combined ? '' : 'is-empty'}`}>
-            {combined ? formatScore(combined) : '—'}
+          <span className={`rp-num ${combined || isVibeOnly ? '' : 'is-empty'}`}>
+            {combined ? formatScore(combined) : (isVibeOnly ? vibeLabel : '—')}
           </span>
-          <span className="rp-max">/ 100</span>
+          <span className="rp-max">{combined ? '/ 100' : (isVibeOnly ? '/ 10' : '/ 100')}</span>
         </div>
+
+        {!isFull && hasVibe && (
+          <span className="rp-vibe-note">комбинированный не вычислен</span>
+        )}
 
         <GradeBadge grade={combinedGrade} />
 

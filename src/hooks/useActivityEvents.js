@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { getTimeAgo } from '../utils/ratingUtils';
 
-const VALID_EVENT_TYPES = ['rating', 'review', 'comment', 'film_add', 'achievement'];
+const VALID_EVENT_TYPES = ['rating', 'vibe', 'review', 'comment', 'film_add', 'achievement'];
 
 // Лента событий теперь полностью серверная: бэкенд сам создаёт события при
 // оценках, рецензиях, комментариях и модерации. Раньше фронтенд дублировал их

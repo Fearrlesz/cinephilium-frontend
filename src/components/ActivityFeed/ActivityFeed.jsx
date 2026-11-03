@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { sanitizeText } from '../../utils/ratingUtils';
+import { formatScore } from '../../utils/scoring';
 import './ActivityFeed.css';
 
 function ActivityFeed({ events, loading }) {
@@ -36,6 +37,7 @@ function ActivityFeed({ events, loading }) {
   const getEventIcon = (type) => {
     const icons = {
       'rating': '',
+      'vibe': '',
       'review': '',
       'comment': '',
       'film_add': '',
@@ -52,9 +54,14 @@ function ActivityFeed({ events, loading }) {
     }
     const film = sanitizeText(event.film || 'фильм');
     const score = event.score || '';
+    const vibeValue = Number(event.metadata?.vibe ?? event.score);
+    const vibeSuffix = Number.isFinite(vibeValue) && vibeValue >= 1
+      ? ` — ${formatScore(vibeValue)}/10`
+      : '';
 
     const templates = {
       'rating': `«${user}» оценил «${film}» на ${score} баллов`,
+      'vibe': `«${user}» поставил вайб «${film}»${vibeSuffix}`,
       'review': `«${user}» написал рецензию на «${film}»`,
       'comment': `«${user}» прокомментировал «${film}»`,
       'film_add': `«${user}» добавил фильм «${film}» в каталог`

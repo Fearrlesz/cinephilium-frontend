@@ -44,6 +44,7 @@ export default function RatingSection({
   const yourValue = yourCombined(userRating);
 
   const communityCombined = communityValue(film?.averageCombined, film?.fullCount);
+  const isVibeOnly = Boolean(userRating && (userRating.completeness || '') === 'vibe');
   const vibeLocked = Boolean(
     vibe.lockedUntil && new Date(vibe.lockedUntil).getTime() > Date.now()
   );
@@ -78,6 +79,8 @@ export default function RatingSection({
       <RatingContext
         community={communityCombined}
         yours={yourValue}
+        vibe={userRating?.vibe}
+        isVibeOnly={isVibeOnly}
       />
 
       <RatingPanel
@@ -89,8 +92,10 @@ export default function RatingSection({
         onVibeInput={vibe.setLocalVibe}
         onVibeCommit={vibe.commitVibe}
         isSavingVibe={vibe.isSaving}
+        isCancellingVibe={vibe.isCancelling}
         vibeError={vibe.error}
         vibeLocked={vibeLocked}
+        onCancelVibe={vibe.cancelVibe}
         onOpenCriteria={openCriteria}
         onRequireAuth={requireAuth}
       />

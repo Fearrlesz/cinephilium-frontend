@@ -8,9 +8,8 @@ const VIBE_LIMIT_MESSAGE = 'Лимит 50 vibe-оценок в сутки.';
 /**
  * Vibe-оценка: одна цифра, отдельное сохранение.
  *
- * F1/DECISION: сброс вайба в 0 невозможен — на бэкенде нет DELETE оценки,
- * а `vibe: 0` не проходит валидацию (1–10). Клик по уже выставленному
- * значению — no-op, а не фальшивый «сброс».
+ * F10/DECISION: вайб можно отменить отдельным DELETE. Full-оценка не
+ * отменяется: 15 критериев и текст не должны пропадать одним кликом.
  */
 export default function useVibeRating({
   filmId,
@@ -23,6 +22,7 @@ export default function useVibeRating({
 }) {
   const [localVibe, setLocalVibe] = useState(() => Number(userRating?.vibe) || 0);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [error, setError] = useState('');
   const [lockedUntil, setLockedUntil] = useState(null);
   const savingRef = useRef(false);
@@ -134,11 +134,73 @@ export default function useVibeRating({
     setUserRating, reloadFilm, reloadUsers, showNotification, navigate
   ]);
 
+  /**
+   * F10/1A — отмена vibe. Full-оценка защищена и на фронте, и на бэке.
+   * Оптимистично убираем оценку, чтобы гейт комментариев и счётчик фильма
+   * обновились сразу; при ошибке возвращаем прежнее состояние.
+   */
+  const cancelVibe = useCallback(async () => {
+    const ratingId = userRating?._id || userRating?.id;
+
+    if (!userRating || (userRating.completeness || 'vibe') !== 'vibe') {
+      setError('Отменить можно только вайб');
+      return false;
+    }
+
+    if (!getAccessToken()) {
+      showNotification?.({
+        title: 'Доступ запрещён',
+        message: 'Войдите в систему, чтобы изменить оценку',
+        type: 'warning'
+      });
+      navigate?.('/login');
+      return false;
+    }
+
+    if (!ratingId || savingRef.current) return false;
+
+    const previous = userRating;
+    savingRef.current = true;
+    setIsCancelling(true);
+    setError('');
+    setUserRating(null);
+    setLocalVibe(0);
+
+    try {
+      await api.delete(`/ratings/${ratingId}`);
+      await Promise.all([
+        reloadFilm?.({ silent: true }),
+        reloadUsers?.()
+      ]);
+      showNotification?.({
+        title: 'Вайб отменён',
+        message: 'Оценка удалена. Можно поставить новую.',
+        type: 'success'
+      });
+      return true;
+    } catch (err) {
+      setUserRating(previous);
+      setLocalVibe(Number(previous.vibe) || 0);
+      const message = getErrorMessage(err, 'Не удалось отменить вайб');
+      setError(message);
+      showNotification?.({ title: 'Ошибка', message, type: 'error' });
+      return false;
+    } finally {
+      savingRef.current = false;
+      setIsCancelling(false);
+    }
+  }, [
+    filmId, userRating?._id, userRating?.id, userRating?.completeness, userRating?.vibe,
+    setUserRating, reloadFilm, reloadUsers, showNotification, navigate
+  ]);
+
   return {
     localVibe,
     setLocalVibe,
     commitVibe,
+    cancelVibe,
     isSaving,
+    isCancelling,
     error,
     lockedUntil,
     serverVibe

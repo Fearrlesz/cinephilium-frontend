@@ -8,9 +8,10 @@ import { formatDelta, formatScore, roundTenth } from '../../../../utils/scoring'
  * combinedScore = 0 на бэке, и фронт не доизобретает vibe × 10.
  * Delta выводится только когда есть и «Сообщество», и «Ваша» (full).
  */
-export default function RatingContext({ community = null, yours = null }) {
+export default function RatingContext({ community = null, yours = null, vibe = null, isVibeOnly = false }) {
   const hasCommunity = Number.isFinite(Number(community)) && Number(community) > 0;
   const hasYours = Number.isFinite(Number(yours)) && Number(yours) > 0;
+  const vibeLabel = isVibeOnly ? `${formatScore(vibe)} / 10` : '';
   const delta = hasCommunity && hasYours ? roundTenth(Number(yours) - Number(community)) : null;
 
   const deltaClass = delta === null
@@ -33,9 +34,9 @@ export default function RatingContext({ community = null, yours = null }) {
       <span className="rc-sep" aria-hidden="true" />
 
       <div className="rc-item">
-        <span className="rc-label">Ваша</span>
-        <span className="rc-val rc-val--yours">
-          {hasYours ? formatScore(yours) : '—'}
+        <span className="rc-label">{isVibeOnly ? 'Ваш вайб' : 'Ваша'}</span>
+        <span className={`rc-val ${isVibeOnly ? 'rc-val--vibe' : 'rc-val--yours'}`}>
+          {hasYours ? formatScore(yours) : (isVibeOnly && vibeLabel ? vibeLabel : '—')}
         </span>
       </div>
 

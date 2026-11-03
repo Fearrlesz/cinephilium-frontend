@@ -45,6 +45,11 @@
   color: var(--azure-bright);
 }
 
+.rc-val--vibe {
+  color: var(--cyan);
+  font-size: 13px;
+}
+
 .rc-sep {
   width: 1px;
   height: 16px;
@@ -438,6 +443,32 @@
   letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+
+/* Вайб рядом с техническим/комбинированным: не подменяем балл, а явно
+   подписываем, что числовой показатель не вычислен. */
+.rp-vibe-note {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--cyan);
+}
+
+.rp-cancel {
+  color: var(--ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rp-cancel:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.rp-cancel:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .rp-foot {

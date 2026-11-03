@@ -63,6 +63,13 @@ export function formatScore(value) {
   return Number.isInteger(number) ? String(number) : number.toFixed(1);
 }
 
+// Вайб — не технический и не комбинированный балл. Там, где числовой
+// показатель не вычислен, показываем явную подпись, а не прочерк.
+export function formatVibe(vibe) {
+  const value = Number(vibe);
+  return Number.isFinite(value) && value >= 1 ? `вайб ${formatScore(value)}` : '';
+}
+
 export function formatDelta(value) {
   if (!Number.isFinite(Number(value))) return '';
   const number = roundTenth(value);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { formatVibe } from '../../../../utils/scoring';
 import './UsersList.css';
 
 function UsersList({ filmUsers, usersLoading, onShowUsers }) {
@@ -36,9 +37,10 @@ function UsersList({ filmUsers, usersLoading, onShowUsers }) {
                 </span>
                 <span className="user-name">{nickname}</span>
                 <span
-                  className="user-score" title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                  className={`user-score${isVibeOnly ? ' is-vibe' : ''}`}
+                  title={isVibeOnly ? 'Только вайб — технический и комбинированный не вычислены' : undefined}
                 >
-                  {isVibeOnly ? '—' : item.rating.finalScore}
+                  {isVibeOnly ? formatVibe(item.rating.vibe) : item.rating.finalScore}
                 </span>
               </Link>
             );
