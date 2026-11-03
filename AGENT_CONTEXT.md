@@ -4,7 +4,7 @@
 **Ветка:** `main`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.9.2)
+**Документация версии:** `CHANGELOG.md` (4.10.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
@@ -446,6 +446,28 @@ FilmPage.jsx
   «Ответы на рецензию». Mock API + Chrome: 12/12 (переход, поля, payload
   с инвайтом, collapsed/expanded label); production build 126.69/21.84.
 
+### F10 — отмена вайба и его видимость (закрыт)
+
+- **Отмена только вайба.** `DELETE /api/ratings/:id` удаляет vibe-оценку
+  владельца, её `Action` и событие `vibe`, отвязывает `Watch.ratingId`,
+  уменьшает `counters.vibes` на 1 и снимает 2 балла. Полную оценку отменить
+  нельзя: `400 FULL_RATING_CANNOT_BE_CANCELLED`; чужая — `404 NOT_FOUND`.
+  В UI кнопка «Отменить вайб» показывается только для vibe-only и
+  авторизованного пользователя.
+- **Вайб не прочерк.** В технической и комбинированной колонках при vibe-only
+  крупно выводится `вайб N` с `/ 10` и подписью «технический/комбинированный
+  не вычислен». В «Ваш вайб» — `N / 10`. В списке оценивших, в карточке оценки
+  профиля, в модалке деталей и в контексте — тоже `вайб N`. Технический и
+  комбинированный баллы не доизобретаются.
+- **Событие.** `ActivityFeed` знает тип `vibe`: «поставил вайб … — N/10»;
+  бэкенд хранит `metadata.vibe`, `score` остаётся `null`. При отмене событие
+  удаляется.
+- **Проверка:** backend `node --test tests/vibe-rating.test.js` → 17/17;
+  frontend production build 127.56 kB JS / 22.03 kB CSS; mock API + Chrome
+  11/11: лента, три колонки, список оценивших, профиль, отмена, удаление
+  события, 480 без overflow. Скриншоты — `screenshots/vibe-cancel/`.
+  Живой прод — `[UNVERIFIED]`.
+
 ---
 
 ## 6. Контракт бэкенда (фактический)
@@ -484,6 +506,20 @@ userRating: {
   `style {originality, boldness}`.
 - `blockWeights` — массив 5 чисел, сумма ровно 100. `genrePreset: 'hybrid'`
   означает «ручные веса», бэкенд берёт `blockWeights`.
+
+`DELETE /api/ratings/:id`:
+
+- только владелец и только `completeness: 'vibe'`;
+- удаляет `Rating`, `Action` типа `rating`, `Event` типа `vibe` с
+  `contentId = ratingId`, отвязывает `Watch.ratingId`;
+- `counters.vibes -1`, `totalPoints -2`; ответ `{ deleted: true, filmId }`;
+- full → `400 FULL_RATING_CANNOT_BE_CANCELLED`, чужая/нет → `404 NOT_FOUND`.
+
+`GET /api/events`:
+
+- тип `vibe` уже существует; для него `metadata.vibe` — значение 1–10,
+  `score` равен `null`. Фронт читает `metadata.vibe ?? score` и не показывает
+  generic «сделал что-то с фильмом».
 
 `GET /api/films/:id/users`:
 
@@ -703,11 +739,13 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/pages/AdminPanel/AdminPanel.jsx` | F9: служебный layout, `.admin-back`, без glass |
 | `src/pages/AdminPanel/AdminPanel.css` | F9: плоские таблицы/секции, нейтральные reject-кнопки |
 | `src/pages/FilmPage/hooks/useFilmData.js` | загрузка фильма и `silent`-обновление |
-| `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение, 429, `errorCode` |
+| `src/pages/FilmPage/hooks/useVibeRating.js` | vibe-only сохранение/отмена, 429, `errorCode`, оптимистичный rollback |
+| `src/pages/FilmPage/components/RatingPanel/RatingPanel.jsx` | vibe/technical/combined, «Отменить вайб», `вайб N` при vibe-only |
+| `src/utils/scoring.js` | `formatVibe` → `вайб N`, `formatScore` не доизобретает 0 |
 | `src/pages/FilmPage/hooks/useRatingForm.js` | черновик full-оценки, веса, preview, save |
 | `src/pages/FilmPage/hooks/usePointerCoarse.js` | drag vs сегменты |
 | `CHANGELOG.md` | 4.1–4.9: что и почему |
-| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/`, `screenshots/f8-profile/`, `screenshots/design-mopup/` | скриншоты F2/F3/F4/F5+F6/F7/F8 и глобального редизайна 4.9 |
+| `screenshots/f2-comments/`, `screenshots/f3-reviews/`, `screenshots/f4-diary/`, `screenshots/f5-f6/`, `screenshots/f7-review-comments/`, `screenshots/f8-profile/`, `screenshots/design-mopup/`, `screenshots/ratings-sort/`, `screenshots/vibe-cancel/` | скриншоты F2/F3/F4/F5+F6/F7/F8, редизайна 4.9, сортировки оценок и отмены вайба |
 
 Все компоненты сгруппированы в одноимённые папки: `X/X.jsx` и, если есть,
 `X/X.css`. Это касается `src/components`, `src/components/Critic`
@@ -747,6 +785,9 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
     «Настройки» → `GET/PUT /users/me/privacy`; свой скрытый профиль виден
     владельцу. Новые стили — только токены, без теней/glass/transform/анимаций.
 12. Если меняешь `client.js` — только точечно и без изменения поведения.
+13. F10: отменять можно только `completeness: 'vibe'`; full → 400. Вайб
+    показывать как `вайб N` везде, где нет technical/combined, а не `—`;
+    событие `vibe` — «поставил вайб … — N/10». Не выводить `0` как балл.
 
 ---
 

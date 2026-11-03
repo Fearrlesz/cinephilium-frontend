@@ -39,6 +39,14 @@ targetId=...&page=&limit=` → `{ items, pagination }`, у корней есть
 `GET /comments/:filmId` остаётся массивом комментариев к фильму. Живые ответы
 прода — `[UNVERIFIED]`.
 
+**Обновление 2026-11-03 (4.10):** `DELETE /api/ratings/:id` отменяет только
+vibe-оценку владельца: удаляет Rating/Action/Event `vibe`, отвязывает
+`Watch.ratingId`, `counters.vibes -1`, `totalPoints -2`; ответ
+`{ deleted: true, filmId }`. Full → `400 FULL_RATING_CANNOT_BE_CANCELLED`;
+чужая/нет → `404 NOT_FOUND`. `GET /events` для типа `vibe` отдаёт
+`metadata.vibe` (1–10) и `score: null`; фронт показывает `вайб N`, а не
+generic-фразу. Живые ответы прода — `[UNVERIFIED]`.
+
 **Обновление 2026-11-03 (4.9):** каталог проверен кодом `films.routes.js` и
 mock API: `GET /films` принимает `q`, `genre`, `yearFrom`, `yearTo`, `rated`
 (`with|without`, также `1|0`), `sort` (`technical|vibe|combined|new|title`),
@@ -242,6 +250,8 @@ sort }` (поле `films`, не `items`). Для рецензий и части 
   `sound {music, design, narrative}`, `style {originality, boldness}`.
 - `ALREADY_FULL_RATING` (`400`) — попытка vibe-only для уже полной оценки;
   `VIBE_LIMIT_REACHED` (`429`, `details.retryAt`) — лимит 50 vibe/сутки.
+- `DELETE /api/ratings/:id` — отмена vibe: `200 {deleted:true, filmId}`;
+  full → `400 FULL_RATING_CANNOT_BE_CANCELLED`; чужая/нет → `404 NOT_FOUND`.
 - `[UNVERIFIED: прод; мутация не выполнялась]`
 
 ### 4.3 Комментарии и рецензии

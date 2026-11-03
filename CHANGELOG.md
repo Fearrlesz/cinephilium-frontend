@@ -1,6 +1,42 @@
-# Changelog — Cinephilium Frontend 4.9.2
+# Changelog — Cinephilium Frontend 4.10.0
 
 **Дата и время среза: 03.11.2026 (Europe/Moscow, UTC+03:00)**
+
+## 4.10.0 — отмена вайба и его видимость
+
+**Дата: 03.11.2026.**
+
+### Смысл
+
+Вайб был «оценкой без выхода»: поставить можно, снять нельзя, а в технической
+и комбинированной колонках он выглядел прочерком. Из-за этого в профиле и
+списках оценивших vibe-only выглядел как отсутствие оценки, а лента писала
+«сделал что-то с фильмом». Теперь вайб отменяется, а везде, где нет
+вычисленного балла, показывается `вайб N` — без подмены technical/combined.
+
+### Что изменено
+
+- Backend `DELETE /api/ratings/:id`: только владелец и только vibe. Удаляет
+  Rating, Action `rating`, Event `vibe`; отвязывает `Watch.ratingId`;
+  `counters.vibes -1`, `totalPoints -2`; ответ `{deleted, filmId}`. Full →
+  `400 FULL_RATING_CANNOT_BE_CANCELLED`, чужая/нет → `404`.
+- `src/pages/FilmPage/hooks/useVibeRating.js` — `cancelVibe` с optimistic
+  очисткой, DELETE, reload film/users, откатом и уведомлением.
+- `RatingPanel` — кнопка «Отменить вайб» только для vibe-only; в technical и
+  combined крупно `вайб N` с `/ 10` и подписью «не вычислен». `RatingContext` —
+  «Ваш вайб» `N / 10`.
+- `FilmPage` (модалка всех оценок), `UsersList`, `ProfileTabs`,
+  `RatingDetailsModal` — `вайб N` вместо `—`; `scoring.js` — `formatVibe`.
+- `ActivityFeed` — шаблон `vibe`: «поставил вайб … — N/10».
+- `useActivityEvents` — `vibe` в списке допустимых типов.
+
+### Проверка
+
+Backend: `node --test tests/vibe-rating.test.js` → 17/17 pass (отмена,
+full-запрет, чужая оценка). Frontend: production build `Compiled successfully`,
+127.56 kB JS / 22.03 kB CSS. Mock API + Chrome CDP 11/11: лента, три колонки,
+список оценивших, профиль, отмена, удаление события, 480 без overflow.
+Скриншоты — `screenshots/vibe-cancel/`. Живой прод — `[UNVERIFIED]`.
 
 ## 4.9.2 — сортировка оценок в профиле
 
