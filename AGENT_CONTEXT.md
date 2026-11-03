@@ -1,10 +1,10 @@
-﻿# Контекст фронтенда Cinephilium
+# Контекст фронтенда Cinephilium
 
 **Дата среза:** 03.11.2026
-**Ветка:** `feature/f1-vibe-rating`  
+**Ветка:** `main`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.9.0)
+**Документация версии:** `CHANGELOG.md` (4.9.1)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
@@ -404,7 +404,18 @@ FilmPage.jsx
   `/admin` — отдельно. Публичные «← На главную» удалены.
 - **Auth.** `AuthLayout` — две колонки на десктопе (редакционный aside + форма),
   одна на ≤860; подчёркнутые поля, azure-кнопка, inline-ошибки. `/register` —
-  отдельный маршрут `<LoginPage initialStage="register" />`.
+  отдельный маршрут `<LoginPage initialStage="register" />`. Стадия берётся из
+  prop на каждом рендере (`const stage = initialStage`), а не из
+  `useState(initialStage)`: React Router переиспользует тот же `LoginPage` при
+  переходе `/login ↔ /register`, иначе форма остаётся в старом состоянии.
+  Ключи маршрутов `login/register` дополнительно сбрасывают поля.
+- **Инвайт-код.** Поле «Инвайт-код» есть только в стадии регистрации сразу под
+  паролем; обязательно, если `GET /auth/config` вернул `inviteRequired: true`.
+  Код выдаёт администратор, ссылка «Связь с админами» ведёт на `/contact`.
+  Согласия на персональные данные и cookie — там же, обязательны.
+- **Ответы на рецензию.** В F7-блоке под рецензией подпись — «Ответы на
+  рецензию» / «Ответы на рецензию · N» и в свёрнутом, и в раскрытом состоянии;
+  пустое состояние — «Пока нет ответов на рецензию».
 - **Приватность профиля.** «Настройки» на своей карточке открывает inline-панель:
   `GET /users/me/privacy`, переключатели `hideProfile`/`hideFromFeed`,
   оптимистичный `PUT /users/me/privacy` с откатом при ошибке. Свой скрытый
@@ -424,6 +435,12 @@ FilmPage.jsx
   Home, auth 1440/480, приватность профиля, About/Privacy/Contact/Top/Admin,
   адаптив 480/620/768/1024, отсутствие horizontal overflow. Живой прод —
   `[UNVERIFIED]`. Скриншоты — `screenshots/design-mopup/`.
+- **4.9.1 (auth/review-label hotfix).** `/login` → `/register` больше не
+  застревает в login: стадия читается из prop, маршруты получили `key`.
+  Инвайт-код и согласия появляются на `/register`; POST `/auth/register`
+  получает `{nickname,password,inviteCode,consent}`. Подпись F7-блока —
+  «Ответы на рецензию». Mock API + Chrome: 12/12 (переход, поля, payload
+  с инвайтом, collapsed/expanded label); production build 126.69/21.84.
 
 ---
 

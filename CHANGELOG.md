@@ -1,6 +1,37 @@
-﻿# Changelog — Cinephilium Frontend 4.9.0
+# Changelog — Cinephilium Frontend 4.9.1
 
 **Дата и время среза: 03.11.2026 (Europe/Moscow, UTC+03:00)**
+
+## 4.9.1 — регистрация и подпись ответов на рецензию
+
+**Дата: 03.11.2026.**
+
+### Смысл
+
+Кнопка «Зарегистрироваться» вела на `/register`, но форма оставалась формой
+входа: React Router переиспользовал `LoginPage`, а стадия была заморожена в
+`useState(initialStage)`. Инвайт-код и согласия поэтому не появлялись. Теперь
+стадия читается из route-prop на каждом рендере, а ключи маршрутов сбрасывают
+поля при переключении. Блок ответов под рецензией больше не называется
+«Комментарии»: это ответы на рецензию.
+
+### Что изменено
+
+- `src/pages/LoginPage/LoginPage.jsx` — `const stage = initialStage` вместо
+  `useState`; `/register` сразу показывает регистрацию, поле «Инвайт-код»,
+  подсказку «Код выдаёт администратор» и обязательные согласия.
+- `src/App.js` — `key="login"` / `key="register"` у элементов маршрутов.
+- `src/pages/FilmPage/components/CommentsSection/CommentsSection.jsx` — подпись
+  «Ответы на рецензию · N» в collapsed и expanded, пустое состояние и
+  placeholder/aria-label переведены на «ответы».
+
+### Проверка
+
+Mock API + Chrome (CDP): 12/12 — login без поля инвайта, переход на `/register`,
+заголовок и кнопка регистрации, поле инвайта, согласия, POST с
+`inviteCode: TESTCODE`, collapsed/expanded «Ответы на рецензию · 3».
+Production build: `Compiled successfully`, 126.69 kB JS / 21.84 kB CSS.
+Живой прод — `[UNVERIFIED]`.
 
 ## 4.9 — каталог, глобальная навигация и плоский редизайн
 
