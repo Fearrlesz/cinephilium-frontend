@@ -350,7 +350,7 @@ function CatalogPage() {
         <div className="catalog-loading">Загрузка каталога…</div>
       ) : films.length === 0 ? (
         <div className="catalog-empty">
-          <p>Ничего не найдено.</p>
+          <p>Ничего не найдено. Похоже, такого в каталоге нет! Может, пополните его?)</p>
           {hasFilters ? (
             <button type="button" className="btn-ghost" onClick={resetFilters}>Сбросить фильтры</button>
           ) : (
