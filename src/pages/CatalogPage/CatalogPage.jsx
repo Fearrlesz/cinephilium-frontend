@@ -103,7 +103,7 @@ function CatalogPage() {
       } catch (err) {
         if (!alive) return;
         console.error('Ошибка каталога:', err);
-        setError('Не удалось загрузить каталог. Попробуйте позже.');
+        setError('Не удалось загрузить каталог. Попробуйте позже. Сорян...');
       } finally {
         if (alive) setLoading(false);
       }
@@ -148,7 +148,7 @@ function CatalogPage() {
       setParams(next);
     } catch (err) {
       console.error('Ошибка догрузки каталога:', err);
-      setError('Не удалось загрузить ещё. Попробуйте позже.');
+      setError('Не удалось загрузить ещё. Попробуйте позже. Упс...');
     } finally {
       setLoadingMore(false);
     }
@@ -211,7 +211,7 @@ function CatalogPage() {
       const { data } = await api.get('/tmdb/search', { params: { query } });
       setTmdbResults(Array.isArray(data?.results) ? data.results : []);
     } catch (err) {
-      setTmdbError(err.response?.data?.error || 'Не удалось найти фильмы');
+      setTmdbError(err.response?.data?.error || 'Не удалось найти фильмы. Похоже, такого в каталоге нет! Может, пополните его?)');
     } finally {
       setTmdbLoading(false);
     }
@@ -385,7 +385,7 @@ function CatalogPage() {
                 {loadingMore ? 'Загрузка…' : 'Загрузить ещё'}
               </button>
             ) : (
-              <span className="catalog-end">— Это все фильмы ({films.length}) —</span>
+              <span className="catalog-end">— Это все фильмы, неужели не нашлось подходящего?!) ({films.length}) —</span>
             )}
             <span className="catalog-count">Показано {films.length} из {total}</span>
           </div>
@@ -408,7 +408,7 @@ function CatalogPage() {
                 autoFocus
               />
               <button type="submit" className="btn-primary" disabled={tmdbLoading}>
-                {tmdbLoading ? 'Ищем…' : 'Найти'}
+                {tmdbLoading ? 'Рыскаем по архивам…' : 'Найти'}
               </button>
             </form>
             {tmdbError && <div className="catalog-error">{tmdbError}</div>}
@@ -431,7 +431,7 @@ function CatalogPage() {
                       onClick={() => importTmdb(item.id)}
                       disabled={Boolean(importingId)}
                     >
-                      {importingId === item.id ? 'Добавляем…' : 'Добавить'}
+                      {importingId === item.id ? 'Добавляем… Спасибо, очень интересный выбор' : 'Добавить'}
                     </button>
                   </div>
                 ))}
