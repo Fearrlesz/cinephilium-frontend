@@ -67,11 +67,11 @@ function HomePage() {
   return (
     <div className="container home-page">
       <section className="home-hero">
-        <p className="home-kicker">Кино, оценённое по существу</p>
+        <p className="home-kicker">Теперь уже точно</p>
         <h1 className="home-title">Храм честного кино</h1>
         <p className="home-lead">
-          15 критериев вместо одной цифры. Технический балл, вайб и общая оценка —
-          без рекламных рейтингов и вкусовщины.
+          15 критериев вместо одной цифры. Технический балл, вайб и общая оценка.
+          Больше никаких безосновательных оценок. Все критерии прозрачны.
         </p>
         <form className="home-search" onSubmit={handleHeroSearch}>
           <input

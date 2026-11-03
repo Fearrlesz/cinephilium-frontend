@@ -12,13 +12,13 @@ function AuthLayout() {
 
       <main className="auth-layout">
         <aside className="auth-aside">
-          <p className="auth-kicker">Кино, оценённое по существу</p>
+          <p className="auth-kicker">Теперь уже точно</p>
           <h2 className="auth-aside-title">
-            Не рейтинг.<br />Разговор о фильме.
+            Рейтинг.<br />Отражающий глубину фильма
           </h2>
           <p className="auth-aside-text">
-            15 критериев, технический балл и вайб — без рекламных звёзд
-            и средней температуры по больнице.
+            15 критериев, технический балл и вайб.
+            Больше никаких безосновательных оценок. Все критерии прозрачны.
           </p>
           <ul className="auth-facts">
             <li><span>01</span>Техническая оценка по 15 критериям</li>

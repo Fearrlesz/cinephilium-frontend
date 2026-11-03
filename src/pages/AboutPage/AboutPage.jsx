@@ -18,8 +18,8 @@ function AboutPage() {
         <p className="about-kicker">Система оценки</p>
         <h1 className="about-title">О системе оценки</h1>
         <p className="about-lead">
-          Пятнадцать критериев, пять блоков и один вайб. Без рекламных рейтингов
-          и вкусовщины: только то, что можно объяснить.
+          Пятнадцать критериев, пять блоков и один вайб.
+          Больше никаких безосновательных оценок. Все критерии прозрачны.
         </p>
       </header>
 
@@ -122,6 +122,16 @@ function AboutPage() {
           Округление — только в самом конце, поэтому нюансы сохраняются.
         </p>
       </section>
+
+      <p className="about-repo">
+        <a
+          href="https://github.com/Fearrlesz/cinephilium-frontend"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Исходный код сайта на GitHub
+        </a>
+      </p>
     </div>
   );
 }

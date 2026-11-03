@@ -261,6 +261,29 @@
   line-height: 1.6;
 }
 
+.about-repo {
+  margin: 32px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-repo a {
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 2px;
+  transition: color 0.14s, border-color 0.14s;
+}
+
+.about-repo a:hover {
+  color: var(--ink);
+  border-color: var(--azure);
+}
+
 @media (max-width: 860px) {
   .about-page {
     padding-top: 104px;
