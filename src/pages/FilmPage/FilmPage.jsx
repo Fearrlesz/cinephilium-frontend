@@ -5,7 +5,6 @@ import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
 import { getGrade } from '../../utils/scoring';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
-import Header from '../../components/Header/Header';
 import FilmInfo from './components/FilmInfo/FilmInfo';
 import FilmActions from './components/FilmActions/FilmActions';
 import RatingSection from './components/RatingSection/RatingSection';
@@ -220,8 +219,6 @@ function FilmPage() {
 
   return (
     <div className="film-page">
-      <Header user={currentUser} />
-
       <section className={`film-hero ${hasBackdrop ? '' : 'no-image'}`}>
         <div
           className={`film-hero-bd ${hasBackdrop ? 'has-image' : ''}`}

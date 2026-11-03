@@ -227,9 +227,10 @@ function AdminPanel() {
 
   return (
     <div className="container admin-panel">
-      <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
-      <h1 className="admin-title"> Админ-панель</h1>
-      <p className="admin-welcome">Добро пожаловать, {user?.nickname}!</p>
+      <button onClick={() => navigate('/')} className="admin-back">← На главную</button>
+      <p className="admin-kicker">Служебный раздел</p>
+      <h1 className="admin-title">Админ-панель</h1>
+      <p className="admin-welcome">{user?.nickname}</p>
 
       <div className="admin-section glass-card">
         <h2> Заявки на регистрацию ({contactRequests.length})</h2>

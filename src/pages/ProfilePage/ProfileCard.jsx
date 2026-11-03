@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '../../utils/ratingUtils';
+import ProfileSettings from './ProfileSettings';
 
-function ProfileCard({ user, isOwnProfile }) {
+function ProfileCard({ user, isOwnProfile, onPrivacyChange }) {
   if (!user) return null;
 
   const counters = user.counters || {};
@@ -10,8 +11,9 @@ function ProfileCard({ user, isOwnProfile }) {
   const achievementsCount = user.achievementsCount
     ?? (Array.isArray(user.achievements) ? user.achievements.length : 0);
   const pinned = user.pinnedAchievement;
+  const hiddenForViewer = Boolean(user.isHidden) && !isOwnProfile;
 
-  const stats = user.isHidden
+  const stats = hiddenForViewer
     ? []
     : [
         { label: 'Оценки', value: ratingCount },
@@ -38,7 +40,7 @@ function ProfileCard({ user, isOwnProfile }) {
             </span>
           )}
           {isOwnProfile && <span className="profile-own">Это вы</span>}
-          {!user.isHidden && pinned && (
+          {!hiddenForViewer && pinned && (
             <Link
               className="profile-pinned"
               to="?tab=achievements"
@@ -48,31 +50,28 @@ function ProfileCard({ user, isOwnProfile }) {
               <span>{pinned}</span>
             </Link>
           )}
-          {isOwnProfile && (
-            <button
-              type="button"
-              className="profile-edit"
-              disabled
-              title="Редактирование профиля скоро"
-            >
-              Редактировать
-            </button>
-          )}
+          {isOwnProfile && <ProfileSettings onPrivacyChange={onPrivacyChange} />}
         </div>
 
-        {user.isHidden && (
+        {hiddenForViewer && (
           <p className="profile-hidden-note">
             Профиль скрыт. Показаны только ник и аватар.
           </p>
         )}
 
-        {!user.isHidden && user.registeredAt && (
+        {isOwnProfile && user.isHidden && (
+          <p className="profile-hidden-note">
+            Профиль скрыт от других. Вы видите его полностью.
+          </p>
+        )}
+
+        {!hiddenForViewer && user.registeredAt && (
           <p className="profile-registered">
             Зарегистрирован {formatDate(user.registeredAt)}
           </p>
         )}
 
-        {!user.isHidden && (
+        {!hiddenForViewer && (
           <div className="profile-stats">
             {stats.map(stat => (
               <div className="profile-stat" key={stat.label}>
@@ -83,7 +82,7 @@ function ProfileCard({ user, isOwnProfile }) {
           </div>
         )}
 
-        {!user.isHidden && (
+        {!hiddenForViewer && (
           <div className="profile-achievement-row">
             {!pinned && (
               <span className="profile-pinned-empty">Достижение не закреплено</span>

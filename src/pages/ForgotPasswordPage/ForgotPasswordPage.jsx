@@ -1,42 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../LoginPage/LoginPage.css';
 
 // Писем сайт не отправляет: ссылку на сброс выдаёт администратор вручную.
 function ForgotPasswordPage() {
   return (
-    <div className="container auth-container">
-      <div className="auth-box glass-card">
-        <h1>Восстановление пароля</h1>
+    <div className="auth-box auth-document">
+      <p className="auth-kicker">Доступ</p>
+      <h1 className="auth-title">Восстановление пароля</h1>
+      <p className="auth-subtitle">
+        Пароль меняется по одноразовой ссылке. Письма сайт не отправляет,
+        ссылку выдаёт администратор вручную.
+      </p>
 
-        <p className="auth-hint">
-          Пароль меняется по одноразовой ссылке. Письма сайт не отправляет,
-          ссылку выдаёт администратор вручную.
+      <div className="auth-admin-callout">
+        <p>
+          Напишите администратору свой никнейм. Он сгенерирует ссылку
+          и пришлёт её вам.
         </p>
+        <Link to="/contact" className="auth-admin-cta">Связь с админами</Link>
+      </div>
 
-        <div className="auth-admin-callout">
-          <p>
-            Кому писать: открой страницу «Связь с админами» — там живые
-            Telegram-контакты администраторов.
-          </p>
-          <Link to="/contact" className="auth-admin-cta">
-            Связь с админами
-          </Link>
-        </div>
+      <ol className="auth-steps">
+        <li>Напишите администратору свой никнейм.</li>
+        <li>Он сгенерирует ссылку в админке и пришлёт её вам.</li>
+        <li>Откройте ссылку и задайте новый пароль — она действует 30 минут.</li>
+      </ol>
 
-        <ol className="auth-steps">
-          <li>Напиши администратору свой никнейм.</li>
-          <li>Он сгенерирует ссылку в админке и пришлёт её тебе.</li>
-          <li>Открой ссылку и задай новый пароль — она действует 30 минут.</li>
-        </ol>
+      <p className="auth-hint">
+        После смены пароля все активные сессии закрываются: войти можно только с новым.
+      </p>
 
-        <p className="auth-hint">
-          После смены пароля все активные сессии закрываются: войти можно только с новым.
-        </p>
-
-        <p className="toggle-auth">
-          <Link to="/login">Вернуться ко входу</Link>
-        </p>
+      <div className="auth-links">
+        <p><Link to="/login">Вернуться ко входу</Link></p>
       </div>
     </div>
   );

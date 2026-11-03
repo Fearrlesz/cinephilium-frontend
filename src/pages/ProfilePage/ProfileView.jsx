@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import api from '../../api/client';
 import ProfileCard from './ProfileCard';
 import ProfileTabs from './ProfileTabs';
@@ -48,6 +47,13 @@ function ProfileView({ userId, isOwnProfile, initialUser = null }) {
     return () => { cancelled = true; };
   }, [userId, initialUser]);
 
+  const handlePrivacyChange = useCallback((field, value) => {
+    if (field !== 'hideProfile') return;
+    setUser(current => (
+      current ? { ...current, isHidden: value } : current
+    ));
+  }, []);
+
   const handlePinnedChange = useCallback(value => {
     setUser(current => (
       current ? { ...current, pinnedAchievement: value } : current
@@ -85,7 +91,6 @@ function ProfileView({ userId, isOwnProfile, initialUser = null }) {
   if (loading) {
     return (
       <div className="profile-page">
-        <Link className="profile-back" to="/">← На главную</Link>
         <div className="profile-skeleton profile-skeleton--card" aria-label="Загрузка">
           <div className="profile-skel-card">
             <div className="profile-skel-line profile-skel-line--wide" />
@@ -100,7 +105,6 @@ function ProfileView({ userId, isOwnProfile, initialUser = null }) {
   if (error || !user) {
     return (
       <div className="profile-page">
-        <Link className="profile-back" to="/">← На главную</Link>
         <p className="profile-error" role="alert">{error || 'Профиль не найден'}</p>
       </div>
     );
@@ -108,13 +112,17 @@ function ProfileView({ userId, isOwnProfile, initialUser = null }) {
 
   const targetUserId = user._id || user.id;
 
+  const hiddenForViewer = Boolean(user.isHidden) && !isOwnProfile;
+
   return (
     <div className="profile-page">
-      <Link className="profile-back" to="/">← На главную</Link>
+      <ProfileCard
+        user={user}
+        isOwnProfile={isOwnProfile}
+        onPrivacyChange={handlePrivacyChange}
+      />
 
-      <ProfileCard user={user} isOwnProfile={isOwnProfile} />
-
-      {!user.isHidden && (
+      {!hiddenForViewer && (
         <ProfileTabs
           userId={targetUserId}
           isOwnProfile={isOwnProfile}

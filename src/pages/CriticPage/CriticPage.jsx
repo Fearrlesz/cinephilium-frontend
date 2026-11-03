@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import useCriticData from '../../hooks/useCriticData';
 import CriticHero from '../../components/Critic/CriticHero/CriticHero';
 import CriticTopMovies from '../../components/Critic/CriticTopMovies/CriticTopMovies';
@@ -11,19 +10,10 @@ const PAGE_TITLE = `${CRITIC_META?.name ?? 'Критик'} — рецензии 
 
 /* ---------- Переиспользуемые куски ---------- */
 
-function BackLink() {
-  return (
-    <Link to="/" className="back-btn" aria-label="Вернуться на главную страницу">
-      <span aria-hidden="true">←</span> На главную
-    </Link>
-  );
-}
-
 function CriticPageSkeleton() {
   return (
     <main className="container critic-page" aria-busy="true" aria-live="polite">
       <span className="sr-only">Загрузка страницы критика…</span>
-      <div className="skeleton skeleton--back-btn" />
       <div className="skeleton skeleton--hero" />
       <div className="skeleton skeleton--row" />
       <div className="skeleton skeleton--row" />
@@ -34,7 +24,6 @@ function CriticPageSkeleton() {
 function CriticPageError({ message, onRetry }) {
   return (
     <main className="container critic-page">
-      <BackLink />
       <div className="error-msg" role="alert">
         <h2> {message}</h2>
         <p>Не удалось загрузить данные критика. Попробуйте ещё раз.</p>
@@ -74,8 +63,6 @@ export default function CriticPage() {
 
   return (
     <main className="container critic-page">
-      <BackLink />
-
       <CriticHero
         critic={critic}
         tagline={CRITIC_META.tagline}

@@ -118,11 +118,124 @@
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .profile-edit:disabled {
   opacity: 1;
+}
+
+.profile-settings {
+  position: relative;
+  margin-left: auto;
+}
+
+.profile-settings .profile-edit {
+  margin-left: 0;
+}
+
+.profile-settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: min(380px, calc(100vw - 48px));
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+
+.profile-settings-title {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profile-settings-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.profile-settings-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-settings-label {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+.profile-settings-hint {
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.profile-settings-error {
+  margin: 0 0 10px;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.profile-settings-saving {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.profile-switch {
+  flex: 0 0 auto;
+  position: relative;
+  width: 34px;
+  height: 18px;
+  margin-top: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.profile-switch.is-on {
+  border-color: var(--azure);
+  background: var(--azure);
+}
+
+.profile-switch:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.profile-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  transition: left 0.14s ease, background-color 0.14s ease;
+}
+
+.profile-switch.is-on .profile-switch-knob {
+  left: 18px;
+  background: var(--void);
 }
 
 .profile-registered,
@@ -725,6 +838,17 @@
     width: 56px;
     height: 56px;
     font-size: 21px;
+  }
+
+  .profile-settings {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .profile-settings-panel {
+    right: auto;
+    left: 0;
+    width: 100%;
   }
 
   .profile-review-head {

@@ -16,6 +16,9 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import CriticPage from './pages/CriticPage/CriticPage';
 import ContactPage from './pages/ContactPage/ContactPage';
+import CatalogPage from './pages/CatalogPage/CatalogPage';
+import SiteLayout from './components/SiteLayout/SiteLayout';
+import AuthLayout from './components/AuthLayout/AuthLayout';
 
 function App() {
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });
@@ -44,19 +47,25 @@ function App() {
     <NotificationContext.Provider value={{ showNotification }}>
       <Router>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/top" element={<TopUsersPage />} />
+          <Route element={<SiteLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/top" element={<TopUsersPage />} />
+            <Route path="/critic" element={<CriticPage />} />
+            <Route path="/film/:id" element={<FilmPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/user/:id" element={<UserProfilePage />} />
+          </Route>
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/critic" element={<CriticPage />} />
-          <Route path="/film/:id" element={<FilmPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/user/:id" element={<UserProfilePage />} />
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<LoginPage initialStage="register" />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          </Route>
         </Routes>
       </Router>
       <NotificationModal
