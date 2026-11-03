@@ -1,73 +1,96 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { CRITERIA_CONFIG, GENRE_LABELS, PRESET_WEIGHTS, BLOCK_NAMES, TECHNICAL_MULTIPLIER, MIN_SCORE, MAX_SCORE } from '../../utils/constants';
-import './AboutPage.css'; 
+import {
+  CRITERIA_CONFIG,
+  GENRE_LABELS,
+  PRESET_WEIGHTS,
+  BLOCK_NAMES,
+  TECHNICAL_MULTIPLIER,
+  VIBE_STEP,
+  MIN_SCORE,
+  MAX_SCORE,
+} from '../../utils/constants';
+import './AboutPage.css';
 
 function AboutPage() {
   return (
     <div className="container about-page">
-      <Link to="/" className="back-btn">← На главную</Link>
-      <h1 className="about-title">📖 О системе оценки</h1>
+      <header className="about-head">
+        <p className="about-kicker">Система оценки</p>
+        <h1 className="about-title">О системе оценки</h1>
+        <p className="about-lead">
+          Пятнадцать критериев, пять блоков и один вайб.
+          Больше никаких безосновательных оценок. Все критерии прозрачны.
+        </p>
+      </header>
 
-      <div className="about-intro glass-card">
-        <p className="neon-text">
+      <section className="about-intro" aria-label="Как устроена оценка">
+        <p>
           Мы оцениваем фильмы по <strong>15 критериям</strong>, разбитым на 5 блоков.
-          Каждый критерий оценивается от <strong>1 до 10</strong>.
+          Каждый критерий — от <strong>1 до 10</strong>.
         </p>
         <p>
-          Из оценок складывается «Технический балл» (10–100), а «Вайб» добавляет
-          к нему личное восприятие: комбинированная оценка — это 70% техники
-          и 30% вайба, переведённого в ту же шкалу.
+          Из оценок складывается «Технический балл». Затем он умножается на
+          «Вайб» — личное восприятие фильма. Так одна и та же картина может
+          получить разные баллы у разных людей, и это честно.
         </p>
-      </div>
+      </section>
 
-      <div className="about-blocks">
+      <section className="about-blocks" aria-label="Блоки критериев">
         {CRITERIA_CONFIG.map((block, idx) => (
-          <div key={block.key} className="about-block glass-card">
-            <h2 className="about-block-title neon-text">{block.name}</h2>
+          <article className="about-block" key={block.key}>
+            <header className="about-block-head">
+              <span className="about-block-number">{String(idx + 1).padStart(2, '0')}</span>
+              <h2 className="about-block-title">{block.name}</h2>
+            </header>
             <div className="about-criteria">
               {block.criteria.map(crit => (
-                <div key={crit.key} className="about-criterion">
+                <div className="about-criterion" key={crit.key}>
                   <div className="about-criterion-name">{crit.name}</div>
                   <div className="about-criterion-desc">{crit.hint}</div>
                 </div>
               ))}
             </div>
-          </div>
+          </article>
         ))}
-      </div> 
+      </section>
 
-      <div className="about-genre-weights glass-card">
-        <header className="section-header">
-          <h2>⚖️ Жанровые веса</h2>
-          <p>
-            В системе предусмотрены <strong>жанровые пресеты</strong>, 
-            которые автоматически распределяют веса между пятью блоками оценки.
-            Это позволяет учитывать особенности жанра: например, в мюзикле звук важнее визуала, 
-            а в байопике сценарий и персонажи выходят на первый план. 
-            Также любой, даже самый причудливый фильм, к примеру, «Андалузский пёс» может быть высоко оценён в своём жанре! Сценарий будет иметь второстепенное значение, что сосредоточит оценку на стиле и визуале, одно из главных преимуществ нашей системы.
-            Ниже по странице вы увидите, как выглядят жанровые пресеты в действии!  
+      <section className="about-weights" aria-labelledby="about-weights-title">
+        <header className="about-section-head">
+          <p className="about-kicker">Веса</p>
+          <h2 id="about-weights-title" className="about-section-title">Жанровые пресеты</h2>
+          <p className="about-section-lead">
+            Жанр меняет вес блоков: в мюзикле важнее звук, в байопике — сценарий
+            и персонажи. Свои веса можно задать вручную под конкретный фильм.
           </p>
         </header>
-        <div className="preset-list">
+
+        <div className="about-preset-list">
           {Object.entries(GENRE_LABELS).map(([key, label]) => {
             if (key === 'hybrid') return null;
             const weights = PRESET_WEIGHTS[key] || [];
-            const total = weights.reduce((a, b) => a + b, 0);
+            const total = weights.reduce((sum, weight) => sum + weight, 0);
+
             return (
-              <article key={key} className="preset-item">
-                <div className="preset-header">
-                  <span className="preset-name">{label}</span>
-                  <span className="preset-total">{total}%</span>
+              <article className="about-preset" key={key}>
+                <div className="about-preset-head">
+                  <span className="about-preset-name">{label}</span>
+                  <span className="about-preset-total">{total}%</span>
                 </div>
-                <div className="preset-bars">
+                <div className="about-preset-bars">
                   {weights.map((weight, index) => (
-                    <div key={index} className="preset-bar-row" title={`${BLOCK_NAMES[index]}: ${weight}%`}>
-                      <span className="preset-bar-label">{BLOCK_NAMES[index]}</span>
-                      <div className="preset-bar-container">
-                        <div className="preset-bar" style={{ width: `${weight}%` }} />
-                      </div>
-                      <span className="preset-bar-value">{weight}%</span>
+                    <div
+                      className="about-preset-row"
+                      key={index}
+                      title={`${BLOCK_NAMES[index]}: ${weight}%`}
+                    >
+                      <span className="about-preset-label">{BLOCK_NAMES[index]}</span>
+                      <span className="about-preset-track">
+                        <span
+                          className="about-preset-bar"
+                          style={{ width: `${weight}%` }}
+                        />
+                      </span>
+                      <span className="about-preset-value">{weight}%</span>
                     </div>
                   ))}
                 </div>
@@ -75,45 +98,40 @@ function AboutPage() {
             );
           })}
         </div>
-        <div className="hybrid-note">
-          <p>
-            <strong>🎛 Свои веса</strong> — вы можете вручную задать распределение весов 
-            под конкретный фильм, если ни один из жанровых пресетов не подходит.
-          </p>
-        </div>
-      </div>
+      </section>
 
-      <div className="about-formula glass-card">
-        <h2>🔢 Формула расчёта</h2>
-        <div className="formula-steps">
-          <div className="formula-step">
-            <span className="step-number">1.</span>
-            <span>По каждому блоку считается среднее арифметическое его критериев (1–10)</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">2.</span>
-            <span>Взвешенное среднее = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) / 100, где сумма весов — 100%</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">3.</span>
-            <span>Технический балл (T) = взвешенное среднее × 10 — шкала от 10 до 100</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">4.</span>
-            <span>Субъективная оценка <strong>«Вайб»</strong> (M) — ваша личная оценка фильма от 1 до 10</span>
-          </div>
-          <div className="formula-step">
-            <span className="step-number">5.</span>
-            <span>Комбинированный балл = T × {TECHNICAL_MULTIPLIER} + M × 3 — тоже шкала от 10 до 100</span>
-          </div>
-        </div>
-        <div className="formula-result">
-          <p>Итоговая оценка всегда в диапазоне от <strong>{MIN_SCORE}</strong> до {MAX_SCORE}.</p>
-          <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
-            💡 Технический и комбинированный баллы округляются до десятых; промежуточные средние не округляются.
-          </p>
-        </div>
-      </div>
+      <section className="about-formula" aria-labelledby="about-formula-title">
+        <header className="about-section-head">
+          <p className="about-kicker">Расчёт</p>
+          <h2 id="about-formula-title" className="about-section-title">Формула</h2>
+        </header>
+
+        <ol className="about-formula-steps">
+          <li>По каждому блоку считается среднее арифметическое его критериев.</li>
+          <li>
+            Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5)
+            × {TECHNICAL_MULTIPLIER}.
+          </li>
+          <li>«Вайб» (M) — ваша личная оценка фильма от 1 до 10.</li>
+          <li>Вайб-множитель = 1 + (M − 1) × {VIBE_STEP}.</li>
+          <li>Комбинированный балл = T × Вайб-множитель.</li>
+        </ol>
+
+        <p className="about-formula-note">
+          Итоговая оценка всегда в диапазоне от {MIN_SCORE} до {MAX_SCORE}.
+          Округление — только в самом конце, поэтому нюансы сохраняются.
+        </p>
+      </section>
+
+      <p className="about-repo">
+        <a
+          href="https://github.com/Fearrlesz/cinephilium-frontend"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Исходный код сайта на GitHub
+        </a>
+      </p>
     </div>
   );
 }

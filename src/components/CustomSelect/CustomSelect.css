@@ -1,0 +1,330 @@
+/* ============================================================
+   ТАБЫ ДЛЯ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
+   ============================================================ */
+
+.sort-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 
+    0 2px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sort-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+}
+
+/*  Золотая подсветка снизу для активной вкладки */
+.sort-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+  border-radius: 4px;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sort-tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sort-tab:hover::after {
+  width: 40%;
+  opacity: 0.3;
+}
+
+.sort-tab.active {
+  background: rgba(91, 155, 213, 0.08);
+  color: var(--gold-bright);
+  box-shadow: 
+    0 4px 20px rgba(91, 155, 213, 0.06),
+    inset 0 1px 0 rgba(91, 155, 213, 0.05);
+}
+
+.sort-tab.active::after {
+  width: 60%;
+  opacity: 1;
+}
+
+.sort-tab.active:hover::after {
+  width: 70%;
+}
+
+.tab-icon {
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.sort-tab:hover .tab-icon {
+  transform: scale(1.1);
+}
+
+.sort-tab.active .tab-icon {
+  transform: scale(1.05);
+}
+
+.tab-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   КОНТЕЙНЕР ДЛЯ ТАБОВ В PANEL
+   ============================================================ */
+
+.sort-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  margin: 20px 0;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sort-controls label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.sort-info {
+  color: var(--text-muted);
+  font-size: 13px;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   АНИМАЦИЯ ПРИ ПЕРЕКЛЮЧЕНИИ
+   ============================================================ */
+
+@keyframes tabActive {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.sort-tab.active {
+  animation: tabActive 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================================================
+   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .sort-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .sort-controls label {
+    text-align: center;
+  }
+
+  .sort-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .sort-tab {
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .sort-tab::after {
+    bottom: 1px;
+  }
+
+  .tab-icon {
+    font-size: 14px;
+  }
+
+  .tab-label {
+    font-size: 12px;
+  }
+
+  .sort-info {
+    text-align: center;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sort-panel {
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 12px;
+  }
+
+  .sort-tabs {
+    gap: 3px;
+    padding: 3px;
+    border-radius: 10px;
+  }
+
+  .sort-tab {
+    padding: 8px 8px;
+    font-size: 11px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+
+  .sort-tab.active::after {
+    width: 30%;
+  }
+
+  .tab-icon {
+    font-size: 12px;
+  }
+
+  .tab-label {
+    font-size: 10px;
+  }
+
+  .sort-controls label {
+    font-size: 10px;
+  }
+
+  .sort-info {
+    font-size: 11px;
+  }
+}
+
+
+/* ============================================================
+   УБИРАЕМ СИНЕЕ СВЕЧЕНИЕ ПРИ КЛИКЕ/ФОКУСЕ
+   ============================================================ */
+
+/* Полностью убираем у всех элементов */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Убираем синее свечение у табов */
+.sort-tab {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.sort-tab:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.sort-tab:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Убираем у всех кликабельных элементов */
+button:focus,
+button:active,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+div[role="button"]:focus,
+div[role="button"]:active,
+div[role="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для всех элементов с табиндаксом */
+[tabindex]:focus,
+[tabindex]:active,
+[tabindex]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для select и input */
+select:focus,
+select:active,
+input:focus,
+input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Для всего документа */
+body {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Оставляем только кастомный фокус для клавиатуры (accessibility) */
+.sort-tab:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+  border-radius: 8px !important;
+}

@@ -56,15 +56,15 @@
 .auth-box input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 30px rgba(168, 133, 64, 0.03);
+  box-shadow: 0 0 30px rgba(91, 155, 213, 0.03);
 }
 
 .auth-box button {
   width: 100%;
   padding: 12px;
   border-radius: 40px;
-  border: 1px solid rgba(168, 133, 64, 0.15);
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.12), rgba(124, 58, 237, 0.06));
+  border: 1px solid rgba(91, 155, 213, 0.15);
+  background: linear-gradient(135deg, rgba(91, 155, 213, 0.12), rgba(95, 201, 212, 0.06));
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-weight: 600;
@@ -74,8 +74,8 @@
 }
 .auth-box button:hover {
   border-color: var(--gold);
-  background: linear-gradient(135deg, rgba(168, 133, 64, 0.18), rgba(124, 58, 237, 0.08));
-  box-shadow: 0 4px 20px rgba(168, 133, 64, 0.04);
+  background: linear-gradient(135deg, rgba(91, 155, 213, 0.18), rgba(95, 201, 212, 0.08));
+  box-shadow: 0 4px 20px rgba(91, 155, 213, 0.04);
 }
 .auth-box button:disabled {
   opacity: 0.4;
@@ -95,7 +95,7 @@
 }
 
 .error-msg {
-  background: rgba(236, 72, 153, 0.06);
+  background: rgba(214, 138, 166, 0.06);
   color: var(--neon-pink);
   padding: 8px 14px;
   border-radius: 10px;
@@ -105,14 +105,14 @@
 }
 
 .success-msg {
-  background: rgba(168, 133, 64, 0.06);
+  background: rgba(91, 155, 213, 0.06);
   color: var(--gold-bright);
   padding: 8px 14px;
   border-radius: 10px;
   margin-bottom: 14px;
   text-align: center;
   font-size: 14px;
-  border: 1px solid rgba(168, 133, 64, 0.08);
+  border: 1px solid rgba(91, 155, 213, 0.08);
 }
 
 /* ============================================================
@@ -179,15 +179,15 @@
    ============================================================ */
 .auth-admin-inline {
   margin: -2px 0 14px;
-  font-family: var(--font-sans);
+  font-family: var(--sans);
   font-size: 12px;
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: var(--ink-muted);
   text-align: left;
 }
 
 .auth-admin-inline a {
-  color: var(--gold-bright);
+  color: var(--azure-bright);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -196,13 +196,13 @@
 .auth-admin-callout {
   margin: 0 0 16px;
   padding: 14px;
-  border: 1px solid var(--gold-dim);
-  border-radius: var(--radius-md);
-  background: var(--bg-glass);
-  font-family: var(--font-sans);
+  border: 1px solid var(--azure-line);
+  border-radius: var(--r-sm);
+  background: var(--azure-soft);
+  font-family: var(--sans);
   font-size: 13px;
   line-height: 1.55;
-  color: var(--text-secondary);
+  color: var(--ink-soft);
   text-align: left;
 }
 
@@ -216,21 +216,21 @@
   justify-content: center;
   min-height: 38px;
   padding: 0 14px;
-  border-radius: 40px;
-  background: var(--gold-bright);
-  color: var(--bg-deep);
-  font-family: var(--font-mono);
+  border-radius: var(--r-sm);
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--mono);
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background var(--transition-smooth), color var(--transition-smooth);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 
 .auth-admin-cta:hover {
-  background: var(--gold);
-  color: var(--bg-deep);
+  background: var(--azure-bright);
+  color: var(--void);
 }
 
 /* ============================================================

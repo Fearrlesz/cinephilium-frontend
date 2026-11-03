@@ -1,0 +1,363 @@
+/* ============================================================
+   COMMENTS — форма-пилюля и список без карточки
+   ============================================================ */
+
+.film-comments {
+  margin-top: 46px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.film-comments .sec-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cform {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 6px;
+}
+
+.c-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--highlight), var(--surface));
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+
+.c-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.c-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.c-input:focus {
+  border-color: var(--azure-line);
+  background: rgba(91, 155, 213, 0.04);
+}
+
+.c-send {
+  flex: none;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 100px;
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.c-send:hover:not(:disabled) {
+  background: var(--azure-bright);
+  color: var(--void);
+  border: none;
+}
+
+/* F2: гейт комментариев — вместо формы без оценки.
+   Плоская строка на токенах, без карточки, стекла и новых цветов. */
+.c-gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 6px;
+}
+
+.c-gate-text {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.c-gate-cta {
+  flex: none;
+}
+
+/* 403 при уже показанной форме: тот же гейт, но над полем ввода.
+   Текст комментария остаётся в input. */
+.c-gate-inline {
+  margin-bottom: 0;
+}
+
+.c-send:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.c-login {
+  margin: 16px 0 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.c-login a {
+  color: var(--azure-bright);
+}
+
+.c-error {
+  margin: 6px 0 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--pink);
+}
+
+.clist {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citem {
+  display: flex;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.citem:first-child {
+  border-top: none;
+}
+
+.citem .c-av {
+  width: 26px;
+  height: 26px;
+  font-size: 9px;
+}
+
+.cmain {
+  min-width: 0;
+}
+
+.cname {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.cmeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.cmeta .dot {
+  opacity: 0.5;
+}
+
+.ctext {
+  margin: 5px 0 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.c-like {
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.c-like:hover {
+  background: none;
+  color: var(--ink);
+}
+
+.c-like span {
+  color: var(--ink-muted);
+}
+
+/* F7: комментарии к рецензии — тот же список и форма, но компактнее
+   и без заголовка секции: блок живёт внутри статьи-рецензии. */
+.film-comments--review {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.c-toggle {
+  margin-top: 2px;
+}
+
+.c-thread {
+  min-width: 0;
+}
+
+.c-thread-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.c-more {
+  margin-top: 8px;
+}
+
+.c-empty {
+  margin: 14px 0 2px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.c-pending {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.c-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.c-actions .c-like {
+  margin-top: 0;
+}
+
+.creplies {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citem--reply {
+  padding: 10px 0 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.citem--reply:first-child {
+  padding-top: 4px;
+  border-top: none;
+}
+
+.citem--reply .c-av {
+  width: 22px;
+  height: 22px;
+  font-size: 8px;
+}
+
+.citem--reply .ctext {
+  font-size: 13px;
+}
+
+.c-reply-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 620px) {
+  .c-time,
+  .cmeta .dot {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .c-gate {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .c-gate-cta {
+    width: 100%;
+  }
+
+  .cform {
+    flex-wrap: wrap;
+  }
+
+  .c-input {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  /* Только аватар формы: без scoped-селектора order сдвигал аватары
+     в списке комментариев на ≤480. */
+  .cform .c-av {
+    order: 1;
+  }
+
+  .c-send {
+    order: 3;
+    flex: 1;
+  }
+
+  .film-comments {
+    margin-top: 36px;
+    padding-top: 22px;
+  }
+
+  .film-comments--review {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+
+  .c-thread-head,
+  .c-reply-note {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

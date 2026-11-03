@@ -1,25 +1,24 @@
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NotificationContext from './context/NotificationContext';
-import NotificationModal from './components/NotificationModal';
+import NotificationModal from './components/NotificationModal/NotificationModal';
 import HomePage from './pages/HomePage/HomePage';
+import AboutPage from './pages/AboutPage/AboutPage';
+import TopUsersPage from './pages/TopUsersPage/TopUsersPage';
+import AdminPanel from './pages/AdminPanel/AdminPanel';
 import FilmPage from './pages/FilmPage/FilmPage';
+import CustomSelect from './components/CustomSelect/CustomSelect';
 import LoginPage from './pages/LoginPage/LoginPage';
-import './App.css';
-
-// Главные экраны грузим сразу, остальные — отдельными чанками по переходу.
-// На кэширование HTML это не влияет: свежесть версии по-прежнему задаёт
-// index.html, а не отдельный чанк.
-const AboutPage = lazy(() => import('./pages/AboutPage/AboutPage'));
-const TopUsersPage = lazy(() => import('./pages/TopUsersPage/TopUsersPage'));
-const AdminPanel = lazy(() => import('./pages/AdminPanel/AdminPanel'));
-const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage/ResetPasswordPage'));
-const PrivacyPage = lazy(() => import('./pages/PrivacyPage/PrivacyPage'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage/ProfilePage'));
-const UserProfilePage = lazy(() => import('./pages/UserProfilePage/UserProfilePage'));
-const CriticPage = lazy(() => import('./pages/CriticPage/CriticPage'));
-const ContactPage = lazy(() => import('./pages/ContactPage/ContactPage'));
+import ForgotPasswordPage from './pages/ForgotPasswordPage/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage/ResetPasswordPage';
+import PrivacyPage from './pages/PrivacyPage/PrivacyPage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
+import CriticPage from './pages/CriticPage/CriticPage';
+import ContactPage from './pages/ContactPage/ContactPage';
+import CatalogPage from './pages/CatalogPage/CatalogPage';
+import SiteLayout from './components/SiteLayout/SiteLayout';
+import AuthLayout from './components/AuthLayout/AuthLayout';
 
 function App() {
   const [notification, setNotification] = useState({ isOpen: false, title: '', message: '', type: 'success' });
@@ -47,23 +46,27 @@ function App() {
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       <Router>
-        <Suspense fallback={<div className="loading">Загрузка...</div>}>
-          <Routes>
+        <Routes>
+          <Route element={<SiteLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/top" element={<TopUsersPage />} />
-            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/critic" element={<CriticPage />} />
             <Route path="/film/:id" element={<FilmPage />} />
-            <Route path="/login" element={<LoginPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/user/:id" element={<UserProfilePage />} />
-          </Routes>
-        </Suspense>
+          </Route>
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<LoginPage initialStage="register" />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          </Route>
+        </Routes>
       </Router>
       <NotificationModal
         isOpen={notification.isOpen}

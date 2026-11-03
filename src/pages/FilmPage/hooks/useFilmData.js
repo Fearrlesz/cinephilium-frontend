@@ -10,8 +10,10 @@ function useFilmData(filmId) {
   const [reviews, setReviews] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const loadFilm = useCallback(async () => {
-    setLoading(true);
+  // `silent` — обновить фильм/агрегаты после оценки, не показывая экран
+  // «Загрузка...». Иначе каждый drag вайба размонтировал бы панель.
+  const loadFilm = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const response = await api.get(`/films/${filmId}`);
       setFilm(response.data);
@@ -23,7 +25,7 @@ function useFilmData(filmId) {
     } catch (err) {
       console.error('Ошибка загрузки фильма:', err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [filmId]);
 

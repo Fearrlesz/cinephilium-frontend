@@ -1,810 +1,906 @@
 /* ============================================================
-   ПРОФИЛЬ — золото (без неона и без фиолетовых полосок)
+   F8 — профиль: карточка, вкладки, плоские секции
+   Только токены; без теней, стекла, translate/scale и
+   анимаций появления.
    ============================================================ */
+
 .profile-page {
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
+  padding: 88px 24px 64px;
 }
 
-.profile-header {
+.profile-back {
+  display: inline-block;
+  margin-bottom: 20px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid transparent;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.profile-back:hover {
+  color: var(--ink);
+  border-bottom-color: var(--line-strong);
+}
+
+/* ── Карточка ─────────────────────────────────────────────── */
+
+.profile-card {
   display: flex;
-  align-items: center;
-  gap: 30px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 28px 32px;
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 30px;
-  position: relative;
-  overflow: hidden;
-}
-
-.profile-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 15%;
-  width: 70%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168, 133, 64, 0.5), transparent);
-  opacity: 0.35;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(168, 133, 64, 0.06);
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--gold);
-  transition: all 0.3s ease;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--void);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 500;
 }
 
-.profile-avatar:hover {
-  border-color: var(--gold-bright);
+.profile-card-body {
+  flex: 1;
+  min-width: 0;
 }
 
-.avatar-placeholder {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 32px;
-  color: var(--gold-bright);
+.profile-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 9px;
 }
 
-.profile-info h1 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 24px;
-  margin-bottom: 4px;
-  color: var(--text-primary);
+.profile-name {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
-.profile-info p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 2px;
+
+.profile-badge,
+.profile-own {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 2px 8px;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.profile-badge--exclusive {
+  border-color: var(--azure-line);
+  color: var(--azure-bright);
+}
+
+.profile-own {
+  border-color: transparent;
+  padding-left: 0;
+  color: var(--ink-faint);
+}
+
+.profile-edit {
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.profile-edit:disabled {
+  opacity: 1;
+}
+
+.profile-settings {
+  position: relative;
+  margin-left: auto;
+}
+
+.profile-settings .profile-edit {
+  margin-left: 0;
+}
+
+.profile-settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: min(380px, calc(100vw - 48px));
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+
+.profile-settings-title {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profile-settings-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.profile-settings-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-settings-label {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+.profile-settings-hint {
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.profile-settings-error {
+  margin: 0 0 10px;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.profile-settings-saving {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.profile-switch {
+  flex: 0 0 auto;
+  position: relative;
+  width: 34px;
+  height: 18px;
+  margin-top: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.profile-switch.is-on {
+  border-color: var(--azure);
+  background: var(--azure);
+}
+
+.profile-switch:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.profile-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  transition: left 0.14s ease, background-color 0.14s ease;
+}
+
+.profile-switch.is-on .profile-switch-knob {
+  left: 18px;
+  background: var(--void);
+}
+
+.profile-registered,
+.profile-hidden-note {
+  margin: 6px 0 0;
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 
 .profile-stats {
   display: flex;
-  gap: 20px;
   flex-wrap: wrap;
-  margin: 8px 0;
-}
-.profile-stats p {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-.profile-stats strong {
-  color: var(--gold-bright);
-}
-
-.logout-btn {
-  padding: 8px 20px;
-  border-radius: 40px;
-  border: 1px solid rgba(236, 72, 153, 0.22);
-  background: transparent;
-  color: var(--neon-pink);
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  transition: all 0.3s;
-  margin-top: 8px;
-  width: auto;
-  font-weight: 400;
-  box-shadow: none;
-}
-.logout-btn:hover {
-  background: rgba(236, 72, 153, 0.08);
-}
-
-.profile-ratings,
-.profile-reviews {
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 24px 28px;
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
-}
-
-.profile-ratings h2,
-.profile-reviews h2 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
-}
-/* Декоративные подчёркивания под заголовками удалены */
-
-/* Заголовок вкладки с сортировкой */
-.profile-ratings-header {
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-ratings-header h2 {
-  margin-bottom: 8px;
-}
-
-.ratings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 8px 22px;
   margin-top: 16px;
 }
 
-.rating-item {
+.profile-stat {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.14);
-  border-radius: 10px;
-  border-left: 3px solid var(--glass-border);
-  transition: all 0.3s ease;
+  align-items: baseline;
+  gap: 7px;
 }
 
-.rating-item:hover {
-  border-left-color: var(--gold);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.rating-film-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.rating-poster-small {
-  width: 40px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.rating-poster-small:hover {
-  border-color: var(--gold);
-}
-
-.rating-film-info h4 {
-  font-family: var(--font-sans);
+.profile-stat-label {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
   font-weight: 500;
-  font-size: 14px;
-  color: var(--text-primary);
-}
-.rating-film-info p {
-  color: var(--text-muted);
-  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-.rating-score {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 20px;
+.profile-stat-value {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--gold-bright);
 }
 
-/* ============================================================
-   ВКЛАДКИ ПРОФИЛЯ
-   ============================================================ */
-.profile-tabs {
-  margin-top: 20px;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 16px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  transition: border-color 0.3s ease;
-}
-
-.profile-tabs:hover {
-  border-color: rgba(168, 133, 64, 0.4);
-}
-
-.tabs-header {
+.profile-achievement-row {
   display: flex;
-  gap: 0;
-  background: rgba(0, 0, 0, 0.14);
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 16px 20px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  border-bottom: 3px solid transparent;
-  font-family: var(--font-sans);
-  letter-spacing: 0.02em;
-  position: relative;
-  border-radius: 0;
-  width: auto;
-  margin-top: 0;
-  box-shadow: none;
-}
-
-.tab-btn:hover {
-  color: var(--text-primary);
-  background: rgba(168, 133, 64, 0.03);
-}
-
-.tab-btn.active {
-  color: var(--gold-bright);
-  border-bottom-color: var(--gold);
-  background: rgba(168, 133, 64, 0.05);
-}
-
-.tab-btn .tab-count {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 1px 10px;
-  border-radius: 12px;
-  margin-left: 6px;
-  transition: all 0.3s ease;
-}
-
-.tab-btn.active .tab-count {
-  color: var(--gold-bright);
-  background: rgba(168, 133, 64, 0.08);
-}
-
-/* ============================================================
-   КАРТОЧКА РЕЦЕНЗИИ В ПРОФИЛЕ — золото
-   (без фиолетовой полосы слева)
-   ============================================================ */
-.review-item {
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 16px;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.review-item:hover {
-  background: rgba(0, 0, 0, 0.2);
-  border-color: rgba(168, 133, 64, 0.4);
-  transform: translateY(-2px);
-}
-
-.review-film-link {
-  text-decoration: none;
-  color: inherit;
-  flex: 1;
-}
-
-.review-film-link:hover .review-title {
-  color: var(--gold-bright);
-}
-
-.review-film-name {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.review-film-name .film-icon {
-  font-size: 16px;
-}
-
-.review-footer {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--glass-border);
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.review-date {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.review-go-to-film {
+.profile-pinned {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 20px;
-  background: rgba(168, 133, 64, 0.06);
-  color: var(--gold-bright);
-  border: 1px solid rgba(168, 133, 64, 0.16);
-  border-radius: 20px;
+  gap: 7px;
+  max-width: 100%;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  font-family: var(--font-sans);
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
 }
 
-.review-go-to-film:hover {
-  background: rgba(168, 133, 64, 0.12);
-  border-color: rgba(168, 133, 64, 0.28);
-  transform: scale(1.03);
+.profile-pinned:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
 }
 
-/* Кнопка редактирования профиля */
-.btn-edit-profile {
-  display: inline-block;
-  padding: 8px 24px;
-  background: rgba(168, 133, 64, 0.06);
-  color: var(--gold-bright);
-  border: 1px solid rgba(168, 133, 64, 0.16);
-  border-radius: 20px;
+.profile-pinned-mark {
+  color: var(--cyan);
+  font-size: 9px;
+}
+
+.profile-pinned-empty {
+  color: var(--ink-faint);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+
+.profile-achievements-link {
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  font-family: var(--font-sans);
 }
 
-.btn-edit-profile:hover {
-  background: rgba(168, 133, 64, 0.12);
-  border-color: rgba(168, 133, 64, 0.28);
-  transform: scale(1.03);
+.profile-achievements-link:hover {
+  color: var(--ink);
+  border-bottom-color: var(--line-strong);
 }
 
-/* Пустое состояние */
-.profile-ratings .empty-state,
-.profile-reviews .empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
+.profile-ach-count {
+  color: var(--ink-faint);
 }
 
-.profile-ratings .empty-state .empty-icon,
-.profile-reviews .empty-state .empty-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 12px;
-  opacity: 0.4;
-}
+/* ── Вкладки ──────────────────────────────────────────────── */
 
-.profile-ratings .empty-state p,
-.profile-reviews .empty-state p {
-  font-size: 15px;
-}
-
-/* ============================================================
-   ДОСТИЖЕНИЯ
-   ============================================================ */
-.achievements-section {
-  background: rgba(0, 0, 0, 0.14);
-  padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
-}
-
-.achievements-section:hover {
-  border-color: rgba(168, 133, 64, 0.4);
-  background: rgba(0, 0, 0, 0.18);
-}
-
-.achievements-section h3,
-.achievements-section h4 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.achievements-section h3 { font-size: 18px; }
-.achievements-section h4 { font-size: 16px; }
-
-.achievement-first-frame {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 165, 0, 0.05));
-  border: 1px solid rgba(255, 215, 0, 0.15);
-}
-
-.achievement-first-frame .achievement-icon {
-  animation: firstFrameGlow 2s ease-in-out infinite;
-}
-
-@keyframes firstFrameGlow {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-/* ============================================================
-   СОРТИРОВКА ОЦЕНОК (горизонтальный ряд, золото, без неона)
-   ============================================================ */
-.sort-controls {
+.profile-tabbar {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: nowrap;      /* ← запрещаем перенос */
-  white-space: nowrap;
+  gap: 24px;
+  margin-top: 26px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line-faint);
+  scrollbar-width: none;
 }
 
-.sort-btn {
-  flex: 0 0 auto;         /* кнопки не растягиваются и не сжимаются */
-  padding: 6px 14px;
-  font-size: 13px;
-  font-family: var(--font-sans);
-  font-weight: 600;       /* ← всегда одинаковый вес, чтобы не «прыгала» ширина */
-  letter-spacing: 0.01em;
+.profile-tabbar::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-tab {
+  flex: 0 0 auto;
+  padding: 11px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   line-height: 1;
-  border-radius: 8px;
+  text-transform: uppercase;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  box-shadow: none;
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.profile-tab:hover {
+  color: var(--ink);
+}
+
+.profile-tab.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--azure);
+}
+
+.profile-tabpanel {
+  padding-top: 24px;
+}
+
+/* ── Общие состояния ─────────────────────────────────────── */
+
+.profile-empty {
   margin: 0;
-  width: auto;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-
-  /* ← анимируем только цвета, не размеры/вес */
-  transition: background-color 0.2s ease,
-              border-color     0.2s ease,
-              color            0.2s ease;
+  padding: 34px 0;
+  color: var(--ink-muted);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
 }
 
-.sort-btn:hover {
-  background: rgba(168, 133, 64, 0.08);
-  border-color: rgba(168, 133, 64, 0.4);
-  color: var(--text-primary);
+.profile-error {
+  margin: 0;
+  padding: 12px 0;
+  border-left: 2px solid var(--line-strong);
+  padding-left: 10px;
+  color: var(--ink-muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.sort-btn.active {
-  border-color: rgba(168, 133, 64, 0.55);
-  background: rgba(168, 133, 64, 0.14);
-  color: var(--gold-bright);
-  /* font-weight НЕ трогаем — иначе кнопка меняет ширину и «скачет» */
+.profile-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
 }
 
-/* ============================================================
-   АДАПТИВ
-   ============================================================ */
-@media (max-width: 768px) {
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
-  }
-  .profile-stats {
-    justify-content: center;
-  }
-  .rating-item {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-  .rating-film-info {
-    justify-content: center;
-  }
-
-  .tabs-header {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .tab-btn {
-    padding: 14px 18px;
-    border-bottom: none;
-    border-left: 3px solid transparent;
-    text-align: left;
-    font-size: 14px;
-  }
-
-  .tab-btn.active {
-    border-bottom-color: transparent;
-    border-left-color: var(--gold);
-    background: rgba(168, 133, 64, 0.06);
-  }
-
-  .tab-btn .tab-count {
-    float: right;
-  }
-
-  .profile-ratings,
-  .profile-reviews {
-    padding: 16px;
-  }
-
-  .review-item {
-    padding: 16px 18px;
-  }
-
-  .review-header {
-    flex-direction: column;
-  }
-
-  .review-rating {
-    align-self: flex-start;
-    font-size: 13px;
-  }
-
-  .review-title {
-    font-size: 16px;
-  }
-
-  .review-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .review-actions {
-    justify-content: space-between;
-  }
-
-  .review-go-to-film {
-    justify-content: center;
-    padding: 8px 16px;
-  }
-
-  .review-text {
-    font-size: 14px;
-  }
-
-  .profile-ratings h2,
-  .profile-reviews h2 {
-    font-size: 18px;
-  }
+.profile-more-btn {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
 }
 
-@media (max-width: 480px) {
-  .tab-btn {
-    padding: 12px 14px;
-    font-size: 13px;
-  }
-  .review-item {
-    padding: 14px 14px;
-  }
-  .review-title {
-    font-size: 15px;
-  }
-  .review-text {
-    font-size: 13px;
-  }
-  .review-rating {
-    font-size: 12px;
-    padding: 2px 10px;
-  }
-  .like-btn {
-    font-size: 13px;
-    padding: 4px 10px;
-  }
-  .review-go-to-film {
-    font-size: 13px;
-    padding: 6px 14px;
-  }
-  .profile-ratings,
-  .profile-reviews {
-    padding: 12px;
-  }
+.profile-more-btn:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--line-strong);
 }
 
-/* ============================================================
-   АДАПТИВ: КНОПКИ СОРТИРОВКИ
-   ============================================================ */
-
-/* Планшет — ещё в строку, но компактнее */
-@media (max-width: 768px) {
-  .sort-controls {
-    gap: 6px;
-  }
-  .sort-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
+.profile-more-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
 }
 
-/* Телефон — ровно 2 кнопки в строку, фиксированная ширина */
-@media (max-width: 480px) {
-  .sort-controls {
-    flex-wrap: wrap;             /* ← разрешаем перенос */
-    justify-content: flex-start;
-    width: 100%;                 /* контейнер на всю ширину */
-    gap: 6px;
-  }
-
-  .sort-btn {
-    flex: 1 1 calc(50% - 3px);   /* ← ровно 2 кнопки в строку, не зависят от текста */
-    min-width: 0;
-    padding: 6px 8px;
-    font-size: 12px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    box-sizing: border-box;
-  }
+.profile-status {
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* Очень узкий экран — по одной в строку, ещё компактнее */
-@media (max-width: 360px) {
-  .sort-btn {
-    flex: 1 1 100%;              /* по одной кнопке в строку */
-    padding: 5px 6px;
-    font-size: 11px;
-  }
+/* ── Оценки ───────────────────────────────────────────────── */
+
+.profile-ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
 }
 
+.profile-rating-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
 
-/* ============================================================
-   БЛОК СРЕДНИХ ПО КРИТЕРИЯМ В КАРТОЧКЕ РЕЦЕНЗИИ ПРОФИЛЯ
-   ============================================================ */
+.profile-rating-poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  object-fit: cover;
+}
 
-.review-header {
+.profile-rating-card:hover .profile-rating-poster {
+  border-color: var(--line-strong);
+}
+
+.profile-rating-title {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 7px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.profile-rating-year {
+  margin-top: 3px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.profile-rating-score {
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-rating-score.is-empty {
+  color: var(--ink-faint);
+}
+
+/* ── Рецензии ─────────────────────────────────────────────── */
+
+.profile-review {
+  padding: 22px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.profile-review:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.profile-review-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
 }
 
-.review-rating-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background: rgba(168, 133, 64, 0.08);
-  border: 1px solid rgba(168, 133, 64, 0.22);
-  border-radius: 20px;
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+.profile-review-film {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.profile-review-film:hover {
+  color: var(--azure-bright);
+}
+
+.profile-review-title {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+}
+
+.profile-review-score {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Сводка: Технический / Вайб / Комбо ---------- */
-.review-criteria-summary {
-  margin: 14px 0 12px;
-  padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
+.profile-review-score-max {
+  margin-left: 2px;
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.profile-review-meta {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+}
+
+.profile-review-text {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.profile-spoiler {
+  margin-top: 12px;
+}
+
+.profile-spoiler-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.profile-spoiler-label {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.profile-spoiler-toggle {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.profile-spoiler-toggle:hover {
+  color: var(--ink);
+  border-bottom-color: var(--line-strong);
+}
+
+/* ── Комментарии ──────────────────────────────────────────── */
+
+.profile-comment {
+  padding: 20px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.profile-comment:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.profile-comment-source {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.profile-comment-source a {
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+
+.profile-comment-source a:hover {
+  color: var(--azure-bright);
+}
+
+.profile-comment-type {
+  color: var(--ink-faint);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.profile-comment-text {
+  margin: 9px 0 0;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+/* ── Достижения ───────────────────────────────────────────── */
+
+.profile-achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
-.criteria-summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.summary-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  font-size: 13px;
-  line-height: 1;
-}
-
-.summary-pill-label {
-  color: var(--text-secondary);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-}
-
-.summary-pill-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  color: var(--gold-bright);
-  font-variant-numeric: tabular-nums;
-}
-
-.summary-pill-suffix {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-left: 1px;
-}
-
-/* ---------- Средние по 5 блокам ---------- */
-.criteria-blocks-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-  gap: 8px;
-}
-
-.criteria-block-chip {
+.profile-achievement {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 6px;
-  background: rgba(168, 133, 64, 0.05);
-  border: 1px solid rgba(168, 133, 64, 0.16);
-  border-radius: 8px;
-  text-align: center;
-  transition: all 0.2s ease;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
 }
 
-.criteria-block-chip:hover {
-  background: rgba(168, 133, 64, 0.10);
-  border-color: rgba(168, 133, 64, 0.32);
+.profile-achievement.is-pinned {
+  border-color: var(--azure-line);
 }
 
-.chip-label {
-  font-size: 10.5px;
-  color: var(--text-secondary);
+.profile-achievement-name {
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.profile-pin-btn {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  line-height: 1.2;
+  cursor: pointer;
 }
 
-.chip-value {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--gold-bright);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+.profile-pin-btn:hover:not(:disabled) {
+  color: var(--ink);
+  border-bottom-color: var(--line-strong);
 }
 
-/* ---------- Адаптив ---------- */
+.profile-pin-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* ── Скелетоны ────────────────────────────────────────────── */
+
+.profile-skeleton--card .profile-skel-card {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.profile-skeleton--grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.profile-skeleton--grid .profile-skel-card {
+  min-width: 0;
+}
+
+.profile-skel-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.profile-skel-line {
+  height: 9px;
+  margin-top: 9px;
+  border-radius: 2px;
+  background: var(--surface-2);
+}
+
+.profile-skel-line--wide {
+  width: 82%;
+}
+
+.profile-skel-line--short {
+  width: 46%;
+}
+
+/* ── Адаптив ──────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .profile-ratings-grid,
+  .profile-skeleton--grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 82px 20px 56px;
+  }
+
+  .profile-card {
+    gap: 18px;
+    padding: 20px;
+  }
+
+  .profile-name {
+    font-size: 22px;
+  }
+
+  .profile-stats {
+    gap: 7px 16px;
+  }
+
+  .profile-ratings-grid,
+  .profile-skeleton--grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .profile-achievements-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .profile-tabbar {
+    gap: 17px;
+  }
+
+  .profile-tab {
+    font-size: 10px;
+  }
+
+  .profile-ratings-grid,
+  .profile-skeleton--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .profile-avatar {
+    flex-basis: 56px;
+    width: 56px;
+    height: 56px;
+    font-size: 21px;
+  }
+
+  .profile-settings {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .profile-settings-panel {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  .profile-review-head {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-review-title {
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 480px) {
-  .review-criteria-summary {
-    padding: 10px 12px;
-    margin: 12px 0 10px;
+  .profile-page {
+    padding: 76px 16px 48px;
   }
 
-  .criteria-blocks-row {
-    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-    gap: 6px;
+  .profile-card {
+    padding: 16px;
   }
 
-  .criteria-block-chip {
-    padding: 6px 4px;
+  .profile-name {
+    font-size: 20px;
   }
 
-  .chip-label {
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px 12px;
+  }
+
+  .profile-achievement-row {
+    gap: 10px;
+  }
+
+  .profile-tabbar {
+    gap: 0 14px;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+
+  .profile-tab {
     font-size: 9.5px;
+    letter-spacing: 0.08em;
+    padding: 9px 0;
   }
 
-  .chip-value {
-    font-size: 13px;
+  .profile-achievements-grid {
+    grid-template-columns: 1fr;
   }
 
-  .summary-pill {
-    padding: 5px 12px;
-    font-size: 12px;
-  }
-
-  .summary-pill-label {
-    font-size: 11px;
+  .profile-review-text {
+    font-size: 14px;
   }
 }

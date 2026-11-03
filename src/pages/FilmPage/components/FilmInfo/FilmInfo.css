@@ -1,0 +1,46 @@
+/* ============================================================
+   HERO INFO — только текст, без карточек
+   ============================================================ */
+
+.hero-info {
+  min-width: 0;
+}
+
+.tagline {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.hero-title {
+  margin: 0;
+}
+
+.hero-meta {
+  margin: 16px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.hero-synopsis {
+  max-width: 62ch;
+  margin: 18px 0 0;
+}
+
+@media (max-width: 768px) {
+  .hero-meta {
+    font-size: 10px;
+  }
+
+  .hero-synopsis {
+    margin-top: 14px;
+  }
+}

@@ -1,0 +1,274 @@
+/* ============================================================
+   HEADER — плоская глобальная навигация, 56px
+   Без стекла, свечения, теней и анимаций появления.
+   ============================================================ */
+
+.hdr {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 800;
+  height: 56px;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line);
+}
+
+.hdr-in {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  max-width: var(--wrap);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.brand {
+  flex: none;
+  padding: 6px 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.brand:hover {
+  color: var(--azure-bright);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin: 0 auto;
+}
+
+.nav-link {
+  position: relative;
+  padding: 19px 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.nav-link:hover {
+  color: var(--ink-soft);
+}
+
+.nav-link.is-active {
+  color: var(--ink);
+}
+
+.nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--azure);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+}
+
+.tool-link {
+  padding: 6px 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.tool-link:hover {
+  color: var(--ink);
+  background: none;
+  border: none;
+}
+
+.tool-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-soft);
+}
+
+.tool-contact:hover {
+  color: var(--ink);
+}
+
+.tool-contact-dot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--azure-bright);
+}
+
+.tool-contact-short {
+  display: none;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.avatar:hover {
+  border-color: var(--azure);
+  color: var(--ink);
+}
+
+/* ── Мобильное меню ───────────────────────────────────────── */
+.hdr-burger {
+  display: none;
+  padding: 5px 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.hdr-mobile {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line);
+}
+
+.hdr-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 8px 24px 16px;
+}
+
+.hdr-mobile-link {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-faint);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.hdr-mobile-link:last-child {
+  border-bottom: none;
+}
+
+.hdr-mobile-link:hover {
+  color: var(--ink);
+}
+
+/* ── Адаптив ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hdr-in {
+    gap: 20px;
+  }
+
+  .nav {
+    gap: 18px;
+  }
+
+  .tool-contact-full {
+    display: none;
+  }
+
+  .tool-contact-short {
+    display: inline;
+  }
+}
+
+@media (max-width: 768px) {
+  .hdr-in {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .tool-search,
+  .tool-contact {
+    display: none;
+  }
+
+  .hdr-burger {
+    display: inline-block;
+  }
+
+  .tools {
+    gap: 12px;
+  }
+
+  .brand {
+    margin-right: auto;
+  }
+
+  .hdr-mobile-nav {
+    padding: 8px 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand {
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+  }
+
+  .tool-link {
+    font-size: 9.5px;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
+}

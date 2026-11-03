@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../api/client';
 import { getErrorMessage } from '../../utils/apiError';
-import '../LoginPage/LoginPage.css';
 
 const PASSWORD_MIN = 8;
 
@@ -16,8 +15,8 @@ function ResetPasswordPage() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
 
     if (password.length < PASSWORD_MIN) {
@@ -44,64 +43,67 @@ function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="container auth-container">
-        <div className="auth-box glass-card">
-          <h1>Сброс пароля</h1>
-          <div className="error-msg">Ссылка недействительна: в ней нет токена.</div>
-          <p className="toggle-auth">
-            <Link to="/forgot-password">Как получить ссылку</Link>
-          </p>
+      <div className="auth-box auth-document">
+        <p className="auth-kicker">Доступ</p>
+        <h1 className="auth-title">Сброс пароля</h1>
+        <div className="auth-error">Ссылка недействительна: в ней нет токена.</div>
+        <div className="auth-links">
+          <p><Link to="/forgot-password">Как получить ссылку</Link></p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container auth-container">
-      <div className="auth-box glass-card">
-        <h1>Новый пароль</h1>
+    <div className="auth-box auth-document">
+      <p className="auth-kicker">Доступ</p>
+      <h1 className="auth-title">Новый пароль</h1>
+      <p className="auth-subtitle">Задайте пароль — после этого все старые сессии закроются.</p>
 
-        {error && <div className="error-msg">{error}</div>}
+      {error && <div className="auth-error">{error}</div>}
 
-        {done ? (
-          <>
-            <div className="success-msg">Пароль изменён. Теперь можно войти.</div>
-            <p className="toggle-auth">
-              <Link to="/login">Перейти ко входу</Link>
-            </p>
-          </>
-        ) : (
-          <form onSubmit={handleSubmit}>
+      {done ? (
+        <>
+          <div className="auth-success">Пароль изменён. Теперь можно войти.</div>
+          <div className="auth-links">
+            <p><Link to="/login">Перейти ко входу</Link></p>
+          </div>
+        </>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <label className="auth-field">
+            <span>Новый пароль</span>
             <input
               type="password"
-              placeholder="Новый пароль"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
               minLength={PASSWORD_MIN}
               required
             />
+          </label>
+          <label className="auth-field">
+            <span>Повторите пароль</span>
             <input
               type="password"
-              placeholder="Повторите пароль"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
               minLength={PASSWORD_MIN}
               required
             />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Сохраняем...' : 'Изменить пароль'}
-            </button>
-          </form>
-        )}
+          </label>
+          <button type="submit" className="auth-submit" disabled={loading}>
+            {loading ? 'Сохраняем…' : 'Изменить пароль'}
+          </button>
+        </form>
+      )}
 
-        {!done && (
-          <p className="toggle-auth">
-            <Link to="/login">Вернуться ко входу</Link>
-          </p>
-        )}
-      </div>
+      {!done && (
+        <div className="auth-links">
+          <p><Link to="/login">Вернуться ко входу</Link></p>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { setAccessToken, getAccessToken } from '../../api/client';
 import { getErrorMessage } from '../../utils/apiError';
 import { useNotification } from '../../context/NotificationContext';
 import { validatePassword, validateNickname } from '../../utils/ratingUtils';
-import './LoginPage.css';
+import '../../components/AuthLayout/AuthLayout.css';
 
 const PASSWORD_MIN = 8;
 const CONSENT_VERSION = '1.0';
 
-function LoginPage() {
+function LoginPage({ initialStage = 'login' }) {
   // login    — вход по никнейму
   // register — регистрация по инвайт-коду от администратора
-  const [stage, setStage] = useState('login');
+  const [stage] = useState(initialStage);
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
@@ -26,12 +26,9 @@ function LoginPage() {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    if (getAccessToken()) {
-      navigate('/');
-    }
+    if (getAccessToken()) navigate('/');
   }, [navigate]);
 
-  // Спрашиваем у бэкенда, открыта регистрация или только по инвайтам.
   useEffect(() => {
     let cancelled = false;
     api.get('/auth/config')
@@ -40,7 +37,6 @@ function LoginPage() {
         setInviteRequired(response.data?.inviteRequired !== false);
       })
       .catch(() => {
-        // Если конфиг недоступен, форма просто попросит код: бэкенд всё равно проверит.
         if (!cancelled) setInviteRequired(true);
       });
     return () => { cancelled = true; };
@@ -58,7 +54,7 @@ function LoginPage() {
 
   const validateCredentials = () => {
     if (!validateNickname(nickname.trim())) {
-      setError('Никнейм должен быть от 2 до 50 символов');
+      setError('Никнейм должен быть от 2 до 20 символов');
       return false;
     }
     if (!validatePassword(password)) {
@@ -114,11 +110,8 @@ function LoginPage() {
 
     try {
       if (!validateCredentials()) return;
-      if (stage === 'login') {
-        await submitLogin();
-      } else {
-        await submitRegister();
-      }
+      if (stage === 'login') await submitLogin();
+      else await submitRegister();
     } catch (err) {
       setError(getErrorMessage(err, stage === 'login' ? 'Не удалось войти' : 'Не удалось зарегистрироваться'));
     } finally {
@@ -126,120 +119,120 @@ function LoginPage() {
     }
   };
 
-  const switchMode = (next) => {
-    setStage(next);
-    setError('');
-    setInfo('');
-  };
-
-  const title = stage === 'login' ? 'Вход в Синефилиум' : 'Регистрация';
-  const buttonLabel = stage === 'login' ? 'Войти' : 'Зарегистрироваться';
+  const isLogin = stage === 'login';
 
   return (
-    <div className="container auth-container">
-      <div className="auth-box glass-card">
-        <h1>{title}</h1>
+    <div className="auth-box">
+      <p className="auth-kicker">{isLogin ? 'Вход' : 'Регистрация'}</p>
+      <h1 className="auth-title">{isLogin ? 'С возвращением' : 'Новый аккаунт'}</h1>
+      <p className="auth-subtitle">
+        {isLogin
+          ? 'Войдите, чтобы оценивать фильмы и вести дневник.'
+          : 'Регистрация по инвайт-коду от администратора.'}
+      </p>
 
-        {error && <div className="error-msg">{error}</div>}
-        {info && <div className="success-msg">{info}</div>}
+      {error && <div className="auth-error">{error}</div>}
+      {info && <div className="auth-success">{info}</div>}
 
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
+        <label className="auth-field">
+          <span>Никнейм</span>
           <input
             type="text"
-            placeholder="Никнейм"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             autoComplete="username"
             required
             minLength={2}
-            maxLength={50}
+            maxLength={20}
           />
+        </label>
 
+        <label className="auth-field">
+          <span>Пароль</span>
           <input
             type="password"
-            placeholder="Пароль"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete={stage === 'login' ? 'current-password' : 'new-password'}
+            autoComplete={isLogin ? 'current-password' : 'new-password'}
             required
             minLength={PASSWORD_MIN}
           />
+        </label>
 
-          {stage === 'login' && (
-            <p className="auth-admin-inline">
-              Нет доступа к аккаунту?{' '}
-              <Link to="/contact">Связь с админами</Link>
-            </p>
-          )}
+        {isLogin && (
+          <p className="auth-admin-inline">
+            Нет доступа к аккаунту? <Link to="/contact">Связь с админами</Link>
+          </p>
+        )}
 
-          {stage === 'register' && (
-            <>
+        {!isLogin && (
+          <>
+            <label className="auth-field">
+              <span>Инвайт-код</span>
               <input
                 type="text"
-                placeholder={inviteRequired ? 'Инвайт-код (например ABCD-EFGH)' : 'Инвайт-код (необязательно)'}
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 autoComplete="off"
                 spellCheck={false}
                 required={inviteRequired}
               />
+            </label>
+            <p className="auth-hint">
+              {inviteRequired
+                ? 'Код выдаёт администратор. Один код — один аккаунт.'
+                : 'Регистрация открыта, код можно не вводить.'}
+            </p>
+            {inviteRequired && (
               <p className="auth-hint">
-                {inviteRequired
-                  ? 'Код выдаёт администратор. Один код — один аккаунт.'
-                  : 'Регистрация открыта, код можно не вводить.'}
+                Нет кода? <Link to="/contact">Связь с админами</Link>
               </p>
+            )}
 
-              {inviteRequired && (
-                <p className="auth-hint">
-                  Нет кода? <Link to="/contact">Связь с админами</Link>
-                </p>
-              )}
-
-              <div className="consent-block">
-                <label className="consent-check">
-                  <input
-                    type="checkbox"
-                    checked={consentPersonal}
-                    onChange={(e) => setConsentPersonal(e.target.checked)}
-                  />
-                  <span>
-                    Согласен на{' '}
-                    <Link to="/privacy#personal-data" target="_blank" rel="noopener noreferrer">
-                      обработку персональных данных
-                    </Link>
-                  </span>
-                </label>
-                <label className="consent-check">
-                  <input
-                    type="checkbox"
-                    checked={consentCookies}
-                    onChange={(e) => setConsentCookies(e.target.checked)}
-                  />
-                  <span>
-                    Согласен на{' '}
-                    <Link to="/privacy#cookies" target="_blank" rel="noopener noreferrer">
-                      использование cookie
-                    </Link>
-                  </span>
-                </label>
-              </div>
-            </>
-          )}
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Загрузка...' : buttonLabel}
-          </button>
-        </form>
-
-        {stage === 'login' && (
-          <p className="toggle-auth">
-            <Link to="/forgot-password">Забыли пароль?</Link>
-          </p>
+            <label className="auth-check">
+              <input
+                type="checkbox"
+                checked={consentPersonal}
+                onChange={(e) => setConsentPersonal(e.target.checked)}
+              />
+              <span>
+                Согласен на{' '}
+                <Link to="/privacy#personal-data" target="_blank" rel="noopener noreferrer">
+                  обработку персональных данных
+                </Link>
+              </span>
+            </label>
+            <label className="auth-check">
+              <input
+                type="checkbox"
+                checked={consentCookies}
+                onChange={(e) => setConsentCookies(e.target.checked)}
+              />
+              <span>
+                Согласен на{' '}
+                <Link to="/privacy#cookies" target="_blank" rel="noopener noreferrer">
+                  использование cookie
+                </Link>
+              </span>
+            </label>
+          </>
         )}
 
-        <p className="toggle-auth" onClick={() => switchMode(stage === 'login' ? 'register' : 'login')}>
-          {stage === 'login' ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите'}
-        </p>
+        <button type="submit" className="auth-submit" disabled={loading}>
+          {loading ? 'Загрузка…' : isLogin ? 'Войти' : 'Зарегистрироваться'}
+        </button>
+      </form>
+
+      <div className="auth-links">
+        {isLogin ? (
+          <>
+            <p><Link to="/forgot-password">Забыли пароль?</Link></p>
+            <p>Нет аккаунта? <Link to="/register">Зарегистрироваться</Link></p>
+          </>
+        ) : (
+          <p>Уже есть аккаунт? <Link to="/login">Войти</Link></p>
+        )}
       </div>
     </div>
   );

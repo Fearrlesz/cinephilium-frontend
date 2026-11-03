@@ -3,15 +3,16 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import useActivityEvents from '../../hooks/useActivityEvents';
 import api from '../../api/client';
-import { getScoreColor } from '../../utils/constants';
-import FilmInfo from './components/FilmInfo';
-import RatingForm from './components/RatingForm';
-import CommentsSection from './components/CommentsSection';
-import ReviewsSection from './components/ReviewsSection';
-import UsersList from './components/UsersList';
+import { getGrade } from '../../utils/scoring';
+import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
+import FilmInfo from './components/FilmInfo/FilmInfo';
+import FilmActions from './components/FilmActions/FilmActions';
+import RatingSection from './components/RatingSection/RatingSection';
+import CommentsSection from './components/CommentsSection/CommentsSection';
+import ReviewsSection from './components/ReviewsSection/ReviewsSection';
+import UsersList from './components/UsersList/UsersList';
 import useFilmData from './hooks/useFilmData';
-import useRatingForm from './hooks/useRatingForm';
-import RatingDetailsModal from '../../components/RatingDetailsModal';
+import RatingDetailsModal from '../../components/RatingDetailsModal/RatingDetailsModal';
 import './FilmPage.css';
 
 function FilmPage() {
@@ -20,7 +21,6 @@ function FilmPage() {
   const { showNotification } = useNotification();
   const { addEvent } = useActivityEvents();
   const [selectedRating, setSelectedRating] = useState(null);
-  const [isRatingMode, setIsRatingMode] = useState(false);
   const [showUsersModal, setShowUsersModal] = useState(false);
 
   const {
@@ -42,29 +42,6 @@ function FilmPage() {
     loadCurrentUser
   } = useFilmData(id);
 
-  const ratingForm = useRatingForm(id, film, userRating, currentUser, loadFilm, loadFilmUsers, setUserRating, showNotification, navigate, addEvent);
-  const {
-    scores,
-    vibe,
-    genrePreset,
-    blockWeights,
-    textReview,
-    isSaving,
-    weightsValid,
-    calculatePreview,
-    saveRating,
-    handleGenreChange,
-    handleWeightChange,
-    handleRatingChange,
-    setVibe,
-    setTextReview,
-    resetForm
-  } = ratingForm;
-
-  useEffect(() => {
-    resetForm();
-  }, [userRating, resetForm]);
-
   useEffect(() => {
     loadFilm();
     loadFilmUsers();
@@ -78,9 +55,11 @@ function FilmPage() {
     if (!token) {
       showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы комментировать', type: 'warning' });
       navigate('/login');
-      return;
+      return { ok: false, code: 'UNAUTHORIZED', message: 'Войдите, чтобы комментировать' };
     }
     try {
+      // DECISION: API-CONTRACT.md описывает { targetType, targetId, text }, но
+      // работающий код и бэкенд используют { filmId, text }. Верил коду.
       await api.post('/comments', { filmId: id, text });
       await loadComments();
       if (currentUser && film) {
@@ -92,9 +71,43 @@ function FilmPage() {
         });
       }
       showNotification({ title: 'Комментарий добавлен', message: 'Ваш комментарий опубликован', type: 'success' });
+      return { ok: true };
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить комментарий', type: 'error' });
+      const code = err.response?.data?.errorCode;
+      const message = err.response?.data?.error || 'Не удалось добавить комментарий';
+
+      // DECISION: F2/3B — 403 ловим по errorCode, не по тексту. Inline-гейт
+      // рисует CommentsSection, поэтому глобальную модалку здесь не показываем.
+      if (code === 'RATING_REQUIRED_FOR_COMMENT') {
+        return {
+          ok: false,
+          code,
+          message: 'Чтобы комментировать, оцените фильм'
+        };
+      }
+
+      showNotification({ title: 'Ошибка', message, type: 'error' });
+      return { ok: false, code, message };
     }
+  };
+
+  // DECISION: F2/2A — «Оценить» из гейта комментариев скроллит к блоку оценки
+  // на этой же странице. RatingSection.jsx (F1) не трогаем, поэтому ищем его
+  // по существующему классу .rating-section.
+  const scrollToRating = () => {
+    const section = document.querySelector('.rating-section');
+    if (!section) return;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    section.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  };
+
+  const requireAuth = () => {
+    showNotification({
+      title: 'Доступ запрещён',
+      message: 'Войдите, чтобы сохранять фильмы',
+      type: 'warning'
+    });
+    navigate('/login');
   };
 
   const likeComment = async (commentId) => {
@@ -112,23 +125,21 @@ function FilmPage() {
     }
   };
 
-  const addReview = async (title, text) => {
+  const addReview = async (title, text, isSpoiler = false) => {
     const token = localStorage.getItem('token');
     if (!token) {
       showNotification({ title: 'Доступ запрещён', message: 'Войдите в систему, чтобы написать рецензию', type: 'warning' });
       navigate('/login');
-      return;
-    }
-    if (!userRating) {
-      showNotification({ title: 'Сначала оцените фильм', message: 'Чтобы написать рецензию, нужно оценить фильм', type: 'warning' });
-      return;
+      return { ok: false, code: 'UNAUTHORIZED', message: 'Войдите, чтобы написать рецензию' };
     }
     try {
+      // DECISION: F3/7 — ratingId убран: по B4 сервер сам берёт Rating
+      // пользователя. isSpoiler — B4, булево в теле POST /api/reviews.
       await api.post('/reviews', {
         filmId: id,
-        ratingId: userRating._id,
         title,
-        text
+        text,
+        isSpoiler: Boolean(isSpoiler)
       });
       await loadReviews();
       if (currentUser && film) {
@@ -140,9 +151,32 @@ function FilmPage() {
         });
       }
       showNotification({ title: 'Рецензия добавлена!', message: 'Ваша рецензия опубликована', type: 'success' });
+      return { ok: true };
     } catch (err) {
-      showNotification({ title: 'Ошибка', message: err.response?.data?.error || 'Не удалось добавить рецензию', type: 'error' });
+      const code = err.response?.data?.errorCode;
+      const message = err.response?.data?.error || 'Не удалось добавить рецензию';
+
+      // DECISION: F3/3A — 403 ловим по errorCode, не по тексту. Inline-гейт
+      // рисует ReviewsSection, поэтому глобальную модалку здесь не показываем.
+      if (code === 'FULL_RATING_REQUIRED_FOR_REVIEW') {
+        return {
+          ok: false,
+          code,
+          message: 'Рецензия доступна после полной оценки — 15 критериев'
+        };
+      }
+
+      showNotification({ title: 'Ошибка', message, type: 'error' });
+      return { ok: false, code, message };
     }
+  };
+
+  // F3/2A: после сохранения полной оценки из модалки ReviewsSection
+  // обновляем film.userRating и список оценивших, чтобы гейт снялся без reload.
+  const handleRatingSaved = (rating) => {
+    setUserRating(rating);
+    loadFilm({ silent: true });
+    loadFilmUsers();
   };
 
   const likeReview = async (reviewId) => {
@@ -174,122 +208,165 @@ function FilmPage() {
     }
   };
 
-  const toggleRatingMode = () => setIsRatingMode(prev => !prev);
-  const handleSaveRating = async () => {
-    await saveRating();
-    setIsRatingMode(false);
-  };
-
   if (loading) return <div className="loading">Загрузка...</div>;
   if (!film) return <div className="error">Фильм не найден</div>;
 
+  const posterUrl = getPosterUrl(film.poster);
+  const hasBackdrop = Boolean(film.backdrop || film.poster);
+  const backdropUrl = film.backdrop ? getPosterUrl(film.backdrop) : posterUrl;
+  const genres = film.genres || [];
+  const actors = film.actors || [];
+
   return (
-    <div className="container">
-      <div className="film-page">
-        <button onClick={() => navigate('/')} className="back-btn">← На главную</button>
-
-        {/* 1. Информация о фильме + ваша оценка */}
-        <FilmInfo
-          film={film}
-          userRating={userRating}
-          onToggleRating={toggleRatingMode}
-          isRatingMode={isRatingMode}
+    <div className="film-page">
+      <section className={`film-hero ${hasBackdrop ? '' : 'no-image'}`}>
+        <div
+          className={`film-hero-bd ${hasBackdrop ? 'has-image' : ''}`}
+          style={hasBackdrop ? { backgroundImage: `url("${backdropUrl}")` } : undefined}
+          aria-hidden="true"
         />
 
-        {/* 2. Форма оценки (открывается по кнопке) */}
-        {isRatingMode && (
-          <RatingForm
-            scores={scores}
-            vibe={vibe}
-            genrePreset={genrePreset}
-            blockWeights={blockWeights}
-            textReview={textReview}
-            weightsValid={weightsValid}
-            isSaving={isSaving}
-            onScoreChange={handleRatingChange}
-            onVibeChange={setVibe}
-            onGenreChange={handleGenreChange}
-            onWeightChange={handleWeightChange}
-            onTextReviewChange={setTextReview}
-            onSave={handleSaveRating}
-            calculatePreview={calculatePreview}
-          />
-        )}
-
-        {/* 3. Список оценок пользователей + детали оценки */}
-        <UsersList
-          filmUsers={filmUsers}
-          usersLoading={false}
-          onShowUsers={() => setShowUsersModal(true)}
-          onOpenRatingDetails={openRatingDetails}
-        />
-
-        {/* 4. Трейлер */}
-        {film.trailer && (
-          <div className="trailer glass-card">
-            <h3>Трейлер</h3>
-            <iframe
-              src={film.trailer}
-              title="Трейлер"
-              allowFullScreen
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-              style={{ width: '100%', height: '380px', border: 'none' }}
-            />
+        <div className="film-hero-in">
+          <div className="film-poster-col">
+            <div className="film-poster">
+              <img src={posterUrl} alt={film.title} onError={handleImgError} />
+            </div>
           </div>
-        )}
 
-        {/* 5. Рецензии — ниже всей основной информации */}
-        <ReviewsSection
-          reviews={reviews}
-          currentUser={currentUser}
-          film={film}
-          userRating={userRating}
-          onAddReview={addReview}
-          onLikeReview={likeReview}
-        />
+          <FilmInfo film={film}>
+            <RatingSection
+              film={film}
+              userRating={userRating}
+              setUserRating={setUserRating}
+              reloadFilm={loadFilm}
+              reloadUsers={loadFilmUsers}
+              showNotification={showNotification}
+              navigate={navigate}
+            />
 
-        {/* 6. Комментарии — самые нижние */}
-        <CommentsSection
-          comments={comments}
-          currentUser={currentUser}
-          film={film}
-          onAddComment={addComment}
-          onLikeComment={likeComment}
-        />
-      </div>
+            <FilmActions
+              film={film}
+              currentUser={currentUser}
+              onRequireAuth={requireAuth}
+            />
+          </FilmInfo>
+        </div>
+      </section>
 
-      {/* Модалка "Все оценки фильма" */}
+      <main className="film-layout">
+        <div className="film-main">
+          <UsersList
+            filmUsers={filmUsers}
+            usersLoading={false}
+            onShowUsers={() => setShowUsersModal(true)}
+            onOpenRatingDetails={openRatingDetails}
+          />
+
+          {film.trailer && (
+            <section className="film-trailer">
+              <h2 className="sec-title">Трейлер</h2>
+              <iframe
+                src={film.trailer}
+                title="Трейлер" allowFullScreen
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+              />
+            </section>
+          )}
+
+          <ReviewsSection
+            reviews={reviews}
+            currentUser={currentUser}
+            film={film}
+            userRating={userRating}
+            onAddReview={addReview}
+            onLikeReview={likeReview}
+            onRatingSaved={handleRatingSaved}
+            showNotification={showNotification}
+          />
+
+          <CommentsSection
+            comments={comments}
+            currentUser={currentUser}
+            film={film}
+            onAddComment={addComment}
+            onLikeComment={likeComment}
+            onRate={scrollToRating}
+          />
+        </div>
+
+        <aside className="film-side">
+          {genres.length > 0 && (
+            <div className="side-block">
+              <h3 className="sec-title">Жанры</h3>
+              <div className="side-chips">
+                {genres.map(genre => (
+                  <span className="chip" key={genre}>{genre}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="side-block">
+            <h3 className="sec-title">О фильме</h3>
+            <dl className="side-facts">
+              {film.year && (
+                <div>
+                  <dt>Год</dt>
+                  <dd>{film.year}</dd>
+                </div>
+              )}
+              {film.director && (
+                <div>
+                  <dt>Режиссёр</dt>
+                  <dd>{film.director}</dd>
+                </div>
+              )}
+              {actors.length > 0 && (
+                <div>
+                  <dt>В ролях</dt>
+                  <dd>{actors.join(', ')}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </aside>
+      </main>
+
       {showUsersModal && (
         <div className="modal-overlay" onClick={() => setShowUsersModal(false)}>
           <div className="modal-content users-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setShowUsersModal(false)}>✕</button>
-            <h2>👥 Все оценки фильма</h2>
-            <p className="modal-subtitle">Всего <strong>{filmUsers.length}</strong> человек</p>
+            <button className="modal-close" onClick={() => setShowUsersModal(false)}>×</button>
+            <p className="modal-kicker">Оценки</p>
+            <h2 className="modal-title">Все оценки фильма</h2>
+            <p className="modal-sub">Всего <strong>{filmUsers.length}</strong> человек</p>
             <div className="users-modal-list">
-              {filmUsers.map((item) => (
-                <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
-                  <div className="user-info">
+              {filmUsers.map((item) => {
+                // F1-fix: для vibe-only finalScore на бэке = 0, не показываем цифру.
+                const isVibeOnly = item.rating.completeness === 'vibe';
+                return (
+                  <div key={`${item.user._id}-${item.rating._id}`} className="user-rating-item-full">
                     <Link to={`/user/${item.user._id}`} className="user-link">
-                      👤 {item.user.nickname || 'Пользователь'}
+                      {item.user.nickname || 'Пользователь'}
                     </Link>
-                    {item.user.isAdmin && <span className="admin-badge">👑</span>}
+                    <div className="rating-info">
+                      <span
+                        className="user-rating-score" style={{ color: isVibeOnly ? 'var(--ink-faint)' : (getGrade(item.rating.finalScore)?.color || 'var(--ink)') }}
+                        title={isVibeOnly ? 'Только вайб — комбинированный не вычислен' : undefined}
+                      >
+                        {isVibeOnly ? '—' : item.rating.finalScore}
+                      </span>
+                      <button
+                        className="details-btn" onClick={() => {
+                          setShowUsersModal(false);
+                          openRatingDetails(item.rating);
+                        }}
+                      >
+                        Детали
+                      </button>
+                    </div>
                   </div>
-                  <div className="rating-info">
-                    <span className="user-rating-score" style={{ color: getScoreColor(item.rating.finalScore) }}>
-                      {item.rating.finalScore}
-                    </span>
-                    <button
-                      className="details-btn"
-                      onClick={() => {
-                        setShowUsersModal(false);
-                        openRatingDetails(item.rating);
-                      }}
-                    >
-                      🔍 Детали
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

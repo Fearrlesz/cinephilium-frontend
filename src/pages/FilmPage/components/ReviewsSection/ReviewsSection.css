@@ -1,0 +1,588 @@
+/* ============================================================
+   REVIEWS — разделители, без карточек и свечений
+   ============================================================ */
+
+.film-reviews {
+  margin-top: 46px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.sec-head .sec-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sec-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+}
+
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--azure-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-btn:hover {
+  background: none;
+  color: var(--ink);
+}
+
+/* F3: гейт рецензий по полной оценке / авторизации.
+   Плоская строка на токенах, без карточки и новых цветов. */
+.rev-gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 8px;
+}
+
+.rev-gate-login {
+  margin: 16px 0 8px;
+}
+
+.rev-gate-text {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.rev-gate-text a {
+  color: var(--azure-bright);
+}
+
+.rev-gate-cta {
+  flex: none;
+}
+
+.rev-gate-inline {
+  margin-bottom: 8px;
+}
+
+/* ── форма ────────────────────────────────────────────────── */
+.review-form {
+  margin: 18px 0 8px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-faint);
+  border-bottom: 1px solid var(--line-faint);
+}
+
+.review-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.review-error {
+  margin: 14px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-strong);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.review-input,
+.review-textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.review-input {
+  margin-bottom: 10px;
+}
+
+.review-input::placeholder,
+.review-textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.review-input:focus,
+.review-textarea:focus {
+  border-color: var(--azure-line);
+  background: rgba(91, 155, 213, 0.04);
+}
+
+.review-textarea-wrap {
+  position: relative;
+}
+
+.review-textarea {
+  min-height: 130px;
+  padding-bottom: 28px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.review-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.review-min {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+.review-min.is-short {
+  color: var(--ink-muted);
+}
+
+.review-meta .char-counter {
+  margin-top: 0;
+}
+
+.review-spoiler {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 12px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.review-spoiler input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  margin: 1px 0 0;
+  flex: none;
+  padding: 0;
+  accent-color: var(--azure);
+  cursor: pointer;
+}
+
+.review-form-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-ghost {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.btn-ghost:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: transparent;
+}
+
+.btn-primary {
+  height: 38px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--azure-bright);
+  color: var(--void);
+}
+
+.btn-primary:disabled {
+  opacity: 0.42;
+}
+
+/* ── список ───────────────────────────────────────────────── */
+.rev-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-line {
+  margin: 0;
+  padding: 26px 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink-faint);
+}
+
+.rev {
+  padding: 26px 0;
+  border-top: 1px solid var(--line-faint);
+}
+
+.rev:first-child {
+  border-top: none;
+  padding-top: 20px;
+}
+
+.rev-pending {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pink);
+}
+
+.rev-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rev-av {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--highlight), var(--surface));
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.rev-id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.rev-author {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rev-author:hover {
+  color: var(--azure-bright);
+}
+
+.badge-admin {
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rev-handle,
+.rev-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.rev-score {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.rev-score span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
+.rev-key {
+  margin: 18px 0 0;
+  padding-left: 13px;
+  border-left: 1px solid var(--azure-line);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* F3: плашка спойлера. Нейтральная: line/surface/ink-faint, без pink. */
+.rev-spoiler {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-spoiler:hover {
+  border-color: var(--line-strong);
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+
+.rev-spoiler-label {
+  color: var(--ink-muted);
+}
+
+.rev-spoiler-action {
+  color: var(--ink-faint);
+}
+
+.rev-body {
+  display: -webkit-box;
+  max-width: 64ch;
+  margin: 12px 0 0;
+  overflow: hidden;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.rev-body.is-open {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.rev-more {
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-more:hover {
+  background: none;
+  color: var(--azure-bright);
+}
+
+.rev-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.rev-action {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rev-action:hover {
+  background: none;
+  color: var(--ink);
+}
+
+.rev-action span {
+  color: var(--ink-muted);
+}
+
+/* ── детали ───────────────────────────────────────────────── */
+.rev-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.rev-details-genre {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.rev-blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px 28px;
+}
+
+.rev-block-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line-faint);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rev-block-head span:last-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.rev-block ul {
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.rev-block li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.rev-block li b {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 768px) {
+  .film-reviews {
+    margin-top: 36px;
+    padding-top: 22px;
+  }
+
+  .rev {
+    padding: 22px 0;
+  }
+
+  .rev-key {
+    font-size: 14px;
+  }
+
+  .rev-body {
+    font-size: 13.5px;
+  }
+
+  .rev-blocks {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .review-form-foot {
+    flex-direction: column-reverse;
+  }
+
+  .review-form-foot > * {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .rev-gate {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .rev-gate-cta {
+    width: 100%;
+  }
+
+  .rev-head {
+    flex-wrap: wrap;
+  }
+
+  .rev-score {
+    margin-left: 0;
+  }
+
+  .rev-actions {
+    gap: 12px;
+  }
+}
