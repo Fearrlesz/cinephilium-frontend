@@ -12,7 +12,11 @@ const CONSENT_VERSION = '1.0';
 function LoginPage({ initialStage = 'login' }) {
   // login    — вход по никнейму
   // register — регистрация по инвайт-коду от администратора
-  const [stage] = useState(initialStage);
+  // DECISION: stage derives from the route prop, not initial state. React Router
+  // reuses the same LoginPage instance when switching /login <-> /register, so
+  // useState(initialStage) would keep the old stage and the register button
+  // would silently render the login form.
+  const stage = initialStage;
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');

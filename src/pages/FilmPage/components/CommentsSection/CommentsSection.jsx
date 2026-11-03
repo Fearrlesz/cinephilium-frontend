@@ -9,16 +9,6 @@ import './CommentsSection.css';
 const REVIEW_PAGE_SIZE = 5;
 const MAX_COMMENT = 1000;
 
-function pluralComments(count) {
-  const value = Math.abs(Number(count) || 0);
-  const mod100 = value % 100;
-  const mod10 = value % 10;
-  if (mod100 >= 11 && mod100 <= 14) return 'комментариев';
-  if (mod10 === 1) return 'комментарий';
-  if (mod10 >= 2 && mod10 <= 4) return 'комментария';
-  return 'комментариев';
-}
-
 function likeCount(comment) {
   if (typeof comment.likesCount === 'number') return comment.likesCount;
   return Array.isArray(comment.likes) ? comment.likes.length : 0;
@@ -302,9 +292,10 @@ function CommentsSection({
     }
   };
 
+  // F7: это не комментарии к фильму, а ответы на текст рецензии.
   const countLabel = reviewCount === null
-    ? 'Комментарии'
-    : `${reviewCount} ${pluralComments(reviewCount)}`;
+    ? 'Ответы на рецензию'
+    : `Ответы на рецензию · ${reviewCount}`;
 
   const reviewThread = isReviewMode ? (
     <section className="film-comments film-comments--review">
@@ -320,7 +311,7 @@ function CommentsSection({
       ) : (
         <div className="c-thread">
           <div className="c-thread-head">
-            <span className="lbl">Комментарии · {reviewCount ?? 0}</span>
+            <span className="lbl">{countLabel}</span>
             <button type="button" className="link-btn" onClick={handleToggleReview}>
               Свернуть
             </button>
@@ -331,16 +322,16 @@ function CommentsSection({
           )}
 
           {reviewLoading && reviewItems.length === 0 && (
-            <p className="c-login">Загрузка комментариев…</p>
+            <p className="c-login">Загрузка ответов…</p>
           )}
 
           {!reviewLoading && reviewItems.length === 0 && (
-            <p className="c-empty">Пока никто не комментировал</p>
+            <p className="c-empty">Пока нет ответов на рецензию</p>
           )}
 
           {!currentUser && (
             <p className="c-login">
-              <Link to="/login">Войдите</Link>, чтобы комментировать.
+              <Link to="/login">Войдите</Link>, чтобы ответить на рецензию.
             </p>
           )}
 
@@ -385,14 +376,14 @@ function CommentsSection({
                 <span className="c-av" aria-hidden="true">{initial}</span>
                 <input
                   className="c-input" type="text"
-                  placeholder={replyTo ? 'Написать ответ…' : 'Написать комментарий…'}
+                  placeholder={replyTo ? 'Написать ответ…' : 'Написать ответ на рецензию…'}
                   value={reviewText}
                   maxLength={MAX_COMMENT}
                   onChange={event => {
                     setReviewText(event.target.value);
                     setReviewError('');
                   }}
-                  aria-label="Текст комментария к рецензии"
+                  aria-label="Текст ответа на рецензию"
                 />
                 <button
                   className="c-send" type="submit"

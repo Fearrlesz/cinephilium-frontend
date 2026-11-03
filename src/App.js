@@ -61,8 +61,8 @@ function App() {
           </Route>
           <Route path="/admin" element={<AdminPanel />} />
           <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<LoginPage initialStage="register" />} />
+            <Route path="/login" element={<LoginPage key="login" />} />
+            <Route path="/register" element={<LoginPage key="register" initialStage="register" />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Route>
