@@ -34,7 +34,7 @@
 
 Backend: `node --test tests/vibe-rating.test.js` → 17/17 pass (отмена,
 full-запрет, чужая оценка). Frontend: production build `Compiled successfully`,
-127.56 kB JS / 22.03 kB CSS. Mock API + Chrome CDP 11/11: лента, три колонки,
+127.68 kB JS / 22.03 kB CSS. Mock API + Chrome CDP 11/11: лента, три колонки,
 список оценивших, профиль, отмена, удаление события, 480 без overflow.
 Скриншоты — `screenshots/vibe-cancel/`. Живой прод — `[UNVERIFIED]`.
 

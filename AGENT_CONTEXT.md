@@ -463,7 +463,7 @@ FilmPage.jsx
   бэкенд хранит `metadata.vibe`, `score` остаётся `null`. При отмене событие
   удаляется.
 - **Проверка:** backend `node --test tests/vibe-rating.test.js` → 17/17;
-  frontend production build 127.56 kB JS / 22.03 kB CSS; mock API + Chrome
+  frontend production build 127.68 kB JS / 22.03 kB CSS; mock API + Chrome
   11/11: лента, три колонки, список оценивших, профиль, отмена, удаление
   события, 480 без overflow. Скриншоты — `screenshots/vibe-cancel/`.
   Живой прод — `[UNVERIFIED]`.
