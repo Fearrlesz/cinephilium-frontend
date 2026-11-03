@@ -4,7 +4,7 @@
 **Ветка:** `main`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.9.1)
+**Документация версии:** `CHANGELOG.md` (4.9.2)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
@@ -349,6 +349,10 @@ FilmPage.jsx
 - Семь вкладок в порядке: Оценки, Рецензии, Комментарии, Дневник, Watchlist,
   Понравившиеся, Достижения. Активная вкладка — `?tab=<key>`, default `ratings`;
   переключение через `useSearchParams`, браузерный «назад» восстанавливает вкладку.
+- Оценки сортируются на сервере: `?sort=new|old|high|low` (по умолчанию `new`).
+  Над сеткой — текстовые «Новые / Старые / Высокие / Низкие»; при смене сортировки
+  список начинается с первой страницы. `high/low` идут по `combinedScore`, vibe
+  без балла всегда после full-оценок. См. `RatingsTab` и `listRatings`.
 - Каждая вкладка грузит свой эндпоинт и имеет собственные skeleton/empty/error/
   «Загрузить ещё». Оценки — `/users/:id/ratings` (12), рецензии —
   `/users/:id/reviews` (10), комментарии — `/users/:id/comments` (15), дневник —

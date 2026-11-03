@@ -131,10 +131,18 @@ function MoreButton({ onClick, loading }) {
   );
 }
 
+const RATING_SORTS = [
+  { value: 'new', label: 'Новые' },
+  { value: 'old', label: 'Старые' },
+  { value: 'high', label: 'Высокие' },
+  { value: 'low', label: 'Низкие' },
+];
+
 function RatingsTab({ userId, isOwnProfile }) {
+  const [sort, setSort] = useState('new');
   const {
     items, pagination, loading, loadingMore, error, hidden, loadMore
-  } = usePagedList(`/users/${userId}/ratings`, 12);
+  } = usePagedList(`/users/${userId}/ratings?sort=${sort}`, 12);
 
   if (hidden) return <ProfileEmpty>Оценки недоступны.</ProfileEmpty>;
   if (loading && items.length === 0) return <TabSkeleton variant="grid" count={5} />;
@@ -146,6 +154,22 @@ function RatingsTab({ userId, isOwnProfile }) {
 
   return (
     <div className="profile-ratings">
+      <div className="profile-ratings-head">
+        <div className="profile-sort" role="group" aria-label="Сортировка оценок">
+          {RATING_SORTS.map(option => (
+            <button
+              key={option.value}
+              type="button"
+              className={`profile-sort-btn${sort === option.value ? ' is-active' : ''}`}
+              aria-pressed={sort === option.value}
+              onClick={() => setSort(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {items.length === 0 ? (
         <ProfileEmpty>
           {isOwnProfile

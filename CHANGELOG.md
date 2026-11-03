@@ -1,6 +1,40 @@
-# Changelog — Cinephilium Frontend 4.9.1
+# Changelog — Cinephilium Frontend 4.9.2
 
 **Дата и время среза: 03.11.2026 (Europe/Moscow, UTC+03:00)**
+
+## 4.9.2 — сортировка оценок в профиле
+
+**Дата: 03.11.2026.**
+
+### Смысл
+
+В F8 вкладка «Оценки» стала пагинированной, и старая клиентская сортировка
+«Новые / Старые / Высокие / Низкие» исчезла. Вернули её на уровне API: иначе
+сортировались бы только уже загруженные 12 карточек, а не весь список.
+
+### Что изменено
+
+- `src/pages/ProfilePage/ProfileTabs.jsx` — `RatingsTab` хранит `sort`
+  (`new|old|high|low`), запрашивает `/users/:id/ratings?sort=...` и показывает
+  текстовые кнопки над сеткой; смена сортировки сбрасывает пагинацию на первую
+  страницу.
+- `src/pages/ProfilePage/ProfilePage.css` — `.profile-ratings-head`,
+  `.profile-sort`, `.profile-sort-btn` на токенах; на 620 переключатель
+  выравнивается влево.
+- Backend `src/utils/profileTabsQuery.js` — `listRatings` принимает
+  `sort=new|old|high|low` (default `new`, неизвестное значение → `new`).
+  `high/low` сортируют по `combinedScore`, vibe без балла идёт после full.
+- Backend `tests/profile-tabs.test.js` — тест на четыре сортировки и fallback.
+
+### Проверка
+
+Backend: `node --test tests/profile-tabs.test.js` → 22/22 pass.
+Frontend: production build `Compiled successfully`, 126.88 kB JS / 21.95 kB CSS.
+Mock API + Chrome CDP: «Новые» → Вайб/Низкая/Высокая, «Старые» →
+Высокая/Низкая/Вайб, «Высокие» → Высокая/Низкая/Вайб, «Низкие» →
+Низкая/Высокая/Вайб; активная кнопка совпадает; 480 — без горизонтального
+overflow. Скриншоты: `screenshots/ratings-sort/`.
+Живой прод — `[UNVERIFIED]`.
 
 ## 4.9.1 — регистрация и подпись ответов на рецензию
 
