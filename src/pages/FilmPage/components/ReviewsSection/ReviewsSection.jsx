@@ -320,12 +320,17 @@ function ReviewsSection({
           const authorId = author._id;
           const rating = review.ratingId;
           const isPending = review.status === 'pending';
+          // У старых рецензий ratingId может быть null: оценку удалили или
+          // документ создан до появления этого поля. typeof null === 'object',
+          // поэтому одной проверки typeof недостаточно — иначе чтение
+          // rating.combinedScore роняет всю страницу фильма.
+          const hasRating = rating !== null && typeof rating === 'object';
           const isTextOpen = Boolean(expandedText[review._id]);
           const isDetailsOpen = Boolean(expandedDetails[review._id]);
           const isSpoiler = review.isSpoiler === true;
           const isSpoilerOpen = Boolean(expandedSpoilers[review._id]);
 
-          const badgeScore = typeof rating === 'object'
+          const badgeScore = hasRating
             ? (rating.combinedScore ?? rating.finalScore ?? rating.technicalScore)
             : null;
 
@@ -399,7 +404,7 @@ function ReviewsSection({
                   Полезно <span>{review.likes?.length || 0}</span>
                 </button>
 
-                {rating && typeof rating === 'object' && (
+                {hasRating && (
                   <button
                     type="button" className="rev-action" onClick={() => toggleDetails(review._id)}
                   >
@@ -408,7 +413,7 @@ function ReviewsSection({
                 )}
               </div>
 
-              {isDetailsOpen && rating && typeof rating === 'object' && (
+              {isDetailsOpen && hasRating && (
                 <RatingDetailsBlock rating={rating} />
               )}
 
