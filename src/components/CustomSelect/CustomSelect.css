@@ -97,7 +97,7 @@
   background: var(--surface-2);
   border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
 }

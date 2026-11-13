@@ -221,6 +221,7 @@ textarea {
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  overscroll-behavior: none;
   padding: 26px;
   background: var(--surface);
   border: 1px solid var(--line-strong);

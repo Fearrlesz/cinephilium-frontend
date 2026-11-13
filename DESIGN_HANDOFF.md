@@ -1,7 +1,7 @@
 # Cinephilium — дизайн-хендофф
 
-**Дата:** 30.10.2026  
-**Ветка:** `feature/f1-vibe-rating`  
+**Дата:** 14.11.2026  
+**Ветка:** `main`  
 **Задача:** полный редизайн страницы фильма и глобального слоя: бордо + azure/cyan,
 плоские поверхности, без стекла, неона и эмодзи.
 
@@ -36,8 +36,12 @@
 | `src/pages/FilmPage/FilmPage.jsx/.css` | герой, постер, layout, сайдбар, users-modal |
 | `src/pages/FilmPage/components/FilmInfo/FilmInfo.jsx/.css` | тэглайн, h1, мета, синопсис |
 | `.../RatingPanel/RatingPanel.jsx/.css` | соцдоказательство, три колонки, вайб-трек, спектр |
-| `.../CriteriaModal/CriteriaModal.jsx/.css` | оболочка модалки критериев |
-| `.../RatingForm/RatingForm.jsx/.css` | жанр, веса, критерии, preview, save |
+| `.../CriteriaModal/CriteriaModal.jsx/.css` | оболочка модалки критериев: 980px, sticky-шапка, fullscreen ≤720 |
+| `.../RatingForm/RatingForm.jsx/.css` | жанр, веса, критерии, вайб, липкий итог, save |
+| `.../ShareCard/ShareCardModal.jsx/.css` | модалка «Карточка готова», скачивание PNG |
+| `.../ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник |
+| `src/components/CustomSelect/CustomSelect.jsx/.css` | кастомный combobox вместо `<select>` |
+| `src/components/RangeSlider/RangeSlider.jsx/.css` | слайдер 1–10 / 0–50, «липкий» на тач |
 | `.../ReviewsSection/ReviewsSection.jsx/.css` | рецензии без карточки |
 | `.../CommentsSection/CommentsSection.jsx/.css` | комментарии без карточки |
 | `.../UsersList/UsersList.jsx/.css` | «Оценили фильм» компактным рядом |
@@ -325,24 +329,63 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 
 ---
 
-## 10. Модалка критериев
+## 10. Модалка критериев, кастомные списки и шеринг
 
-- `.modal-overlay`: fixed, `rgba(10,7,9,.86)`, `backdrop-filter: blur(6px)`,
+### Оболочка
+
+- `.criteria-overlay`: fixed, `rgba(10,7,9,.86)`, `backdrop-filter: blur(6px)`,
   z-index 9500, padding 24.
-- `.modal-content`: max-width 600, max-height 90vh, padding 26, `surface`,
-  border `line-strong`, radius `r-lg`, тень `0 40px 90px rgba(0,0,0,.9)`.
-- Кикер — mono 10.5/.15em uppercase ink-muted; заголовок Inter 20/600;
+- `.criteria-modal`: 980px, `max-height: 92vh`, padding 0, flex-колонка;
+  `.modal-head` и `.rf-foot` не скроллятся, тело — `.rf-scroll`. ≤720 —
+  fullscreen `100dvh`.
+- Кикер — mono 12/.15em uppercase ink-muted; заголовок Inter 24/600;
   саб Inter 12.5 ink-faint.
-- Инпуты/select — padding 11/13, border `line`, radius `r-sm`, focus `azure-line`.
-- Кнопка сохранения — height 42, фон azure, текст void, Inter 11.5/600 uppercase,
-  disabled opacity .42.
-- Слайдер критерия — 2px-линия:
-  `linear-gradient(90deg, var(--fc) var(--fill), var(--line) var(--fill))`,
-  thumb 12px, фон ink.
-- Аккордеон: `.crit` с border-top `line-faint`; маркер 6×6 radius 2 цветом блока;
-  title Inter 13.5/500; average mono 12; `+ / −` mono 13.
-- Веса: полоса 18px radius r-xs, сегменты цветами блоков; сумма ровно 100,
-  иначе сохранение disabled и предупреждение pink.
+
+### Форма оценки
+
+- `.rf-howto` — плашка-ссылка «Как оценивать» → `/about` (не поповеры).
+- `.rf-card` — секция-карточка: `surface`, border `line`, radius `r-md`,
+  padding 18/20; заголовок `.lbl` 12.
+- Жанр — `CustomSelect` 42px, max-width 380; системного `<select>` нет.
+- Веса: `.rf-weights-viz` 26px, сегменты цветами блоков; `.rf-weight-cells`
+  5 колонок — имя 12, вес 18 mono + `%` 12; `.rs` 0–50 с 6 делениями.
+  Сумма ровно 100, иначе «Уровнять» + disabled.
+- Критерии: `.rf-block` с корешком 2px `--bc`; шапка-кнопка — метр 10 точек
+  6px, целое среднее 16, шеврон. Тело `.rf-crit`: grid 1fr/2.5fr/56, label 13,
+  число 28 mono, `.rs` 1–10 с 10 делениями.
+- Вайб: число 44, слово, `.rs` 1–10 cyan, note.
+- `.rf-foot`: combined 32px, `/100` 12, грейд цветом, meta technical/vibe,
+  кнопки 42. ≤720 — колонка, кнопки flex 1.
+- Дефолт критериев 1, вайб 5. Десятых у критериев/средних нет (метр +
+  целое); technical/combined — по формуле, с десятыми. Пока всё на 1/5 и
+  оценки нет — «—» и «оценок пока нет».
+- Анимация числа 160ms opacity/translateY; заливка 70ms; reduced-motion.
+
+### Кастомные списки
+
+- `src/components/CustomSelect`: кнопка-combobox 42px (`size="sm"` — 32px),
+  список `.cselect__list` absolute, `surface-2`, max-height 288, z-index 70,
+  aria/клавиатура/Escape/клик вне. В каталоге — жанр, оценки, сортировка.
+
+### Шеринг-карточка
+
+- `ShareCardModal` открывается после full-save: `.share-modal` 640,
+  max-height 92vh, шапка, `.share-card-frame` 4:5, футер «Закрыть» /
+  «Скачать PNG».
+- Canvas 560×700 @2× (1120×1400): бренд Instrument Serif 24 без трёх кружков,
+  eyebrow mono 9, название 38/34/30 (кириллица — Georgia, как h1 на сайте),
+  byline, плитка грейда 72, балл 54, 5 блоков, футер с вайб/тех и ником 14.5.
+- Фон — backdrop через `getPosterUrl(..., 'w780')` + скрим; без фото —
+  градиент; tainted canvas — перерисовка без фото.
+
+### Тач и фокус
+
+- `-webkit-tap-highlight-color: transparent`; на `(pointer: coarse)` —
+  `outline: none` для `:focus/:focus-visible`, у `.rs__thumb` без синего
+  кольца. На десктопе `:focus-visible` — azure 1px.
+- Внутренние скроллы (`.rf-scroll`, `.share-modal__body`, `.modal-content`,
+  `.cselect__list`) — `overscroll-behavior: none`; `html` —
+  `overscroll-behavior-y: none` (без синего overscroll-свечения Chrome).
 
 ---
 
@@ -385,6 +428,12 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 - Придумывать новые брейкпоинты.
 - Менять F1-логику: `combined` только для full, vibe-only — прочерки,
   веса строго 100, `vibe × 10` не возвращать.
+- Возвращать нативные `<select>` — только `CustomSelect`; стилизовать
+  `input[type=range]` вне `RangeSlider`.
+- Показывать на тач системный focus-ring/синюю подсветку и включать
+  overscroll-свечение внутри модалок/списков.
+- Делать шеринг-карточку для vibe-only или подставлять в неё фейковые
+  фильм/ник.
 
 ---
 
@@ -404,11 +453,14 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 ## 14. Проверка и артефакты
 
 - `npm run build` — `Compiled successfully`.
-- CSS bundle ≈ 23.5 kB gzip, JS ≈ 115 kB gzip.
+- CSS bundle ≈ 23.1 kB gzip, JS ≈ 133 kB gzip.
 - Скриншоты: `screenshots/film-redesign/`:
-  `before-after.png`, `top.png`, `feed.png`, `modal.png`, `modal-bottom.png`.
-- Скриншоты сняты с production-сборки на mock API; Google Fonts в песочнице
-  недоступны, поэтому на кадрах fallback-шрифт.
+  `before-after.png`, `top.png`, `feed.png`, `modal.png`, `modal-bottom.png`,
+  `rating-form-1440.png`, `rating-form-390.png`, `share-card-1120.png`,
+  `share-card-1440.png`, `share-card-390.png`.
+- Скриншоты сняты с production-сборки на mock API; шрифты Inter/IBM Plex Mono
+  на кадрах настоящие. Мобильные — через CDP `Emulation.setDeviceMetricsOverride`
+  (390×844, touch): проверен тап по `CustomSelect` без синего кольца.
 
 ---
 

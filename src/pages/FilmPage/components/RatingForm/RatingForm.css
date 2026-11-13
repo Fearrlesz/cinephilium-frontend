@@ -17,6 +17,7 @@
   min-height: 0;
   padding: 20px 28px 26px;
   overflow-y: auto;
+  overscroll-behavior: none;
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
 }

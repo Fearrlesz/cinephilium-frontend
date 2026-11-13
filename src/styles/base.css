@@ -13,10 +13,15 @@
 * {
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   scroll-behavior: smooth;
+  /* DECISION: гасим системные тач-эффекты — синюю подсветку тапа
+     и overscroll-свечение Chrome на мобилках. */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -75,6 +80,16 @@ button {
   outline: 1px solid var(--azure);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* DECISION: на тач-устройствах фокус-кольцо при тапе выглядит как
+   системное синее свечение. Оставляем его только для точного
+   указателя (мышь/трекпад), клавиатурный фокус там сохраняется. */
+@media (pointer: coarse) {
+  :focus,
+  :focus-visible {
+    outline: none;
+  }
 }
 
 ::-webkit-scrollbar {
