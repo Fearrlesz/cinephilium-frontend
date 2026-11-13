@@ -59,10 +59,11 @@ export default function RatingPanel({
   vibeError,
   vibeLocked,
   onOpenCriteria,
+  onShareCard,
   onRequireAuth,
   onCancelVibe
 }) {
-  const isFull = (userRating?.completeness || '') === 'full';
+  const isFull = Boolean(userRating) && (userRating.completeness || 'full') === 'full';
   const hasVibe = Number(vibe) >= 1;
   const hasTechnical = isFull && Number(userRating?.technicalScore) > 0;
 
@@ -185,9 +186,14 @@ export default function RatingPanel({
         )}
 
         {isFull ? (
-          <button type="button" className="rp-cta rp-cta--link" onClick={onOpenCriteria}>
-            Изменить критерии →
-          </button>
+          <div className="rp-actions">
+            <button type="button" className="rp-cta rp-cta--link" onClick={onOpenCriteria}>
+              Изменить критерии →
+            </button>
+            <button type="button" className="rp-cta rp-cta--link" onClick={onShareCard}>
+              Карточка оценки →
+            </button>
+          </div>
         ) : (
           <button
             type="button" className={`rp-cta ${hasVibe ? 'rp-cta--accent' : ''}`}

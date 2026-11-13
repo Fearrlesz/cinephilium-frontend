@@ -4,7 +4,7 @@
 **Ветка:** `main`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.11.0)
+**Документация версии:** `CHANGELOG.md` (4.12.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
@@ -112,8 +112,8 @@ FilmPage.jsx
       VibeTrack/VibeTrack.jsx        drag-трек / 10 сегментов
     CriteriaModal/CriteriaModal.jsx  модалка полной оценки (980px, липкая шапка/низ)
       RatingForm/RatingForm.jsx      жанр, веса, критерии, вайб, итог, save
-    ShareCard/ShareCardModal.jsx     карточка после сохранения full-оценки
-      shareCardRenderer.js           canvas 560×700 @2× → PNG
+    ShareCard/ShareCardModal.jsx     карточка full-оценки: после save и из панели
+      shareCardRenderer.js           canvas 560×700 @2× → PNG (постер + скрим)
   FilmActions/FilmActions.jsx  сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
     WatchAction/WatchAction.jsx  кнопка и модалка просмотра
     WatchModal/WatchModal.jsx    дата, пересмотр, теги
@@ -186,13 +186,16 @@ FilmPage.jsx
   пока нет» (проп `hasSavedRating`), а не сразу «10 / Провал».
 - Низ `.rf-foot` липкий: combined 32px, грейд, technical/vibe и кнопки; сумма
   весов по-прежнему строго 100.
-- После успешного сохранения full-оценки `RatingSection` открывает
-  `ShareCardModal` (после закрытия модалки оценки, чтобы оверлеи не
-  накладывались). Canvas 1120×1400 (2× от 560×700): бренд без трёх кружков,
-  название фильма, режиссёр · год, грейд/балл, 5 блоков, вайб/тех и
-  `@nickname` из `currentUser`. PNG скачивается; фон — backdrop фильма, при
+- `ShareCardModal` открывается после успешного сохранения full-оценки (после
+  закрытия модалки оценки, чтобы оверлеи не накладывались) и в любой момент
+  из панели: у сохранённой full-оценки в `.rp-actions` две ссылки — «Изменить
+  критерии» и «Карточка оценки». Canvas 1120×1400 (2× от 560×700): бренд без
+  трёх кружков, название фильма, режиссёр · год, грейд/балл, 5 блоков,
+  вайб/тех и `@nickname` из `currentUser`. Фон — постер фильма
+  (`film.poster`, запасной `film.backdrop`) с затемнением и скримом; при
   ошибке загрузки/tainted canvas карточка рисуется без фото. Только для full,
-  vibe-only карточку не вызывает.
+  vibe-only карточку не вызывает; старые full-оценки без `completeness`
+  тоже получают вход (`(completeness || 'full') === 'full'`).
 
 ### Ошибки оценки
 
@@ -738,8 +741,8 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.css` | оболочка 980/92vh, fullscreen ≤720, шапка |
 | `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр (CustomSelect), веса, карточки блоков, RangeSlider, вайб, липкий итог |
 | `src/pages/FilmPage/components/RatingForm/RatingForm.css` | `.rf-*`: секции-карточки, 28/44/32px числа, адаптив 900/720/520 |
-| `src/pages/FilmPage/components/ShareCard/ShareCardModal.jsx` | модалка «Карточка готова», скачивание PNG, закрытие по Esc/оверлею |
-| `src/pages/FilmPage/components/ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник, backdrop+скрим |
+| `src/pages/FilmPage/components/ShareCard/ShareCardModal.jsx` | модалка «Карточка оценки» (после save и из панели), скачивание PNG, Esc/оверлей |
+| `src/pages/FilmPage/components/ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник, постер/backdrop+скрим |
 | `src/components/CustomSelect/CustomSelect.jsx` | кастомный combobox вместо `<select>`: aria, клавиатура, клик вне, Escape |
 | `src/components/CustomSelect/CustomSelect.css` | `.cselect*`: 42/32px, список 288px, z-index 70 |
 | `src/components/RangeSlider/RangeSlider.jsx` | слайдер 1–10 / 0–50: нативный input, свой трек/бегунок, sticky |
@@ -836,9 +839,12 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 14. 4.11: не добавлять нативный `<select>` — только `CustomSelect`; слайдеры —
     только `RangeSlider` (без глобального `input[type=range]`). Форма оценки:
     дефолт критериев 1, средние блоков без десятых, плашка «Как оценивать» →
-    `/about`, липкий низ, 980px. После full-save — `ShareCardModal`. На тач не
-    показывать focus-ring/синюю подсветку, внутренние скроллы —
-    `overscroll-behavior: none`.
+    `/about`, липкий низ, 980px. На тач не показывать focus-ring/синюю
+    подсветку, внутренние скроллы — `overscroll-behavior: none`.
+15. 4.12: `ShareCardModal` — только для full (старые full без `completeness`
+    считаются full); открывается после save и из `.rp-actions` панели. Фон
+    карточки — постер, затем backdrop; `@nickname` брать только из
+    `currentUser`, не подставлять фейки.
 
 ---
 

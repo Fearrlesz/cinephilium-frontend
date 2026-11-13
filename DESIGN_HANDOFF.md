@@ -369,14 +369,16 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 
 ### Шеринг-карточка
 
-- `ShareCardModal` открывается после full-save: `.share-modal` 640,
-  max-height 92vh, шапка, `.share-card-frame` 4:5, футер «Закрыть» /
-  «Скачать PNG».
+- `ShareCardModal` открывается после full-save и из панели оценки (у
+  сохранённой full-оценки в `.rp-actions` — «Изменить критерии» и «Карточка
+  оценки»): `.share-modal` 640, max-height 92vh, шапка, `.share-card-frame`
+  4:5, футер «Закрыть» / «Скачать PNG».
 - Canvas 560×700 @2× (1120×1400): бренд Instrument Serif 24 без трёх кружков,
   eyebrow mono 9, название 38/34/30 (кириллица — Georgia, как h1 на сайте),
   byline, плитка грейда 72, балл 54, 5 блоков, футер с вайб/тех и ником 14.5.
-- Фон — backdrop через `getPosterUrl(..., 'w780')` + скрим; без фото —
-  градиент; tainted canvas — перерисовка без фото.
+- Фон — постер (`film.poster`, запасной `film.backdrop`) через
+  `getPosterUrl(..., 'w780')`, фильтр `brightness(.62)`, скрим от 0.55 сверху
+  до VOID внизу; без фото — градиент; tainted canvas — перерисовка без фото.
 
 ### Тач и фокус
 
@@ -433,7 +435,7 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 - Показывать на тач системный focus-ring/синюю подсветку и включать
   overscroll-свечение внутри модалок/списков.
 - Делать шеринг-карточку для vibe-only или подставлять в неё фейковые
-  фильм/ник.
+  фильм/ник; подменять постер на «похожую» картинку.
 
 ---
 
@@ -453,11 +455,11 @@ dt mono 9.5/.11em uppercase ink-faint, dd Inter 13.5/1.55.
 ## 14. Проверка и артефакты
 
 - `npm run build` — `Compiled successfully`.
-- CSS bundle ≈ 23.1 kB gzip, JS ≈ 133 kB gzip.
+- CSS bundle ≈ 23.1 kB gzip, JS ≈ 133.3 kB gzip.
 - Скриншоты: `screenshots/film-redesign/`:
   `before-after.png`, `top.png`, `feed.png`, `modal.png`, `modal-bottom.png`,
   `rating-form-1440.png`, `rating-form-390.png`, `share-card-1120.png`,
-  `share-card-1440.png`, `share-card-390.png`.
+  `share-card-390.png` (карточка с постером, экспорт 1120×1400 и мобилка).
 - Скриншоты сняты с production-сборки на mock API; шрифты Inter/IBM Plex Mono
   на кадрах настоящие. Мобильные — через CDP `Emulation.setDeviceMetricsOverride`
   (390×844, touch): проверен тап по `CustomSelect` без синего кольца.
