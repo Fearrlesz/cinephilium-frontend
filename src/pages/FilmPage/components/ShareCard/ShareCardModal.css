@@ -1,0 +1,201 @@
+.share-overlay {
+  z-index: 9600;
+  padding: 20px;
+}
+
+.share-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 100%);
+  max-height: 92vh;
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.share-modal__head {
+  flex: none;
+  padding: 22px 26px 14px;
+  border-bottom: 1px solid var(--line-faint);
+}
+
+.share-modal__kicker {
+  margin: 0 0 7px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.share-modal__title {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.share-modal__sub {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.share-modal__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 26px 4px;
+  overflow-y: auto;
+}
+
+.share-card-frame {
+  width: auto;
+  height: min(calc(92vh - 214px), 630px);
+  max-width: 100%;
+  overflow: hidden;
+  background: var(--void);
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  flex: none;
+  margin: auto;
+}
+
+.share-card-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.share-card-skeleton {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.share-modal__foot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 26px 20px;
+  border-top: 1px solid var(--line-faint);
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.share-btn--ghost {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.share-btn--ghost:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.share-btn--primary {
+  background: var(--azure);
+  color: var(--void);
+  font-weight: 600;
+}
+
+.share-btn--primary:hover {
+  background: var(--azure-bright);
+}
+
+.share-btn--primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.share-btn:focus-visible {
+  outline: 1px solid var(--azure-bright);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .share-overlay {
+    padding: 0;
+  }
+
+  .share-modal {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .share-modal__head {
+    padding: 18px 20px 12px;
+  }
+
+  .share-modal__body {
+    padding: 14px 20px 4px;
+  }
+
+  .share-card-frame {
+    width: 100%;
+    height: auto;
+  }
+
+  .share-modal__foot {
+    padding: 14px 20px 18px;
+  }
+
+  .share-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 400px) {
+  .share-modal__title {
+    font-size: 20px;
+  }
+}
+
+/* Пользователь листает карточку — скроллбар не должен спорить с фоном. */
+.share-modal__body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.share-modal__body::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 2px;
+}

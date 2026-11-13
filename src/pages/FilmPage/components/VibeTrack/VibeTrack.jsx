@@ -20,6 +20,7 @@ export default function VibeTrack({
 }) {
   const trackRef = useRef(null);
   const draggingRef = useRef(false);
+  const armedRef = useRef(false);
   const lastEmittedRef = useRef(value);
 
   // После ответа сервера/отката ошибки value меняется извне — синхронизируем
@@ -48,32 +49,62 @@ export default function VibeTrack({
     onInput(next);
   };
 
+  const commitCurrent = () => {
+    const next = lastEmittedRef.current;
+    if (next >= 1) onCommit(next);
+  };
+
+  /**
+   * DECISION: мышь работает «липко» — после клика бегунок следует за курсором
+   * без зажатой кнопки (как в RangeSlider формы). Тач остаётся с capture:
+   * палец на экране, ничего не «залипает».
+   */
   const handlePointerDown = event => {
     if (isInactive) return;
     event.preventDefault();
 
-    draggingRef.current = true;
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-
     const next = valueFromClientX(event.clientX);
     lastEmittedRef.current = next;
     onInput(next);
+
+    if (event.pointerType === 'mouse') {
+      armedRef.current = true;
+      return;
+    }
+
+    draggingRef.current = true;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const handlePointerMove = event => {
-    if (!draggingRef.current || isInactive) return;
+    if (isInactive) return;
+    if (!draggingRef.current && !armedRef.current) return;
     emitInput(valueFromClientX(event.clientX));
   };
 
-  const finishDrag = event => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
+  const finishPointer = event => {
+    if (isInactive) return;
+    const wasDragging = draggingRef.current;
 
-    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    if (wasDragging) {
+      draggingRef.current = false;
+
+      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
     }
 
-    onCommit(valueFromClientX(event.clientX));
+    if (wasDragging || armedRef.current) commitCurrent();
+  };
+
+  const handlePointerLeave = () => {
+    if (!armedRef.current) return;
+    armedRef.current = false;
+    commitCurrent();
+  };
+
+  const handleBlur = () => {
+    armedRef.current = false;
   };
 
   const cancelDrag = () => {
@@ -84,6 +115,11 @@ export default function VibeTrack({
 
   const handleKeyDown = event => {
     if (isInactive) return;
+
+    if (event.key === 'Escape' && armedRef.current) {
+      armedRef.current = false;
+      return;
+    }
 
     const current = value >= 1 ? value : 0;
     let next = null;
@@ -157,8 +193,10 @@ export default function VibeTrack({
       aria-disabled={isInactive}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      onPointerUp={finishDrag}
+      onPointerUp={finishPointer}
       onPointerCancel={cancelDrag}
+      onPointerLeave={handlePointerLeave}
+      onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     >
       <div className="vibe-rail">

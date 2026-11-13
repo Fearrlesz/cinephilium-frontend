@@ -1,330 +1,190 @@
 /* ============================================================
-   ТАБЫ ДЛЯ СОРТИРОВКИ — ПРЕМИУМ КИБЕРПАНК
+   CUSTOM SELECT — кнопка + список в стиле сайта.
+   Никаких системных списков ОС, стекла и теней.
    ============================================================ */
 
-.sort-tabs {
-  display: flex;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 4px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 
-    0 2px 20px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.sort-tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
+.cselect {
   position: relative;
-  user-select: none;
-  -webkit-user-select: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.cselect__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 42px;
+  padding: 0 36px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: left;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.cselect__btn:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+}
+
+.cselect.is-open .cselect__btn {
+  border-color: var(--azure-line);
+  background: var(--azure-soft);
+}
+
+.cselect__btn:focus-visible {
+  outline: 1px solid var(--azure-line);
+  outline-offset: 1px;
+}
+
+.cselect__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/*  Золотая подсветка снизу для активной вкладки */
-.sort-tab::after {
-  content: '';
+.cselect__value.is-placeholder {
+  color: var(--ink-muted);
+}
+
+.cselect__chev {
   position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
-  border-radius: 4px;
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  top: 50%;
+  right: 13px;
+  width: 12px;
+  height: 12px;
+  flex: none;
+  fill: none;
+  stroke: var(--ink-faint);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: translateY(-50%);
+  transition: transform var(--dur-fast) var(--ease), stroke var(--dur-fast) var(--ease);
+  pointer-events: none;
 }
 
-.sort-tab:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
+.cselect.is-open .cselect__chev {
+  stroke: var(--ink-muted);
+  transform: translateY(-50%) rotate(180deg);
 }
 
-.sort-tab:hover::after {
-  width: 40%;
-  opacity: 0.3;
+.cselect__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 70;
+  max-height: 288px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
-.sort-tab.active {
-  background: rgba(91, 155, 213, 0.08);
-  color: var(--gold-bright);
-  box-shadow: 
-    0 4px 20px rgba(91, 155, 213, 0.06),
-    inset 0 1px 0 rgba(91, 155, 213, 0.05);
+.cselect__list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.sort-tab.active::after {
-  width: 60%;
-  opacity: 1;
+.cselect__list::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 6px;
 }
 
-.sort-tab.active:hover::after {
-  width: 70%;
-}
-
-.tab-icon {
-  font-size: 16px;
-  line-height: 1;
-  transition: transform 0.3s ease;
-}
-
-.sort-tab:hover .tab-icon {
-  transform: scale(1.1);
-}
-
-.sort-tab.active .tab-icon {
-  transform: scale(1.05);
-}
-
-.tab-label {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-/* ============================================================
-   КОНТЕЙНЕР ДЛЯ ТАБОВ В PANEL
-   ============================================================ */
-
-.sort-panel {
+.cselect__opt {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  flex-wrap: wrap;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
-  margin: 20px 0;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-xs);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
 }
 
-.sort-controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+.cselect__opt-label {
+  min-width: 0;
 }
 
-.sort-controls label {
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  opacity: 0.7;
-  text-transform: uppercase;
-  font-size: 11px;
+.cselect__opt.is-active {
+  background: rgba(237, 232, 224, 0.05);
+  color: var(--ink);
 }
 
-.sort-info {
-  color: var(--text-muted);
-  font-size: 13px;
+.cselect__opt.is-selected {
+  color: var(--azure-bright);
+}
+
+.cselect__check {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--azure-bright);
+}
+
+.cselect--sm .cselect__btn {
+  height: 32px;
+  padding: 0 28px 0 8px;
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.cselect--sm .cselect__btn:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.cselect--sm.is-open .cselect__btn {
+  background: var(--surface);
+}
+
+.cselect--sm .cselect__chev {
+  right: 9px;
+  width: 11px;
+  height: 11px;
+}
+
+/* В каталоге пункты длиннее кнопки: список шире, но не вылезает за экран. */
+.cselect--sm .cselect__list {
+  right: auto;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(320px, calc(100vw - 32px));
+}
+
+.cselect--sm .cselect__opt {
+  padding: 7px 9px;
+  font-size: 12px;
+}
+
+.cselect.is-disabled {
   opacity: 0.5;
-  white-space: nowrap;
 }
 
-/* ============================================================
-   АНИМАЦИЯ ПРИ ПЕРЕКЛЮЧЕНИИ
-   ============================================================ */
-
-@keyframes tabActive {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.sort-tab.active {
-  animation: tabActive 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* ============================================================
-   АДАПТИВ ДЛЯ МОБИЛЬНЫХ
-   ============================================================ */
-
-@media (max-width: 768px) {
-  .sort-panel {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  .sort-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .sort-controls label {
-    text-align: center;
-  }
-
-  .sort-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 4px;
-    border-radius: 12px;
-  }
-
-  .sort-tab {
-    justify-content: center;
-    padding: 10px 12px;
-    font-size: 12px;
-    border-radius: 10px;
-  }
-
-  .sort-tab::after {
-    bottom: 1px;
-  }
-
-  .tab-icon {
-    font-size: 14px;
-  }
-
-  .tab-label {
-    font-size: 12px;
-  }
-
-  .sort-info {
-    text-align: center;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .sort-panel {
-    padding: 12px;
-    margin: 12px 0;
-    border-radius: 12px;
-  }
-
-  .sort-tabs {
-    gap: 3px;
-    padding: 3px;
-    border-radius: 10px;
-  }
-
-  .sort-tab {
-    padding: 8px 8px;
-    font-size: 11px;
-    gap: 4px;
-    border-radius: 8px;
-  }
-
-  .sort-tab.active::after {
-    width: 30%;
-  }
-
-  .tab-icon {
-    font-size: 12px;
-  }
-
-  .tab-label {
-    font-size: 10px;
-  }
-
-  .sort-controls label {
-    font-size: 10px;
-  }
-
-  .sort-info {
-    font-size: 11px;
-  }
-}
-
-
-/* ============================================================
-   УБИРАЕМ СИНЕЕ СВЕЧЕНИЕ ПРИ КЛИКЕ/ФОКУСЕ
-   ============================================================ */
-
-/* Полностью убираем у всех элементов */
-* {
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-touch-callout: none !important;
-}
-
-/* Убираем синее свечение у табов */
-.sort-tab {
-  -webkit-tap-highlight-color: transparent !important;
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
-
-.sort-tab:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.sort-tab:active {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Убираем у всех кликабельных элементов */
-button:focus,
-button:active,
-button:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-div[role="button"]:focus,
-div[role="button"]:active,
-div[role="button"]:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Для всех элементов с табиндаксом */
-[tabindex]:focus,
-[tabindex]:active,
-[tabindex]:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Для select и input */
-select:focus,
-select:active,
-input:focus,
-input:active {
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Для всего документа */
-body {
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-/* Оставляем только кастомный фокус для клавиатуры (accessibility) */
-.sort-tab:focus-visible {
-  outline: 2px solid var(--gold) !important;
-  outline-offset: 2px !important;
-  border-radius: 8px !important;
+.cselect.is-disabled .cselect__btn {
+  cursor: not-allowed;
 }

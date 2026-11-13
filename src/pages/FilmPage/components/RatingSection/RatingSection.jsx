@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getAccessToken } from '../../../../api/client';
 import { communityValue, yourCombined } from '../../../../utils/scoring';
 import usePointerCoarse from '../../hooks/usePointerCoarse';
@@ -6,6 +6,7 @@ import useVibeRating from '../../hooks/useVibeRating';
 import RatingContext from '../RatingContext/RatingContext';
 import RatingPanel from '../RatingPanel/RatingPanel';
 import CriteriaModal from '../CriteriaModal/CriteriaModal';
+import ShareCardModal from '../ShareCard/ShareCardModal';
 import '../RatingPanel/RatingPanel.css';
 
 /**
@@ -23,9 +24,12 @@ export default function RatingSection({
   reloadFilm,
   reloadUsers,
   showNotification,
-  navigate
+  navigate,
+  currentUser
 }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [pendingShare, setPendingShare] = useState(null);
+  const [shareCard, setShareCard] = useState(null);
   const coarse = usePointerCoarse();
   const authenticated = Boolean(getAccessToken());
 
@@ -66,13 +70,23 @@ export default function RatingSection({
     setModalOpen(true);
   };
 
-  const handleSaved = rating => {
+  const handleSaved = (rating, payload) => {
     setUserRating(rating);
     reloadFilm?.({ silent: true });
     // F1-fix: после full список «Оценили фильм» должен показать новую оценку,
     // иначе счётчик и список остаются старыми до перезагрузки страницы.
     reloadUsers?.();
+    // DECISION: карточка открывается после закрытия модалки оценки (см. эффект
+    // ниже), иначе два оверлея на мгновение существуют одновременно.
+    setPendingShare({ rating, payload });
   };
+
+  useEffect(() => {
+    if (!modalOpen && pendingShare) {
+      setShareCard(pendingShare);
+      setPendingShare(null);
+    }
+  }, [modalOpen, pendingShare]);
 
   return (
     <section className="rating-section" aria-label="Оценка фильма">
@@ -107,6 +121,16 @@ export default function RatingSection({
           onClose={() => setModalOpen(false)}
           onSaved={handleSaved}
           showNotification={showNotification}
+        />
+      )}
+
+      {shareCard && (
+        <ShareCardModal
+          film={film}
+          rating={shareCard.rating}
+          payload={shareCard.payload}
+          currentUser={currentUser}
+          onClose={() => setShareCard(null)}
         />
       )}
     </section>

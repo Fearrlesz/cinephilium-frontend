@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../api/client';
 import { getPosterUrl, handleImgError } from '../../utils/posterUrl';
+import CustomSelect from '../../components/CustomSelect/CustomSelect';
 import './CatalogPage.css';
 
 const PAGE_SIZE = 20;
@@ -262,19 +263,19 @@ function CatalogPage() {
       </div>
 
       <div className="catalog-filters" aria-label="Фильтры каталога">
-        <label className="catalog-field">
+        <div className="catalog-field catalog-field--genre">
           <span className="catalog-label">Жанр</span>
-          <select
-            className="catalog-select"
+          <CustomSelect
+            size="sm"
             value={genre}
-            onChange={(event) => updateParam('genre', event.target.value)}
-          >
-            <option value="">Все жанры</option>
-            {facets.genres.map(item => (
-              <option key={item.value} value={item.value}>{item.value}</option>
-            ))}
-          </select>
-        </label>
+            onChange={(value) => updateParam('genre', value)}
+            options={[
+              { value: '', label: 'Все жанры' },
+              ...facets.genres.map(item => ({ value: item.value, label: item.value }))
+            ]}
+            ariaLabel="Жанр"
+          />
+        </div>
 
         <label className="catalog-field catalog-field--years">
           <span className="catalog-label">Год</span>
@@ -303,29 +304,31 @@ function CatalogPage() {
           </span>
         </label>
 
-        <label className="catalog-field">
+        <div className="catalog-field">
           <span className="catalog-label">Оценки</span>
-          <select
-            className="catalog-select"
+          <CustomSelect
+            size="sm"
             value={rated}
-            onChange={(event) => updateParam('rated', event.target.value)}
-          >
-            <option value="">Все фильмы</option>
-            <option value="1">С оценками</option>
-            <option value="0">Без оценок</option>
-          </select>
-        </label>
+            onChange={(value) => updateParam('rated', value)}
+            options={[
+              { value: '', label: 'Все фильмы' },
+              { value: '1', label: 'С оценками' },
+              { value: '0', label: 'Без оценок' }
+            ]}
+            ariaLabel="Оценки"
+          />
+        </div>
 
-        <label className="catalog-field">
+        <div className="catalog-field">
           <span className="catalog-label">Сортировка</span>
-          <select
-            className="catalog-select"
+          <CustomSelect
+            size="sm"
             value={sort}
-            onChange={(event) => updateParam('sort', event.target.value)}
-          >
-            {SORTS.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
-          </select>
-        </label>
+            onChange={(value) => updateParam('sort', value)}
+            options={SORTS}
+            ariaLabel="Сортировка"
+          />
+        </div>
 
         {hasFilters && (
           <button type="button" className="catalog-reset" onClick={resetFilters}>

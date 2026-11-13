@@ -141,21 +141,9 @@
   color: var(--ink-faint);
 }
 
-.catalog-select {
-  height: 32px;
-  padding: 0 26px 0 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-xs);
-  background: var(--surface);
-  font-family: var(--sans);
-  font-size: 12px;
-  color: var(--ink-soft);
-  cursor: pointer;
-}
-
-.catalog-select:focus {
-  outline: none;
-  border-color: var(--azure);
+.catalog-field--genre {
+  min-width: 190px;
+  max-width: 260px;
 }
 
 .catalog-years {
