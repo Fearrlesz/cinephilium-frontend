@@ -1,10 +1,10 @@
 # Контекст фронтенда Cinephilium
 
-**Дата среза:** 03.11.2026
+**Дата среза:** 14.11.2026
 **Ветка:** `main`  
 **Репозиторий:** https://github.com/Fearrlesz/cinephilium-frontend  
 **Бэкенд:** https://github.com/Fearrlesz/cinephilium-backend  
-**Документация версии:** `CHANGELOG.md` (4.10.0)
+**Документация версии:** `CHANGELOG.md` (4.11.0)
 **Дизайн-хендофф:** `DESIGN_HANDOFF.md` — палитра, типографика, компоненты,
 точные значения из `tokens.css`.
 
@@ -57,7 +57,7 @@ REACT_APP_API_URL=http://127.0.0.1:3000/api npm start
 src/
   api/                 client.js, films.js, critics.js
   components/          <Name>/<Name>.jsx: Header, NotificationModal, ActivityFeed,
-                       RatingDetailsModal, CustomSelect, ProfileGalleries,
+                       RatingDetailsModal, CustomSelect, RangeSlider, ProfileGalleries,
                        ProfileDiary; Critic/<Name>/<Name>.jsx
   context/             NotificationContext
   hooks/               useActivityEvents, useCriticData
@@ -110,8 +110,10 @@ FilmPage.jsx
     RatingContext/RatingContext.jsx  «Сообщество / Ваша / delta»
     RatingPanel/RatingPanel.jsx      три колонки
       VibeTrack/VibeTrack.jsx        drag-трек / 10 сегментов
-    CriteriaModal/CriteriaModal.jsx  модалка полной оценки
-      RatingForm/RatingForm.jsx      жанр, веса, аккордеон, preview, save
+    CriteriaModal/CriteriaModal.jsx  модалка полной оценки (980px, липкая шапка/низ)
+      RatingForm/RatingForm.jsx      жанр, веса, критерии, вайб, итог, save
+    ShareCard/ShareCardModal.jsx     карточка после сохранения full-оценки
+      shareCardRenderer.js           canvas 560×700 @2× → PNG
   FilmActions/FilmActions.jsx  сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
     WatchAction/WatchAction.jsx  кнопка и модалка просмотра
     WatchModal/WatchModal.jsx    дата, пересмотр, теги
@@ -164,6 +166,33 @@ FilmPage.jsx
   что бэкенд: простое среднее по критериям внутри блока, затем веса блоков.
 - `scifi_author` в `constants.js` — `[20,20,25,15,20]`, как на бэкенде
   (раньше было `[25,20,20,15,20]`).
+
+### Модалка оценки и шеринг-карточка (4.11)
+
+- Оболочка: `.criteria-modal` — 980px, `max-height: 92vh`, flex-колонка;
+  шапка и низ не скроллятся, скролл — `.rf-scroll`; ≤720 — fullscreen `100dvh`.
+- В начале формы — плашка-ссылка «Как оценивать» → `/about` (новая вкладка).
+  Старые hint-поповеры у критериев удалены; `hint` остаётся для AboutPage и
+  `RatingDetailsModal`.
+- Слайдеры — `src/components/RangeSlider`: нативный `input[type=range]` под
+  своим треком 8px, бегунком 20px и делениями; шаг 1. Критерии/вайб — 1–10,
+  веса — 0–50. На тач — «липкий» режим: тап и движение без удержания кнопки,
+  отпускают `pointerleave`/клик мимо/`Esc`.
+- Критерии по умолчанию **1** (`DEFAULT_SCORE=1` в `useRatingForm`), вайб — 5.
+  Средние блоков округляются до целого и дублируются метром из 10 точек;
+  десятых у критериев и средних нет. Technical/combined в футере считаются по
+  формуле и остаются с десятыми.
+- Пока нет сохранённой оценки и всё на 1/5, футер показывает «—» и «оценок
+  пока нет» (проп `hasSavedRating`), а не сразу «10 / Провал».
+- Низ `.rf-foot` липкий: combined 32px, грейд, technical/vibe и кнопки; сумма
+  весов по-прежнему строго 100.
+- После успешного сохранения full-оценки `RatingSection` открывает
+  `ShareCardModal` (после закрытия модалки оценки, чтобы оверлеи не
+  накладывались). Canvas 1120×1400 (2× от 560×700): бренд без трёх кружков,
+  название фильма, режиссёр · год, грейд/балл, 5 блоков, вайб/тех и
+  `@nickname` из `currentUser`. PNG скачивается; фон — backdrop фильма, при
+  ошибке загрузки/tainted canvas карточка рисуется без фото. Только для full,
+  vibe-only карточку не вызывает.
 
 ### Ошибки оценки
 
@@ -674,6 +703,15 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 - Эмодзи в интерфейсе не используем. Числа и лейблы — mono, предложения — Inter,
   имена уровня h1 — Instrument Serif.
 - Тексты интерфейса — русские.
+- Системный `<select>` не используем: везде `src/components/CustomSelect`
+  (combobox с aria, клавиатурой и закрытием по клику вне). В каталоге —
+  `size="sm"` (32px), в модалке оценки — 42px.
+- Тач-устройства: `-webkit-tap-highlight-color: transparent`; на
+  `(pointer: coarse)` фокус-аутлайн выключен, чтобы тап не давал системное
+  синее кольцо. На десктопе `:focus-visible` остаётся (azure 1px). Внутренние
+  скроллы (`.rf-scroll`, `.share-modal__body`, `.modal-content`,
+  `.cselect__list`) — `overscroll-behavior: none`, у `html` —
+  `overscroll-behavior-y: none`: без синего overscroll-свечения Chrome.
 - Продуктовые и контрактные решения фиксировать `// DECISION: ...` в коде.
 - Бэкенд не трогать; контракт сверять с его `src/config/scoring.js` и роутами.
 - `client.js` не переписывать; точечные добавления без изменения поведения — можно.
@@ -696,9 +734,16 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/pages/FilmPage/components/RatingPanel/RatingPanel.jsx` | три колонки, combined только full |
 | `src/pages/FilmPage/components/RatingPanel/RatingPanel.css` | стили панели и трека |
 | `src/pages/FilmPage/components/VibeTrack/VibeTrack.jsx` | drag / сегменты, клавиатура, no-op |
-| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.jsx` | модалка критериев |
-| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.css` | оболочка модалки, аккордеон, ошибки полей |
-| `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр, веса, критерии, preview, save |
+| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.jsx` | модалка критериев: 980px, sticky-шапка, `hasSavedRating` |
+| `src/pages/FilmPage/components/CriteriaModal/CriteriaModal.css` | оболочка 980/92vh, fullscreen ≤720, шапка |
+| `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр (CustomSelect), веса, карточки блоков, RangeSlider, вайб, липкий итог |
+| `src/pages/FilmPage/components/RatingForm/RatingForm.css` | `.rf-*`: секции-карточки, 28/44/32px числа, адаптив 900/720/520 |
+| `src/pages/FilmPage/components/ShareCard/ShareCardModal.jsx` | модалка «Карточка готова», скачивание PNG, закрытие по Esc/оверлею |
+| `src/pages/FilmPage/components/ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник, backdrop+скрим |
+| `src/components/CustomSelect/CustomSelect.jsx` | кастомный combobox вместо `<select>`: aria, клавиатура, клик вне, Escape |
+| `src/components/CustomSelect/CustomSelect.css` | `.cselect*`: 42/32px, список 288px, z-index 70 |
+| `src/components/RangeSlider/RangeSlider.jsx` | слайдер 1–10 / 0–50: нативный input, свой трек/бегунок, sticky |
+| `src/components/RangeSlider/RangeSlider.css` | `.rs*`: трек 8px, бегунок 20px, деления, без кольца на coarse |
 | `src/pages/FilmPage/components/UsersList/UsersList.jsx` | «Оценили фильм», скрытие `finalScore` для vibe |
 | `src/pages/FilmPage/components/CommentsSection/CommentsSection.jsx` | F2: три состояния формы, 403 inline, лайк без гейта; F7: режим рецензии через `targetType`/`targetId`, пагинация, ответы одного уровня |
 | `src/pages/FilmPage/components/CommentsSection/CommentsSection.css` | F2: гейт, адаптив 480/620; F7: свёрнутый блок, ответы, pending |
@@ -724,7 +769,7 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/components/SiteLayout/SiteLayout.jsx` | F9: общий публичный layout (Header + Outlet) |
 | `src/components/AuthLayout/AuthLayout.jsx` | F9: минимальная оболочка login/register/forgot/reset, две колонки |
 | `src/components/AuthLayout/AuthLayout.css` | F9: auth-формы, aside, документальные auth-страницы |
-| `src/pages/CatalogPage/CatalogPage.jsx` | F9: поиск, фильтры, сортировка, URL state, пагинация, TMDB-модалка |
+| `src/pages/CatalogPage/CatalogPage.jsx` | F9: поиск, фильтры (жанр/оценки/сортировка — `CustomSelect size="sm"`), URL state, пагинация, TMDB-модалка |
 | `src/pages/CatalogPage/CatalogPage.css` | F9: плоский каталог, чипы, сетка, модалка, адаптив |
 | `src/pages/HomePage/HomePage.jsx` | F9: редакционная главная, топ-5, 10 новинок, импорт-редирект |
 | `src/pages/HomePage/HomePage.css` | F9: плоский hero, текстовые табы, сетки топ/новинок |
@@ -788,6 +833,12 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 13. F10: отменять можно только `completeness: 'vibe'`; full → 400. Вайб
     показывать как `вайб N` везде, где нет technical/combined, а не `—`;
     событие `vibe` — «поставил вайб … — N/10». Не выводить `0` как балл.
+14. 4.11: не добавлять нативный `<select>` — только `CustomSelect`; слайдеры —
+    только `RangeSlider` (без глобального `input[type=range]`). Форма оценки:
+    дефолт критериев 1, средние блоков без десятых, плашка «Как оценивать» →
+    `/about`, липкий низ, 980px. После full-save — `ShareCardModal`. На тач не
+    показывать focus-ring/синюю подсветку, внутренние скроллы —
+    `overscroll-behavior: none`.
 
 ---
 
@@ -801,8 +852,12 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 - Страница фильма: `.film-hero` (backdrop 55vh, постер 340px, инфо), `.film-layout`
   (main + sidebar 300px). Рецензии, комментарии и «Оценили фильм» — плоские
   секции с разделителями, без `.glass-card`, blur и цветных свечений.
-- Модалка критериев: `.modal-overlay` + `.modal-content`, внутри `.rating-form`
-  (select жанра, полоса весов, аккордеон `.crit`, 2px-слайдеры, preview).
+- Модалка критериев (4.11): `.modal-overlay` + `.criteria-modal` 980px; шапка
+  и `.rf-foot` липкие, тело `.rf-scroll`. Секции-карточки `.rf-card`,
+  `.rf-block` с цветным корешком и метром, числа 28/44/32, RangeSlider 8/20px,
+  плашка «Как оценивать». Шеринг-карточка — отдельный canvas 1120×1400 в
+  `.share-modal` (4:5), без зависимостей. На тач — без focus-ring и
+  overscroll-свечения (см. §8).
 - F5/F6: `.film-actions` — плоские pill-кнопки под панелью оценки; активное
   состояние — azure, счётчик mono. `.pg-grid` — постеры 2/3 без карточек, hover-
   оверлей на градиенте, на мобиле подписи под постером. Новых hex/шрифтов/
