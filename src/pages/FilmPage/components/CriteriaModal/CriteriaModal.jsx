@@ -58,7 +58,7 @@ export default function CriteriaModal({
           <p className="modal-kicker">Оценка фильма</p>
           <h2 className="modal-title" id="criteriaModalTitle">{film?.title || 'Фильм'}</h2>
           <p className="modal-sub">
-            {[film?.year, film?.director].filter(Boolean).join('· ')}
+            {[film?.year, film?.director].filter(Boolean).join(' · ')}
           </p>
         </div>
 
@@ -78,6 +78,7 @@ export default function CriteriaModal({
           onSave={handleSave}
           onClose={onClose}
           calculatePreview={form.calculatePreview}
+          hasSavedRating={Boolean(userRating?.scores)}
         />
       </div>
     </div>

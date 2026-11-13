@@ -242,6 +242,7 @@ function FilmPage() {
               reloadUsers={loadFilmUsers}
               showNotification={showNotification}
               navigate={navigate}
+              currentUser={currentUser}
             />
 
             <FilmActions

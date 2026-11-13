@@ -1,28 +1,46 @@
 import React, { useMemo, useState } from 'react';
-import { CRITERIA_CONFIG, GENRE_LABELS } from '../../../../utils/constants';
+import { Link } from 'react-router-dom';
+import {
+  BLOCK_NAMES,
+  CRITERIA_CONFIG,
+  GENRE_LABELS
+} from '../../../../utils/constants';
 import {
   BLOCK_COLORS,
+  DEFAULT_WEIGHTS,
+  WEIGHTS_SUM,
   WEIGHT_SLIDER_MAX,
   formatScore,
-  getGrade
+  getGrade,
+  getVibeWord
 } from '../../../../utils/scoring';
+import CustomSelect from '../../../../components/CustomSelect/CustomSelect';
+import RangeSlider from '../../../../components/RangeSlider/RangeSlider';
 import './RatingForm.css';
 
 const MIN_SCORE = 1;
 const MAX_SCORE = 10;
-const DEFAULT_SCORE = 5;
+const DEFAULT_SCORE = 1;
+const DEFAULT_VIBE = 5;
 const SCORE_STEP = 1;
-const RANGE = MAX_SCORE - MIN_SCORE;
 
-const fillPercent = value => ((value - MIN_SCORE) / RANGE) * 100;
+const CRITERIA_COUNT = CRITERIA_CONFIG.reduce(
+  (sum, block) => sum + block.criteria.length,
+  0
+);
+
+const GENRE_OPTIONS = [
+  { value: '', label: 'Без жанра — базовые веса' },
+  ...Object.entries(GENRE_LABELS).map(([value, label]) => ({ value, label }))
+];
 
 const normalizeWeightsArray = weights => {
   const total = weights.reduce((sum, weight) => sum + weight, 0);
-  if (total === 0) return [30, 25, 20, 15, 10];
+  if (total === 0) return DEFAULT_WEIGHTS;
 
   const raw = weights.map(weight => (weight / total) * 100);
   const ints = raw.map(value => Math.floor(value));
-  const remainder = 100 - ints.reduce((sum, value) => sum + value, 0);
+  const remainder = WEIGHTS_SUM - ints.reduce((sum, value) => sum + value, 0);
 
   const fractions = raw
     .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
@@ -32,16 +50,26 @@ const normalizeWeightsArray = weights => {
   return ints;
 };
 
+const weightTicks = max => Array.from(
+  { length: 6 },
+  (_, index) => Math.round((max * index) / 5)
+);
+
+/** Одинаковая «еле заметная» анимация смены числа во всей форме. */
+function AnimatedNumber({ value }) {
+  return <span key={String(value)} className="rf-num-in">{value}</span>;
+}
+
 /**
  * Содержимое модалки критериев. Компонент презентационный:
  * состояние, confirm по весам и отправка живут в useRatingForm.
  */
 function RatingForm({
   scores = {},
-  vibe = DEFAULT_SCORE,
+  vibe = DEFAULT_VIBE,
   genrePreset = '',
-  blockWeights = [30, 25, 20, 15, 10],
-  weightsValid = false,
+  blockWeights = DEFAULT_WEIGHTS,
+  weightsValid = true,
   isSaving = false,
   error = '',
   fieldErrors = {},
@@ -51,294 +79,326 @@ function RatingForm({
   onWeightChange = () => {},
   onSave = () => {},
   onClose = () => {},
-  calculatePreview = () => ({ tech: null, vibe: 0, combined: null })
+  calculatePreview = () => ({ tech: null, vibe, combined: null }),
+  hasSavedRating = false
 }) {
-  const [activeHint, setActiveHint] = useState(null);
   const [openBlocks, setOpenBlocks] = useState({ scenario: true });
 
   const totalWeight = useMemo(
-    () => (blockWeights || []).reduce((sum, weight) => sum + (Number(weight) || 0), 0),
+    () => blockWeights.reduce((sum, weight) => sum + weight, 0),
     [blockWeights]
   );
 
-  const getScore = (blockKey, criterionKey) =>
-    scores?.[blockKey]?.[criterionKey] ?? DEFAULT_SCORE;
+  const preview = calculatePreview();
+  const grade = preview.combined == null ? null : getGrade(preview.combined);
 
-  const preview = useMemo(
-    () => calculatePreview(scores, vibe, blockWeights, genrePreset),
-    [scores, vibe, blockWeights, genrePreset, calculatePreview]
-  );
-
-  const grade = useMemo(() => getGrade(preview?.combined), [preview]);
-
-  const blockScores = useMemo(() => CRITERIA_CONFIG.map((config, index) => {
-    const values = config.criteria.map(
-      criterion => scores?.[config.key]?.[criterion.key] ?? DEFAULT_SCORE
+  const blockScores = useMemo(() => CRITERIA_CONFIG.map((block, index) => {
+    const values = block.criteria.map(
+      criterion => Number(scores?.[block.key]?.[criterion.key] ?? DEFAULT_SCORE)
     );
-    const average = values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
-    const color = BLOCK_COLORS[config.key] || BLOCK_COLORS.scenario;
+    const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+
     return {
-      key: config.key,
-      name: config.name,
+      key: block.key,
+      name: block.name,
       average,
-      fillPct: (average / MAX_SCORE) * 100,
-      color,
-      weight: blockWeights?.[index] ?? 0
+      rounded: Math.round(average),
+      color: BLOCK_COLORS[block.key],
+      weight: Number(blockWeights[index] ?? 0)
     };
   }), [scores, blockWeights]);
 
-  const handleNormalize = () => {
-    const next = normalizeWeightsArray(blockWeights);
-    next.forEach((value, index) => onWeightChange(index, value));
-  };
+  const getScore = (blockKey, criterionKey) => Number(
+    scores?.[blockKey]?.[criterionKey] ?? DEFAULT_SCORE
+  );
 
-  const isHybrid = genrePreset === 'hybrid';
-
-  const toggleBlock = key => {
-    setOpenBlocks(previous => ({ ...previous, [key]: !previous[key] }));
-  };
-
-  const fieldError = (blockKey, criterionKey) => (
+  const getFieldError = (blockKey, criterionKey) => (
     fieldErrors?.[`${blockKey}.${criterionKey}`]
     || fieldErrors?.[`scores.${blockKey}.${criterionKey}`]
     || fieldErrors?.[criterionKey]
     || ''
   );
 
+  const allOpen = CRITERIA_CONFIG.every(block => openBlocks[block.key]);
+
+  // Пока не тронута ни одна оценка, не показываем «10 / Провал»:
+  // дефолт 1 — это «ещё не оценивал», а не приговор фильму.
+  const untouched = useMemo(() => {
+    if (hasSavedRating) return false;
+    if (Number(vibe) !== DEFAULT_VIBE) return false;
+    return CRITERIA_CONFIG.every(block => block.criteria.every(
+      criterion => getScore(block.key, criterion.key) === MIN_SCORE
+    ));
+  }, [hasSavedRating, vibe, scores]);
+
+  const showResult = !untouched;
+
+  const toggleBlock = key => {
+    setOpenBlocks(previous => ({ ...previous, [key]: !previous[key] }));
+  };
+
+  const toggleAll = () => {
+    setOpenBlocks(allOpen
+      ? {}
+      : CRITERIA_CONFIG.reduce((next, block) => ({ ...next, [block.key]: true }), {}));
+  };
+
+  const handleNormalize = () => {
+    normalizeWeightsArray(blockWeights).forEach((weight, index) => {
+      onWeightChange(index, weight);
+    });
+  };
+
+  const totalWeightLabel = weightsValid ? 'ровно 100' : 'нужно ровно 100';
+  const combinedText = showResult ? formatScore(preview.combined) : '—';
+  const technicalText = formatScore(preview.tech);
+
   return (
     <div className="rating-form">
-      {error && <div className="form-error" role="alert">{error}</div>}
+      <div className="rf-scroll">
+        {error && <div className="form-error" role="alert">{error}</div>}
 
-      <div className="form-sec">
-        <span className="lbl">Жанр</span>
-
-        <div className="select-wrap">
-          <select
-            className="field-select" value={genrePreset}
-            onChange={event => onGenreChange(event.target.value)}
-            aria-label="Жанр"
-          >
-            <option value="">Без жанра — базовые веса</option>
-            {Object.entries(GENRE_LABELS).map(([key, label]) => (
-              <option value={key} key={key}>{label}</option>
-            ))}
-          </select>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </div>
-
-        <div className="weights-viz" role="img" aria-label="Распределение весов по блокам">
-          {blockScores.map(block => (
-            <div
-              key={block.key}
-              className="weights-viz__seg" data-empty={block.weight < 6}
-              style={{
-                flexGrow: block.weight || 0.0001,
-                background: block.color.solid
-              }}
-              title={`${block.name}: ${block.weight}%`}
-            >
-              {block.weight}%
-            </div>
-          ))}
-        </div>
-
-        <div className={`weights-sum ${weightsValid ? 'is-valid' : 'is-invalid'}`}>
-          <span>
-            Σ = <b>{totalWeight}</b>%{' '}
-            {weightsValid ? 'ровно 100' : 'нужно ровно 100'}
+        <Link
+          className="rf-howto"
+          to="/about"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span className="rf-howto__mark" aria-hidden="true">?</span>
+          <span className="rf-howto__body">
+            <span className="rf-howto__title">Как оценивать</span>
+            <span className="rf-howto__text">
+              15 критериев, веса блоков и формула — в памятке
+            </span>
           </span>
-          {!weightsValid && isHybrid && (
-            <button type="button" className="link-btn" onClick={handleNormalize}>
-              Уровнять
-            </button>
-          )}
-        </div>
+          <span className="rf-howto__arrow" aria-hidden="true">→</span>
+        </Link>
 
-        {!isHybrid ? (
-          <button
-            type="button" className="link-btn manual-weights" onClick={() => onGenreChange('hybrid')}
+        <section className="rf-card" aria-labelledby="rfWeightsTitle">
+          <div className="rf-card__head">
+            <span className="rf-lbl" id="rfWeightsTitle">Жанр и веса</span>
+            <div className={`rf-sum ${weightsValid ? '' : 'is-invalid'}`}>
+              <span>
+                Σ <b>{totalWeight}</b>% · {totalWeightLabel}
+              </span>
+              {!weightsValid && (
+                <button type="button" className="rf-link" onClick={handleNormalize}>
+                  Уровнять
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="rf-genre">
+            <CustomSelect
+              className="rf-genre__select"
+              value={genrePreset}
+              onChange={onGenreChange}
+              options={GENRE_OPTIONS}
+              ariaLabel="Жанр и веса блоков"
+            />
+          </div>
+
+          <div
+            className="rf-weights-viz"
+            role="img"
+            aria-label={`Распределение весов: ${blockScores.map(
+              block => `${block.name} ${block.weight}%`
+            ).join(', ')}`}
           >
-            Веса вручную
-          </button>
-        ) : (
-          <div className="weight-rows">
+            {blockScores.map(block => (
+              <span
+                key={block.key}
+                className="rf-weights-viz__seg"
+                data-empty={block.weight < 6 ? 'true' : 'false'}
+                style={{
+                  flexGrow: Math.max(block.weight, 0.0001),
+                  background: block.color.solid
+                }}
+              >
+                {block.weight}%
+              </span>
+            ))}
+          </div>
+
+          <div className="rf-weight-cells">
             {blockScores.map((block, index) => {
-              const weight = blockWeights?.[index] ?? 0;
-              const sliderMax = Math.max(WEIGHT_SLIDER_MAX, weight);
+              const sliderMax = Math.max(WEIGHT_SLIDER_MAX, block.weight);
+
               return (
-                <div className="weight-row" key={block.key}>
-                  <label htmlFor={`weight-${index}`}>
-                    <span
-                      className="crit-mark" style={{ background: block.color.solid }}
-                      aria-hidden="true"
-                    />
-                    {block.name}
-                  </label>
-                  <input
-                    id={`weight-${index}`}
-                    type="range" min="0" max={sliderMax}
-                    step="1" value={weight}
-                    onChange={event => onWeightChange(index, Number(event.target.value))}
-                    style={{ '--fill': `${Math.min(100, (weight / sliderMax) * 100)}%` }}
-                    aria-label={`Вес блока ${block.name}`}
+                <div className="rf-weight-cell" key={block.key}>
+                  <div className="rf-weight-cell__top">
+                    <span className="rf-weight-cell__name">
+                      <span className="rf-dot" style={{ background: block.color.solid }} />
+                      {BLOCK_NAMES[index]}
+                    </span>
+                    <span className="rf-weight-cell__val">
+                      <AnimatedNumber value={block.weight} />
+                      <span className="rf-weight-cell__unit">%</span>
+                    </span>
+                  </div>
+                  <RangeSlider
+                    min={0}
+                    max={sliderMax}
+                    step={1}
+                    value={block.weight}
+                    color={block.color.solid}
+                    ticks={weightTicks(sliderMax)}
+                    ariaLabel={`Вес блока ${block.name}`}
+                    onChange={value => onWeightChange(index, value)}
                   />
-                  <span className="value-display">{weight}%</span>
                 </div>
               );
             })}
           </div>
-        )}
-      </div>
+        </section>
 
-      <div className="form-sec">
-        <span className="lbl">Критерии</span>
-
-        {CRITERIA_CONFIG.map(block => {
-          const color = BLOCK_COLORS[block.key] || BLOCK_COLORS.scenario;
-          const isOpen = Boolean(openBlocks[block.key]);
-          const average = blockScores.find(item => item.key === block.key)?.average ?? DEFAULT_SCORE;
-
-          return (
-            <div className={`crit ${isOpen ? 'is-open' : ''}`} key={block.key}>
-              <button
-                type="button" className="crit-summary" onClick={() => toggleBlock(block.key)}
-                aria-expanded={isOpen}
-              >
-                <span
-                  className="crit-mark" style={{ background: color.solid }}
-                  aria-hidden="true"
-                />
-                <span className="crit-title">{block.name}</span>
-                <span className="crit-avg">{average.toFixed(1)}</span>
-                <span className="crit-plus" aria-hidden="true">{isOpen ? '−' : '+'}</span>
-              </button>
-
-              {isOpen && (
-                <div className="crit-body">
-                  {block.criteria.map(criterion => {
-                    const value = getScore(block.key, criterion.key);
-                    const hintId = `${block.key}.${criterion.key}`;
-                    const currentError = fieldError(block.key, criterion.key);
-
-                    return (
-                      <React.Fragment key={criterion.key}>
-                        <div className="crit-row">
-                          <label htmlFor={`crit-${hintId}`}>
-                            {criterion.name}
-                            <span className="hint-wrapper">
-                              <button
-                                type="button" className="hint-icon" onClick={() => setActiveHint(activeHint === hintId ? null : hintId)}
-                                aria-expanded={activeHint === hintId}
-                                aria-label={`Подсказка: ${criterion.name}`}
-                              >
-                                i
-                              </button>
-                              {activeHint === hintId && (
-                                <span className="hint-popup" role="tooltip">{criterion.hint}</span>
-                              )}
-                            </span>
-                          </label>
-
-                          <input
-                            id={`crit-${hintId}`}
-                            type="range" min={MIN_SCORE}
-                            max={MAX_SCORE}
-                            step={SCORE_STEP}
-                            value={value}
-                            onChange={event => onScoreChange(
-                              block.key,
-                              criterion.key,
-                              Number(event.target.value)
-                            )}
-                            style={{
-                              '--fill': `${fillPercent(value)}%`,
-                              '--fc': color.solid
-                            }}
-                          />
-                          <span className="value-display">{value}</span>
-                        </div>
-
-                        {currentError && (
-                          <span className="field-error" role="alert">{currentError}</span>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="form-sec vibe-sec">
-        <div className="vibe-head">
-          <span className="lbl">Вайб</span>
-          <span className="vibe-value">{vibe}</span>
+        <div className="rf-criteria-head">
+          <span className="rf-lbl">Критерии</span>
+          <div className="rf-criteria-meta">
+            <span>{CRITERIA_COUNT} параметров · {CRITERIA_CONFIG.length} блоков</span>
+            <button type="button" className="rf-link" onClick={toggleAll}>
+              {allOpen ? 'Свернуть все' : 'Развернуть все'}
+            </button>
+          </div>
         </div>
-        <input
-          id="vibeSlider" type="range" min={MIN_SCORE}
-          max={MAX_SCORE}
-          step={SCORE_STEP}
-          value={vibe}
-          onChange={event => onVibeChange(Number(event.target.value))}
-          style={{ '--fill': `${fillPercent(vibe)}%`, '--fc': 'var(--cyan-bright)' }}
-          aria-label="Вайб от 1 до 10"
-        />
-        <p className="vibe-note">Субъективное впечатление. Не влияет на технический балл.</p>
+
+        <div className="rf-blocks">
+          {CRITERIA_CONFIG.map(block => {
+            const info = blockScores.find(item => item.key === block.key);
+            const isOpen = Boolean(openBlocks[block.key]);
+
+            return (
+              <section
+                className={`rf-block ${isOpen ? 'is-open' : ''}`}
+                key={block.key}
+                style={{ '--bc': info.color.solid }}
+              >
+                <button
+                  type="button"
+                  className="rf-block__head"
+                  aria-expanded={isOpen}
+                  onClick={() => toggleBlock(block.key)}
+                >
+                  <span className="rf-block__name">{block.name}</span>
+                  <span className="rf-meter" aria-hidden="true">
+                    {Array.from({ length: 10 }, (_, index) => (
+                      <i key={index} className={index < info.rounded ? 'is-on' : ''} />
+                    ))}
+                  </span>
+                  <span
+                    className="rf-block__avg"
+                    title={`среднее ${info.average.toFixed(1)}`}
+                  >
+                    <AnimatedNumber value={info.rounded} />
+                  </span>
+                  <svg className="rf-block__chev" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                {isOpen && (
+                  <div className="rf-block__body">
+                    {block.criteria.map(criterion => {
+                      const inputId = `crit-${block.key}-${criterion.key}`;
+                      const currentError = getFieldError(block.key, criterion.key);
+
+                      return (
+                        <React.Fragment key={criterion.key}>
+                          <div className="rf-crit">
+                            <label className="rf-crit__label" htmlFor={inputId}>
+                              {criterion.name}
+                            </label>
+                            <RangeSlider
+                              id={inputId}
+                              min={MIN_SCORE}
+                              max={MAX_SCORE}
+                              step={SCORE_STEP}
+                              value={getScore(block.key, criterion.key)}
+                              color={info.color.solid}
+                              ariaLabel={criterion.name}
+                              onChange={value => onScoreChange(block.key, criterion.key, value)}
+                            />
+                            <span className="rf-crit__num" aria-hidden="true">
+                              <AnimatedNumber value={getScore(block.key, criterion.key)} />
+                            </span>
+                          </div>
+                          {currentError && (
+                            <span className="rf-field-error" role="alert">{currentError}</span>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            );
+          })}
+        </div>
+
+        <section className="rf-card rf-vibe" aria-labelledby="rfVibeTitle">
+          <div className="rf-vibe__top">
+            <div className="rf-vibe__label">
+              <span className="rf-lbl" id="rfVibeTitle">Вайб</span>
+              <span className="rf-vibe__word">{getVibeWord(vibe)}</span>
+            </div>
+            <div className="rf-vibe__value">
+              <span className="rf-vibe__num">
+                <AnimatedNumber value={vibe} />
+              </span>
+              <span className="rf-vibe__unit">/ 10</span>
+            </div>
+          </div>
+
+          <RangeSlider
+            min={MIN_SCORE}
+            max={MAX_SCORE}
+            step={SCORE_STEP}
+            value={vibe}
+            color="var(--cyan-bright)"
+            ariaLabel="Вайб от 1 до 10"
+            onChange={onVibeChange}
+          />
+
+          <p className="rf-vibe__note">
+            Субъективное впечатление. Не влияет на технический балл.
+          </p>
+        </section>
       </div>
 
-      <div className="preview">
-        <div className="preview-head">
-          <span className="lbl">Предварительный расчёт</span>
-          {grade && (
-            <span className="preview-grade" style={{ color: grade.color }}>
+      <footer className="rf-foot">
+        <div className="rf-foot__result">
+          <span className="rf-foot__label">Комбинированный</span>
+          <span className="rf-foot__num">
+            <AnimatedNumber value={combinedText} />
+          </span>
+          {showResult && <span className="rf-foot__unit">/100</span>}
+          {showResult && grade && (
+            <span className="rf-foot__grade" style={{ color: grade.color }}>
               {grade.letter} · {grade.label}
             </span>
           )}
+          <span className={`rf-foot__meta${showResult ? '' : ' is-empty'}`}>
+            {showResult
+              ? `технический ${technicalText} · вайб ${vibe}`
+              : 'оценок пока нет'}
+          </span>
         </div>
 
-        <div className="block-bars">
-          {blockScores.map(block => (
-            <div key={block.key} className="block-bar">
-              <span className="block-bar__label">{block.name}</span>
-              <span className="block-bar__track">
-                <span
-                  className="block-bar__fill" style={{ width: `${block.fillPct}%`, background: block.color.solid }}
-                />
-              </span>
-              <span className="block-bar__value">{block.average.toFixed(1)}</span>
-            </div>
-          ))}
+        <div className="rf-foot__actions">
+          <button type="button" className="rf-btn rf-btn--ghost" onClick={onClose}>
+            Отмена
+          </button>
+          <button
+            type="button"
+            className="rf-btn rf-btn--primary"
+            onClick={onSave}
+            disabled={isSaving || !weightsValid}
+          >
+            {isSaving ? 'Сохраняем…' : 'Сохранить оценку'}
+          </button>
         </div>
-
-        <div className="preview-row">
-          <span>Технический</span>
-          <b>{Number.isFinite(Number(preview?.tech)) ? formatScore(preview.tech) : '—'}</b>
-        </div>
-        <div className="preview-row">
-          <span>Вайб</span>
-          <b>{vibe}</b>
-        </div>
-        <div className="preview-row is-primary">
-          <span>Комбинированный</span>
-          <b>{Number.isFinite(Number(preview?.combined)) ? formatScore(preview.combined) : '—'}</b>
-        </div>
-      </div>
-
-      <div className="modal-foot">
-        <button type="button" className="btn-ghost" onClick={onClose}>
-          Отмена
-        </button>
-        <button
-          type="button" className="btn-primary" disabled={isSaving || !weightsValid}
-          onClick={onSave}
-        >
-          {isSaving ? 'Сохраняем…' : 'Сохранить оценку'}
-        </button>
-      </div>
+      </footer>
     </div>
   );
 }

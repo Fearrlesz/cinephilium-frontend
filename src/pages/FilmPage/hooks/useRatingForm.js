@@ -10,10 +10,12 @@ import {
   WEIGHTS_SUM
 } from '../../../utils/scoring';
 
+const DEFAULT_SCORE = 1;
+
 const createEmptyScores = () => Object.fromEntries(
   CRITERIA_CONFIG.map(block => [
     block.key,
-    Object.fromEntries(block.criteria.map(criterion => [criterion.key, 5]))
+    Object.fromEntries(block.criteria.map(criterion => [criterion.key, DEFAULT_SCORE]))
   ])
 );
 
@@ -24,7 +26,7 @@ const cloneScores = scores => {
     result[block.key] = {};
     for (const criterion of block.criteria) {
       const value = Number(scores?.[block.key]?.[criterion.key]);
-      result[block.key][criterion.key] = Number.isFinite(value) ? value : 5;
+      result[block.key][criterion.key] = Number.isFinite(value) ? value : DEFAULT_SCORE;
     }
   }
   return result;
