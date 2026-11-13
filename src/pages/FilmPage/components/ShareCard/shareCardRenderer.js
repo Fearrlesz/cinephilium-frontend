@@ -85,7 +85,9 @@ export function buildShareCardModel({ film, rating, payload, user }) {
   if (film?.director) bylineParts.push(film.director);
   if (film?.year) bylineParts.push(String(film.year));
 
-  const backdropSource = film?.backdrop || film?.poster || '';
+  // DECISION: на фоне — постер (узнаваемая афиша), а не широкий backdrop:
+  // в 4:5 он читается как обложка, а backdrop остаётся запасным вариантом.
+  const backdropSource = film?.poster || film?.backdrop || '';
 
   return {
     title: film?.title || 'Без названия',
@@ -258,7 +260,7 @@ function paintBackground(ctx, image, gradeColor) {
   if (image) {
     ctx.save();
     if ('filter' in ctx) {
-      ctx.filter = 'saturate(0.6) brightness(0.7) contrast(1.03)';
+      ctx.filter = 'saturate(0.62) brightness(0.62) contrast(1.04)';
     }
     drawCover(ctx, image);
     ctx.restore();
@@ -271,14 +273,15 @@ function paintBackground(ctx, image, gradeColor) {
     ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
   }
 
-  // Основной затемняющий градиент: верх фото виден, низ уходит в void.
+  // Основной затемняющий градиент: верх постера виден, середина и низ уходят
+  // в void — под текстом нужен запас контраста даже для светлой афиши.
   const scrim = ctx.createLinearGradient(0, 0, 0, CARD_HEIGHT);
-  scrim.addColorStop(0, 'rgba(10, 7, 9, 0.42)');
-  scrim.addColorStop(0.12, 'rgba(10, 7, 9, 0.18)');
-  scrim.addColorStop(0.34, 'rgba(10, 7, 9, 0.42)');
-  scrim.addColorStop(0.52, 'rgba(10, 7, 9, 0.74)');
-  scrim.addColorStop(0.64, 'rgba(10, 7, 9, 0.92)');
-  scrim.addColorStop(0.78, 'rgba(10, 7, 9, 0.98)');
+  scrim.addColorStop(0, 'rgba(10, 7, 9, 0.55)');
+  scrim.addColorStop(0.12, 'rgba(10, 7, 9, 0.2)');
+  scrim.addColorStop(0.34, 'rgba(10, 7, 9, 0.55)');
+  scrim.addColorStop(0.52, 'rgba(10, 7, 9, 0.82)');
+  scrim.addColorStop(0.64, 'rgba(10, 7, 9, 0.95)');
+  scrim.addColorStop(0.78, 'rgba(10, 7, 9, 0.99)');
   scrim.addColorStop(1, VOID);
   ctx.fillStyle = scrim;
   ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);

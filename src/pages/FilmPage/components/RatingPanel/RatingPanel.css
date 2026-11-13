@@ -410,6 +410,15 @@
   color: var(--ink);
 }
 
+/* Full: две ссылки под спектром — изменить критерии и карточка оценки. */
+.rp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 .rp-formula {
   min-height: 38px;
   margin-top: 14px;

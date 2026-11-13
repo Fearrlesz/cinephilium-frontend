@@ -78,7 +78,14 @@ export default function RatingSection({
     reloadUsers?.();
     // DECISION: карточка открывается после закрытия модалки оценки (см. эффект
     // ниже), иначе два оверлея на мгновение существуют одновременно.
-    setPendingShare({ rating, payload });
+    setPendingShare({ rating, payload, justSaved: true });
+  };
+
+  // DECISION: карточку можно пересобрать и для уже сохранённой full-оценки —
+  // вход в панели оценки, а не только сразу после сохранения.
+  const openShareCard = () => {
+    if (!userRating || (userRating.completeness || 'full') !== 'full') return;
+    setShareCard({ rating: userRating, payload: null, justSaved: false });
   };
 
   useEffect(() => {
@@ -111,6 +118,7 @@ export default function RatingSection({
         vibeLocked={vibeLocked}
         onCancelVibe={vibe.cancelVibe}
         onOpenCriteria={openCriteria}
+        onShareCard={openShareCard}
         onRequireAuth={requireAuth}
       />
 
@@ -129,6 +137,7 @@ export default function RatingSection({
           film={film}
           rating={shareCard.rating}
           payload={shareCard.payload}
+          justSaved={Boolean(shareCard.justSaved)}
           currentUser={currentUser}
           onClose={() => setShareCard(null)}
         />

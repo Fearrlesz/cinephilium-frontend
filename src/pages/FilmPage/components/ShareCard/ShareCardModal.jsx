@@ -9,7 +9,14 @@ import './ShareCardModal.css';
  * скриншота DOM»: превью и файл — один и тот же data URL. Пока картинка
  * рендерится, показываем скелетон того же размера, чтобы модалка не прыгала.
  */
-export default function ShareCardModal({ film, rating, payload, currentUser, onClose }) {
+export default function ShareCardModal({
+  film,
+  rating,
+  payload,
+  currentUser,
+  justSaved = false,
+  onClose
+}) {
   const [dataUrl, setDataUrl] = useState('');
   const [failed, setFailed] = useState(false);
   const closeRef = useRef(null);
@@ -67,8 +74,10 @@ export default function ShareCardModal({ film, rating, payload, currentUser, onC
         onClick={event => event.stopPropagation()}
       >
         <div className="share-modal__head">
-          <p className="share-modal__kicker">Оценка сохранена</p>
-          <h2 className="share-modal__title" id="shareCardTitle">Карточка готова</h2>
+          <p className="share-modal__kicker">{justSaved ? 'Оценка сохранена' : 'Ваша оценка'}</p>
+          <h2 className="share-modal__title" id="shareCardTitle">
+            {justSaved ? 'Карточка готова' : 'Карточка оценки'}
+          </h2>
           <p className="share-modal__sub">Скачайте PNG и поделитесь впечатлением о фильме.</p>
         </div>
 
