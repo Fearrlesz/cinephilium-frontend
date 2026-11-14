@@ -17,8 +17,7 @@ export default function ShareCardModal({
   justSaved = false,
   onClose
 }) {
-  const [dataUrl, setDataUrl] = useState('');
-  const [failed, setFailed] = useState(false);
+  const [state, setState] = useState({ status: 'loading' });
   const closeRef = useRef(null);
 
   const model = useMemo(
@@ -28,21 +27,31 @@ export default function ShareCardModal({
 
   useEffect(() => {
     let alive = true;
-    setDataUrl('');
-    setFailed(false);
+    setState({ status: 'loading' });
 
     renderShareCard(model)
-      .then(url => {
-        if (alive) setDataUrl(url);
+      .then(result => {
+        if (alive) setState({ status: 'ready', ...result });
       })
-      .catch(() => {
-        if (alive) setFailed(true);
+      .catch(error => {
+        // Причина уже залогирована в рендерере (console.warn), но в модалке
+        // показываем её же текстом: раньше все сбои выглядели одинаково.
+        if (alive) setState({ status: 'failed', error: String(error?.message || error) });
       });
 
     return () => {
       alive = false;
     };
   }, [model]);
+
+  const dataUrl = state.status === 'ready' ? state.dataUrl : '';
+  // 'missing' (у фильма нет постера) — не сбой, примечание не нужно.
+  const posterNote =
+    state.status !== 'ready' || state.poster === 'ok' || state.poster === 'missing'
+      ? ''
+      : state.poster === 'tainted'
+        ? 'Постер не удалось встроить в PNG — карточка сохранена без фото.'
+        : 'Постер не загрузился, карточка без фото. Перезагрузите страницу и попробуйте снова.';
 
   useEffect(() => {
     const onKeyDown = event => {
@@ -87,11 +96,19 @@ export default function ShareCardModal({
               <img src={dataUrl} alt={`Карточка оценки фильма «${model.title}»`} />
             ) : (
               <div className="share-card-skeleton" aria-live="polite">
-                {failed ? 'Не удалось собрать карточку' : 'Собираем карточку…'}
+                {state.status === 'failed'
+                  ? `Не удалось собрать карточку${state.error ? `: ${state.error}` : ''}`
+                  : 'Собираем карточку…'}
               </div>
             )}
           </div>
         </div>
+
+        {posterNote && (
+          <p className="share-modal__note" role="status">
+            {posterNote}
+          </p>
+        )}
 
         <div className="share-modal__foot">
           <button
