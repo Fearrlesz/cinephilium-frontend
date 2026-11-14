@@ -23,6 +23,7 @@ import { BLOCK_NAMES } from '../../../../utils/constants';
 import { getPosterUrl } from '../../../../utils/posterUrl';
 
 export const CARD_WIDTH = 560;
+
 export const CARD_HEIGHT = 700;
 const CARD_SCALE = 2;
 
@@ -45,6 +46,22 @@ function num(value) {
   if (value === null || value === undefined || value === '') return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+// DECISION (C-2): canvas просит постер по отдельному URL — с `variant=card`.
+// Прокси отдаёт картинки как `immutable` на год, а в кэше браузера уже могли
+// лежать записи без `Access-Control-Allow-Origin` (их положил обычный `<img>`
+// на странице фильма). Такой кэш не «исправить» обновлением сервера: у записи
+// свой срок жизни, поэтому canvas-загрузка идёт по ещё не отравленному адресу.
+// Лишний query-параметр бэкенд игнорирует (см. api/tmdb-image.js).
+const CARD_CACHE_VARIANT = 'card';
+
+function withCardVariant(url) {
+  if (!url) return '';
+  // Только наш прокси: data:/blob: и сторонние URL не трогаем.
+  if (!url.includes('/api/tmdb-image')) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}variant=${CARD_CACHE_VARIANT}`;
 }
 
 function hexToRgba(hex, alpha) {
@@ -99,7 +116,7 @@ export function buildShareCardModel({ film, rating, payload, user }) {
     technical: num(technical),
     vibe: num(vibe),
     blocks,
-    backdropUrl: backdropSource ? getPosterUrl(backdropSource, 'w780') : ''
+    backdropUrl: backdropSource ? withCardVariant(getPosterUrl(backdropSource, 'w780')) : ''
   };
 }
 
@@ -193,31 +210,86 @@ function roundRectPath(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
-function loadImage(src, timeoutMs = 4500) {
+const POSTER_FETCH_TIMEOUT_MS = 6000;
+const IMAGE_DECODE_TIMEOUT_MS = 4500;
+
+function fetchWithTimeout(url, timeoutMs) {
+  const options = { mode: 'cors', credentials: 'omit' };
+  if (typeof AbortController !== 'function') return fetch(url, options);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
+function decodeImage(src, timeoutMs, crossOrigin) {
   return new Promise(resolve => {
-    if (!src) {
-      resolve(null);
-      return;
-    }
     const image = new Image();
-    image.crossOrigin = 'anonymous';
+    if (crossOrigin) image.crossOrigin = 'anonymous';
     let settled = false;
+    let timer = null;
     const finish = value => {
       if (settled) return;
       settled = true;
+      if (timer) clearTimeout(timer);
       resolve(value);
     };
-    const timer = setTimeout(() => finish(null), timeoutMs);
-    image.onload = () => {
-      clearTimeout(timer);
-      finish(image);
-    };
-    image.onerror = () => {
-      clearTimeout(timer);
-      finish(null);
-    };
+    timer = setTimeout(() => finish(null), timeoutMs);
+    image.onload = () => finish(image);
+    image.onerror = () => finish(null);
     image.src = src;
   });
+}
+
+// DECISION (C-2): постер качается fetch'ем и отдаётся canvas через blob-URL,
+// а не грузится сразу `<img crossOrigin="anonymous">`.
+// Причина — HTTP-кэш. `<img>` без CORS (страница фильма, сетка постеров)
+// получает ответ без `Access-Control-Allow-Origin` и кладёт его в кэш на год
+// (прокси отдаёт `immutable`). Тот же адрес с `crossOrigin='anonymous'` браузер
+// берёт из кэша, CORS-проверка падает — и постер молча исчезает с карточки.
+// `fetch` в режиме cors проверяет заголовки на сетевом ответе и отдаёт байты,
+// а blob-URL не «пачкает» canvas, поэтому `toDataURL` работает без фолбэка.
+//
+// Возвращает `{ image, release, status, error }`: статус нужен модалке, чтобы
+// показать причину, а не общее «не удалось собрать карточку».
+async function loadPosterImage(src) {
+  if (!src) return { image: null, release: null, status: 'missing', error: '' };
+
+  if (src.startsWith('data:') || src.startsWith('blob:')) {
+    const image = await decodeImage(src, IMAGE_DECODE_TIMEOUT_MS, false);
+    return {
+      image,
+      release: null,
+      status: image ? 'ok' : 'failed',
+      error: image ? '' : 'не удалось декодировать изображение'
+    };
+  }
+
+  let objectUrl = '';
+  try {
+    const response = await fetchWithTimeout(src, POSTER_FETCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    if (!blob.size) throw new Error('пустой ответ');
+    objectUrl = URL.createObjectURL(blob);
+    const image = await decodeImage(objectUrl, IMAGE_DECODE_TIMEOUT_MS, false);
+    if (!image) throw new Error('не удалось декодировать изображение');
+    return { image, release: () => URL.revokeObjectURL(objectUrl), status: 'ok', error: '' };
+  } catch (error) {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    const reason = error?.name === 'AbortError' ? 'таймаут загрузки' : String(error?.message || error);
+
+    // Последний шанс: если fetch не прошёл по сети/CORS, но в кэше лежит уже
+    // «правильный» ответ (с ACAO), обычный crossOrigin-Image его возьмёт.
+    if (error?.name === 'TypeError') {
+      const cached = await decodeImage(src, IMAGE_DECODE_TIMEOUT_MS, true);
+      if (cached) return { image: cached, release: null, status: 'ok', error: '' };
+    }
+
+    // Без этого лога любой сбой постера выглядел как «карточка без фото»
+    // вообще без следов в консоли — из-за этого баг и жил незамеченным.
+    console.warn('[share-card] постер не загрузился:', src, reason);
+    return { image: null, release: null, status: 'failed', error: reason };
+  }
 }
 
 function drawCover(ctx, image) {
@@ -488,24 +560,38 @@ async function ensureFonts() {
   if (document.fonts.ready) await document.fonts.ready;
 }
 
+// Возвращает `{ dataUrl, poster, posterError }`:
+// `poster` — 'ok' | 'missing' | 'failed' | 'tainted'; модалка по нему решает,
+// показывать ли пользователю примечание «карточка без постера».
 export async function renderShareCard(model) {
   await ensureFonts();
-  const image = await loadImage(model.backdropUrl);
+  const poster = await loadPosterImage(model.backdropUrl);
 
   const canvas = createCanvas();
   const ctx = canvas.getContext('2d');
   ctx.scale(CARD_SCALE, CARD_SCALE);
-  paintCard(ctx, model, image);
+  paintCard(ctx, model, poster.image);
 
   try {
-    return canvas.toDataURL('image/png');
+    return {
+      dataUrl: canvas.toDataURL('image/png'),
+      poster: poster.status,
+      posterError: poster.error
+    };
   } catch (error) {
     // Картинка с чужого origin без CORS «пачкает» canvas и ломает экспорт.
     // Тогда перерисовываем без фото — карточка остаётся, просто без кадра.
+    console.warn('[share-card] canvas tainted, рисуем без фото:', error?.message);
     const fallback = createCanvas();
     const fallbackCtx = fallback.getContext('2d');
     fallbackCtx.scale(CARD_SCALE, CARD_SCALE);
     paintCard(fallbackCtx, model, null);
-    return fallback.toDataURL('image/png');
+    return {
+      dataUrl: fallback.toDataURL('image/png'),
+      poster: poster.status === 'ok' ? 'tainted' : poster.status,
+      posterError: poster.error || 'canvas tainted'
+    };
+  } finally {
+    poster.release?.();
   }
 }

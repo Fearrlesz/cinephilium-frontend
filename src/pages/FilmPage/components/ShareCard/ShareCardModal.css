@@ -46,6 +46,17 @@
   color: var(--ink-muted);
 }
 
+.share-modal__note {
+  flex: none;
+  margin: 0;
+  padding: 10px 26px 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
 .share-modal__body {
   display: flex;
   flex: 1;
@@ -169,6 +180,10 @@
 
   .share-modal__body {
     padding: 14px 20px 4px;
+  }
+
+  .share-modal__note {
+    padding: 8px 20px 0;
   }
 
   .share-card-frame {

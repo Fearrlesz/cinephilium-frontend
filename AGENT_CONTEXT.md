@@ -113,7 +113,7 @@ FilmPage.jsx
     CriteriaModal/CriteriaModal.jsx  модалка полной оценки (980px, липкая шапка/низ)
       RatingForm/RatingForm.jsx      жанр, веса, критерии, вайб, итог, save
     ShareCard/ShareCardModal.jsx     карточка full-оценки: после save и из панели
-      shareCardRenderer.js           canvas 560×700 @2× → PNG (постер + скрим)
+      shareCardRenderer.js           canvas 560×700 @2× → PNG (постер + скрим, fetch→blob)
   FilmActions/FilmActions.jsx  сердечко + watchlist (F5/F6) + «Просмотрено» (F4)
     WatchAction/WatchAction.jsx  кнопка и модалка просмотра
     WatchModal/WatchModal.jsx    дата, пересмотр, теги
@@ -192,10 +192,18 @@ FilmPage.jsx
   критерии» и «Карточка оценки». Canvas 1120×1400 (2× от 560×700): бренд без
   трёх кружков, название фильма, режиссёр · год, грейд/балл, 5 блоков,
   вайб/тех и `@nickname` из `currentUser`. Фон — постер фильма
-  (`film.poster`, запасной `film.backdrop`) с затемнением и скримом; при
-  ошибке загрузки/tainted canvas карточка рисуется без фото. Только для full,
-  vibe-only карточку не вызывает; старые full-оценки без `completeness`
+  (`film.poster`, запасной `film.backdrop`) с затемнением и скримом. Только для
+  full, vibe-only карточку не вызывает; старые full-оценки без `completeness`
   тоже получают вход (`(completeness || 'full') === 'full'`).
+- Постер для canvas (C-2) качается **не** через `<img crossOrigin>`: `fetch` с
+  `mode: 'cors'` → `blob` → `URL.createObjectURL` → `Image`. Иначе браузер берёт
+  из HTTP-кэша запись, положенную обычным `<img>` (без `Access-Control-Allow-Origin`,
+  `immutable` на год), CORS падает и постер молча исчезает. URL для canvas идёт с
+  `&variant=card` — отдельный ключ кэша от уже «отравленных» записей. Если постер
+  не загрузился, рендерер пишет `console.warn('[share-card] …')`, а модалка под
+  превью показывает примечание (`.share-modal__note`): карточка без фото либо
+  причина полного сбоя. `renderShareCard()` возвращает `{ dataUrl, poster,
+  posterError }`, где `poster` — `ok | missing | failed | tainted`.
 
 ### Ошибки оценки
 
@@ -742,7 +750,8 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
 | `src/pages/FilmPage/components/RatingForm/RatingForm.jsx` | жанр (CustomSelect), веса, карточки блоков, RangeSlider, вайб, липкий итог |
 | `src/pages/FilmPage/components/RatingForm/RatingForm.css` | `.rf-*`: секции-карточки, 28/44/32px числа, адаптив 900/720/520 |
 | `src/pages/FilmPage/components/ShareCard/ShareCardModal.jsx` | модалка «Карточка оценки» (после save и из панели), скачивание PNG, Esc/оверлей |
-| `src/pages/FilmPage/components/ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник, постер/backdrop+скрим |
+| `src/pages/FilmPage/components/ShareCard/shareCardRenderer.js` | canvas 560×700 @2×: титул, грейд, блоки, ник, постер/backdrop+скрим; постер — `fetch` → blob → `Image` (C-2), возвращает `{ dataUrl, poster, posterError }` |
+| `src/pages/FilmPage/components/ShareCard/ShareCardModal.css` | C-2: `.share-modal__note` — примечание «карточка без фото» под превью |
 | `src/components/CustomSelect/CustomSelect.jsx` | кастомный combobox вместо `<select>`: aria, клавиатура, клик вне, Escape |
 | `src/components/CustomSelect/CustomSelect.css` | `.cselect*`: 42/32px, список 288px, z-index 70 |
 | `src/components/RangeSlider/RangeSlider.jsx` | слайдер 1–10 / 0–50: нативный input, свой трек/бегунок, sticky |
@@ -845,6 +854,11 @@ F3 — 29/29, F4 — 40/40, F5/F6 — 19/19, F7 — 16/16, F8 — 47/47. Жив�
     считаются full); открывается после save и из `.rp-actions` панели. Фон
     карточки — постер, затем backdrop; `@nickname` брать только из
     `currentUser`, не подставлять фейки.
+16. C-2: постер в canvas — только `fetch(mode:'cors')` → blob → objectURL, с
+    `&variant=card`; `<img crossOrigin>` не возвращать. Если снова появится
+    «карточка без постера» — сначала смотреть Network: ответ прокси должен иметь
+    `Access-Control-Allow-Origin` и `Vary: Origin, Accept-Encoding`, а ошибки —
+    `Cache-Control: no-store`.
 
 ---
 
