@@ -4,8 +4,6 @@ import {
   GENRE_LABELS,
   PRESET_WEIGHTS,
   BLOCK_NAMES,
-  TECHNICAL_MULTIPLIER,
-  VIBE_STEP,
   MIN_SCORE,
   MAX_SCORE,
 } from '../../utils/constants';
@@ -16,26 +14,36 @@ function AboutPage() {
     <div className="container about-page">
       <header className="about-head">
         <p className="about-kicker">Система оценки</p>
-        <h1 className="about-title">О системе оценки</h1>
+        <h1 className="about-title">Архитектура вкуса</h1>
         <p className="about-lead">
-          Пятнадцать критериев, пять блоков и один вайб.
-          Больше никаких безосновательных оценок. Все критерии прозрачны.
+          Кино — это многогранное искусство. А его часто сводят к одной цифре без объяснения, откуда она взялась.
         </p>
       </header>
 
-      <section className="about-intro" aria-label="Как устроена оценка">
-        <p>
-          Мы оцениваем фильмы по <strong>15 критериям</strong>, разбитым на 5 блоков.
-          Каждый критерий — от <strong>1 до 10</strong>.
-        </p>
-        <p>
-          Из оценок складывается «Технический балл». Затем он умножается на
-          «Вайб» — личное восприятие фильма. Так одна и та же картина может
-          получить разные баллы у разных людей, и это честно.
-        </p>
+      <section className="about-philosophy" aria-label="Философия проекта">
+        <div className="philosophy-text">
+          <h2>Почему мы это делаем?</h2>
+          <p>
+            Мы привыкли к псевдоконстантам. К цифре «8.7» на IMDb или «87» на Metacritic. Мы безусловно верим этим источникам, но они сводят сложное к упрощённому.
+          </p>
+          <p>
+            Проблема не в том, что агрегаторы есть. Проблема в том, что они <strong>почти не показывают, из чего складывается оценка</strong>. Мы разложили кино на 15 критериев не ради усложнения, а потому что искусство заслуживает внимательного разбора. Мы хотим, чтобы зритель видел: «А что именно делает фильм хорошим?»
+          </p>
+          <p>
+            Но самое интересное начинается, когда аналитика встречается с эмоцией. Мы даём три балла: Технический, Вайб и Комбинированный. Вы можете поставить технике 95, а вайбу 2 (фильм гениален, но не ваш). И система это увидит. Это ваш личный когнитивный диссонанс, зафиксированный в цифрах.
+          </p>
+        </div>
       </section>
 
       <section className="about-blocks" aria-label="Блоки критериев">
+        <header className="about-section-head">
+          <p className="about-kicker">Критерии</p>
+          <h2 className="about-section-title">15 граней кино</h2>
+          <p className="about-section-lead">
+            Каждый критерий оценивается от <strong>1 до 10</strong>. Чтобы вам было проще, мы составили шкалу ориентиров для каждой оценки.
+          </p>
+        </header>
+
         {CRITERIA_CONFIG.map((block, idx) => (
           <article className="about-block" key={block.key}>
             <header className="about-block-head">
@@ -44,9 +52,29 @@ function AboutPage() {
             </header>
             <div className="about-criteria">
               {block.criteria.map(crit => (
-                <div className="about-criterion" key={crit.key}>
-                  <div className="about-criterion-name">{crit.name}</div>
-                  <div className="about-criterion-desc">{crit.hint}</div>
+                <div className="about-criterion-card" key={crit.key}>
+                  <div className="about-criterion-header">
+                    <h3 className="about-criterion-name">{crit.name}</h3>
+                  </div>
+                  
+                  <p className="about-criterion-desc">{crit.desc || crit.hint}</p>
+                  
+                  {crit.anchors && (
+                    <div className="about-criterion-anchors">
+                      <div className="anchor-item anchor-low">
+                        <span className="anchor-score">1</span>
+                        <span className="anchor-text">{crit.anchors[1]}</span>
+                      </div>
+                      <div className="anchor-item anchor-mid">
+                        <span className="anchor-score">5</span>
+                        <span className="anchor-text">{crit.anchors[5]}</span>
+                      </div>
+                      <div className="anchor-item anchor-high">
+                        <span className="anchor-score">10</span>
+                        <span className="anchor-text">{crit.anchors[10]}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -59,8 +87,7 @@ function AboutPage() {
           <p className="about-kicker">Веса</p>
           <h2 id="about-weights-title" className="about-section-title">Жанровые пресеты</h2>
           <p className="about-section-lead">
-            Жанр меняет вес блоков: в мюзикле важнее звук, в байопике — сценарий
-            и персонажи. Свои веса можно задать вручную под конкретный фильм.
+            В боевике важнее визуал, в байопике — сценарий. Система подстраивается под контекст. Свои веса можно задать вручную.
           </p>
         </header>
 
@@ -103,15 +130,15 @@ function AboutPage() {
       <section className="about-formula" aria-labelledby="about-formula-title">
         <header className="about-section-head">
           <p className="about-kicker">Расчёт</p>
-          <h2 id="about-formula-title" className="about-section-title">Формула</h2>
+          <h2 id="about-formula-title" className="about-section-title">Математика честности</h2>
         </header>
 
-      <ol className="about-formula-steps">
-  <li>По каждому блоку считается среднее арифметическое его критериев.</li>
-  <li>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) ÷ 100 × 10.</li>
-  <li>«Вайб» (M) — ваша личная оценка фильма от 1 до 10.</li>
-  <li>Комбинированный балл = T × 0.7 + M × 3 — это 70% техники и 30% вайба, приведённого к шкале 10–100.</li>
-</ol>
+        <ol className="about-formula-steps">
+          <li>По каждому из 5 блоков считается среднее арифметическое его критериев.</li>
+          <li>Технический балл (T) = (среднее_блока1 × вес1 + … + среднее_блока5 × вес5) ÷ 100 × 10.</li>
+          <li>«Вайб» (M) — ваша личная оценка фильма от 1 до 10.</li>
+          <li>Комбинированный балл = T × 0.7 + M × 3 — это 70% техники и 30% вайба, приведённого к шкале 10–100.</li>
+        </ol>
         <p className="about-formula-note">
           Итоговая оценка всегда в диапазоне от {MIN_SCORE} до {MAX_SCORE}.
           Округление — только в самом конце, поэтому нюансы сохраняются.
