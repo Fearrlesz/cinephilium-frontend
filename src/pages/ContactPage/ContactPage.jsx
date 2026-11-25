@@ -62,8 +62,8 @@ function ContactPage() {
         <p className="contact-kicker">Доступ</p>
         <h1 className="contact-title">Связь с админами</h1>
         <p className="contact-lead">
-          Доступ в Синефилиум — по приглашению. Напиши админу в Telegram или оставь
-          заявку: ответим по указанному контакту.
+          Доступ в Синефилиум — по приглашению. Вот так вот, м-да, совсем там, осинефилились... Напишите админу в Telegram или оставьте
+          заявку: ответим по указанному контакту. ВАЖНО: сейчас доступен только я, @fearrlez, спасибо. 
         </p>
       </header>
 
@@ -141,7 +141,7 @@ function ContactPage() {
               </label>
 
               <label className="contact-field">
-                <span>Пара слов о себе <em>(необязательно)</em></span>
+                <span>Пара слов о себе, значительно упростит регистрацию. (Нет, мне просто интересно читать о Вас) <em>(необязательно)</em></span>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -163,7 +163,7 @@ function ContactPage() {
               />
 
               <button type="submit" className="contact-submit" disabled={loading}>
-                {loading ? 'Отправляем…' : 'Отправить заявку'}
+                {loading ? 'Отправляем… Голубем' : 'Отправить заявку'}
               </button>
             </form>
           )}
