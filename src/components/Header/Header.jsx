@@ -1,4 +1,4 @@
-1import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api, { logout as apiLogout } from '../../api/client';
 import './Header.css';
@@ -90,7 +90,7 @@ function Header() {
               >
                 {initial}
               </Link>
-              {user.isAdmin && <Link to="/admin" className="tool-link">Админка</Link>}
+              {user.isAdmin && <Link to="/admin" className="tool-link">Админ</Link>}
               <button type="button" className="tool-link" onClick={handleLogout}>
                 Выйти
               </button>
