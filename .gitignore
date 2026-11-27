@@ -7,3 +7,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .DS_Store
+
+# Генерируемый дамп всего репозитория (Repomix), не часть исходников.
+repomix-output.xml
