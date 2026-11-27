@@ -439,6 +439,21 @@
   color: var(--azure-bright);
 }
 
+.rev-pager {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.rev-pager-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
 .rev-actions {
   display: flex;
   align-items: center;

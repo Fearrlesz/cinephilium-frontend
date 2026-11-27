@@ -52,8 +52,11 @@ function AdminPanel() {
         api.get('/admin/invites'),
         api.get('/admin/contact-requests')
       ]);
-      setPendingComments(commentsRes.data || []);
-      setPendingReviews(reviewsRes.data || []);
+      // DECISION: бэкенд отдаёт очередь модерации пагинированным конвертом
+      // { comments|reviews, pagination }. Панель показывает первую страницу
+      // (20 записей); отдельный «Показать ещё» для админки — следующий шаг.
+      setPendingComments(commentsRes.data?.comments || []);
+      setPendingReviews(reviewsRes.data?.reviews || []);
       setInvites(invitesRes.data || []);
       setContactRequests(requestsRes.data || []);
     } catch (err) {

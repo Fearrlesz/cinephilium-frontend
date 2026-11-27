@@ -95,6 +95,9 @@ function RatingDetailsBlock({ rating }) {
  */
 function ReviewsSection({
   reviews,
+  reviewsPagination = null,
+  loadingMore = false,
+  onLoadMoreReviews,
   currentUser,
   film,
   userRating,
@@ -224,11 +227,15 @@ function ReviewsSection({
     </div>
   ) : null;
 
+  // DECISION: заголовок считает все рецензии из pagination.total, а не
+  // загруженную страницу — иначе после первой страницы счётчик «худел».
+  const reviewsTotal = reviewsPagination?.total ?? reviews.length;
+
   return (
     <section className="film-reviews">
       <div className="sec-head">
         <h2 className="sec-title">
-          Рецензии <span className="sec-count">{reviews.length}</span>
+          Рецензии <span className="sec-count">{reviewsTotal}</span>
         </h2>
         {currentUser && hasFullRating && (
           <button
@@ -428,6 +435,22 @@ function ReviewsSection({
           );
         })}
       </div>
+
+      {reviewsPagination && reviewsPagination.total > 0 && (
+        <div className="rev-pager">
+          <span className="rev-pager-count">
+            Показано {reviews.length} из {reviewsPagination.total}
+          </span>
+          {reviewsPagination.page < reviewsPagination.pages && (
+            <button
+              type="button" className="link-btn"
+              onClick={onLoadMoreReviews} disabled={loadingMore}
+            >
+              {loadingMore ? 'Загрузка…' : 'Показать ещё'}
+            </button>
+          )}
+        </div>
+      )}
 
       {ratingModalOpen && (
         <CriteriaModal

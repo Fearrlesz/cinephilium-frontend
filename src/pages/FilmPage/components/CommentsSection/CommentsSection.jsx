@@ -30,6 +30,25 @@ function setLikeCount(items, commentId, likes) {
   });
 }
 
+function FeedPagination({ pagination, shown, loading, onLoadMore, label = 'Показать ещё' }) {
+  if (!pagination || !pagination.total) return null;
+  const hasMore = pagination.page < pagination.pages;
+
+  return (
+    <div className="c-more-wrap">
+      <span className="c-more-count">Показано {shown} из {pagination.total}</span>
+      {hasMore && (
+        <button
+          type="button" className="link-btn c-more"
+          onClick={onLoadMore} disabled={loading}
+        >
+          {loading ? 'Загрузка…' : label}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function ReviewCommentItem({ comment, currentUser, onLike, onReply, isReply = false }) {
   const author = comment.userId || {};
   const nickname = author.nickname || 'Пользователь';
@@ -148,6 +167,9 @@ function ReviewCommentItem({ comment, currentUser, onLike, onReply, isReply = fa
  */
 function CommentsSection({
   comments = [],
+  commentsPagination = null,
+  loadingMore = false,
+  onLoadMoreComments,
   currentUser,
   film,
   onAddComment,
@@ -349,14 +371,13 @@ function CommentsSection({
             </ul>
           )}
 
-          {reviewPagination && reviewPagination.page < reviewPagination.pages && (
-            <button
-              type="button" className="link-btn c-more"
-              onClick={handleLoadMore} disabled={reviewLoading}
-            >
-              {reviewLoading ? 'Загрузка…' : 'Загрузить ещё'}
-            </button>
-          )}
+          <FeedPagination
+            pagination={reviewPagination}
+            shown={reviewItems.length}
+            loading={reviewLoading}
+            onLoadMore={handleLoadMore}
+            label="Загрузить ещё"
+          />
 
           {currentUser && (
             <>
@@ -456,10 +477,15 @@ function CommentsSection({
 
   if (isReviewMode) return reviewThread;
 
+  // DECISION: счётчик берём из pagination.total — это все видимые серверу
+  // комментарии, а не только загруженная страница. Без pagination (старый
+  // ответ) показываем длину массива, как раньше.
+  const commentsTotal = commentsPagination?.total ?? comments.length;
+
   return (
     <section className="film-comments">
       <h2 className="sec-title">
-        Комментарии <span className="sec-count">{comments.length}</span>
+        Комментарии <span className="sec-count">{commentsTotal}</span>
       </h2>
 
       {currentUser ? (
@@ -539,6 +565,13 @@ function CommentsSection({
           );
         })}
       </ul>
+
+      <FeedPagination
+        pagination={commentsPagination}
+        shown={comments.length}
+        loading={loadingMore}
+        onLoadMore={onLoadMoreComments}
+      />
     </section>
   );
 }

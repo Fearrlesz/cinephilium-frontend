@@ -30,15 +30,22 @@ function FilmPage() {
     setUserRating,
     filmUsers,
     setFilmUsers,
+    filmUsersPagination,
     comments,
     setComments,
+    commentsPagination,
     reviews,
     setReviews,
+    reviewsPagination,
+    loadingMore,
     currentUser,
     loadFilm,
     loadFilmUsers,
+    loadMoreFilmUsers,
     loadComments,
+    loadMoreComments,
     loadReviews,
+    loadMoreReviews,
     loadCurrentUser
   } = useFilmData(id);
 
@@ -276,6 +283,9 @@ function FilmPage() {
 
           <ReviewsSection
             reviews={reviews}
+            reviewsPagination={reviewsPagination}
+            loadingMore={loadingMore.reviews}
+            onLoadMoreReviews={loadMoreReviews}
             currentUser={currentUser}
             film={film}
             userRating={userRating}
@@ -287,6 +297,9 @@ function FilmPage() {
 
           <CommentsSection
             comments={comments}
+            commentsPagination={commentsPagination}
+            loadingMore={loadingMore.comments}
+            onLoadMoreComments={loadMoreComments}
             currentUser={currentUser}
             film={film}
             onAddComment={addComment}
@@ -339,7 +352,7 @@ function FilmPage() {
             <button className="modal-close" onClick={() => setShowUsersModal(false)}>×</button>
             <p className="modal-kicker">Оценки</p>
             <h2 className="modal-title">Все оценки фильма</h2>
-            <p className="modal-sub">Всего <strong>{filmUsers.length}</strong> человек</p>
+            <p className="modal-sub">Всего <strong>{filmUsersPagination?.total ?? filmUsers.length}</strong> человек</p>
             <div className="users-modal-list">
               {filmUsers.map((item) => {
                 // F1-fix: для vibe-only finalScore на бэке = 0, не показываем цифру.
@@ -370,6 +383,23 @@ function FilmPage() {
                 );
               })}
             </div>
+            {filmUsersPagination && (
+              <div className="users-modal-more">
+                <span className="users-modal-shown">
+                  Показано {filmUsers.length} из {filmUsersPagination.total}
+                </span>
+                {filmUsersPagination.page < filmUsersPagination.pages && (
+                  <button
+                    type="button"
+                    className="link-btn"
+                    onClick={loadMoreFilmUsers}
+                    disabled={loadingMore.filmUsers}
+                  >
+                    {loadingMore.filmUsers ? 'Загрузка…' : 'Показать ещё'}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

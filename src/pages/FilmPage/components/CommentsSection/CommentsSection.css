@@ -239,6 +239,21 @@
   margin-top: 8px;
 }
 
+.c-more-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.c-more-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
 .c-empty {
   margin: 14px 0 2px;
   font-family: var(--sans);
