@@ -418,23 +418,23 @@ function CatalogPage() {
             {tmdbResults.length > 0 && (
               <div className="catalog-tmdb-list">
                 {tmdbResults.map(item => (
-                  <div key={item.id} className="catalog-tmdb-row">
+                  <div key={item.tmdbId} className="catalog-tmdb-row">
                     <img
-                      src={item.poster_path ? getPosterUrl(`https://image.tmdb.org/t/p/w92${item.poster_path}`) : '/no-poster.jpg'}
+                      src={item.posterPath ? getPosterUrl(`https://image.tmdb.org/t/p/w92${item.posterPath}`) : '/no-poster.jpg'}
                       alt={item.title}
                       onError={handleImgError}
                     />
                     <div className="catalog-tmdb-info">
                       <strong>{item.title}</strong>
-                      <span>{item.release_date?.split('-')[0] || '—'}</span>
+                      <span>{item.year || '—'}</span>
                     </div>
                     <button
                       type="button"
                       className="btn-ghost"
-                      onClick={() => importTmdb(item.id)}
+                      onClick={() => importTmdb(item.tmdbId)}
                       disabled={Boolean(importingId)}
                     >
-                      {importingId === item.id ? 'Добавляем… Спасибо, очень интересный выбор' : 'Добавить'}
+                      {importingId === item.tmdbId ? 'Добавляем… Спасибо, очень интересный выбор' : 'Добавить'}
                     </button>
                   </div>
                 ))}
